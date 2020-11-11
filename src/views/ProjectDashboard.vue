@@ -24,7 +24,7 @@
                 <button class="btn list-item" style="width: 100%">Download as GTFS</button>
             </div>
         </div>
-        <div id="ProjectInfo" syle="flex: 1">
+        <div id="ProjectInfo">
             <table>
                 <tbody>
                     <tr>
@@ -40,11 +40,15 @@
                     </tr>
                     <tr>
                         <td>Start Date</td>
-                        <td>{{feedinfo.feed_start_date}}</td>
+                        <td v-if="feedInfo">{{ feedInfo.feed_start_date }}</td>
+                    </tr>
+                    <tr>
+                        <td>End Date</td>
+                        <td v-if="feedInfo">{{ feedInfo.feed_end_date }}</td>
                     </tr>
                     <tr>
                         <td>Version</td>
-                        <td>{{feedinfo.feed_version}}</td>
+                        <td v-if="feedInfo">{{ feedInfo.feed_version }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -71,14 +75,17 @@
 
     export default {
         name: 'ProjectDashboard',
-        components: {},
         data() {
             return {
                 project: {},
-                feedinfo: {},
-                tables: ["FeedInfo", "Agencies", "Calendars", "Stops", "Routes", "Shapes", "Trips", "Stop Times",
-                    "Frequencies", "Calendar Dates", "Fare Attributes", "Fare Rules", "Transfers", "Pathways",
-                    "Levels"
+                feedInfo: {
+                    feed_start_date: '',
+                    feed_end_date: '',
+                    feed_version: ''
+                },
+                tables: [
+                    "FeedInfo", "Agencies", "Calendars", "Stops", "Routes", "Shapes", "Trips", "Stop Times",
+                    "Frequencies", "Calendar Dates", "Fare Attributes", "Fare Rules", "Transfers", "Pathways", "Levels"
                 ]
             }
         },
@@ -99,13 +106,11 @@
                     this.project = response.data;
                 });
                 feedInfoAPI.getFeedInfo(this.$route.params.projectid).then(response => {
-                    console.log(response.data.results[0]);
-                    this.feedinfo = response.data.results[0];
+                    if (response.data.results.length){
+                        this.feedInfo = response.data.results[0];
+                    }
                 });
             }
-        },
-        mounted() {
-
         },
         beforeRouteEnter(to, from, next) {
             next(vm => vm.initData());
