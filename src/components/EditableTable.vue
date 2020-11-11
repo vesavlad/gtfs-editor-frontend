@@ -146,6 +146,7 @@
         uploadModalVisible: false,
         createModalVisible: false,
         created: {},
+        current_page: -1000,
       };
     },
     props: {
@@ -330,8 +331,14 @@
         this.$nextTick(() => this.$refs.vuetable.$data.tableData.forEach(row => row.changed = false));
       },
       onPaginationData(paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData);
-        this.$refs.paginationDropDown.setPaginationData(paginationData);
+        if(paginationData.current_page !== this.current_page){
+          this.current_page = paginationData.current_page;
+          this.$refs.pagination.setPaginationData(paginationData);
+          this.$refs.paginationDropDown.setPaginationData(paginationData);
+          this.$nextTick(()=>{
+            $(".vuetable-pagination-dropdown").val(this.current_page).trigger('change');
+          });
+        }
       },
       reloadTable() {
         this.$refs.vuetable.refresh();
@@ -362,15 +369,14 @@
     },
     mounted() {
       this.$nextTick(() => {
-        $(".vuetable-pagination-dropdown").select2({
+        $("select.vuetable-pagination-dropdown").select2({
           matcher(query, option) {
             if (query.term) {
               return String(option.id).startsWith(query.term) ? option : null;
             }
             return option;
           }
-        });
-        console.log($(".create-select.options"));
+        }).on('change', (evt) => this.$refs.pagination.loadPage(evt.target.value));
       });
     },
   };

@@ -1,5 +1,5 @@
 <template>
-  <select class="select-data" ref="select" v-model="value">
+  <select class="select-data" ref="select">
   </select>
 </template>
 <script>
@@ -73,6 +73,7 @@
           var newOption = new Option(name, value, true, true);
           $(select).append(newOption).trigger('change');
         }
+        console.log(this.field);
         $(select).select2({
           ajax: {
             url: this.field.ajax_params.url,
@@ -101,7 +102,7 @@
                   more: data.pagination.current_page !== data.pagination.last_page,
                 },
               }
-              if(data.pagination.current_page===1){
+              if(field.nullable && data.pagination.current_page===1){
                 reply.results.unshift({
                   id: "",
                   text: "None"

@@ -16,7 +16,10 @@ import RoutesView from '../views/RoutesView.vue'
 import CalendarDateView from '../views/CalendarDateView.vue'
 import FrequencyView from '../views/FrequencyView.vue'
 import FareAttributesView from '../views/FareAttributesView.vue'
+import FareRulesView from '../views/FareRulesView.vue'
 import LevelsView from '../views/LevelsView.vue'
+import TransfersView from '../views/TransfersView.vue'
+import PathwaysView from '../views/PathwaysView.vue'
 
 
 Vue.use(VueRouter)
@@ -107,6 +110,30 @@ const routes = [{
         component: FareAttributesView,
         meta: {
           breadcrumb: 'Fare Attributes'
+        },
+      },
+      {
+        path: '/project/:projectid/farerules',
+        name: 'Fare Rules',
+        component: FareRulesView,
+        meta: {
+          breadcrumb: 'Fare Rules'
+        },
+      },
+      {
+        path: '/project/:projectid/transfers',
+        name: 'Transfers',
+        component: TransfersView,
+        meta: {
+          breadcrumb: 'Transfers'
+        },
+      },
+      {
+        path: '/project/:projectid/pathways',
+        name: 'Pathways',
+        component: PathwaysView,
+        meta: {
+          breadcrumb: 'Pathways'
         },
       },
       {

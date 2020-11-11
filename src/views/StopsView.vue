@@ -9,6 +9,9 @@
 <script>
     import EditableTable from "@/components/EditableTable.vue";
     import stopsAPI from '@/api/stops.api';
+    import levelsAPI from '@/api/levels.api';
+
+    
     export default {
         components: {
             EditableTable,
@@ -82,12 +85,19 @@
                         },
                     },
                     {
-                        name: 'level_id',
-                        title: 'Level',
-                    },
-                    {
                         name: 'platform_code',
                         title: 'Platform Code',
+                    },
+                    {
+                        name: 'level_id',
+                        sortField: 'level_id',
+                        title: 'Level',
+                        foreignKey: true,
+                        id_field: 'level',
+                        nullable: true,
+                        ajax_params: {
+                            url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectid),
+                        }
                     },
                 ],
             };

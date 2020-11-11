@@ -33,7 +33,7 @@
           },
           {
             name: 'currency_type',
-            title: 'Currency Type',
+            title: 'Currency Code',
           },
           {
             name: 'payment_method',
