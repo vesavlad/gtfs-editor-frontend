@@ -1,0 +1,396 @@
+<template>
+  <div class="TransportModeTable">
+    <div>
+      <template v-if="searchable">
+        <form class="form-inline d-flex mx-1 justify-content-end" @submit.stop.prevent="doSearch"
+          style="min-width:500px; max-width:50%">
+          <div class="input-group">
+            <input v-model="quickSearch" type="search" placeholder="Quick search">
+            <button type="submit" class="btn btn-outline-secondary">
+              <i class="mdi mdi-magnify" /> Go
+            </button>
+          </div>
+        </form>
+      </template>
+      <div>
+        <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="fields" data-path="results"
+          pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams"
+          @initialized="onInit" @vuetable:loaded="datafy">
+          <div slot="actions" slot-scope="props">
+            <button class="btn icon" @click="deleteRow(props.rowData)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+          <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
+          </template>
+          <div :key="index" v-for="(field, index) in fields.filter(field=>getName(field)!=='actions')"
+            :slot="getName(field)" slot-scope="properties">
+            <!-- Foreign key -->
+            <FKSelect v-if="field.foreignKey" :properties="properties"
+              @change="log($event); properties.rowData[field.id_field]=$event.val; changeHandler(properties, this);">
+            </FKSelect>
+            <!-- Options -->
+            <SimpleSelect v-else-if="field.options" :properties="properties"
+              @change="log($event); properties.rowData[field.name]=$event.val; changeHandler(properties, this);">
+            </SimpleSelect>
+            <!-- <select v-else-if="field.options" class="select-simple" v-model="properties.rowData[getName(field)]"
+              @change="changeHandler(properties)">
+              <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
+            </select> -->
+            <!-- Default -->
+            <input v-else :type="field.data_type" v-model="properties.rowData[getName(field)]"
+              :checked="properties.rowData[getName(field)]" @change="changeHandler(properties)">
+          </div>
+        </vuetable>
+        <div style="display: flex;">
+          <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
+          </VuetablePagination>
+          <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
+          </VuetablePaginationDropDown>
+        </div>
+      </div>
+      <div style="display: flex;">
+        <button class="btn btn-outline-secondary" @click="saveChanges">
+          Save
+        </button>
+        <form method="get" :action="downloadURL"> <button class="btn btn-outline-secondary" type="submit">
+            Download CSV
+          </button>
+        </form>
+        <button class="btn btn-outline-secondary" @click="uploadModalVisible=true">
+          Upload CSV
+        </button>
+        <button class="btn btn-outline-secondary" @click="createModalVisible=true">
+          Add row
+        </button>
+      </div>
+    </div>
+    <Modal v-if="uploadModalVisible" @close="uploadModalVisible = false" :showCancelButton="true">
+      <template slot="title">
+        <h2>Upload CSV</h2>
+      </template>
+      <template slot="content">
+        <span>
+          Upload CSV file.
+        </span>
+      </template>
+      <template slot="base">
+        <FileReader @load="uploadCSVFile($event)"></FileReader>
+      </template>
+      <template slot="close-button-name">Upload</template>
+    </Modal>
+    <Modal v-if="createModalVisible" @ok="createEntry" @close="createModalVisible = false"
+      @cancel="createModalVisible = false" :showCancelButton="true" @mounted="createModalCreated()">
+      <template slot="title">
+        <h2>Create new</h2>
+      </template>
+      <template slot="content">
+        <form ref="createForm">
+          <div :key="index" v-for="(field, index) in fields.filter(field=>getName(field)!=='actions')">
+                        <!-- Foreign key -->
+            <label> {{getName(field)}} </label>
+            <select :class="'create-select data ' + getName(field)" v-if="field.foreignKey">
+            </select>
+            <!-- Options -->
+            <select class="create-select options" v-else-if="field.options">
+              <option v-if="field.blankable" ></option>
+              <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
+            </select>
+            <!-- Default -->
+            <input v-else :type="field.data_type" v-model="created[getName(field)]">
+          </div>
+        </form>
+        <div ref="errorDiv" v-html="errorModal.message" />
+      </template>
+      <template slot="close-button-name">Create Entry</template>
+    </Modal>
+  </div>
+
+</template>
+
+
+
+
+<script>
+  let Vuetable = require('vuetable-2')
+  import FKSelect from '@/components/FKSelect.vue';
+  import SimpleSelect from '@/components/SimpleSelect.vue';
+  import Modal from "@/components/Modal.vue";
+  import FileReader from "@/components/FileReader.vue";
+  import errorMessageMixin from "@/mixins/errorMessageMixin.js";
+  import VuetablePagination from "@/components/VueTablePagination.vue";
+  import $ from 'jquery';
+  import 'select2';
+
+  export default {
+    name: "EditableTable",
+    components: {
+      Vuetable: Vuetable.Vuetable,
+      VuetablePagination,
+      VuetablePaginationDropDown: Vuetable.VuetablePaginationDropDown,
+      Modal,
+      FileReader,
+      FKSelect,
+      SimpleSelect,
+    },
+    mixins: [errorMessageMixin],
+    data: function () {
+      return {
+        errorModal: {
+          message: '',
+        },
+        test: true,
+        quickSearch: '',
+        hasChanged: false,
+        uploadModalVisible: false,
+        createModalVisible: false,
+        created: {},
+      };
+    },
+    props: {
+      fields: {
+        type: Array,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      createMethod: {
+        type: Function,
+        required: true,
+      },
+      updateMethod: {
+        type: Function,
+        required: true,
+      },
+      deleteMethod: {
+        type: Function,
+        required: true,
+      },
+      uploadCSV: {
+        type: Function,
+        required: true,
+      },
+      downloadURL: {
+        type: String,
+        required: true,
+      },
+      searchable: {
+        type: Boolean,
+        default: false,
+      }
+    },
+    methods: {
+      datafy() {},
+      printargs() {
+        console.log(arguments);
+      },
+      changeHandler(props) {
+        let table = $("table.vuetable");
+        table.children("tbody:first").children().eq(props.rowIndex).addClass("edited");
+        this.hasChanged = true;
+        console.log(props.rowIndex, "Changed")
+        props.rowData.changed = true;
+      },
+      getOption(value, options) {
+        for (const [k, v] of Object.entries(options)) {
+          if (v === value) {
+            return k;
+          }
+        }
+        return undefined;
+      },
+      async saveChanges() {
+        let data = this.$refs.vuetable.tableData;
+
+        data.filter(row => row.changed).map(
+          (row) => {
+            for (let i = 0; i < this.fields.length; i++) {
+              let field = this.fields[i];
+              let fieldName = this.getName(field);
+
+              if (row[fieldName] === '') {
+                row[fieldName] = null;
+              }
+            }
+            console.log("Updating Row")
+            console.log(row);
+            this.updateMethod(row).then(response => {
+              row.changed = false;
+              console.log(response);
+            }).catch(error => {
+              window.error = error;
+              let response = error.response;
+              console.log(response.data);
+              console.log(row);
+              window.alert(`Error sending HTTP request\n${response.data.message}`);
+            });
+          }
+        );
+      },
+      createModalCreated(){
+        this.fields.filter((f)=>f.foreignKey).forEach((field)=>{
+          $(`.create-select.data.${this.getName(field)}`).select2({
+            ajax: {
+              url: field.ajax_params.url,
+              data: function (params) {
+                let query = {
+                  search: params.term,
+                  per_page: 50,
+                  page: params.page,
+                }
+                return query
+              },
+              processResults(data) {
+                let name_field = field.name;
+                if (field.name_field) {
+                  name_field = field.name_field
+                }
+                console.log(name_field)
+                let reply = {
+                  results: data.results.map(result => {
+                    let res = {
+                      id: result.id,
+                      text: result[name_field]
+                    };
+                    return res;
+                  }),
+                  pagination: {
+                    more: data.pagination.current_page !== data.pagination.last_page,
+                  },
+                }
+                return reply;
+              },
+            }
+          }).on('change', (evt)=>{
+            console.log(this.getName(field), evt.target.value);
+            this.created[field.id_field]=evt.target.value;
+          });
+        });
+        this.fields.filter((f)=>f.options).forEach((field)=>{
+          console.log(field);
+          console.log($(".create-select.options"));
+        })
+      },
+      getInputvalue(input, field) {
+        let data_type = field.data_type;
+        if (data_type === 'checkbox')
+          return input.checked;
+        return input.value;
+      },
+      deleteRow(data) {
+        this.deleteMethod(data).then(() => {
+          this.reloadTable();
+        })
+      },
+      createEntry() {
+        console.log(this.created);
+        this.createMethod(this.created).then(response => {
+          console.log(response);
+          this.createModalVisible = false;
+          this.reloadTable();
+        }).catch(error => {
+          console.log(error.response.data);
+          this.errorModal.message = this.getErrorMessage(error.response.data);
+        });
+      },
+      uploadCSVFile(file) {
+        this.uploadCSV(file).then(response => {
+          console.log(response);
+          this.uploadModalVisible = false;
+        }).catch(error => {
+          console.log(error);
+        });
+      },
+      log() {
+        console.log(...arguments);
+      },
+      getName(field) {
+        if (typeof (field) == 'string') return field;
+        return field.name;
+      },
+      getSortParam(sortOrder) {
+        let query = sortOrder.map(function (sort) {
+          return sort.field + +sort.direction
+        }).join('&');
+        console.log(query);
+        return query;
+      },
+      onInit() {
+        console.log(arguments);
+        this.datafy()
+      },
+      onLoad() {},
+      doLoadTable() {},
+      onChangePage(page) {
+        this.$refs.vuetable.changePage(page);
+        this.datafy();
+        this.$nextTick(() => this.$refs.vuetable.$data.tableData.forEach(row => row.changed = false));
+      },
+      onPaginationData(paginationData) {
+        this.$refs.pagination.setPaginationData(paginationData);
+        this.$refs.paginationDropDown.setPaginationData(paginationData);
+      },
+      reloadTable() {
+        this.$refs.vuetable.refresh();
+
+      },
+      doSearch() {
+        this.reloadTable();
+      },
+      doSomethingAfterReload(data, table) {
+        console.log(data)
+        console.log(table)
+      },
+      makeQueryParams(sortOrder, currentPage, perPage) {
+        let sorting = ""
+        if (sortOrder.length > 0) {
+          sorting = sortOrder[0].sortField + "|" + sortOrder[0].direction;
+        }
+        return {
+          sort: sorting,
+          page: currentPage,
+          per_page: perPage,
+          search: this.quickSearch,
+        }
+      },
+      onActionClicked(action, data) {
+        console.log("slot actions: on-click", data);
+      },
+    },
+    mounted() {
+      this.$nextTick(() => {
+        $(".vuetable-pagination-dropdown").select2({
+          matcher(query, option) {
+            if (query.term) {
+              return String(option.id).startsWith(query.term) ? option : null;
+            }
+            return option;
+          }
+        });
+        console.log($(".create-select.options"));
+      });
+    },
+  };
+</script>
+
+<style>
+  button.ui.button {
+    padding: 8px 3px 8px 10px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+  }
+
+  div.pagination {
+    width: 160px;
+  }
+
+  tr.edited {
+    background: yellow !important;
+    color: #ffff7d !important;
+  }
+
+  @import "../../node_modules/select2/dist/css/select2.min.css";
+</style>
