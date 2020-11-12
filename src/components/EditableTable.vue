@@ -16,14 +16,15 @@
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="fields" data-path="results"
           pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams"
           @initialized="onInit" @vuetable:loaded="datafy">
-          <div slot="actions" slot-scope="props">
-            <button class="btn icon" @click="deleteRow(props.rowData)">
-              <span class="material-icons">delete</span>
-            </button>
-          </div>
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
           </template>
+          <div slot="actions" slot-scope="props">
+            <button class="btn icon" @click="beginDeleteRow(props.rowData)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+          <!-- This is where the fields are converted into inputs to make the table editable -->
           <div :key="index" v-for="(field, index) in fields.filter(field=>getName(field)!=='actions')"
             :slot="getName(field)" slot-scope="properties">
             <!-- Foreign key -->
@@ -34,10 +35,6 @@
             <SimpleSelect v-else-if="field.options" :properties="properties"
               @change="log($event); properties.rowData[field.name]=$event.val; changeHandler(properties, this);">
             </SimpleSelect>
-            <!-- <select v-else-if="field.options" class="select-simple" v-model="properties.rowData[getName(field)]"
-              @change="changeHandler(properties)">
-              <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
-            </select> -->
             <!-- Default -->
             <input v-else :type="field.data_type" v-model="properties.rowData[getName(field)]"
               :checked="properties.rowData[getName(field)]" @change="changeHandler(properties)">
@@ -106,6 +103,17 @@
       </template>
       <template slot="close-button-name">Create Entry</template>
     </Modal>
+    <Modal v-if="deleteModal.visible" @ok="deleteRow" @close="deleteModal.visible = false" @cancel="deleteModal.visible = false" :showCancelButton="true">
+      <template slot="title">
+        <h2>Are you sure you want to delete this row?</h2>
+      </template>
+      <template slot="content">
+        <span>
+          {{deleteModal.message}}
+        </span>
+      </template>
+      <template slot="close-button-name">Delete</template>
+    </Modal>
   </div>
 
 </template>
@@ -143,6 +151,11 @@
       return {
         errorModal: {
           message: '',
+        },
+        deleteModal: {
+          visible: false,
+          data: {},
+         message: '' 
         },
         test: true,
         quickSearch: '',
@@ -319,13 +332,20 @@
           return input.checked;
         return input.value;
       },
-      deleteRow(data) {
+      beginDeleteRow(data){
+        this.deleteModal.visible = true;
+        this.deleteModal.data = data;
+      },
+      deleteRow() {
+        let data = this.deleteModal.data;
         this.deleteMethod(data).then(() => {
           this.reloadTable();
+          this.deleteModal.visible = false;
+          this.deleteModal.data = {};
+          this.deleteModal.message = "";
         }).catch((err)=>{
           let data=err.response.data;
-          console.log(data);
-          window.alert(data.message);
+          this.deleteModal.message = data.message;
         });
       },
       createEntry() {

@@ -36,6 +36,7 @@
           },
           {
             name: 'agency_timezone',
+            remember_creation_value: true,
             sortField: 'agency_timezone',
             title: 'Timezone',
           },
