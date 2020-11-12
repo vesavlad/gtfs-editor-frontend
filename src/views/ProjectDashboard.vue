@@ -40,15 +40,15 @@
                     </tr>
                     <tr>
                         <td>Start Date</td>
-                        <td v-if="project.feedinfo">{{ project.feedinfo.feed_start_date }}</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_start_date:'' }}</td>
                     </tr>
                     <tr>
                         <td>End Date</td>
-                        <td v-if="project.feedinfo">{{ project.feedinfo.feed_end_date }}</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_end_date:'' }}</td>
                     </tr>
                     <tr>
                         <td>Version</td>
-                        <td v-if="project.feedinfo">{{ project.feedinfo.feed_version }}</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_version:'' }}</td>
                     </tr>
                 </tbody>
             </table>
