@@ -40,15 +40,15 @@
                     </tr>
                     <tr>
                         <td>Start Date</td>
-                        <td v-if="feedInfo">{{ feedInfo.feed_start_date }}</td>
+                        <td v-if="project.feedinfo">{{ project.feedinfo.feed_start_date }}</td>
                     </tr>
                     <tr>
                         <td>End Date</td>
-                        <td v-if="feedInfo">{{ feedInfo.feed_end_date }}</td>
+                        <td v-if="project.feedinfo">{{ project.feedinfo.feed_end_date }}</td>
                     </tr>
                     <tr>
                         <td>Version</td>
-                        <td v-if="feedInfo">{{ feedInfo.feed_version }}</td>
+                        <td v-if="project.feedinfo">{{ project.feedinfo.feed_version }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -71,17 +71,13 @@
 
 <script>
     import projectsAPI from '@/api/projects.api';
-    import feedInfoAPI from '@/api/feedinfo.api';
 
     export default {
         name: 'ProjectDashboard',
         data() {
             return {
-                project: {},
-                feedInfo: {
-                    feed_start_date: '',
-                    feed_end_date: '',
-                    feed_version: ''
+                project: {
+                    feedInfo: {},
                 },
                 tables: [
                     "FeedInfo", "Agencies", "Calendars", "Stops", "Routes", "Shapes", "Trips", "Stop Times",
@@ -91,24 +87,8 @@
         },
         methods: {
             initData() {
-                if (localStorage.getItem('projectNames')) {
-                    try {
-                        this.projectNames = JSON.parse(localStorage.getItem('projectNames'));
-                        console.log(this.projectNames);
-                    } catch (e) {
-                        console.log('Can\'t get projectNames')
-                        localStorage.removeItem('projectNames');
-                    }
-                } else {
-                    localStorage.setItem('projectNames', JSON.stringify({}));
-                }
                 projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
                     this.project = response.data;
-                });
-                feedInfoAPI.getFeedInfo(this.$route.params.projectid).then(response => {
-                    if (response.data.results.length){
-                        this.feedInfo = response.data.results[0];
-                    }
                 });
             }
         },
