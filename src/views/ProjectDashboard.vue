@@ -8,8 +8,7 @@
                     </tr>
                     <tr v-for="table in tables" :key="table">
                         <td>
-                            <router-link :to="{ name: table, params: { projectid: $route.params.projectid }}">{{table}}
-                            </router-link>
+                            <router-link :to="{ name: table, params: { projectid: $route.params.projectid }}">{{table}}</router-link>
                         </td>
                     </tr>
                 </tbody>
@@ -24,7 +23,7 @@
                 <button class="btn list-item" style="width: 100%">Download as GTFS</button>
             </div>
         </div>
-        <div id="ProjectInfo" syle="flex: 1">
+        <div id="ProjectInfo">
             <table>
                 <tbody>
                     <tr>
@@ -40,14 +39,19 @@
                     </tr>
                     <tr>
                         <td>Start Date</td>
-                        <td>{{feedinfo.feed_start_date}}</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_start_date:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td>End Date</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_end_date:'' }}</td>
                     </tr>
                     <tr>
                         <td>Version</td>
-                        <td>{{feedinfo.feed_version}}</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_version:'' }}</td>
                     </tr>
                 </tbody>
             </table>
+            <br />
             <table>
                 <tbody>
                     <tr>
@@ -67,45 +71,26 @@
 
 <script>
     import projectsAPI from '@/api/projects.api';
-    import feedInfoAPI from '@/api/feedinfo.api';
 
     export default {
         name: 'ProjectDashboard',
-        components: {},
         data() {
             return {
-                project: {},
-                feedinfo: {},
-                tables: ["FeedInfo", "Agencies", "Calendars", "Stops", "Routes", "Shapes", "Trips", "Stop Times",
-                    "Frequencies", "Calendar Dates", "Fare Attributes", "Fare Rules", "Transfers", "Pathways",
-                    "Levels"
+                project: {
+                    feedInfo: {},
+                },
+                tables: [
+                    "FeedInfo", "Agencies", "Calendars", "Stops", "Routes", "Shapes", "Trips", "Stop Times",
+                    "Frequencies", "Calendar Dates", "Fare Attributes", "Fare Rules", "Transfers", "Pathways", "Levels"
                 ]
             }
         },
         methods: {
             initData() {
-                if (localStorage.getItem('projectNames')) {
-                    try {
-                        this.projectNames = JSON.parse(localStorage.getItem('projectNames'));
-                        console.log(this.projectNames);
-                    } catch (e) {
-                        console.log('Can\'t get projectNames')
-                        localStorage.removeItem('projectNames');
-                    }
-                } else {
-                    localStorage.setItem('projectNames', JSON.stringify({}));
-                }
                 projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
                     this.project = response.data;
                 });
-                feedInfoAPI.getFeedInfo(this.$route.params.projectid).then(response => {
-                    console.log(response.data.results[0]);
-                    this.feedinfo = response.data.results[0];
-                });
             }
-        },
-        mounted() {
-
         },
         beforeRouteEnter(to, from, next) {
             next(vm => vm.initData());
