@@ -8,8 +8,7 @@
                     </tr>
                     <tr v-for="table in tables" :key="table">
                         <td>
-                            <router-link :to="{ name: table, params: { projectid: $route.params.projectid }}">{{table}}
-                            </router-link>
+                            <router-link :to="{ name: table, params: { projectid: $route.params.projectid }}">{{table}}</router-link>
                         </td>
                     </tr>
                 </tbody>
@@ -52,6 +51,7 @@
                     </tr>
                 </tbody>
             </table>
+            <br />
             <table>
                 <tbody>
                     <tr>
