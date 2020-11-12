@@ -22,23 +22,23 @@
           {
             name: 'agency_id',
             sortField: 'agency_id',
-            title: 'Agency',
+            title: 'Agency*',
           },
           {
             name: 'agency_name',
             sortField: 'agency_name',
-            title: 'Name',
+            title: 'Name*',
           },
           {
             name: 'agency_url',
             sortField: 'agency_url',
-            title: 'agency_url',
+            title: 'URL*',
           },
           {
             name: 'agency_timezone',
             remember_creation_value: true,
             sortField: 'agency_timezone',
-            title: 'Timezone',
+            title: 'Timezone*',
           },
           {
             name: 'agency_lang',

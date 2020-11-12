@@ -23,17 +23,17 @@
           {
             name: 'fare_id',
             sortField: 'fare_id',
-            title: 'Fare',
+            title: 'Fare*',
           },
           {
             name: 'price',
             sortField: 'price',
             data_type: 'number',
-            title: 'Price',
+            title: 'Price*',
           },
           {
             name: 'currency_type',
-            title: 'Currency Code',
+            title: 'Currency Code*',
           },
           {
             name: 'payment_method',
@@ -55,7 +55,7 @@
           },
           {
             name: 'agency_id',
-            title: 'Agency',
+            title: 'Agency*',
             sortField: 'agency_id',
             foreignKey: true,
             id_field: 'agency',
@@ -65,7 +65,7 @@
           },
           {
             name: 'transfer_duration',
-            title: 'Duration',
+            title: 'Duration*',
             data_type: 'number',
           },
         ],

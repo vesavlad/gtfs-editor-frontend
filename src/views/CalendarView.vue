@@ -25,19 +25,19 @@
           {
             name: 'service_id',
             sortField: 'service_id',
-            title: 'Service ID',
+            title: 'Service ID*',
           },
           {
             name: 'start_date',
             sortField: 'start_date',
             data_type: 'date',
-            title: 'Start Date',
+            title: 'Start Date*',
           },
           {
             name: 'end_date',
             sortField: 'end_date',
             data_type: 'date',
-            title: 'End Date',
+            title: 'End Date*',
           },
           {
             name: 'monday',

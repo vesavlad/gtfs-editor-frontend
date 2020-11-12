@@ -23,7 +23,7 @@
           'actions',
           {
             name: 'fare_id',
-            title: 'Fare ID',
+            title: 'Fare ID*',
             sortField: 'fare_id',
             foreignKey: true,
             id_field: 'fare_attribute',
@@ -33,7 +33,7 @@
           },
           {
             name: 'route_id',
-            title: 'Route',
+            title: 'Route*',
             sortField: 'route_id',
             foreignKey: true,
             id_field: 'route',

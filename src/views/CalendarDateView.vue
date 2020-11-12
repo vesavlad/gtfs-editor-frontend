@@ -23,13 +23,13 @@
           {
             name: 'service_id',
             sortField: 'service_id',
-            title: 'Service ID',
+            title: 'Service ID*',
           },
           {
             name: 'date',
             sortField: 'date',
             data_type: 'date',
-            title: 'Date',
+            title: 'Date*',
           },
           {
             name: 'exception_type',

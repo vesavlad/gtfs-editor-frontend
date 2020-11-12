@@ -22,12 +22,12 @@
                     'actions',
                     {
                         name: 'route_id',
-                        title: 'Route',
+                        title: 'Route*',
                         sortField: 'route_id',
                     },
                     {
                         name: 'agency_id',
-                        title: 'Agency',
+                        title: 'Agency*',
                         sortField: 'agency_id',
                         foreignKey: true,
                         id_field: 'agency',

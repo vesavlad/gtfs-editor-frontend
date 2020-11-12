@@ -22,7 +22,7 @@
           'actions',
           {
             name: 'trip_id',
-            title: 'Trip',
+            title: 'Trip*',
             sortField: 'trip_id',
             foreignKey: true,
             id_field: 'trip',
@@ -34,13 +34,13 @@
             name: 'start_time',
             sortField: 'start_time',
             data_type: 'time',
-            title: 'Start Time',
+            title: 'Start Time*',
           },
           {
             name: 'end_time',
             sortField: 'end_time',
             data_type: 'time',
-            title: 'End Time',
+            title: 'End Time*',
           },
           {
             name: 'headway_secs',

@@ -22,7 +22,7 @@
                     'actions',
                     {
                         name: "pathway_id",
-                        title: "Pathway"
+                        title: "Pathway*"
                     },
                     {
                         name: 'pathway_mode',
@@ -40,7 +40,7 @@
                     },
                     {
                         name: 'from_stop_id',
-                        title: 'From Stop',
+                        title: 'From Stop*',
                         sortField: 'from_stop_id',
                         foreignKey: true,
                         name_field: 'stop_id',
@@ -51,7 +51,7 @@
                     },
                     {
                         name: 'to_stop_id',
-                        title: 'To Stop',
+                        title: 'To Stop*',
                         sortField: 'to_stop_id',
                         foreignKey: true,
                         name_field: 'stop_id',

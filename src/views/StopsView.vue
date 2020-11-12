@@ -24,7 +24,7 @@
                     'actions',
                     {
                         name: 'stop_id',
-                        title: 'Stop',
+                        title: 'Stop*',
                         sortField: 'stop_id',
                     },
                     {
@@ -34,16 +34,16 @@
                     },
                     {
                         name: 'stop_name',
-                        title: 'Name',
+                        title: 'Name*',
                         sortField: 'stop_name',
                     },
                     {
                         name: 'stop_lat',
-                        title: 'Lat',
+                        title: 'Lat*',
                     },
                     {
                         name: 'stop_lon',
-                        title: 'Lon',
+                        title: 'Lon*',
                     },
                     {
                         name: 'stop_url',

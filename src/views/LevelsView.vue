@@ -22,17 +22,17 @@
           {
             name: 'level_id',
             sortField: 'level_id',
-            title: 'Level',
+            title: 'Level*',
           },
           {
             name: 'level_index',
             sortField: 'level_index',
             data_type: 'number',
-            title: 'Index',
+            title: 'Index*',
           },
           {
             name: 'level_name',
-            title: 'Name',
+            title: 'Name*',
             sortField: 'level_name',
           },
         ],

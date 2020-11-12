@@ -23,12 +23,12 @@
                     'actions',
                     {
                         name: 'trip_id',
-                        title: 'Trip',
+                        title: 'Trip*',
                         sortField: 'trip_id',
                     },
                     {
                         name: 'route_id',
-                        title: 'Route',
+                        title: 'Route*',
                         sortField: 'route_id',
                         foreignKey: true,
                         id_field: 'route',
@@ -41,6 +41,7 @@
                         title: 'Shape',
                         sortField: 'shape',
                         foreignKey: true,
+                        nullable: true,
                         id_field: 'shape',
                         ajax_params: {
                             url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectid),
@@ -48,7 +49,7 @@
                     },
                     {
                         name: 'service_id',
-                        title: 'Service',
+                        title: 'Service*',
                     },
                     {
                         name: 'trip_headsign',

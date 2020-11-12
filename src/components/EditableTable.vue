@@ -86,7 +86,7 @@
         <form ref="createForm">
           <div :key="index" v-for="(field, index) in fields.filter(field=>getName(field)!=='actions')">
             <!-- Foreign key -->
-            <label> {{getName(field)}} </label>
+            <label> {{getTitle(field)}} </label>
             <select :class="'create-select data ' + getName(field)" v-if="field.foreignKey">
               <option>Unselected</option>
             </select>
@@ -354,6 +354,9 @@
           ...this.created
         }
         this.fields.forEach(field => {
+          if(data[field.name] === ""){
+            data[field.name] = null;
+          }
           if (field.data_type === 'color') {
             if (data[field.name].charAt(0) === '#') {
               data[field.name] = data[field.name].slice(1, 7)
@@ -388,6 +391,13 @@
       },
       log() {
         console.log(...arguments);
+      },
+      getTitle(field) {
+        let title = this.getName(field);
+        if( field instanceof Object && field.title){
+          title = field.title
+        }
+        return title;
       },
       getName(field) {
         if (typeof (field) == 'string') return field;
