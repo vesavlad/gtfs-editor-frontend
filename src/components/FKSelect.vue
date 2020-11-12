@@ -67,7 +67,7 @@
           let name = this.name;
           let value= this.value;
           if(name===null){
-            name="None"
+            name="Unselected"
             value=null
           }
           var newOption = new Option(name, value, true, true);
@@ -105,7 +105,7 @@
               if(field.nullable && data.pagination.current_page===1){
                 reply.results.unshift({
                   id: "",
-                  text: "None"
+                  text: "Unselected"
                 })
               }
               return reply;

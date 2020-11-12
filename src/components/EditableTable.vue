@@ -88,13 +88,14 @@
       <template slot="content">
         <form ref="createForm">
           <div :key="index" v-for="(field, index) in fields.filter(field=>getName(field)!=='actions')">
-                        <!-- Foreign key -->
+            <!-- Foreign key -->
             <label> {{getName(field)}} </label>
             <select :class="'create-select data ' + getName(field)" v-if="field.foreignKey">
+              <option>Unselected</option>
             </select>
             <!-- Options -->
-            <select class="create-select options" v-else-if="field.options">
-              <option v-if="field.blankable" ></option>
+            <select :class="'create-select options ' + getName(field)" v-else-if="field.options">
+              <option v-if="field.blankable"></option>
               <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
             </select>
             <!-- Default -->
@@ -136,6 +137,9 @@
     },
     mixins: [errorMessageMixin],
     data: function () {
+      let created_data = {};
+      this.fields.forEach((field) => this.setDefaultCreationValue(field, created_data));
+      console.log(created_data);
       return {
         errorModal: {
           message: '',
@@ -145,7 +149,7 @@
         hasChanged: false,
         uploadModalVisible: false,
         createModalVisible: false,
-        created: {},
+        created: created_data,
         current_page: -1000,
       };
     },
@@ -185,6 +189,26 @@
     },
     methods: {
       datafy() {},
+      setDefaultCreationValue(field, data=this.created){
+        if (field === "actions") {
+          return;
+        }
+        if (field.foreignKey) {
+          data[field.name] = null;
+        } else if (field.options) {
+          data[field.name] = Object.values(field.options)[0];
+        } else if (field.data_type) {
+          let def = "";
+          if (field.data_type === "checkbox") {
+            def = false;
+          } else if (field.data_type === 'color') {
+            def = "#000000"
+          }
+          data[field.name] = def;
+        } else {
+          data[this.getName(field)] = "";
+        }
+      },
       printargs() {
         console.log(arguments);
       },
@@ -215,6 +239,11 @@
               if (row[fieldName] === '') {
                 row[fieldName] = null;
               }
+              if (field.data_type === 'color') {
+                if (row[fieldName].charAt(0) === '#') {
+                  row[fieldName] = row[fieldName].slice(0, 1)
+                }
+              }
             }
             console.log("Updating Row")
             console.log(row);
@@ -231,8 +260,8 @@
           }
         );
       },
-      createModalCreated(){
-        this.fields.filter((f)=>f.foreignKey).forEach((field)=>{
+      createModalCreated() {
+        this.fields.filter((f) => f.foreignKey).forEach((field) => {
           $(`.create-select.data.${this.getName(field)}`).select2({
             ajax: {
               url: field.ajax_params.url,
@@ -262,17 +291,26 @@
                     more: data.pagination.current_page !== data.pagination.last_page,
                   },
                 }
+                if (field.nullable && data.pagination.current_page === 1) {
+                  reply.results.unshift({
+                    id: "",
+                    text: "Unselected"
+                  })
+                }
                 return reply;
               },
             }
-          }).on('change', (evt)=>{
+          }).on('change', (evt) => {
             console.log(this.getName(field), evt.target.value);
-            this.created[field.id_field]=evt.target.value;
+            this.created[field.id_field] = evt.target.value;
           });
         });
-        this.fields.filter((f)=>f.options).forEach((field)=>{
+        this.fields.filter((f) => f.options).forEach((field) => {
           console.log(field);
-          console.log($(".create-select.options"));
+          console.log($(`.create-select.options.${this.getName(field)}`).select2().on('change', (evt) => {
+            console.log(this.getName(field), evt.target.value);
+            this.created[field.name] = evt.target.value;
+          }));
         })
       },
       getInputvalue(input, field) {
@@ -284,14 +322,36 @@
       deleteRow(data) {
         this.deleteMethod(data).then(() => {
           this.reloadTable();
-        })
+        }).catch((err)=>{
+          let data=err.response.data;
+          console.log(data);
+          window.alert(data.message);
+        });
       },
       createEntry() {
         console.log(this.created);
-        this.createMethod(this.created).then(response => {
+        let data = {
+          ...this.created
+        }
+        this.fields.forEach(field => {
+          if (field.data_type === 'color') {
+            if (data[field.name].charAt(0) === '#') {
+              data[field.name] = data[field.name].slice(1, 7)
+            }
+          }
+        });
+        console.log(data);
+        this.createMethod(data).then(response => {
           console.log(response);
           this.createModalVisible = false;
           this.reloadTable();
+          this.errorModal.message = "";
+          this.fields.filter(field => field !== "actions").forEach(field => {
+            if(field instanceof Object && !field.remember_creation_value){
+              this.setDefaultCreationValue(field);
+            }
+            this.setDefaultCreationValue(field);
+          });
         }).catch(error => {
           console.log(error.response.data);
           this.errorModal.message = this.getErrorMessage(error.response.data);
@@ -301,6 +361,7 @@
         this.uploadCSV(file).then(response => {
           console.log(response);
           this.uploadModalVisible = false;
+          this.reloadTable();
         }).catch(error => {
           console.log(error);
         });
@@ -331,11 +392,11 @@
         this.$nextTick(() => this.$refs.vuetable.$data.tableData.forEach(row => row.changed = false));
       },
       onPaginationData(paginationData) {
-        if(paginationData.current_page !== this.current_page){
+        if (paginationData.current_page !== this.current_page) {
           this.current_page = paginationData.current_page;
           this.$refs.pagination.setPaginationData(paginationData);
           this.$refs.paginationDropDown.setPaginationData(paginationData);
-          this.$nextTick(()=>{
+          this.$nextTick(() => {
             $(".vuetable-pagination-dropdown").val(this.current_page).trigger('change');
           });
         }

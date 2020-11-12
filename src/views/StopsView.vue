@@ -67,6 +67,7 @@
                         foreignKey: true,
                         name_field: 'stop_id',
                         id_field: 'id',
+                        nullable: true,
                         ajax_params: {
                             url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
                         }

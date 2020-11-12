@@ -73,7 +73,7 @@
                     },
                     {
                         name: "wheelchair_accessible",
-                        title: "Wheelchair",
+                        title: "Wheelchair Accessible",
                         type: "select-simple",
                         options: {
                             'Unknown': null,
@@ -83,7 +83,7 @@
                     },
                     {
                         name: "bikes_allowed",
-                        title: "Bicycle",
+                        title: "Bikes Allowed",
                         type: "select-simple",
                         options: {
                             'Unknown': null,

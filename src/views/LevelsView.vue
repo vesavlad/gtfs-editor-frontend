@@ -31,10 +31,6 @@
             title: 'Index',
           },
           {
-            name: 'headway_secs',
-            title: 'Headway Seconds',
-          },
-          {
             name: 'level_name',
             title: 'Name',
             sortField: 'level_name',

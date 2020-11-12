@@ -39,6 +39,10 @@
             sortField: 'agency_timezone',
             title: 'Timezone',
           },
+          {
+            name: 'agency_lang',
+            title: 'Language',
+          },
         ],
       };
     },

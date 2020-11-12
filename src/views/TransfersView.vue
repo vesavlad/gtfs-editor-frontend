@@ -1,7 +1,7 @@
 <template>
     <div>
-        <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove"
-      :createMethod="create" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+        <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
+            :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
         </EditableTable>
     </div>
 </template>
@@ -52,6 +52,10 @@
                         ajax_params: {
                             url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
                         }
+                    },
+                    {
+                        name: 'min_transfer_time',
+                        title: 'Min Transfer Time',
                     },
                 ],
             };
