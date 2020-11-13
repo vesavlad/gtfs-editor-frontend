@@ -33,14 +33,27 @@
           },
           {
             name: 'route_id',
-            title: 'Route*',
+            title: 'Route',
             sortField: 'route_id',
             foreignKey: true,
+            nullable: true,
             id_field: 'route',
             ajax_params: {
               url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
             }
           },
+          {
+            name: "origin_id",
+            title: "Origin Zone",
+          },
+          {
+            name: "destination_id",
+            title: "Destination Zone",
+          },
+          {
+            name: "contains_id",
+            title: "Contained Zone",
+          }
         ],
       };
     },
