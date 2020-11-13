@@ -73,7 +73,6 @@
           var newOption = new Option(name, value, true, true);
           $(select).append(newOption).trigger('change');
         }
-        console.log(this.field);
         $(select).select2({
           ajax: {
             url: this.field.ajax_params.url,

@@ -29,7 +29,7 @@
             :slot="getName(field)" slot-scope="properties">
             <!-- Foreign key -->
             <FKSelect v-if="field.foreignKey" :properties="properties"
-              @change="log($event); properties.rowData[field.id_field]=$event.val; changeHandler(properties, this);">
+              @change="log($event); properties.rowData[field.name]=$event.val; changeHandler(properties, this);">
             </FKSelect>
             <!-- Options -->
             <SimpleSelect v-else-if="field.options" :properties="properties"

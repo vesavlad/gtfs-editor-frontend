@@ -9,6 +9,7 @@
 <script>
   import EditableTable from "@/components/EditableTable.vue";
   import agenciesAPI from '@/api/agencies.api';
+  import timezones from '@/api/timezones'
   export default {
     components: {
       EditableTable,
@@ -39,10 +40,24 @@
             remember_creation_value: true,
             sortField: 'agency_timezone',
             title: 'Timezone*',
+            type: "select-simple",
+            options: timezones.timezones.reduce((o, k) => Object.assign(o, {[k]:k}),{}),
           },
           {
             name: 'agency_lang',
             title: 'Language',
+          },
+          {
+            name: 'agency_phone',
+            title: 'Phone',
+          },
+          {
+            name: 'agency_fare_url',
+            title: 'Fare URL',
+          },
+          {
+            name: 'agency_email',
+            title: 'E-Mail',
           },
         ],
       };
