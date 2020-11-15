@@ -34,12 +34,20 @@
                         <td>Never</td>
                     </tr>
                     <tr>
-                        <td>Last Validated</td>
-                        <td>Never</td>
+                        <td>Publisher name</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_publisher_name:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Publisher URL</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_publisher_url:'' }}</td>
                     </tr>
                     <tr>
                         <td>Start Date</td>
                         <td>{{ project.feedinfo?project.feedinfo.feed_start_date:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Lang</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_lang:'' }}</td>
                     </tr>
                     <tr>
                         <td>End Date</td>
@@ -49,19 +57,29 @@
                         <td>Version</td>
                         <td>{{ project.feedinfo?project.feedinfo.feed_version:'' }}</td>
                     </tr>
+                    <tr>
+                        <td>Feed id</td>
+                        <td>{{ project.feedinfo?project.feedinfo.feed_id:'' }}</td>
+                    </tr>
                 </tbody>
             </table>
             <br />
             <table>
                 <tbody>
                     <tr>
-                        <th>Last Validation</th>
+                        <th colspan="2">Last Validation</th>
                     </tr>
                     <tr>
-                        <td>0 errors</td>
+                        <td>Last execution</td>
+                        <td>{{ (new Date()).toLocaleString() }}</td>
                     </tr>
                     <tr>
-                        <td>0 warnings</td>
+                        <td>Errors</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>Warnings</td>
+                        <td>0</td>
                     </tr>
                 </tbody>
             </table>
