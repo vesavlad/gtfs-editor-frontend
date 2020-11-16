@@ -12,10 +12,12 @@
           </div>
         </form>
       </template>
+      <button class="btn icon" @click="informationModal.visible=true">
+        <span class="material-icons">info</span>
+      </button>
       <div>
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="fields" data-path="results"
-          pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams"
-          @initialized="onInit" @vuetable:loaded="datafy">
+          pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
           </template>
@@ -55,15 +57,15 @@
             Download CSV
           </button>
         </form>
-        <button class="btn btn-outline-secondary" @click="uploadModalVisible=true">
+        <button class="btn btn-outline-secondary" @click="uploadModal.visible=true">
           Upload CSV
         </button>
-        <button class="btn btn-outline-secondary" @click="createModalVisible=true">
+        <button class="btn btn-outline-secondary" @click="log(createModal.data); createModal.visible=true">
           Add row
         </button>
       </div>
     </div>
-    <Modal v-if="uploadModalVisible" @close="uploadModalVisible = false" :showCancelButton="true">
+    <Modal v-if="uploadModal.visible" @close="uploadModal.visible = false" :showCancelButton="true">
       <template slot="title">
         <h2>Upload CSV</h2>
       </template>
@@ -77,8 +79,8 @@
       </template>
       <template slot="close-button-name">Upload</template>
     </Modal>
-    <Modal v-if="createModalVisible" @ok="createEntry" @close="createModalVisible = false"
-      @cancel="createModalVisible = false" :showCancelButton="true" @mounted="createModalCreated()">
+    <Modal v-if="createModal.visible" @ok="createEntry" @close="createModal.visible = false"
+      @cancel="createModal.visible = false" :showCancelButton="true" @mounted="createModalCreated()">
       <template slot="title">
         <h2>Create new</h2>
       </template>
@@ -96,14 +98,15 @@
               <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
             </select>
             <!-- Default -->
-            <input v-else :type="field.data_type" v-model="created[getName(field)]">
+            <input v-else :type="field.data_type" v-model="createModal.data[getName(field)]">
           </div>
         </form>
         <div ref="errorDiv" v-html="errorModal.message" />
       </template>
       <template slot="close-button-name">Create Entry</template>
     </Modal>
-    <Modal v-if="deleteModal.visible" @ok="deleteRow" @close="deleteModal.visible = false" @cancel="deleteModal.visible = false" :showCancelButton="true">
+    <Modal v-if="deleteModal.visible" @ok="deleteRow" @close="deleteModal.visible = false"
+      @cancel="deleteModal.visible = false" :showCancelButton="true">
       <template slot="title">
         <h2>Are you sure you want to delete this row?</h2>
       </template>
@@ -113,6 +116,17 @@
         </span>
       </template>
       <template slot="close-button-name">Delete</template>
+    </Modal>
+    <Modal v-if="informationModal.visible" @ok="informationModal.visible = false"
+      @close="informationModal.visible = false" @cancel="informationModal.visible = false">
+      <template slot="title">
+        <h2>Table information</h2>
+      </template>
+      <template slot="content">
+        <span>
+          <slot name="information">Table Information Not Available</slot>
+        </span>
+      </template>
     </Modal>
   </div>
 
@@ -147,22 +161,28 @@
     data: function () {
       let created_data = {};
       this.fields.forEach((field) => this.setDefaultCreationValue(field, created_data));
-      console.log(created_data);
       return {
         errorModal: {
           message: '',
         },
+        informationModal: {
+          visible: false,
+        },
         deleteModal: {
           visible: false,
           data: {},
-         message: '' 
+          message: ''
+        },
+        createModal: {
+          data: created_data,
+          visible: false,
+        },
+        uploadModal: {
+          visible: false,
         },
         test: true,
         quickSearch: '',
         hasChanged: false,
-        uploadModalVisible: false,
-        createModalVisible: false,
-        created: created_data,
         current_page: -1000,
       };
     },
@@ -201,8 +221,7 @@
       }
     },
     methods: {
-      datafy() {},
-      setDefaultCreationValue(field, data=this.created){
+      setDefaultCreationValue(field, data = this.createModal.data) {
         if (field === "actions") {
           return;
         }
@@ -267,7 +286,6 @@
               window.error = error;
               let response = error.response;
               console.log(response.data);
-              console.log(row);
               window.alert(`Error sending HTTP request\n${response.data.message}`);
             });
           }
@@ -315,14 +333,14 @@
             }
           }).on('change', (evt) => {
             console.log(this.getName(field), evt.target.value);
-            this.created[field.id_field] = evt.target.value;
+            this.createModal.data[field.id_field] = evt.target.value;
           });
         });
         this.fields.filter((f) => f.options).forEach((field) => {
           console.log(field);
           console.log($(`.create-select.options.${this.getName(field)}`).select2().on('change', (evt) => {
             console.log(this.getName(field), evt.target.value);
-            this.created[field.name] = evt.target.value;
+            this.createModal.data[field.name] = evt.target.value;
           }));
         })
       },
@@ -332,7 +350,7 @@
           return input.checked;
         return input.value;
       },
-      beginDeleteRow(data){
+      beginDeleteRow(data) {
         this.deleteModal.visible = true;
         this.deleteModal.data = data;
       },
@@ -343,18 +361,17 @@
           this.deleteModal.visible = false;
           this.deleteModal.data = {};
           this.deleteModal.message = "";
-        }).catch((err)=>{
-          let data=err.response.data;
+        }).catch((err) => {
+          let data = err.response.data;
           this.deleteModal.message = data.message;
         });
       },
       createEntry() {
-        console.log(this.created);
         let data = {
-          ...this.created
+          ...this.createModal.data
         }
         this.fields.forEach(field => {
-          if(data[field.name] === ""){
+          if (data[field.name] === "") {
             data[field.name] = null;
           }
           if (field.data_type === 'color') {
@@ -366,14 +383,17 @@
         console.log(data);
         this.createMethod(data).then(response => {
           console.log(response);
-          this.createModalVisible = false;
+          this.createModal.visible = false;
           this.reloadTable();
           this.errorModal.message = "";
           this.fields.filter(field => field !== "actions").forEach(field => {
-            if(field instanceof Object && !field.remember_creation_value){
+            if (field instanceof Object) {
+              if (!field.remember_creation_value) {
+                this.setDefaultCreationValue(field);
+              }
+            } else {
               this.setDefaultCreationValue(field);
             }
-            this.setDefaultCreationValue(field);
           });
         }).catch(error => {
           console.log(error.response.data);
@@ -383,7 +403,7 @@
       uploadCSVFile(file) {
         this.uploadCSV(file).then(response => {
           console.log(response);
-          this.uploadModalVisible = false;
+          this.uploadModal.visible = false;
           this.reloadTable();
         }).catch(error => {
           console.log(error);
@@ -394,7 +414,7 @@
       },
       getTitle(field) {
         let title = this.getName(field);
-        if( field instanceof Object && field.title){
+        if (field instanceof Object && field.title) {
           title = field.title
         }
         return title;
@@ -410,15 +430,20 @@
         console.log(query);
         return query;
       },
-      onInit() {
-        console.log(arguments);
-        this.datafy()
+      hasUnsavedChanges() {
+        return this.$refs.vuetable.$data.tableData.reduce((changed, row) => row.changed || changed, false);
       },
-      onLoad() {},
-      doLoadTable() {},
       onChangePage(page) {
+        if (page == this.current_page) {
+          return;
+        }
+        if (this.hasUnsavedChanges()) {
+          let answer = window.confirm("There are unsaved changes, are you sure you want to proceed?");
+          if (!answer) {
+            return;
+          }
+        }
         this.$refs.vuetable.changePage(page);
-        this.datafy();
         this.$nextTick(() => this.$refs.vuetable.$data.tableData.forEach(row => row.changed = false));
       },
       onPaginationData(paginationData) {

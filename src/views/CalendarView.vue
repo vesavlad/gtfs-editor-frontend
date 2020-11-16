@@ -2,6 +2,9 @@
   <div>
     <EditableTable :fields="fields" :url="url" :updateMethod="updateCalendar" :deleteMethod="removeCalendar"
       :createMethod="createCalendar" :downloadURL="downloadURL" :uploadCSV="uploadCSV">
+      <template slot="information">
+        Calendars are amazing!!!
+      </template>
     </EditableTable>
   </div>
 </template>
@@ -15,7 +18,6 @@
       EditableTable,
     },
     data() {
-      console.log(calendarAPI.calendarAPI.getDownloadURL(this.$route.params.projectid));
       return {
         downloadURL: calendarAPI.calendarAPI.getDownloadURL(this.$route.params.projectid),
         url: calendarAPI.calendarAPI.getFullBaseURL(this.$route.params.projectid),
@@ -31,12 +33,14 @@
             name: 'start_date',
             sortField: 'start_date',
             data_type: 'date',
+            remember_creation_value: true,
             title: 'Start Date*',
           },
           {
             name: 'end_date',
             sortField: 'end_date',
             data_type: 'date',
+            remember_creation_value: true,
             title: 'End Date*',
           },
           {
