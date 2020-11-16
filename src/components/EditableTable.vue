@@ -12,6 +12,9 @@
           </div>
         </form>
       </template>
+      <button class="btn icon" @click="informationModal.visible=true">
+        <span class="material-icons">info</span>
+      </button>
       <div>
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="fields" data-path="results"
           pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
@@ -114,6 +117,17 @@
       </template>
       <template slot="close-button-name">Delete</template>
     </Modal>
+    <Modal v-if="informationModal.visible" @ok="informationModal.visible = false"
+      @close="informationModal.visible = false" @cancel="informationModal.visible = false">
+      <template slot="title">
+        <h2>Table information</h2>
+      </template>
+      <template slot="content">
+        <span>
+          <slot name="information">Table Information Not Available</slot>
+        </span>
+      </template>
+    </Modal>
   </div>
 
 </template>
@@ -150,6 +164,9 @@
       return {
         errorModal: {
           message: '',
+        },
+        informationModal: {
+          visible: false,
         },
         deleteModal: {
           visible: false,
@@ -413,16 +430,16 @@
         console.log(query);
         return query;
       },
-      hasUnsavedChanges(){
-        return this.$refs.vuetable.$data.tableData.reduce((changed,row) => row.changed || changed, false);
+      hasUnsavedChanges() {
+        return this.$refs.vuetable.$data.tableData.reduce((changed, row) => row.changed || changed, false);
       },
       onChangePage(page) {
-        if(page == this.current_page){
+        if (page == this.current_page) {
           return;
         }
-        if(this.hasUnsavedChanges()){
+        if (this.hasUnsavedChanges()) {
           let answer = window.confirm("There are unsaved changes, are you sure you want to proceed?");
-          if(!answer){
+          if (!answer) {
             return;
           }
         }

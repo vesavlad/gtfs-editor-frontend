@@ -2,6 +2,9 @@
   <div>
     <EditableTable :fields="fields" :url="url" :updateMethod="updateCalendar" :deleteMethod="removeCalendar"
       :createMethod="createCalendar" :downloadURL="downloadURL" :uploadCSV="uploadCSV">
+      <template slot="information">
+        Calendars are amazing!!!
+      </template>
     </EditableTable>
   </div>
 </template>
