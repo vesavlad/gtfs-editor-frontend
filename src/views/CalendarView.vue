@@ -31,12 +31,14 @@
             name: 'start_date',
             sortField: 'start_date',
             data_type: 'date',
+            remember_creation_value: true,
             title: 'Start Date*',
           },
           {
             name: 'end_date',
             sortField: 'end_date',
             data_type: 'date',
+            remember_creation_value: true,
             title: 'End Date*',
           },
           {
