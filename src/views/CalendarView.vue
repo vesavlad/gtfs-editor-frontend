@@ -15,7 +15,6 @@
       EditableTable,
     },
     data() {
-      console.log(calendarAPI.calendarAPI.getDownloadURL(this.$route.params.projectid));
       return {
         downloadURL: calendarAPI.calendarAPI.getDownloadURL(this.$route.params.projectid),
         url: calendarAPI.calendarAPI.getFullBaseURL(this.$route.params.projectid),

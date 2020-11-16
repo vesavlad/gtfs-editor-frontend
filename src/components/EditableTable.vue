@@ -147,7 +147,6 @@
     data: function () {
       let created_data = {};
       this.fields.forEach((field) => this.setDefaultCreationValue(field, created_data));
-      console.log(created_data);
       return {
         errorModal: {
           message: '',
@@ -414,7 +413,19 @@
         console.log(query);
         return query;
       },
+      hasUnsavedChanges(){
+        return this.$refs.vuetable.$data.tableData.reduce((changed,row) => row.changed || changed, false);
+      },
       onChangePage(page) {
+        if(page == this.current_page){
+          return;
+        }
+        if(this.hasUnsavedChanges()){
+          let answer = window.confirm("There are unsaved changes, are you sure you want to proceed?");
+          if(!answer){
+            return;
+          }
+        }
         this.$refs.vuetable.changePage(page);
         this.$nextTick(() => this.$refs.vuetable.$data.tableData.forEach(row => row.changed = false));
       },
