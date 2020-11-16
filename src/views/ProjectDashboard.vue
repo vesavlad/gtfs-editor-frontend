@@ -18,7 +18,6 @@
             <div class="list">
                 <button class="btn list-item" style="width: 100%">Project Settings</button>
                 <button class="btn list-item" style="width: 100%">Upload GTFS File</button>
-                <button class="btn list-item" style="width: 100%" @click="validateButtonAction">Validate</button>
                 <button class="btn list-item" style="width: 100%">Publication</button>
                 <button class="btn list-item" style="width: 100%">Download as GTFS</button>
             </div>
@@ -67,7 +66,8 @@
             <table>
                 <tbody>
                     <tr>
-                        <th colspan="2">Last GTFS Validation</th>
+                        <th>Last GTFS Validation</th>
+                        <th><button class="btn" @click="validateButtonAction">Validate</button></th>
                     </tr>
                     <tr>
                         <td>Status</td>
@@ -95,14 +95,21 @@
                 </tbody>
             </table>
         </div>
+        <Modal v-if="showModal" @cancel="showModal = false" @close="showModal = false" @ok="showModal = false" :showCancelButton="false" :modalClasses="['warning']">
+            <p slot="content">{{ modalContent }}</p>
+        </Modal>
     </div>
 </template>
 
 <script>
     import projectsAPI from '@/api/projects.api';
+    import Modal from '@/components/Modal.vue'
 
     export default {
         name: 'ProjectDashboard',
+        components: {
+            Modal
+        },
         data() {
             return {
                 project: {
