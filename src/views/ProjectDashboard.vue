@@ -127,6 +127,9 @@
         methods: {
             initData() {
                 projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
+                    if (!response.data.gtfsvalidation){
+                        response.data.gtfsvalidation = {};
+                    }
                     this.project = response.data;
                 });
             },
