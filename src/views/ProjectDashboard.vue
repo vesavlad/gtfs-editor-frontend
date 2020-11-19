@@ -90,13 +90,13 @@
                         <td>{{ project.gtfsvalidation.warning_number }}</td>
                     </tr>
                     <tr>
-                        <td colspan="2"><button class="btn list-item" style="width: 100%" :disabled="project.gtfsvalidation.status!=='finished'" @click="seeGTFSValidationResults">see results</button></td>
+                        <td colspan="2"><button class="btn list-item" style="width: 100%" :disabled="['finished', 'error'].indexOf(project.gtfsvalidation.status)<0" @click="seeGTFSValidationResults">see results</button></td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <Modal v-if="showModal" @cancel="showModal = false" @close="showModal = false" @ok="showModal = false" :showCancelButton="false" :modalClasses="['warning']">
-            <p slot="content">{{ modalContent }}</p>
+            <p slot="content" v-html="modalContent"></p>
         </Modal>
     </div>
 </template>
@@ -134,8 +134,8 @@
                 });
             },
             seeGTFSValidationResults() {
-                let content = this.project.gtfsvalidation.status==='error'?this.project.gtfsvalidation.error_message:this.project.gtfsvalidation.message;
-                this.modalContent = content;
+                let content = this.project.gtfsvalidation.message;
+                this.modalContent = '<pre>'+content+'</pre>';
                 this.showModal = true;
             },
             validateButtonAction() {
