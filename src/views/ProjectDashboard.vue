@@ -30,7 +30,7 @@
                     </tr>
                     <tr>
                         <td>Last Edited</td>
-                        <td>Never</td>
+                        <td>{{ project.last_modification?(new Date(project.last_modification)).toLocaleString():'Never' }}</td>
                     </tr>
                     <tr>
                         <td>Publisher name</td>
