@@ -85,15 +85,15 @@
               return query
             },
             processResults(data) {
-              let name_field = field.name;
-              if (field.name_field) {
-                name_field = field.name_field
+              let name = field.name;
+              if (field.fk_name) {
+                name = field.fk_name
               }
               let reply = {
                 results: data.results.map(result => {
                   let res = {
                     id: result.id,
-                    text: result[name_field]
+                    text: result[name]
                   };
                   return res;
                 }),

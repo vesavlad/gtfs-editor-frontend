@@ -31,7 +31,7 @@
             :slot="getName(field)" slot-scope="properties">
             <!-- Foreign key -->
             <FKSelect v-if="field.foreignKey" :properties="properties"
-              @change="log($event); properties.rowData[field.name]=$event.val; changeHandler(properties, this);">
+              @change="log($event); properties.rowData[field.id_field]=$event.val; changeHandler(properties, this);">
             </FKSelect>
             <!-- Options -->
             <SimpleSelect v-else-if="field.options" :properties="properties"
@@ -306,8 +306,8 @@
               },
               processResults(data) {
                 let name_field = field.name;
-                if (field.name_field) {
-                  name_field = field.name_field
+                if (field.fk_name) {
+                  name_field = field.fk_name
                 }
                 console.log(name_field)
                 let reply = {
@@ -338,10 +338,10 @@
         });
         this.fields.filter((f) => f.options).forEach((field) => {
           console.log(field);
-          console.log($(`.create-select.options.${this.getName(field)}`).select2().on('change', (evt) => {
+          $(`.create-select.options.${this.getName(field)}`).select2().on('change', (evt) => {
             console.log(this.getName(field), evt.target.value);
             this.createModal.data[field.name] = evt.target.value;
-          }));
+          });
         })
       },
       getInputvalue(input, field) {

@@ -23,6 +23,9 @@
 @import "../node_modules/material-icons/css/material-icons.css";
 @import "./assets/css/base.css";
 @import "./assets/css/style.css";
+#app {
+  height: 100vh;
+}
 </style>
 <script>
 require('material-icons')
