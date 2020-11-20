@@ -1,41 +1,44 @@
-
 <template>
-  <select class="select-data" ref="select" v-model="val">
+  <select class="select-data" ref="select">
   </select>
 </template>
-
-
 <script>
-  import fieldMixin from "@/mixins/fieldMixin.js";
   import $ from 'jquery';
   import 'select2';
   export default {
-    mixins: [
-      fieldMixin,
-    ],
     props: {
-      field: {
-        type: Object,
-        required: true,
+      properties: {
+        type: Object
+      }
+    },
+    computed: {
+      field() {
+        return this.properties.rowField;
       },
-      data: {
-        type: Object,
-        required: true,
+      data() {
+        return this.properties.rowData;
       },
-      value: {},
+      value() {
+        return this.properties.rowData[this.properties.rowField.id_field]
+      },
+      name() {
+        return this.properties.rowData[this.properties.rowField.name]
+      },
+      rowID() {
+        return this.properties.rowData.id;
+      }
     },
     watch: {
-      value() {
+      rowID() {
         this.changeEnabled = false;
-        this.val = this.value;
+        $(this.$refs.select).select2('destroy');
+        this.datafy();
         this.changeEnabled = true;
       }
     },
     data() {
       return {
         changeEnabled: true,
-        val: this.value,
-        name: this.getFieldName(this.field),
       }
     },
     mounted() {
@@ -44,40 +47,35 @@
     },
     methods: {
       onChange(evt) {
-        console.log(evt);
-        this.val = evt.target.value;
-        console.log(this.val);
         if (this.changeEnabled) {
-          this.$emit("input", this.val);
+          this.$emit('change', {
+            val: evt.target.value,
+          });
         }
       },
       log(msg) {
         console.log(msg);
       },
-      selectDefault(){
-
-      },
       datafy() {
         let select = this.$refs.select;
         let field = this.field;
-        let defaultText = this.getFKText(field, this.data);
-        let defaultValue = this.value;
-        let self = this;
         // if Option already exists we select it
-        if ($(select).find("option[value='" + defaultText + "']").length) {
-          $(select).val(defaultValue).trigger('change');
+        if ($(select).find("option[value='" + this.value + "']").length) {
+          $(select).val(this.value).trigger('change');
         } else {
           // Otherwise we create it and select it
-          if (defaultText === null) {
-            defaultText = "Unselected"
-            defaultValue = null
+          let name = this.name;
+          let value= this.value;
+          if(name===null){
+            name="Unselected"
+            value=null
           }
-          var newOption = new Option(defaultText, defaultValue, true, true);
-          $(select).append(newOption).val(defaultValue).trigger('change');
+          var newOption = new Option(name, value, true, true);
+          $(select).append(newOption).trigger('change');
         }
         $(select).select2({
           ajax: {
-            url: self.field.ajax_params.url,
+            url: this.field.ajax_params.url,
             data: function (params) {
               let query = {
                 search: params.term,
@@ -87,7 +85,10 @@
               return query
             },
             processResults(data) {
-              let name = self.getFKName(field);
+              let name = field.name;
+              if (field.fk_name) {
+                name = field.fk_name
+              }
               let reply = {
                 results: data.results.map(result => {
                   let res = {
@@ -100,7 +101,7 @@
                   more: data.pagination.current_page !== data.pagination.last_page,
                 },
               }
-              if (field.nullable && data.pagination.current_page === 1) {
+              if(field.nullable && data.pagination.current_page===1){
                 reply.results.unshift({
                   id: "",
                   text: "Unselected"
@@ -114,9 +115,3 @@
     },
   }
 </script>
-
-<style>
-span.select2-selection{
-  min-width: 80px;
-}
-</style>

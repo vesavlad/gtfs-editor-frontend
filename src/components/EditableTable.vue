@@ -27,20 +27,21 @@
             </button>
           </div>
           <!-- This is where the fields are converted into inputs to make the table editable -->
-          <div :key="index" v-for="(field, index) in fields.filter(field=>getName(field)!=='actions')"
-            :slot="getName(field)" slot-scope="properties">
-            <!-- Foreign key -->
+            <generalized-input :key="index" v-for="(field, index) in fields.filter(field=>getFieldName(field)!=='actions')"
+            :slot="getFieldName(field)" slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
+            v-model="properties.rowData[getFieldName(properties.rowField)]" v-on:input="changeHandler(properties)">
+            </generalized-input>
+            <!-- Foreign key
             <FKSelect v-if="field.foreignKey" :properties="properties"
               @change="log($event); properties.rowData[field.id_field]=$event.val; changeHandler(properties, this);">
             </FKSelect>
-            <!-- Options -->
+            Options
             <SimpleSelect v-else-if="field.options" :properties="properties"
               @change="log($event); properties.rowData[field.name]=$event.val; changeHandler(properties, this);">
             </SimpleSelect>
-            <!-- Default -->
-            <input v-else :type="field.data_type" v-model="properties.rowData[getName(field)]"
-              :checked="properties.rowData[getName(field)]" @change="changeHandler(properties)">
-          </div>
+           Default
+            <input v-else :type="field.data_type" v-model="properties.rowData[getFieldName(field)]"
+              :checked="properties.rowData[getFieldName(field)]" @change="changeHandler(properties)"> -->
         </vuetable>
         <div style="display: flex;">
           <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
@@ -86,19 +87,19 @@
       </template>
       <template slot="content">
         <form ref="createForm">
-          <div :key="index" v-for="(field, index) in fields.filter(field=>getName(field)!=='actions')">
+          <div :key="index" v-for="(field, index) in fields.filter(field=>getFieldName(field)!=='actions')">
             <!-- Foreign key -->
-            <label> {{getTitle(field)}} </label>
-            <select :class="'create-select data ' + getName(field)" v-if="field.foreignKey">
+            <label> {{getFieldTitle(field)}} </label>
+            <select :class="'create-select data ' + getFieldName(field)" v-if="field.foreignKey">
               <option>Unselected</option>
             </select>
             <!-- Options -->
-            <select :class="'create-select options ' + getName(field)" v-else-if="field.options">
+            <select :class="'create-select options ' + getFieldName(field)" v-else-if="field.options">
               <option v-if="field.blankable"></option>
               <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
             </select>
             <!-- Default -->
-            <input v-else :type="field.data_type" v-model="createModal.data[getName(field)]">
+            <input v-else :type="field.data_type" v-model="createModal.data[getFieldName(field)]">
           </div>
         </form>
         <div ref="errorDiv" v-html="errorModal.message" />
@@ -137,12 +138,12 @@
 
 <script>
   let Vuetable = require('vuetable-2')
-  import FKSelect from '@/components/FKSelect.vue';
-  import SimpleSelect from '@/components/SimpleSelect.vue';
   import Modal from "@/components/Modal.vue";
   import FileReader from "@/components/FileReader.vue";
   import errorMessageMixin from "@/mixins/errorMessageMixin.js";
+  import fieldMixin from "@/mixins/fieldMixin.js";
   import VuetablePagination from "@/components/VueTablePagination.vue";
+  import GeneralizedInput from "@/components/GeneralizedInput.vue";
   import $ from 'jquery';
   import 'select2';
 
@@ -154,10 +155,12 @@
       VuetablePaginationDropDown: Vuetable.VuetablePaginationDropDown,
       Modal,
       FileReader,
-      FKSelect,
-      SimpleSelect,
+      GeneralizedInput,
     },
-    mixins: [errorMessageMixin],
+    mixins: [
+      errorMessageMixin,
+      fieldMixin
+    ],
     data: function () {
       let created_data = {};
       this.fields.forEach((field) => this.setDefaultCreationValue(field, created_data));
@@ -238,7 +241,7 @@
           }
           data[field.name] = def;
         } else {
-          data[this.getName(field)] = "";
+          data[this.getFieldName(field)] = "";
         }
       },
       printargs() {
@@ -266,7 +269,7 @@
           (row) => {
             for (let i = 0; i < this.fields.length; i++) {
               let field = this.fields[i];
-              let fieldName = this.getName(field);
+              let fieldName = this.getFieldName(field);
 
               if (row[fieldName] === '') {
                 row[fieldName] = null;
@@ -293,7 +296,7 @@
       },
       createModalCreated() {
         this.fields.filter((f) => f.foreignKey).forEach((field) => {
-          $(`.create-select.data.${this.getName(field)}`).select2({
+          $(`.create-select.data.${this.getFieldName(field)}`).select2({
             ajax: {
               url: field.ajax_params.url,
               data: function (params) {
@@ -332,14 +335,14 @@
               },
             }
           }).on('change', (evt) => {
-            console.log(this.getName(field), evt.target.value);
+            console.log(this.getFieldName(field), evt.target.value);
             this.createModal.data[field.id_field] = evt.target.value;
           });
         });
         this.fields.filter((f) => f.options).forEach((field) => {
           console.log(field);
-          $(`.create-select.options.${this.getName(field)}`).select2().on('change', (evt) => {
-            console.log(this.getName(field), evt.target.value);
+          $(`.create-select.options.${this.getFieldName(field)}`).select2().on('change', (evt) => {
+            console.log(this.getFieldName(field), evt.target.value);
             this.createModal.data[field.name] = evt.target.value;
           });
         })
@@ -411,17 +414,6 @@
       },
       log() {
         console.log(...arguments);
-      },
-      getTitle(field) {
-        let title = this.getName(field);
-        if (field instanceof Object && field.title) {
-          title = field.title
-        }
-        return title;
-      },
-      getName(field) {
-        if (typeof (field) == 'string') return field;
-        return field.name;
       },
       getSortParam(sortOrder) {
         let query = sortOrder.map(function (sort) {

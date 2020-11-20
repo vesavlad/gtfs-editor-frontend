@@ -1,19 +1,19 @@
 <template>
   <div>
     <form ref="form">
-      <div :key="index" v-for="(field, index) in fields.filter(field=>getName(field)!=='actions')">
+      <div :key="index" v-for="(field, index) in fields.filter(field=>getFieldName(field)!=='actions')">
         <!-- Foreign key -->
-        <label> {{getTitle(field)}} </label>
-        <select :class="'popup-select data ' + getName(field)" v-if="field.foreignKey">
+        <label> {{getFieldTitle(field)}} </label>
+        <select :class="'popup-select data ' + getFieldName(field)" v-if="field.foreignKey">
           <option>Unselected</option>
         </select>
         <!-- Options -->
-        <select :class="'popup-select options ' + getName(field)" v-else-if="field.options">
+        <select :class="'popup-select options ' + getFieldName(field)" v-else-if="field.options">
           <option v-if="field.blankable"></option>
           <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
         </select>
         <!-- Default -->
-        <input v-else :type="field.data_type" v-model="newData[getName(field)]">
+        <input v-else :type="field.data_type" v-model="newData[getFieldName(field)]">
       </div>
     </form>
   </div>
@@ -23,7 +23,11 @@
 <script>
   import $ from 'jquery';
   import 'select2';
+  import fieldMixin from "@/mixins/fieldMixin.js";
   export default {
+    mixins: [
+      fieldMixin,
+    ],
     name: 'PopupContent',
     props: {
       fields: {
@@ -58,7 +62,7 @@
 
         $("select.popup-select.options").select2().on("change");
         this.fields.filter((f) => f.foreignKey).forEach((field) => {
-          $(`select.popup-select.data.${this.getName(field)}`).select2({
+          $(`select.popup-select.data.${this.getFieldName(field)}`).select2({
             ajax: {
               url: field.ajax_params.url,
               data: function (params) {
@@ -98,28 +102,16 @@
               },
             }
           }).on('change', (evt) => {
-            console.log(this.getName(field), evt.target.value);
+            console.log(this.getFieldName(field), evt.target.value);
             this.newData[field.id_field] = evt.target.value;
           });
           this.fields.filter((f) => f.options).forEach((field) => {
             console.log(field);
-            $(`.popup-select.options.${this.getName(field)}`).val(this.newData[this.getName(field)]).trigger("change").select2().on('change', (evt) => {
+            $(`.popup-select.options.${this.getFieldName(field)}`).val(this.newData[this.getFieldName(field)]).trigger("change").select2().on('change', (evt) => {
               this.newData[field.name] = evt.target.value;
             });
           });
         });
-      },
-      getName(field) {
-        if (field instanceof String) {
-          return field;
-        }
-        return field.name;
-      },
-      getTitle(field) {
-        if (field instanceof Object) {
-          return field.title || field.name
-        }
-        return this.getName(field);
       },
       getData() {
         return this.newData;

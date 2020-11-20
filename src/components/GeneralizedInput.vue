@@ -1,63 +1,56 @@
 <template>
-    <select class="select-simple" ref="select" v-model="val">
-        <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
-    </select>
+  <input v-if="false">
+  <!-- Foreign key -->
+  <!-- <FKSelect v-if="field.foreignKey" :properties="properties"
+    @change="log($event); properties.rowData[field.id_field]=$event.val; changeHandler(properties, this);">
+  </FKSelect> -->
+  <FKSelect v-else-if="field.foreignKey" :field="field" :data="data" v-model="val" @input="$emit('input', $event)">
+  </FKSelect>
+  <!-- Options -->
+  <SimpleSelect v-else-if="field.options" :field="field" v-model="val" @input="$emit('input', $event)">
+  </SimpleSelect>
+  <!-- Default -->
+  <SimpleInput v-else :field="field" v-model="val" @input="$emit('input', $event)">
+  </SimpleInput>
+
 </template>
 <script>
-    import $ from 'jquery';
-    import 'select2';
-    export default {
-        props: {
-            properties: {
-                type: Object
-            }
-        },
-        computed: {
-            field() {
-                return this.properties.rowField;
-            },
-            data() {
-                return this.properties.rowData;
-            },
-            rowID() {
-                return this.properties.rowData.id;
-            }
-        },
-        watch: {
-            rowID() {
-                this.changeEnabled = false;
-                $(this.$refs.select).select2('destroy');
-                this.val = this.data[this.name];
-                this.$nextTick(this.datafy);
-                this.changeEnabled = true;
-            }
-        },
-        data() {
-            return {
-                changeEnabled: true,
-                val: this.properties.rowData[this.properties.rowField.name],
-                name: this.properties.rowField.name,
-            }
-        },
-        mounted() {
-            this.datafy();
-            $(this.$refs.select).on('change', this.onChange);
-        },
-        methods: {
-            onChange(evt) {
-                if (this.changeEnabled) {
-                    this.$emit('change', {
-                        val: evt.target.value,
-                    });
-                }
-            },
-            log(msg) {
-                console.log(msg);
-            },
-            datafy() {
-                let select = this.$refs.select;
-                $(select).select2();
-            },
-        },
-    }
+  import fieldMixin from "@/mixins/fieldMixin.js";
+  import SimpleInput from './SimpleInput.vue';
+  import SimpleSelect from './SimpleSelect.vue';
+  import FKSelect from './FKSelect.vue';
+  export default {
+    components: {
+      SimpleInput,
+      SimpleSelect,
+      FKSelect,
+    },
+    mixins: [
+      fieldMixin,
+      SimpleInput,
+    ],
+    props: {
+      field: {
+        type: Object,
+        required: true,
+      },
+      data: {
+        type: Object,
+        required: true,
+      },
+    },
+    data() {
+      let name = this.getFieldName(this.field);
+      return {
+        name,
+        val: this.data[name],
+      }
+    },
+    mounted() {},
+    methods: {
+      log() {
+        console.log(...arguments);
+      }
+    },
+  }
 </script>
