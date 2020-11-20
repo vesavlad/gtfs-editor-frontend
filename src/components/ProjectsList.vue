@@ -42,7 +42,7 @@
       </template>
       <template slot="content">
         <label for="pname">Project Name:</label>
-        <input type="text" id="pname" />
+        <input v-model="projectName" type="text" />
       </template>
       <template slot="base"> </template>
       <template slot="close-button-name">Create Project</template>
@@ -60,21 +60,6 @@ export default {
   components: {
     Modal,
   },
-  methods: {
-    createProject() {
-      let name = document.getElementById("pname").value;
-      console.log(name);
-      projectsAPI
-        .createProject(name)
-        .then((response) => {
-          let id = response.data.project_id;
-          this.$router.push({ name: "projectoverview", projectid: id });
-        })
-        .catch((error) => {
-          this.errorMessage = error;
-        });
-    },
-  },
   props: {
     rows: {
       type: Array,
@@ -84,7 +69,20 @@ export default {
   data() {
     return {
       creatingProject: false,
+      projectName: null
     };
   },
+  methods: {
+    createProject() {
+      projectsAPI
+        .createProject(this.projectName)
+        .then((response) => {
+          this.$router.push({ name: "projectoverview", params: {projectid: response.data.project_id} });
+        })
+        .catch((error) => {
+          this.errorMessage = error;
+        });
+    },
+  }
 };
 </script>

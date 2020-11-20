@@ -18,7 +18,6 @@
             <div class="list">
                 <button class="btn list-item" style="width: 100%">Project Settings</button>
                 <button class="btn list-item" style="width: 100%">Upload GTFS File</button>
-                <button class="btn list-item" style="width: 100%" @click="validateButtonAction">Validate</button>
                 <button class="btn list-item" style="width: 100%">Publication</button>
                 <button class="btn list-item" style="width: 100%">Download as GTFS</button>
             </div>
@@ -31,7 +30,7 @@
                     </tr>
                     <tr>
                         <td>Last Edited</td>
-                        <td>Never</td>
+                        <td>{{ project.last_modification?(new Date(project.last_modification)).toLocaleString():'Never' }}</td>
                     </tr>
                     <tr>
                         <td>Publisher name</td>
@@ -67,7 +66,8 @@
             <table>
                 <tbody>
                     <tr>
-                        <th colspan="2">Last GTFS Validation</th>
+                        <th>Last GTFS Validation</th>
+                        <th><button class="btn" @click="validateButtonAction">Validate</button></th>
                     </tr>
                     <tr>
                         <td>Status</td>
@@ -90,19 +90,26 @@
                         <td>{{ project.gtfsvalidation.warning_number }}</td>
                     </tr>
                     <tr>
-                        <td colspan="2"><button class="btn list-item" style="width: 100%" :disabled="project.gtfsvalidation.status!=='finished'" @click="seeGTFSValidationResults">see results</button></td>
+                        <td colspan="2"><button class="btn list-item" style="width: 100%" :disabled="['finished', 'error'].indexOf(project.gtfsvalidation.status)<0" @click="seeGTFSValidationResults">see results</button></td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        <Modal v-if="showModal" @cancel="showModal = false" @close="showModal = false" @ok="showModal = false" :showCancelButton="false" :modalClasses="['warning']">
+            <p slot="content" v-html="modalContent"></p>
+        </Modal>
     </div>
 </template>
 
 <script>
     import projectsAPI from '@/api/projects.api';
+    import Modal from '@/components/Modal.vue'
 
     export default {
         name: 'ProjectDashboard',
+        components: {
+            Modal
+        },
         data() {
             return {
                 project: {
@@ -120,12 +127,15 @@
         methods: {
             initData() {
                 projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
+                    if (!response.data.gtfsvalidation){
+                        response.data.gtfsvalidation = {};
+                    }
                     this.project = response.data;
                 });
             },
             seeGTFSValidationResults() {
-                let content = this.project.gtfsvalidation.status==='error'?this.project.gtfsvalidation.error_message:this.project.gtfsvalidation.message;
-                this.modalContent = content;
+                let content = this.project.gtfsvalidation.message;
+                this.modalContent = '<pre>'+content+'</pre>';
                 this.showModal = true;
             },
             validateButtonAction() {
