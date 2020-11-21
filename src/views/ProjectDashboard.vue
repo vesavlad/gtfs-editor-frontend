@@ -19,7 +19,6 @@
                 <button class="btn list-item" style="width: 100%">Project Settings</button>
                 <button class="btn list-item" style="width: 100%">Upload GTFS File</button>
                 <button class="btn list-item" style="width: 100%">Publication</button>
-                <button class="btn list-item" style="width: 100%">Download as GTFS</button>
             </div>
         </div>
         <div id="ProjectInfo">
@@ -59,6 +58,32 @@
                     <tr>
                         <td>Feed id</td>
                         <td>{{ project.feedinfo?project.feedinfo.feed_id:'' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+            <table>
+                <tbody>
+                    <tr>
+                        <th colspan=2>GTFS</th>
+                    </tr>
+                    <tr>
+                        <td>Last build</td>
+                        <td>{{ project.gtfs_file_updated_at?(new Date(project.gtfs_file_updated_at)).toLocaleString():'Never' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Build status</td>
+                        <td>{{ project.gtfs_creation_status?project.gtfs_creation_status:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Build duration</td>
+                        <td>{{ project.gtfs_creation_duration?project.gtfs_creation_duration:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><button class="btn" @click="buildGTFSButtonAction">Build GTFS</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><button class="btn" style="width: 100%" @click="dowloadGTFS">Download GTFS</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -133,6 +158,25 @@
                     this.project = response.data;
                 });
             },
+            dowloadGTFS() {
+                projectsAPI.downloadGTFS(this.$route.params.projectid).then(response => {
+                    let blob = new Blob([response.data], {type: response.headers['content-type']});
+                    let url = window.URL.createObjectURL(blob);
+                    window.open(url);
+                }).catch(error => {
+                    alert(error.response.data);
+                });
+            },
+            buildGTFSButtonAction() {
+                projectsAPI.buildGTFS(this.$route.params.projectid).then(response => {
+                    this.project.gtfs_file_updated_at = response.data.gtfs_file_updated_at;
+                    this.project.gtfs_creation_status = response.data.gtfs_creation_status;
+                    this.project.gtfs_creation_duration = response.data.gtfs_creation_duration;
+                    this.runPeriodicCall();
+                }).catch(error => {
+                    alert(error.response.data);
+                });
+            },
             seeGTFSValidationResults() {
                 let content = this.project.gtfsvalidation.message;
                 this.modalContent = '<pre>'+content+'</pre>';
@@ -158,7 +202,6 @@
             cancelGTFSValidation() {
                 projectsAPI.cancelGTFSValidation(this.$route.params.projectid).then(response => {
                     this.project.gtfsvalidation = response.data;
-                    clearInterval(this.interval);
                 }).catch(error => {
                     this.modalContent = error.response.data[0];
                     this.showModal = true;
@@ -169,12 +212,12 @@
                 this.interval = setInterval(() => {
                     console.log('updated gtfs validation status...');
                     projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
-                        if (['finished', 'error', 'canceled'].indexOf(response.data.gtfsvalidation.status) > -1 ) {
+                        if (['finished', 'error', 'canceled'].indexOf(response.data.gtfsvalidation.status) > -1 && ['finished', 'error'].indexOf(response.data.gtfs_creation_status) > -1) {
                             clearInterval(this.interval);
                         }
-                        this.project.gtfsvalidation = response.data.gtfsvalidation;
+                        this.project = response.data;
                     });
-                }, 5000);
+                }, 2000);
             }
         },
         beforeRouteEnter(to, from, next) {
