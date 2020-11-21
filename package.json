@@ -20,6 +20,7 @@
     "debounce": "^1.2.0",
     "echarts": "^4.9.0",
     "file-saver": "^2.0.2",
+    "mapbox-gl": "^1.12.0",
     "material-icons": "^0.3.1",
     "moment": "^2.29.1",
     "package.json": "^2.0.1",
@@ -29,6 +30,7 @@
     "vue-2-breadcrumbs": "^0.7.9",
     "vue-datatables-net": "git+https://github.com/niiknow/vue-datatables-net.git",
     "vue-echarts": "^5.0.0-beta.0",
+    "vue-mapbox": "^0.4.1",
     "vue-router": "^3.4.5",
     "vuetable-2": "^2.0.0-beta.4",
     "vuex": "^3.5.1"

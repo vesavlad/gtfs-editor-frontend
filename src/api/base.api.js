@@ -19,7 +19,12 @@ const BaseAPI = class {
         return httpClient.getBaseURL()+this.getDetailURL(projectid, id);
     }
     getAll(projectid){
-        return httpClient.get(this.getBaseURL(projectid));
+        return httpClient.get(this.getBaseURL(projectid), {
+            params: {
+                no_page: "True"
+            },
+            timeout: 0,
+        });
     }
     update(projectid, data) {
         return httpClient.patch(this.getDetailURL(projectid, data.id), data);
