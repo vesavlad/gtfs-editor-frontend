@@ -22,6 +22,9 @@ let fieldMixin = {
     getFKText(field, data) {
       return data[this.getFieldName(field)];
     },
+    getProperFields(fields){
+      return fields.filter(field => this.getFieldName(field) !== "actions");
+    }
   }
 }
 

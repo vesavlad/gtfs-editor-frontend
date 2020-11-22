@@ -74,14 +74,12 @@
                     {
                         name: 'route_color',
                         title: 'Color',
-                        data_type: 'color',
                         remember_creation_value: true,
                         sortField: 'route_color',
                     },
                     {
                         name: 'route_text_color',
                         title: 'Text Color',
-                        data_type: 'color',
                         remember_creation_value: true,
                         sortField: 'route_text_color',
                     },

@@ -27,21 +27,11 @@
             </button>
           </div>
           <!-- This is where the fields are converted into inputs to make the table editable -->
-            <generalized-input :key="index" v-for="(field, index) in fields.filter(field=>getFieldName(field)!=='actions')"
-            :slot="getFieldName(field)" slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
+          <generalized-input :key="index"
+            v-for="(field, index) in fields.filter(field=>getFieldName(field)!=='actions')" :slot="getFieldName(field)"
+            slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
             v-model="properties.rowData[getFieldName(properties.rowField)]" v-on:input="changeHandler(properties)">
-            </generalized-input>
-            <!-- Foreign key
-            <FKSelect v-if="field.foreignKey" :properties="properties"
-              @change="log($event); properties.rowData[field.id_field]=$event.val; changeHandler(properties, this);">
-            </FKSelect>
-            Options
-            <SimpleSelect v-else-if="field.options" :properties="properties"
-              @change="log($event); properties.rowData[field.name]=$event.val; changeHandler(properties, this);">
-            </SimpleSelect>
-           Default
-            <input v-else :type="field.data_type" v-model="properties.rowData[getFieldName(field)]"
-              :checked="properties.rowData[getFieldName(field)]" @change="changeHandler(properties)"> -->
+          </generalized-input>
         </vuetable>
         <div style="display: flex;">
           <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
