@@ -46,8 +46,6 @@
         this.val = evt.target.value;
         if (this.changeEnabled) {
           this.$emit("input", this.val);
-        } else {
-          this.changeEnabled = true;
         }
       },
       log(msg) {
@@ -56,17 +54,18 @@
       selectDefault(defaultText, defaultValue) {
         let select = this.$refs.select;
         // if Option already exists we select it
-        if ($(select).find("option[value='" + defaultText + "']").length) {
+        if (defaultValue == null) {
+          defaultText = "Unselected";
+          defaultValue = "";
+        }
+        if ($(select).find("option[value='" + defaultValue + "']").length) {
           $(select).val(defaultValue).trigger('change');
         } else {
           // Otherwise we create it and select it
-          if (defaultText === null) {
-            defaultText = "Unselected"
-            defaultValue = null
-          }
           var newOption = new Option(defaultText, defaultValue, true, true);
-          $(select).append(newOption).val(defaultValue).trigger('change');
+          $(select).append(newOption).trigger('change');
         }
+        this.changeEnabled = true;
       },
       datafy() {
         let select = this.$refs.select;
@@ -74,7 +73,7 @@
         let defaultText = this.getFKText(field, this.data);
         let defaultValue = this.value;
         let self = this;
-        this.selectDefault(defaultText, defaultValue) ;
+        this.selectDefault(defaultText, defaultValue);
         $(select).select2({
           ajax: {
             url: self.field.ajax_params.url,
@@ -109,7 +108,7 @@
               return reply;
             },
           }
-        });
+        }).on('change', this.onChange);
       },
     },
   }

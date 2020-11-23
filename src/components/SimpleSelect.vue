@@ -24,7 +24,7 @@
       value() {
         this.changeEnabled = false;
         $(this.$refs.select).select2('destroy');
-        this.val = this.value;
+        this.val = (this.value === "")? null:this.value;
         this.$nextTick(this.datafy);
       }
     },
@@ -44,8 +44,6 @@
         this.val = evt.target.value;
         if (this.changeEnabled) {
           this.$emit("input", this.val);
-        } else {
-          this.changeEnabled = true;
         }
       },
       log(msg) {
@@ -54,6 +52,7 @@
       datafy() {
         let select = this.$refs.select;
         $(select).select2();
+        this.changeEnabled = true;
       },
     },
   }

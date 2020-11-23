@@ -39,7 +39,7 @@
       let name = this.getFieldName(this.field);
       return {
         name,
-        val: this.data[name],
+        val: this.data[this.getFieldID(this.field)],
       }
     },
     mounted() {},
