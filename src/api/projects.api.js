@@ -6,26 +6,19 @@ const getAllProjects = () => {
     return httpClient.get(`${END_POINT}?no_page`);
 }
 
-const createProject = (name) => {
-    return httpClient.post(`${END_POINT}`, {name});
-}
-
-const getProjectDetail = (id) => {
-    return httpClient.get(`${END_POINT}${id}/`);
-}
-
-const runGTFSValidation = (id) => {
-    return httpClient.post(`${END_POINT}${id}/run_gtfs_validation/`)
-}
-
-const cancelGTFSValidation = (id) => {
-    return httpClient.post(`${END_POINT}${id}/cancel_gtfs_validation/`)
-}
+const createProject = (name) => httpClient.post(`${END_POINT}`, {name});
+const getProjectDetail = (id) => httpClient.get(`${END_POINT}${id}/`);
+const runGTFSValidation = (id) => httpClient.post(`${END_POINT}${id}/run_gtfs_validation/`);
+const cancelGTFSValidation = (id) => httpClient.post(`${END_POINT}${id}/cancel_gtfs_validation/`);
+const buildGTFS = (id) => httpClient.post(`${END_POINT}${id}/create_gtfs_file/`);
+const downloadGTFS = (id) => httpClient.request({url: `${END_POINT}${id}/download/`, method: 'GET', responseType: 'blob'});
 
 export default {
     getAllProjects,
     createProject,
     getProjectDetail,
     runGTFSValidation,
-    cancelGTFSValidation
+    cancelGTFSValidation,
+    buildGTFS,
+    downloadGTFS
 }
