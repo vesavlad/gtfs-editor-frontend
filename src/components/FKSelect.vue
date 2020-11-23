@@ -1,4 +1,3 @@
-
 <template>
   <select class="select-data" ref="select" v-model="val">
   </select>
@@ -28,7 +27,7 @@
       value() {
         this.changeEnabled = false;
         this.val = this.value;
-        this.changeEnabled = true;
+        this.selectDefault(this.getFKText(this.field, this.data), this.value);
       }
     },
     data() {
@@ -44,25 +43,18 @@
     },
     methods: {
       onChange(evt) {
-        console.log(evt);
         this.val = evt.target.value;
-        console.log(this.val);
         if (this.changeEnabled) {
           this.$emit("input", this.val);
+        } else {
+          this.changeEnabled = true;
         }
       },
       log(msg) {
         console.log(msg);
       },
-      selectDefault(){
-
-      },
-      datafy() {
+      selectDefault(defaultText, defaultValue) {
         let select = this.$refs.select;
-        let field = this.field;
-        let defaultText = this.getFKText(field, this.data);
-        let defaultValue = this.value;
-        let self = this;
         // if Option already exists we select it
         if ($(select).find("option[value='" + defaultText + "']").length) {
           $(select).val(defaultValue).trigger('change');
@@ -75,6 +67,14 @@
           var newOption = new Option(defaultText, defaultValue, true, true);
           $(select).append(newOption).val(defaultValue).trigger('change');
         }
+      },
+      datafy() {
+        let select = this.$refs.select;
+        let field = this.field;
+        let defaultText = this.getFKText(field, this.data);
+        let defaultValue = this.value;
+        let self = this;
+        this.selectDefault(defaultText, defaultValue) ;
         $(select).select2({
           ajax: {
             url: self.field.ajax_params.url,
@@ -116,7 +116,7 @@
 </script>
 
 <style>
-span.select2-selection{
-  min-width: 80px;
-}
+  span.select2-selection {
+    min-width: 80px;
+  }
 </style>

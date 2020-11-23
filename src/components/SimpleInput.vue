@@ -1,5 +1,5 @@
 <template>
-    <input ref="input" :type="field.data_type" v-model="val" @input="log($event); $emit('input', getValue($event.target))">
+    <input ref="input" :type="field.data_type" v-model="val" @input="$emit('input', getValue($event.target))">
 </template>
 
 <script>
@@ -45,7 +45,6 @@
         if(this.field.data_type === "color"){
           value = value.slice(1);
         }
-        console.log(value);
         return value;
       },
       log(){

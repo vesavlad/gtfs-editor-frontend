@@ -2,10 +2,10 @@
 let fieldMixin = {
   methods: {
     getFieldName(field) {
-      if (field instanceof String) {
-        return field;
+      if (field instanceof Object) {
+        return field.name;
       }
-      return field.name;
+      return field;
     },
     getFieldTitle(field) {
       if (field instanceof Object) {
@@ -19,11 +19,18 @@ let fieldMixin = {
       }
       return field.name;
     },
+    getFieldID(field) {
+      if(field instanceof Object && field.id_field){
+        return field.id_field;
+      }
+      return this.getFieldName(field);
+    },
     getFKText(field, data) {
       return data[this.getFieldName(field)];
     },
     getProperFields(fields){
-      return fields.filter(field => this.getFieldName(field) !== "actions");
+      let properFields = fields.filter(field => (this.getFieldName(field) !== "actions"));
+      return properFields;
     }
   }
 }

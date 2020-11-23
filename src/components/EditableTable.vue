@@ -27,11 +27,10 @@
             </button>
           </div>
           <!-- This is where the fields are converted into inputs to make the table editable -->
-          <generalized-input :key="index"
-            v-for="(field, index) in fields.filter(field=>getFieldName(field)!=='actions')" :slot="getFieldName(field)"
+          <GeneralizedInput :key="index" v-for="(field, index) in getProperFields(fields)" :slot="getFieldName(field)"
             slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
-            v-model="properties.rowData[getFieldName(properties.rowField)]" v-on:input="changeHandler(properties)">
-          </generalized-input>
+            v-model="properties.rowData[getFieldID(properties.rowField)]" v-on:input="changeHandler(properties)">
+          </GeneralizedInput>
         </vuetable>
         <div style="display: flex;">
           <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
@@ -51,7 +50,7 @@
         <button class="btn btn-outline-secondary" @click="uploadModal.visible=true">
           Upload CSV
         </button>
-        <button class="btn btn-outline-secondary" @click="log(createModal.data); createModal.visible=true">
+        <button class="btn btn-outline-secondary" @click="createModal.visible=true">
           Add row
         </button>
       </div>
@@ -76,22 +75,12 @@
         <h2>Create new</h2>
       </template>
       <template slot="content">
-        <form ref="createForm">
-          <div :key="index" v-for="(field, index) in fields.filter(field=>getFieldName(field)!=='actions')">
-            <!-- Foreign key -->
-            <label> {{getFieldTitle(field)}} </label>
-            <select :class="'create-select data ' + getFieldName(field)" v-if="field.foreignKey">
-              <option>Unselected</option>
-            </select>
-            <!-- Options -->
-            <select :class="'create-select options ' + getFieldName(field)" v-else-if="field.options">
-              <option v-if="field.blankable"></option>
-              <option v-for="(option, key) in field.options" :key="key" :value="option">{{key}}</option>
-            </select>
-            <!-- Default -->
-            <input v-else :type="field.data_type" v-model="createModal.data[getFieldName(field)]">
-          </div>
-        </form>
+        <div :key="`create-${getFieldName(field)}`" v-for="field in getProperFields(fields)">
+          <label>{{getFieldName(field)}}</label>
+          <GeneralizedInput :data="createModal.data" :field="field" :value="createModal.data[getFieldName(field)]"
+          v-model="createModal.data[getFieldID(field)]">
+          </GeneralizedInput>
+        </div>
         <div ref="errorDiv" v-html="errorModal.message" />
       </template>
       <template slot="close-button-name">Create Entry</template>
@@ -238,6 +227,7 @@
         console.log(arguments);
       },
       changeHandler(props) {
+        console.log(props.rowData[this.getFieldName(props.rowField)])
         let table = $("table.vuetable");
         table.children("tbody:first").children().eq(props.rowIndex).addClass("edited");
         this.hasChanged = true;

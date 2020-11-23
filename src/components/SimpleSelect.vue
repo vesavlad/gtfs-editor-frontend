@@ -26,7 +26,6 @@
         $(this.$refs.select).select2('destroy');
         this.val = this.value;
         this.$nextTick(this.datafy);
-        this.changeEnabled = true;
       }
     },
     data() {
@@ -42,11 +41,11 @@
     },
     methods: {
       onChange(evt) {
-        console.log(evt);
         this.val = evt.target.value;
-        console.log(this.val);
         if (this.changeEnabled) {
           this.$emit("input", this.val);
+        } else {
+          this.changeEnabled = true;
         }
       },
       log(msg) {
