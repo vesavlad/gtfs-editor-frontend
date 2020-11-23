@@ -7,6 +7,11 @@
     <div v-show="tab==='table'" class="table-container">
       <EditableTable :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
         :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+        <template slot="additional-actions" slot-scope="props">
+          <button class="btn icon" @click="focusStop(props)">
+            <span class="material-icons">map</span>
+          </button>
+        </template>
       </EditableTable>
     </div>
     <div v-show="tab==='map'" class="map-container">
@@ -39,11 +44,18 @@
       };
     },
     methods: {
-      switchTab(tab){
+      log() {
+        console.log(...arguments);
+      },
+      switchTab(tab) {
         this.tab = tab;
-        if (tab === "map"){
+        if (tab === "map") {
           this.$nextTick(this.$refs.map.resize);
         }
+      },
+      focusStop(props){
+        this.switchTab("map");
+        this.$refs.map.focusStop(props.rowData);
       },
       updateTrip(data) {
         return stopsAPI.stopsAPI.update(this.$route.params.projectid, data);
@@ -97,7 +109,14 @@
     border: 1px solid #ccc;
     border-top: none;
   }
-  .map-container{
+
+  .map-container {
     height: 100vh;
+  }
+
+  button.ui.button {
+    padding: 8px 3px 8px 10px;
+    margin-top: 1px;
+    margin-bottom: 1px;
   }
 </style>

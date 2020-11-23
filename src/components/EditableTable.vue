@@ -25,6 +25,7 @@
             <button class="btn icon" @click="beginDeleteRow(props.rowData)">
               <span class="material-icons">delete</span>
             </button>
+            <slot name="additional-actions" v-bind:rowData="props.rowData" v-bind:rowField="props.rowField" v-bind:rowIndex="props.rowIndex"></slot>
           </div>
           <!-- This is where the fields are converted into inputs to make the table editable -->
           <GeneralizedInput :key="index" v-for="(field, index) in getProperFields(fields)" :slot="getFieldName(field)"

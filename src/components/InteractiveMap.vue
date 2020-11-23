@@ -89,6 +89,11 @@
       });
     },
     methods: {
+      focusStop(stop_data){
+        this.map.flyTo({
+          center: [stop_data.stop_lon,stop_data.stop_lat]
+        });
+      },
       onClosePopup() {
         console.log(this.$refs.popupContent.getData());
       },
@@ -124,7 +129,7 @@
           data: this.geojson,
         });
         this.map.addLayer({
-          id: "layer-stops-circle",
+          id: "layer-stops-icon",
           type: "circle",
           source: "stops",
           paint: {
@@ -157,11 +162,10 @@
         let canvas = map.getCanvas();
         let stopMap = this.stopMap;
         let self = this;
-        this.map.on('click', 'stops', (evt) => {
+        this.map.on('click', 'layer-stops-icon', (evt) => {
           if (this.dragMode(evt)) {
             return;
           }
-          console.log("Popup");
           var coordinates = evt.features[0].geometry.coordinates.slice();
           var stop_id = evt.features[0].properties.stop_id;
 
@@ -181,20 +185,19 @@
           });
           this.modalOpen = true;
         });
-        this.map.on('mouseenter', 'stops', function () {
+        this.map.on('mouseenter', 'layer-stops-icon', function () {
           if (this.dragging) return;
           canvas.style.cursor = 'pointer';
         });
-        this.map.on('mouseleave', 'stops', function () {
+        this.map.on('mouseleave', 'layer-stops-icon', function () {
           if (this.dragging) return;
           canvas.style.cursor = '';
         });
-        map.on('mousedown', 'stops', function (evt) {
+        map.on('mousedown', 'layer-stops-icon', function (evt) {
           // Prevent the default map drag behavior.
           if (!self.dragMode(evt)) {
             return;
           }
-          console.log("Dragging");
           evt.preventDefault();
           canvas.style.cursor = 'grab';
           let activeStop = evt.features[0]
