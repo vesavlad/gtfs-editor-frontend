@@ -124,7 +124,7 @@
           data: this.geojson,
         });
         this.map.addLayer({
-          id: "stops",
+          id: "layer-stops-circle",
           type: "circle",
           source: "stops",
           paint: {
@@ -137,6 +137,18 @@
               ]
             },
             "circle-color": "#2222DD"
+          }
+        });
+        this.map.addLayer({
+          id: "layer-stops-label",
+          type: "symbol",
+          source: "stops",
+          minzoom: 14, // Set zoom level to whatever suits your needs
+          layout: {
+            "text-field": "{title}",
+            "text-anchor": "top",
+            "text-offset": [0, 0.5],
+            "text-allow-overlap": true,
           }
         });
       },
