@@ -43,6 +43,8 @@
           stop: {},
         },
         modalOpen: false,
+        dragging: false,
+        geojson: {},
       }
     },
     computed: {
@@ -66,7 +68,7 @@
 
       this.$nextTick(() => {
         stopsAPI.stopsAPI.getAll(this.project).then((response) => {
-          this.stops = response.data
+          this.stops = response.data;
           let map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
@@ -76,6 +78,7 @@
           this.map = map;
           map.on('load', () => {
             this.addStops();
+            this.addListeners();
             this.$emit('load');
           })
         }).catch((err) => {
@@ -86,7 +89,7 @@
       });
     },
     methods: {
-      onClosePopup(){
+      onClosePopup() {
         console.log(this.$refs.popupContent.getData());
       },
       resize() {
@@ -94,13 +97,10 @@
       },
       generatePopup(stop) {
         this.popup.stop = stop;
-        console.log(this.$refs.popupContent);
         return this.$refs.popupContent.$el;
       },
       addStops() {
-        let map = this.map;
-        let stopMap = this.stopMap;
-        let data = {
+        this.geojson = {
           type: 'FeatureCollection',
           features: this.stops.map(stop => {
             return {
@@ -121,7 +121,7 @@
         };
         this.map.addSource('stops', {
           type: 'geojson',
-          data,
+          data: this.geojson,
         });
         this.map.addLayer({
           id: "stops",
@@ -139,9 +139,17 @@
             "circle-color": "#2222DD"
           }
         });
-        console.log("Points added");
+      },
+      addListeners() {
+        let map = this.map;
+        let canvas = map.getCanvas();
+        let stopMap = this.stopMap;
+        let self = this;
         this.map.on('click', 'stops', (evt) => {
-
+          if (this.dragMode(evt)) {
+            return;
+          }
+          console.log("Popup");
           var coordinates = evt.features[0].geometry.coordinates.slice();
           var stop_id = evt.features[0].properties.stop_id;
 
@@ -156,18 +164,59 @@
             .setLngLat(coordinates)
             .setDOMContent(this.generatePopup(stop))
           popup.addTo(map);
-          popup.on('close', ()=>{
+          popup.on('close', () => {
             stopsAPI.stopsAPI.update(this.project, this.$refs.popupContent.getData());
           });
           this.modalOpen = true;
         });
         this.map.on('mouseenter', 'stops', function () {
-          map.getCanvas().style.cursor = 'pointer';
+          if (this.dragging) return;
+          canvas.style.cursor = 'pointer';
         });
         this.map.on('mouseleave', 'stops', function () {
-          map.getCanvas().style.cursor = '';
+          if (this.dragging) return;
+          canvas.style.cursor = '';
         });
-      }
+        map.on('mousedown', 'stops', function (evt) {
+          // Prevent the default map drag behavior.
+          if (!self.dragMode(evt)) {
+            return;
+          }
+          console.log("Dragging");
+          evt.preventDefault();
+          canvas.style.cursor = 'grab';
+          let activeStop = evt.features[0]
+
+          map.once('mouseup', evt => {
+            let coords = evt.lngLat;
+            self.updateStop(activeStop, coords);
+            canvas.style.cursor = '';
+          });
+        });
+      },
+      updateStop(stop, coords) {
+        stop.geometry.coordinates = coords;
+        this.geojson.features = this.geojson.features.map(feature => {
+          if (feature.properties.stop_id === stop.properties.stop_id) {
+            feature.geometry.coordinates = [coords.lng, coords.lat];
+            let stop_data = this.stopMap[stop.properties.stop_id];
+            stop_data.stop_lat = coords.lat;
+            stop_data.stop_lon = coords.lng;
+            stopsAPI.stopsAPI.update(this.project, {
+              id: stop_data.id,
+              stop_lat: coords.lat,
+              stop_lon: coords.lng,
+            }).then(() => {
+              console.log("updated");
+            })
+          }
+          return feature;
+        });
+        this.map.getSource('stops').setData(this.geojson);
+      },
+      dragMode(evt) {
+        return evt.originalEvent.altKey;
+      },
     },
   }
 </script>

@@ -34,7 +34,6 @@
       }
     },
     data() {
-      console.log(this.fields);
       return {
         newData: {
           changed: false,

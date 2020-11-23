@@ -27,6 +27,7 @@ const BaseAPI = class {
         });
     }
     update(projectid, data) {
+        console.log(data);
         return httpClient.patch(this.getDetailURL(projectid, data.id), data);
     }
     create(projectid, data){
