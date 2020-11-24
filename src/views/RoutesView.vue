@@ -22,7 +22,7 @@
                     'actions',
                     {
                         name: 'route_id',
-                        title: 'Route*',
+                        title: 'Route ID*',
                         sortField: 'route_id',
                     },
                     {

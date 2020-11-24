@@ -23,7 +23,7 @@
           {
             name: 'agency_id',
             sortField: 'agency_id',
-            title: 'Agency*',
+            title: 'Agency ID*',
           },
           {
             name: 'agency_name',

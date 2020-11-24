@@ -23,7 +23,7 @@
           {
             name: 'fare_id',
             sortField: 'fare_id',
-            title: 'Fare*',
+            title: 'Fare ID*',
           },
           {
             name: 'price',

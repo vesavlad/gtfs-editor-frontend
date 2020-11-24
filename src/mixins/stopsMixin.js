@@ -9,7 +9,7 @@ let stopsMixin = {
         'actions',
         {
           name: 'stop_id',
-          title: 'Stop*',
+          title: 'Stop ID*',
           sortField: 'stop_id',
         },
         {

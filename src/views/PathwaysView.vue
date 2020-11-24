@@ -22,7 +22,7 @@
                     'actions',
                     {
                         name: "pathway_id",
-                        title: "Pathway*"
+                        title: "Pathway ID*"
                     },
                     {
                         name: 'pathway_mode',
