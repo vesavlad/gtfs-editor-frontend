@@ -91,7 +91,8 @@
     methods: {
       focusStop(stop_data){
         this.map.flyTo({
-          center: [stop_data.stop_lon,stop_data.stop_lat]
+          center: [stop_data.stop_lon,stop_data.stop_lat],
+          zoom: 16,
         });
       },
       onClosePopup() {
@@ -103,6 +104,9 @@
       generatePopup(stop) {
         this.popup.stop = stop;
         return this.$refs.popupContent.$el;
+      },
+      createLabel(stop){
+        return stop.stop_id + (stop.stop_code?` (${stop.stop_code})`:"");
       },
       addStops() {
         this.geojson = {
@@ -119,7 +123,7 @@
               },
               properties: {
                 stop_id: stop.id,
-                title: stop.stop_name
+                label: this.createLabel(stop),
               }
             }
           })
@@ -150,7 +154,7 @@
           source: "stops",
           minzoom: 14, // Set zoom level to whatever suits your needs
           layout: {
-            "text-field": "{title}",
+            "text-field": "{label}",
             "text-anchor": "top",
             "text-offset": [0, 0.5],
             "text-allow-overlap": true,
