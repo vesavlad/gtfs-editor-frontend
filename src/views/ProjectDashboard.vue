@@ -17,7 +17,7 @@
         <div id="Buttons" class="list-container" style="flex: 1">
             <div class="list">
                 <button class="btn list-item" style="width: 100%">Project Settings</button>
-                <button class="btn list-item" style="width: 100%">Upload GTFS File</button>
+                <input type="file" ref="file" class="btn list-item" @change="uploadGTFSFile" style="width: 100%" />Upload GTFS File
                 <button class="btn list-item" style="width: 100%">Publication</button>
             </div>
         </div>
@@ -205,6 +205,16 @@
                 }).catch(error => {
                     this.modalContent = error.response.data[0];
                     this.showModal = true;
+                });
+            },
+            uploadGTFSFile() {
+                let currentFile =this.$refs.file.files.item(0);
+                projectsAPI.uploadGTFS(this.$route.params.projectid, currentFile).then(response => {
+                    console.log(response.data);
+                    this.$refs.file.value = null;
+                }).catch(error => {
+                    console.log(error.data);
+                    this.$refs.file.value = null;
                 });
             },
             runPeriodicCall() {

@@ -12,6 +12,16 @@ const runGTFSValidation = (id) => httpClient.post(`${END_POINT}${id}/run_gtfs_va
 const cancelGTFSValidation = (id) => httpClient.post(`${END_POINT}${id}/cancel_gtfs_validation/`);
 const buildGTFS = (id) => httpClient.post(`${END_POINT}${id}/create_gtfs_file/`);
 const downloadGTFS = (id) => httpClient.request({url: `${END_POINT}${id}/download/`, method: 'GET', responseType: 'blob'});
+const uploadGTFS = (id, file) => {
+    let formData = new FormData();
+    formData.append('file', file)
+    let headers = { 
+        headers: { 
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+    return httpClient.post(`${END_POINT}${id}/upload_gtfs_file/`, formData, headers);
+}
 
 export default {
     getAllProjects,
@@ -20,5 +30,6 @@ export default {
     runGTFSValidation,
     cancelGTFSValidation,
     buildGTFS,
-    downloadGTFS
+    downloadGTFS,
+    uploadGTFS
 }
