@@ -1,29 +1,25 @@
 <template>
-  <div id='map'>
-    <popup-content v-show="modalOpen" ref="popupContent" :fields="stopFields" :data="popup.stop"></popup-content>
+  <div id='map-container'>
+    <div id='map'>
+      <popup-content v-show="modalOpen" ref="popupContent" :fields="stopFields" v-model="popup.stop"></popup-content>
+    </div>
+    <div class="map-overlay top">
+      <div class="map-overlay-inner" v-if="map">
+        <button v-if="!creation.creating" class="btn icon" alt="Create Stop" @click="beginCreation">
+          <span class="material-icons">add</span>
+        </button>
+        <div v-if="creation.creating">
+          <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields"
+            :errors="creation.errors" v-model="creation.data">
+          </popup-content>
+          <button class="btn icon" alt="Create" @click="create">
+            <span class="material-icons">add_location</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
-<style>
-  @import url("https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css");
-
-  #map {
-    width: 100%;
-    height: 100%;
-    min-height: 800px;
-  }
-
-  canvas.mapglbox-canvas {
-    width: 100%;
-    height: 100%;
-  }
-
-  div.mapboxgl-popup-content {
-    overflow-y: scroll;
-    max-height: 400px;
-  }
-</style>
-
 
 <script>
   import stopsAPI from '@/api/stops.api';
@@ -42,9 +38,22 @@
         popup: {
           stop: {},
         },
+        map: false,
         modalOpen: false,
         dragging: false,
         geojson: {},
+        creation: {
+          creating: false,
+          data: {
+            stop_lat: null,
+            stop_lon: null,
+          },
+          errors: {},
+          geojson: {
+            type: 'FeatureCollection',
+            features: [] // We use feature collection to allow either 0 or 1
+          }
+        },
       }
     },
     computed: {
@@ -89,14 +98,29 @@
       });
     },
     methods: {
-      focusStop(stop_data){
-        this.map.flyTo({
-          center: [stop_data.stop_lon,stop_data.stop_lat],
-          zoom: 16,
+      beginCreation() {
+        let self = this;
+        this.map.once("click", e => {
+          self.creation.creating = true;
+          self.updateCreationCoords(e.lngLat);
         });
       },
-      onClosePopup() {
-        console.log(this.$refs.popupContent.getData());
+      create() {
+        let data = this.creation.data;
+        stopsAPI.stopsAPI.create(this.project, data).then(response => {
+          console.log(response);
+          this.addStop(data);
+          this.creation.errors = {};
+        }).catch((err) => {
+          console.log(err.response);
+          this.creation.errors = err.response.data;
+        });
+      },
+      focusStop(stop_data) {
+        this.map.flyTo({
+          center: [stop_data.stop_lon, stop_data.stop_lat],
+          zoom: 16,
+        });
       },
       resize() {
         this.map.resize();
@@ -105,10 +129,11 @@
         this.popup.stop = stop;
         return this.$refs.popupContent.$el;
       },
-      createLabel(stop){
-        return stop.stop_id + (stop.stop_code?` (${stop.stop_code})`:"");
+      createLabel(stop) {
+        return stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : "");
       },
       addStops() {
+        // We create the geojson and add it to the map
         this.geojson = {
           type: 'FeatureCollection',
           features: this.stops.map(stop => {
@@ -132,6 +157,8 @@
           type: 'geojson',
           data: this.geojson,
         });
+
+        // We add an icon and text to the geojson
         this.map.addLayer({
           id: "layer-stops-icon",
           type: "circle",
@@ -152,7 +179,7 @@
           id: "layer-stops-label",
           type: "symbol",
           source: "stops",
-          minzoom: 14, // Set zoom level to whatever suits your needs
+          minzoom: 14,
           layout: {
             "text-field": "{label}",
             "text-anchor": "top",
@@ -160,6 +187,39 @@
             "text-allow-overlap": true,
           }
         });
+
+        // Icon for new stop
+        this.map.addSource('creating', {
+          type: 'geojson',
+          data: this.creation.geojson,
+        })
+        this.map.addLayer({
+          id: "layer-creating-icon",
+          type: "circle",
+          source: "creating",
+          paint: {
+            "circle-radius": {
+              base: 2,
+              stops: [
+                [12, 4],
+                [20, 240]
+              ]
+            },
+            "circle-color": "#DD9911",
+          }
+        });
+      },
+      updateCreationCoords(coords) {
+        this.creation.data.stop_lon = coords.lng;
+        this.creation.data.stop_lat = coords.lat;
+        this.creation.geojson.features = [{
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [coords.lng, coords.lat],
+          },
+        }];
+        this.map.getSource('creating').setData(this.creation.geojson);
       },
       addListeners() {
         let map = this.map;
@@ -185,7 +245,7 @@
             .setDOMContent(this.generatePopup(stop))
           popup.addTo(map);
           popup.on('close', () => {
-            stopsAPI.stopsAPI.update(this.project, this.$refs.popupContent.getData());
+            stopsAPI.stopsAPI.update(this.project, this.popup.stop);
           });
           this.modalOpen = true;
         });
@@ -209,6 +269,21 @@
           map.once('mouseup', evt => {
             let coords = evt.lngLat;
             self.updateStop(activeStop, coords);
+            canvas.style.cursor = '';
+          });
+        });
+
+        map.on('mousedown', 'layer-creating-icon', function (evt) {
+          // Prevent the default map drag behavior.
+          if (!self.dragMode(evt)) {
+            return;
+          }
+          evt.preventDefault();
+          canvas.style.cursor = 'grab';
+
+          map.once('mouseup', evt => {
+            let coords = evt.lngLat;
+            self.updateCreationCoords(coords);
             canvas.style.cursor = '';
           });
         });
@@ -239,3 +314,80 @@
     },
   }
 </script>
+
+<style>
+  @import url("https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css");
+
+  #map {
+    width: 100%;
+    height: 100%;
+    min-height: 800px;
+  }
+
+  canvas.mapglbox-canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  div.mapboxgl-popup-content {
+    overflow-y: scroll;
+    max-height: 400px;
+  }
+
+  #map-container {
+    position: relative;
+  }
+
+  .map-overlay {
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    position: absolute;
+    width: 200px;
+    top: 0;
+    left: 0;
+    padding: 10px;
+  }
+
+  .map-overlay .map-overlay-inner {
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .map-overlay-inner fieldset {
+    border: none;
+    padding: 0;
+    margin: 0 0 10px;
+  }
+
+  .map-overlay-inner fieldset:last-child {
+    margin: 0;
+  }
+
+  .map-overlay-inner select {
+    width: 100%;
+  }
+
+  .map-overlay-inner label {
+    display: block;
+    font-weight: bold;
+    margin: 0 0 5px;
+  }
+
+  .map-overlay-inner button {
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .map-overlay-inner button:focus {
+    outline: none;
+  }
+
+  .map-overlay-inner button:hover {
+    box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.1);
+  }
+</style>

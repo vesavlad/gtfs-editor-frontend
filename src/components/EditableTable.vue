@@ -12,7 +12,7 @@
           </div>
         </form>
       </template>
-      <button class="btn icon" @click="informationModal.visible=true">
+      <button class="btn icon" @click="informationModal.visible=true" alt="Go to GTFS specification.">
         <span class="material-icons">info</span>
       </button>
       <div>
@@ -22,7 +22,7 @@
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
           </template>
           <div slot="actions" slot-scope="props">
-            <button class="btn icon" @click="beginDeleteRow(props.rowData)">
+            <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
               <span class="material-icons">delete</span>
             </button>
             <slot name="additional-actions" v-bind:rowData="props.rowData" v-bind:rowField="props.rowField" v-bind:rowIndex="props.rowIndex"></slot>

@@ -8,7 +8,7 @@
       <EditableTable :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
         :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
         <template slot="additional-actions" slot-scope="props">
-          <button class="btn icon" @click="focusStop(props)">
+          <button class="btn icon" @click="focusStop(props)" alt="Focus Stop on interactive map.">
             <span class="material-icons">map</span>
           </button>
         </template>

@@ -2,8 +2,9 @@
   <div>
     <div :key="`popup-${getFieldName(field)}`" v-for="field in getProperFields(fields)">
       <label>{{getFieldName(field)}}</label>
+      <div class="error-message" v-for="error in errors[getFieldName(field)]" v-bind:key="error">{{error}}</div>
       <GeneralizedInput :data="newData" :field="field" :value="newData[getFieldName(field)]"
-        v-model="newData[getFieldID(field)]">
+        v-model="newData[getFieldID(field)]" v-on:input="$emit('input',newData)">
       </GeneralizedInput>
     </div>
   </div>
@@ -11,8 +12,6 @@
 
 
 <script>
-  import $ from 'jquery';
-  import 'select2';
   import fieldMixin from "@/mixins/fieldMixin.js";
   import GeneralizedInput from "@/components/GeneralizedInput.vue";
   export default {
@@ -28,24 +27,30 @@
         type: Array,
         required: true
       },
-      data: {
+      value: {
         type: Object,
         required: true
-      }
+      },
+      errors: {
+        type: Object,
+        default: () => new Object(),
+      },
     },
     data() {
       return {
         newData: {
+          ...this.value,
           changed: false,
-        }
+        },
       }
     },
     watch: {
-      data(newData) {
-        this.newData = newData;
-        $("select.popup-select").select2("destroy");
-        this.$nextTick(this.datafy);
-      }
+      value: {
+        handler(newData) {
+          this.newData = newData;
+        },
+        deep: true,
+      },
     },
     methods: {
       log() {
@@ -61,4 +66,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  .error-message {
+    color: red;
+  }
 </style>
