@@ -6,9 +6,6 @@
           style="min-width:500px; max-width:50%">
           <div class="input-group">
             <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
-            <button type="submit" class="btn btn-outline-secondary">
-              <i class="mdi mdi-magnify" /> Go
-            </button>
           </div>
         </form>
       </template>
