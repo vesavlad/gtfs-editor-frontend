@@ -164,6 +164,7 @@
         quickSearch: '',
         hasChanged: false,
         current_page: -1000,
+        last_page: -1000,
         doSearch: false,
       };
     },
@@ -418,8 +419,9 @@
         this.$nextTick(() => this.$refs.vuetable.$data.tableData.forEach(row => row.changed = false));
       },
       onPaginationData(paginationData) {
-        if (paginationData.current_page !== this.current_page) {
+        if (paginationData.current_page !== this.current_page || paginationData.last_page !== this.last_page) {
           this.current_page = paginationData.current_page;
+          this.last_page = paginationData.last_page;
           this.$refs.pagination.setPaginationData(paginationData);
           this.$refs.paginationDropDown.setPaginationData(paginationData);
           this.$nextTick(() => {
@@ -429,10 +431,6 @@
       },
       reloadTable() {
         this.$refs.vuetable.refresh();
-      },
-      doSomethingAfterReload(data, table) {
-        console.log(data)
-        console.log(table)
       },
       makeQueryParams(sortOrder, currentPage, perPage) {
         let sorting = ""
