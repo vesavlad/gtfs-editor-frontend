@@ -161,10 +161,17 @@
       },
       create() {
         let data = this.creation.data;
-        stopsAPI.stopsAPI.create(this.project, data).then(response => {
-          console.log(response);
+        stopsAPI.stopsAPI.create(this.project, data).then(() => {
           this.addStop(data);
+          console.log(this.creation);
           this.creation.errors = {};
+          this.creation.creating = false;
+          this.creation.data = {
+            stop_lat: null,
+            stop_lon: null,
+          };
+          this.creation.geojson.features = [];
+          this.map.getSource('creating').setData(this.creation.geojson);
         }).catch((err) => {
           console.log(err);
           console.log(err.response);
@@ -189,7 +196,8 @@
         return stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : "");
       },
       addStop(data) {
-        console.log(data);
+        this.stops.push(data);
+        this.reGenerateStops();
       },
       generateStopGeoJson(stop) {
         return {

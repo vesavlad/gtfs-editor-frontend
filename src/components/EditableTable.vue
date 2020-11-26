@@ -454,7 +454,7 @@
       },
     },
     created(){
-      this.doSearch = debounce(this.reloadTable, 500);
+      this.doSearch = debounce(this.reloadTable, 300);
     },
     mounted() {
       this.$nextTick(() => {
