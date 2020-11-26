@@ -5,7 +5,7 @@
         <form class="form-inline d-flex mx-1 justify-content-end" @submit.stop.prevent="doSearch"
           style="min-width:500px; max-width:50%">
           <div class="input-group">
-            <input v-model="quickSearch" type="search" placeholder="Quick search">
+            <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
             <button type="submit" class="btn btn-outline-secondary">
               <i class="mdi mdi-magnify" /> Go
             </button>
@@ -126,7 +126,7 @@
   import GeneralizedInput from "@/components/GeneralizedInput.vue";
   import $ from 'jquery';
   import 'select2';
-
+  import {debounce} from "debounce";
   export default {
     name: "EditableTable",
     components: {
@@ -167,6 +167,7 @@
         quickSearch: '',
         hasChanged: false,
         current_page: -1000,
+        doSearch: false,
       };
     },
     props: {
@@ -431,10 +432,6 @@
       },
       reloadTable() {
         this.$refs.vuetable.refresh();
-
-      },
-      doSearch() {
-        this.reloadTable();
       },
       doSomethingAfterReload(data, table) {
         console.log(data)
@@ -455,6 +452,9 @@
       onActionClicked(action, data) {
         console.log("slot actions: on-click", data);
       },
+    },
+    created(){
+      this.doSearch = debounce(this.reloadTable, 500);
     },
     mounted() {
       this.$nextTick(() => {

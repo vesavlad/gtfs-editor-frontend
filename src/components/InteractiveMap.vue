@@ -1,7 +1,16 @@
 <template>
   <div id='map-container'>
     <div id='map'>
-      <popup-content v-show="modalOpen" ref="popupContent" :fields="stopFields" v-model="popup.stop"></popup-content>
+      <div ref="popup" v-show="popup.open">
+        <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
+        </popup-content>
+        <button class="btn icon" alt="Delete" @click="beginStopDeletion">
+          <span class="material-icons">delete</span>
+        </button>
+        <!-- <button class="btn icon" alt="Save" @click="log">
+          <span class="material-icons">save</span>
+        </button> -->
+      </div>
     </div>
     <div class="map-overlay top">
       <div class="map-overlay-inner" v-if="map">
@@ -9,8 +18,8 @@
           <span class="material-icons">add</span>
         </button>
         <div v-if="creation.creating">
-          <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields"
-            :errors="creation.errors" v-model="creation.data">
+          <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
+            v-model="creation.data">
           </popup-content>
           <button class="btn icon" alt="Create" @click="create">
             <span class="material-icons">add_location</span>
@@ -18,28 +27,49 @@
         </div>
       </div>
     </div>
+    <Modal v-if="deleteModal.visible" @ok="deleteStop" @close="deleteModal.visible = false"
+      @cancel="deleteModal.visible = false" :showCancelButton="true">
+      <template slot="title">
+        <h2>Are you sure you want to delete this stop?</h2>
+      </template>
+      <template slot="content">
+        <span>
+          {{deleteModal.message}}
+        </span>
+      </template>
+      <template slot="close-button-name">Delete</template>
+    </Modal>
   </div>
 </template>
 
 <script>
   import stopsAPI from '@/api/stops.api';
   import PopupContent from '@/components/PopupContent.vue';
+  import Modal from "@/components/Modal.vue";
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
 
   export default {
     name: 'InteractiveMap',
     components: {
-      PopupContent
+      PopupContent,
+      Modal,
     },
     data() {
       return {
         stops: [],
+        deleteModal: {
+          visible: false,
+          stop: {},
+          message: "",
+        },
         popup: {
           stop: {},
+          open: false,
+          errors: {},
+          disableClose: false,
         },
         map: false,
-        modalOpen: false,
         dragging: false,
         geojson: {},
         creation: {
@@ -98,6 +128,30 @@
       });
     },
     methods: {
+      beginStopDeletion() {
+        let stop = this.popup.stop;
+        this.deleteModal.visible = true;
+        this.deleteModal.stop = stop;
+        this.deleteModal.message = "";
+      },
+      deleteStop() {
+        let stop = this.deleteModal.stop;
+        stopsAPI.stopsAPI.remove(this.project, stop).then(() => {
+          this.deleteModal.visible = false;
+          this.deleteModal.stop = {};
+          this.deleteModal.message = "";
+          this.popup.disableClose = true;
+          this.popup.popup.remove();
+          this.popup.disableClose = false;
+          this.stops = this.stops.filter(s => s.id !== stop.id);
+          this.reGenerateStops();
+          console.log("removed");
+        }).catch((err) => {
+          console.log(err);
+          let data = err.response.data;
+          this.deleteModal.message = data.message;
+        });
+      },
       beginCreation() {
         let self = this;
         this.map.once("click", e => {
@@ -112,6 +166,7 @@
           this.addStop(data);
           this.creation.errors = {};
         }).catch((err) => {
+          console.log(err);
           console.log(err.response);
           this.creation.errors = err.response.data;
         });
@@ -127,31 +182,40 @@
       },
       generatePopup(stop) {
         this.popup.stop = stop;
-        return this.$refs.popupContent.$el;
+        this.popup.errors = {};
+        return this.$refs.popup;
       },
       createLabel(stop) {
         return stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : "");
+      },
+      addStop(data) {
+        console.log(data);
+      },
+      generateStopGeoJson(stop) {
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [
+              stop.stop_lon,
+              stop.stop_lat,
+            ]
+          },
+          properties: {
+            stop_id: stop.id,
+            label: this.createLabel(stop),
+          }
+        }
+      },
+      reGenerateStops(){
+        this.geojson.features = this.stops.map(this.generateStopGeoJson);
+        this.map.getSource('stops').setData(this.geojson);
       },
       addStops() {
         // We create the geojson and add it to the map
         this.geojson = {
           type: 'FeatureCollection',
-          features: this.stops.map(stop => {
-            return {
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [
-                  stop.stop_lon,
-                  stop.stop_lat,
-                ]
-              },
-              properties: {
-                stop_id: stop.id,
-                label: this.createLabel(stop),
-              }
-            }
-          })
+          features: this.stops.map(this.generateStopGeoJson),
         };
         this.map.addSource('stops', {
           type: 'geojson',
@@ -243,11 +307,24 @@
           let popup = new mapboxgl.Popup()
             .setLngLat(coordinates)
             .setDOMContent(this.generatePopup(stop))
-          popup.addTo(map);
-          popup.on('close', () => {
-            stopsAPI.stopsAPI.update(this.project, this.popup.stop);
-          });
-          this.modalOpen = true;
+          popup.addTo(map)
+            .on('close', () => {
+              if (this.popup.disableClose) return;
+              stopsAPI.stopsAPI.update(this.project, this.popup.stop).then(response => {
+                console.log(response);
+                this.stops = this.stops.map(stop => {
+                  if(this.popup.stop.id === stop.id){
+                    return {...this.popup.stop};
+                  }
+                  else {
+                    return stop;
+                  }
+                });
+                this.reGenerateStops()
+              });
+            });
+          this.popup.popup = popup;
+          this.popup.open = true;
         });
         this.map.on('mouseenter', 'layer-stops-icon', function () {
           if (this.dragging) return;
@@ -288,25 +365,20 @@
           });
         });
       },
+      log() {
+        console.log(...arguments);
+      },
       updateStop(stop, coords) {
         stop.geometry.coordinates = coords;
-        this.geojson.features = this.geojson.features.map(feature => {
-          if (feature.properties.stop_id === stop.properties.stop_id) {
-            feature.geometry.coordinates = [coords.lng, coords.lat];
-            let stop_data = this.stopMap[stop.properties.stop_id];
-            stop_data.stop_lat = coords.lat;
-            stop_data.stop_lon = coords.lng;
-            stopsAPI.stopsAPI.update(this.project, {
-              id: stop_data.id,
-              stop_lat: coords.lat,
-              stop_lon: coords.lng,
-            }).then(() => {
-              console.log("updated");
-            })
+        this.stops = this.stops.map(s => {
+          if(s.id !== stop.properties.stop_id){
+            return s;
           }
-          return feature;
+          s.stop_lon = coords.lng;
+          s.stop_lat = coords.lat;
+          return s;
         });
-        this.map.getSource('stops').setData(this.geojson);
+        this.reGenerateStops();
       },
       dragMode(evt) {
         return evt.originalEvent.altKey;
