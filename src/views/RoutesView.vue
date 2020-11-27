@@ -1,7 +1,12 @@
 <template>
     <div>
-        <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove"
-      :createMethod="create" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+        <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
+            :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+            <template slot="additional-actions" slot-scope="props">
+                <button class="btn icon" @click="goToRoute(props)" alt="Go to route">
+                    <span class="material-icons">map</span>
+                </button>
+            </template>
         </EditableTable>
     </div>
 </template>
@@ -87,6 +92,15 @@
             };
         },
         methods: {
+            goToRoute(params) {
+                this.$router.push({
+                    path: 'trips',
+                    params,
+                    query: {
+                        search: params.rowData.route_id,
+                    }
+                })
+            },
             update(data) {
                 return routesAPI.routesAPI.update(this.$route.params.projectid, data);
             },

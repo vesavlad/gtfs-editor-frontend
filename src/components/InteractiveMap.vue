@@ -286,7 +286,6 @@
       },
       findStop(id) {
         let s = null;
-        console.log(id);
         this.stops.forEach(stop => {
           if(stop.id === id){
             s = stop;

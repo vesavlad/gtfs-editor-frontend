@@ -167,7 +167,7 @@
           visible: false,
         },
         test: true,
-        quickSearch: '',
+        quickSearch: this.$route.query.search?this.$route.query.search:'',
         hasChanged: false,
         current_page: -1000,
         last_page: -1000,
