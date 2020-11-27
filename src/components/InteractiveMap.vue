@@ -86,15 +86,6 @@
         },
       }
     },
-    computed: {
-      stopMap() {
-        let map = {};
-        this.stops.forEach(stop => {
-          map[stop.id] = stop;
-        });
-        return map;
-      }
-    },
     props: {
       project: {
         required: true,
@@ -293,17 +284,26 @@
         }];
         this.map.getSource('creating').setData(this.creation.geojson);
       },
+      findStop(id) {
+        let s = null;
+        console.log(id);
+        this.stops.forEach(stop => {
+          if(stop.id === id){
+            s = stop;
+          }
+        })
+        return s;
+      },
       addListeners() {
         let map = this.map;
         let canvas = map.getCanvas();
-        let stopMap = this.stopMap;
         let self = this;
         this.map.on('click', 'layer-stops-icon', (evt) => {
           if (this.dragMode(evt)) {
             return;
           }
           var coordinates = evt.features[0].geometry.coordinates.slice();
-          var stop_id = evt.features[0].properties.stop_id;
+          var id = evt.features[0].properties.stop_id;
 
           // Ensure that if the map is zoomed out such that multiple
           // copies of the feature are visible, the popup appears
@@ -311,7 +311,7 @@
           while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
             coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
           }
-          let stop = stopMap[stop_id];
+          let stop = this.findStop(id);
           let popup = new mapboxgl.Popup()
             .setLngLat(coordinates)
             .setDOMContent(this.generatePopup(stop))
@@ -377,13 +377,13 @@
         console.log(...arguments);
       },
       updateStop(stop, coords) {
-        stop.geometry.coordinates = coords;
         this.stops = this.stops.map(s => {
           if(s.id !== stop.properties.stop_id){
             return s;
           }
           s.stop_lon = coords.lng;
           s.stop_lat = coords.lat;
+          console.log(s);
           return s;
         });
         this.reGenerateStops();

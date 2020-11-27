@@ -22,7 +22,8 @@
             <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
               <span class="material-icons">delete</span>
             </button>
-            <slot name="additional-actions" v-bind:rowData="props.rowData" v-bind:rowField="props.rowField" v-bind:rowIndex="props.rowIndex"></slot>
+            <slot name="additional-actions" v-bind:rowData="props.rowData" v-bind:rowField="props.rowField"
+              v-bind:rowIndex="props.rowIndex"></slot>
           </div>
           <!-- This is where the fields are converted into inputs to make the table editable -->
           <GeneralizedInput :key="index" v-for="(field, index) in getProperFields(fields)" :slot="getFieldName(field)"
@@ -45,7 +46,7 @@
             Download CSV
           </button>
         </form>
-        <button class="btn btn-outline-secondary" @click="uploadModal.visible=true">
+        <button class="btn btn-outline-secondary" @click="uploadModal.visible=true; uploadModal.error = '';">
           Upload CSV
         </button>
         <button class="btn btn-outline-secondary" @click="createModal.visible=true">
@@ -61,6 +62,8 @@
         <span>
           Upload CSV file.
         </span>
+        <br>
+        <span v-if="uploadModal.error" style="color: red;">{{uploadModal.error}}</span>
       </template>
       <template slot="base">
         <FileReader @load="uploadCSVFile($event)"></FileReader>
@@ -76,7 +79,7 @@
         <div :key="`create-${getFieldName(field)}`" v-for="field in getProperFields(fields)">
           <label>{{getFieldName(field)}}</label>
           <GeneralizedInput :data="createModal.data" :field="field" :value="createModal.data[getFieldName(field)]"
-          v-model="createModal.data[getFieldID(field)]">
+            v-model="createModal.data[getFieldID(field)]">
           </GeneralizedInput>
         </div>
         <div ref="errorDiv" v-html="errorModal.message" />
@@ -123,7 +126,9 @@
   import GeneralizedInput from "@/components/GeneralizedInput.vue";
   import $ from 'jquery';
   import 'select2';
-  import {debounce} from "debounce";
+  import {
+    debounce
+  } from "debounce";
   export default {
     name: "EditableTable",
     components: {
@@ -158,6 +163,7 @@
           visible: false,
         },
         uploadModal: {
+          error: "",
           visible: false,
         },
         test: true,
@@ -389,7 +395,8 @@
           this.uploadModal.visible = false;
           this.reloadTable();
         }).catch(error => {
-          console.log(error);
+          console.log(error.response);
+          this.uploadModal.error = error.response.data;
         });
       },
       log() {
@@ -448,7 +455,7 @@
         console.log("slot actions: on-click", data);
       },
     },
-    created(){
+    created() {
       this.doSearch = debounce(this.reloadTable, 300);
     },
     mounted() {
