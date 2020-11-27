@@ -20,6 +20,7 @@ import FareRulesView from '../views/FareRulesView.vue'
 import LevelsView from '../views/LevelsView.vue'
 import TransfersView from '../views/TransfersView.vue'
 import PathwaysView from '../views/PathwaysView.vue'
+import Shapes from '../views/Shapes.vue'
 
 
 Vue.use(VueRouter)
@@ -142,6 +143,14 @@ const routes = [{
         component: LevelsView,
         meta: {
           breadcrumb: 'Levels'
+        },
+      },
+      {
+        path: '/project/:projectid/shapes',
+        name: 'Shapes',
+        component: Shapes,
+        meta: {
+          breadcrumb: 'Shapes'
         },
       },
 
