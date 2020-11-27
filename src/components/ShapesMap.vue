@@ -65,66 +65,69 @@
             'line-width': 2
           }
         });
-        const url = 'img/arrow.png'
-        this.map.loadImage(url, (err, image) => {
-          if (err) {
-            console.log(err);
-            return;
-          }
-          this.map.addImage('arrow', image);
-          this.map.addLayer({
-            'id': 'arrowId',
-            'type': 'symbol',
-            'source': 'mapSource',
-            'layout': {
-              'symbol-placement': 'line',
-              'symbol-spacing': 1,
-              'icon-allow-overlap': true,
-              // 'icon-ignore-placement': true,
-              'icon-image': 'arrow',
-              'icon-size': 0.045,
-              'visibility': 'visible'
-            }
-          });
-        });
+        // console.log(process.env);
+        // let url = `@/assets/arrow.png`
+        // console.log(url);
+        // console.log(require(url));
+        // this.map.loadImage(url, (err, image) => {
+        //   if (err) {
+        //     console.log(err); 
+        //     return;
+        //   }
+        //   this.map.addImage('arrow', image);
+        //   this.map.addLayer({
+        //     'id': 'arrowId',
+        //     'type': 'symbol',
+        //     'source': 'mapSource',
+        //     'layout': {
+        //       'symbol-placement': 'line',
+        //       'symbol-spacing': 1,
+        //       'icon-allow-overlap': true,
+        //       // 'icon-ignore-placement': true,
+        //       'icon-image': 'arrow',
+        //       'icon-size': 0.045,
+        //       'visibility': 'visible'
+        //     }
+        //   });
+        // });
 
-        this.setDefaultCoordinates();
       },
-      setDefaultCoordinates() {
-        let points = [
-          [-122.48369693756104, 37.83381888486939],
-          [-122.48348236083984, 37.83317489144141],
-          [-122.48339653015138, 37.83270036637107],
-          [-122.48356819152832, 37.832056363179625],
-          [-122.48404026031496, 37.83114119107971],
-          [-122.48404026031496, 37.83049717427869],
-          [-122.48348236083984, 37.829920943955045],
-          [-122.48356819152832, 37.82954808664175],
-          [-122.48507022857666, 37.82944639795659],
-          [-122.48610019683838, 37.82880236636284],
-          [-122.48695850372314, 37.82931081282506],
-          [-122.48700141906738, 37.83080223556934],
-          [-122.48751640319824, 37.83168351665737],
-          [-122.48803138732912, 37.832158048267786],
-          [-122.48888969421387, 37.83297152392784],
-          [-122.48987674713133, 37.83263257682617],
-          [-122.49043464660643, 37.832937629287755],
-          [-122.49125003814696, 37.832429207817725],
-          [-122.49163627624512, 37.832564787218985],
-          [-122.49223709106445, 37.83337825839438],
-          [-122.49378204345702, 37.83368330777276]
-        ]
-        this.setShapeCoordinates(points);
+      displayShape(shape) {
+        shapesAPI.shapesAPI.detail(this.project, shape.id).then(response => {
+          let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+          this.setShapeCoordinates(points);
+        }).catch(err => console.log(err));
       },
       setShapeCoordinates(points) {
         this.geojson.geometry.coordinates = points;
         this.map.getSource('shape').setData(this.geojson);
-        this.map.flyTo({
-          center: points[0],
-          zoom: 14,
-        });
-
+        this.map.fitBounds(this.getBounds(points));
       },
+      getBounds(points) {
+        // We start with the entire world
+        let minlon = 180;
+        let minlat = 90;
+        let maxlon = -180;
+        let maxlat = -90;
+        // First point is gonna override all 4 defaults, then we slowly expand the square to incorporate any new points
+        points.forEach(point => {
+          minlon = Math.min(point[0], minlon)
+          minlat = Math.min(point[1], minlat)
+          maxlon = Math.max(point[0], maxlon)
+          maxlat = Math.max(point[1], maxlat)
+        });
+        // We add a bit of padding to better visualize the shape
+        let lonPadding = (maxlon-minlon)*0.1
+        let latPadding = (maxlat-minlat)*0.1
+        minlon = Math.max(-90, minlon - lonPadding)
+        minlat = Math.max(-180, minlat - latPadding)
+        maxlon = Math.min(90, maxlon + lonPadding)
+        maxlat = Math.min(180, maxlat+ latPadding)
+        return [
+          [minlon, minlat],
+          [maxlon, maxlat],
+        ]
+      }
     },
   };
 </script>

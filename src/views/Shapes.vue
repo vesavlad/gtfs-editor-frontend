@@ -1,7 +1,7 @@
 <template>
   <div style="display: flex; flex-direction: row;">
-    <ShapesTable :project="$route.params.projectid"></ShapesTable>
-    <ShapesMap :project="$route.params.projectid"></ShapesMap>
+    <ShapesTable ref="table" :project="$route.params.projectid" @focus-shape="displayShape"></ShapesTable>
+    <ShapesMap ref="map" :project="$route.params.projectid"></ShapesMap>
   </div>
 </template>
 
@@ -16,6 +16,10 @@
     data() {
       return {};
     },
-    methods: {},
+    methods: {
+      displayShape(shape){
+        this.$refs.map.displayShape(shape);
+      }
+    },
   };
 </script>

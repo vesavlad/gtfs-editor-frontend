@@ -1,14 +1,23 @@
 <template>
   <div>
+    <form class="form-inline d-flex mx-1 justify-content-end" @submit.stop.prevent="doSearch"
+      style="min-width:500px; max-width:50%">
+      <div class="input-group">
+        <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
+      </div>
+    </form>
     <div>
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
-        @vuetable:pagination-data="onPaginationData">
+        @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
         <div slot="actions" slot-scope="props" style="display: flex; flex-direction: row;">
           <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
             <span class="material-icons">delete</span>
           </button>
           <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
             <span class="material-icons">edit</span>
+          </button>
+          <button class="btn icon" @click="$emit('focus-shape', props.rowData)" alt="Display shape.">
+            <span class="material-icons">remove_red_eye</span>
           </button>
         </div>
       </Vuetable>
@@ -30,6 +39,9 @@
   let Vuetable = require('vuetable-2')
   import VuetablePagination from "@/components/VueTablePagination.vue";
   import shapesAPI from "@/api/shapes.api";
+  import {
+    debounce
+  } from "debounce";
   export default {
     name: "ShapesTable",
     components: {
@@ -40,6 +52,8 @@
     mixins: [],
     data: function () {
       return {
+        quickSearch: "",
+        doSearch: false,
         fields: [
           "actions",
           {
@@ -77,8 +91,24 @@
         }
         this.$refs.vuetable.changePage(page);
       },
+      reloadTable() {
+        this.$refs.vuetable.refresh();
+      },
+      makeQueryParams(sortOrder, currentPage, perPage) {
+        let sorting = ""
+        if (sortOrder.length > 0) {
+          sorting = sortOrder[0].sortField + "|" + sortOrder[0].direction;
+        }
+        return {
+          sort: sorting,
+          page: currentPage,
+          per_page: perPage,
+          search: this.quickSearch,
+        }
+      },
     },
     mounted() {
+      this.doSearch = debounce(this.reloadTable, 300);
       this.$nextTick(() => {
         $("select.vuetable-pagination-dropdown").select2({
           matcher(query, option) {

@@ -26,6 +26,9 @@ const BaseAPI = class {
             timeout: 0,
         });
     }
+    detail(projectid, id){
+        return httpClient.get(this.getDetailURL(projectid, id));
+    }
     update(projectid, data) {
         return httpClient.patch(this.getDetailURL(projectid, data.id), data);
     }
