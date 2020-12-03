@@ -32,6 +32,9 @@ const BaseAPI = class {
     update(projectid, data) {
         return httpClient.patch(this.getDetailURL(projectid, data.id), data);
     }
+    put(projectid, data) {
+        return httpClient.put(this.getDetailURL(projectid, data.id), data);
+    }
     create(projectid, data){
         return httpClient.post(this.getBaseURL(projectid), data);
     }

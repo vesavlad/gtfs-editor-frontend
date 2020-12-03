@@ -11,7 +11,6 @@
   import shapesAPI from "@/api/shapes.api";
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
-  console.log(shapesAPI);
   export default {
     name: "ShapesMap",
     components: {},
@@ -25,6 +24,10 @@
             'type': 'LineString',
             'coordinates': []
           }
+        },
+        pointsGeojson: {
+          type: 'FeatureCollection',
+          features: []
         },
       };
     },
@@ -52,6 +55,10 @@
           'type': 'geojson',
           'data': this.geojson,
         });
+        this.map.addSource('shape-pts', {
+          'type': 'geojson',
+          'data': this.pointsGeojson,
+        });
         this.map.addLayer({
           'id': 'shape-layer',
           'type': 'line',
@@ -65,43 +72,87 @@
             'line-width': 2
           }
         });
-        // console.log(process.env);
-        // let url = `@/assets/arrow.png`
-        // console.log(url);
-        // console.log(require(url));
-        // this.map.loadImage(url, (err, image) => {
-        //   if (err) {
-        //     console.log(err); 
-        //     return;
-        //   }
-        //   this.map.addImage('arrow', image);
-        //   this.map.addLayer({
-        //     'id': 'arrowId',
-        //     'type': 'symbol',
-        //     'source': 'mapSource',
-        //     'layout': {
-        //       'symbol-placement': 'line',
-        //       'symbol-spacing': 1,
-        //       'icon-allow-overlap': true,
-        //       // 'icon-ignore-placement': true,
-        //       'icon-image': 'arrow',
-        //       'icon-size': 0.045,
-        //       'visibility': 'visible'
-        //     }
-        //   });
-        // });
+        this.map.addLayer({
+          id: "shape-circle-layer",
+          type: "circle",
+          source: "shape-pts",
+          paint: {
+            "circle-radius": {
+              base: 2,
+              stops: [
+                [12, 1.5],
+                [14, 4],
+                [20, 180]
+              ]
+            },
+            "circle-color": "#2222DD"
+          }
+        });
+        this.map.addLayer({
+          id: "shape-label-layer",
+          type: "symbol",
+          source: "shape-pts",
+          minzoom: 14,
+          layout: {
+            "text-field": "{label}",
+            "text-anchor": "top",
+            "text-offset": [0, 0.5],
+            "text-allow-overlap": true,
+          }
+        });
+        let img = require('../assets/png/arrow-small.png')
+        this.map.loadImage(img, (err, image) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          this.map.addImage('arrow', image);
+          this.map.addLayer({
+            'id': 'arrowId',
+            'type': 'symbol',
+            'source': 'shape',
+            'layout': {
+              'symbol-placement': 'line',
+              'symbol-spacing': 100,
+              'icon-allow-overlap': true,
+              'icon-ignore-placement': true,
+              'icon-image': 'arrow',
+              'icon-size': 1,
+              'visibility': 'visible'
+            }
+          });
+        });
 
       },
       displayShape(shape) {
         shapesAPI.shapesAPI.detail(this.project, shape.id).then(response => {
           let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+          this.pointsGeojson.features = points.map(point => {
+            return {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [
+                  point.shape_pt_lon,
+                  point.shape_pt_lat,
+                ]
+              },
+              properties: {
+                label: point.shape_pt_sequence,
+              }
+            }
+          })
+          this.map.getSource('shape-pts').setData(this.pointsGeojson);
           this.setShapeCoordinates(points);
+          console.log(this.map.getSource('shape-pts'));
         }).catch(err => console.log(err));
       },
       setShapeCoordinates(points) {
         this.geojson.geometry.coordinates = points;
         this.map.getSource('shape').setData(this.geojson);
-        this.map.fitBounds(this.getBounds(points));
+        this.map.fitBounds(this.getBounds(points), {
+          padding: 50
+        });
       },
       getBounds(points) {
         // We start with the entire world
@@ -116,13 +167,6 @@
           maxlon = Math.max(point[0], maxlon)
           maxlat = Math.max(point[1], maxlat)
         });
-        // We add a bit of padding to better visualize the shape
-        let lonPadding = (maxlon-minlon)*0.1
-        let latPadding = (maxlat-minlat)*0.1
-        minlon = Math.max(-90, minlon - lonPadding)
-        minlat = Math.max(-180, minlat - latPadding)
-        maxlon = Math.min(90, maxlon + lonPadding)
-        maxlat = Math.min(180, maxlat+ latPadding)
         return [
           [minlon, minlat],
           [maxlon, maxlat],

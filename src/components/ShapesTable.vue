@@ -13,7 +13,7 @@
           <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
             <span class="material-icons">delete</span>
           </button>
-          <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
+          <button class="btn icon" @click="$emit('edit-shape', props.rowData)" alt="Delete entry.">
             <span class="material-icons">edit</span>
           </button>
           <button class="btn icon" @click="$emit('focus-shape', props.rowData)" alt="Display shape.">

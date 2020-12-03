@@ -298,9 +298,6 @@
         let canvas = map.getCanvas();
         let self = this;
         this.map.on('click', 'layer-stops-icon', (evt) => {
-          if (this.dragMode(evt)) {
-            return;
-          }
           var coordinates = evt.features[0].geometry.coordinates.slice();
           var id = evt.features[0].properties.stop_id;
 
@@ -341,36 +338,42 @@
           if (this.dragging) return;
           canvas.style.cursor = '';
         });
-        map.on('mousedown', 'layer-stops-icon', function (evt) {
+        map.on('mousedown', 'layer-stops-icon', function (evt_down) {
           // Prevent the default map drag behavior.
-          if (!self.dragMode(evt)) {
-            return;
-          }
-          evt.preventDefault();
+          evt_down.preventDefault();
           canvas.style.cursor = 'grab';
-          let activeStop = evt.features[0]
+          let activeStop = evt_down.features[0]
+          console.log(evt_down.features);
 
-          map.once('mouseup', evt => {
-            let coords = evt.lngLat;
+          map.once('mouseup', evt_up => {
+            let coords = evt_up.lngLat;
+            let distance = self.calcDistance(evt_down, evt_up);
+            if(!distance){
+              return;
+            }
             self.updateStop(activeStop, coords);
             canvas.style.cursor = '';
           });
         });
 
-        map.on('mousedown', 'layer-creating-icon', function (evt) {
+        map.on('mousedown', 'layer-creating-icon', function (evt_down) {
           // Prevent the default map drag behavior.
-          if (!self.dragMode(evt)) {
-            return;
-          }
-          evt.preventDefault();
+          evt_down.preventDefault();
           canvas.style.cursor = 'grab';
-
-          map.once('mouseup', evt => {
-            let coords = evt.lngLat;
+          map.once('mouseup', evt_up => {
+            let coords = evt_up.lngLat;
             self.updateCreationCoords(coords);
             canvas.style.cursor = '';
           });
         });
+      },
+      // Distance in pixels between events
+      calcDistance(e1, e2) {
+        e1 = e1.point;
+        e2 = e2.point;
+        let xdif = e1.x-e2.x;
+        let ydif = e2.y-e2.y;
+        return Math.sqrt(xdif*xdif+ydif*ydif)
       },
       log() {
         console.log(...arguments);
@@ -386,9 +389,6 @@
           return s;
         });
         this.reGenerateStops();
-      },
-      dragMode(evt) {
-        return evt.originalEvent.altKey;
       },
     },
   }
