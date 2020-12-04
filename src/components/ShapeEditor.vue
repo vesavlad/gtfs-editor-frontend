@@ -38,12 +38,6 @@
   import mapMatching from '@/api/mapMatching.api';
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
-  let debug = true;
-  let print = (...args) => {
-    if (debug) {
-      console.log(...args);
-    }
-  }
   export default {
     name: 'ShapeEditor',
     components: {},
@@ -66,6 +60,10 @@
           start: [],
           finish: [],
         },
+        connectingLineGeojson: {
+          'type': 'FeatureCollection',
+          features: [],
+        },
         pointSeqGeojson: {
           'type': 'FeatureCollection',
           features: [],
@@ -73,7 +71,7 @@
         points: [],
         lineCoords: [],
         id: 0,
-        mapMatching: !this.shape,
+        mapMatching: !this.shape || this.range,
         shape_id: this.shape ? this.shape.shape_id : "",
         warning: false,
         error: false,
@@ -89,6 +87,10 @@
       range: {
         default: false,
       },
+      mode: {
+        type: String,
+        default: "simple"
+      }
     },
     computed: {
       creating() {
@@ -102,7 +104,7 @@
       });
       this.map = map;
       map.on('load', () => {
-        this.addPoints();
+        this.addSources();
         this.addLayers();
         this.addListeners();
         let bounds = [
@@ -116,7 +118,7 @@
       })
     },
     methods: {
-      addPoints() {
+      addSources() {
         // This are our base points
         this.map.addSource('points', {
           'type': 'geojson',
@@ -142,8 +144,13 @@
           'type': 'geojson',
           'data': fixedPointsGeojson,
         });
-        if (!this.creating) {
-          this.mapMatching = false;
+        
+        this.map.addSource('connecting-line', {
+          'type': 'geojson',
+          'data': this.connectingLineGeojson,
+        });
+
+        if (!this.creating && this.mode !== "all") {
           shapesAPI.shapesAPI.detail(this.project, this.shape.id).then(response => {
             let points = response.data.points.map(point => {
               return {
@@ -216,6 +223,21 @@
             'line-width': 5
           }
         });
+
+        this.map.addLayer({
+          'id': 'connecting-line-layer',
+          'type': 'line',
+          'source': 'connecting-line',
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': '#CC8811',
+            'line-width': 5
+          }
+        });
+
         // Line for the map matching shape
         this.map.addLayer({
           'id': 'line-layer',
@@ -303,18 +325,13 @@
         })
         // When click on a line we add a point in there between the ends
         map.on('click', 'point-line-layer', evt => {
-          print("Clicked on line");
-
           evt.preventDefault();
-          console.log(evt);
           let feature = evt.features[0];
-          console.log(feature);
           let newStop = {
             ...evt.lngLat,
             id: self.id++,
           }
           self.points.splice(self.getPointIndex(feature.properties.to), 0, newStop);
-          console.log(self.points);
           self.reGeneratePoints();
         });
         map.on('mouseenter', 'point-line-layer', () => {
@@ -330,7 +347,6 @@
           if (e.defaultPrevented) {
             return;
           }
-          print("Double clicked map")
           e.preventDefault();
           this.points.push({
             ...e.lngLat,
@@ -339,18 +355,15 @@
           this.reGeneratePoints();
         });
         map.on('contextmenu', 'point-layer', evt => {
-          print("Right clicked node");
           evt.preventDefault();
           let id = evt.features[0].properties.id;
           this.points = this.points.filter(point => point.id !== id);
           this.reGeneratePoints();
         });
         map.on('mousedown', 'point-layer', function (evt_down) {
-          print("clicked on point");
           evt_down.preventDefault();
           canvas.style.cursor = 'grab';
           let feature = evt_down.features[0]
-          console.log(feature);
 
           map.once('mouseup', evt_up => {
             let coords = evt_up.lngLat;
@@ -358,14 +371,12 @@
             if (!distance) {
               return;
             }
-            print("let go of point")
             self.updatePoint(feature, coords);
             canvas.style.cursor = '';
           });
         });
       },
       updatePoint(pt, coords) {
-        console.log(pt);
         this.points = this.points.map(point => {
           if (pt.properties.id === point.id) {
             point = {
@@ -386,7 +397,6 @@
         return Math.sqrt(xdif * xdif + ydif * ydif)
       },
       reGeneratePoints() {
-        console.log(this.points)
         // We add the features
         this.pointGeojson.features = this.points.map(this.generatePointGeojson);
         // And the polyline
@@ -414,7 +424,6 @@
               this.lineGeojson.geometry.coordinates = [];
               console.log("No matchings")
             } else {
-              console.log(matchings[0]);
               this.lineGeojson.geometry.coordinates = matchings[0].geometry.coordinates;
             }
 
@@ -428,7 +437,38 @@
           this.lineGeojson.geometry.coordinates = [];
           this.map.getSource('line').setData(this.lineGeojson);
         }
+        let connectingLines = [];
+        if(this.fixedPoints.start.length > 0){
+          let connectee = this.points.concat(this.fixedPoints.finish);
+          if(connectee.length) {
+            connectingLines.push(this.generateLine(this.fixedPoints.start[this.fixedPoints.start.length-1], connectee[0]))
+          }
+        }
+        if(this.fixedPoints.finish.length > 0){
+          let connectee = this.fixedPoints.start.concat(this.points);
+          if(connectee.length) {
+            connectingLines.push(this.generateLine(connectee[connectee.length-1], this.fixedPoints.finish[0]))
+          }
+        }
+        this.connectingLineGeojson.features = connectingLines;
+        this.map.getSource('connecting-line').setData(this.connectingLineGeojson);
         this.warning = false;
+      },
+      generateLine(from, to){
+        return {
+            'type': 'Feature',
+            'properties': {
+              from: from.id,
+              to: to.id,
+            },
+            'geometry': {
+              'type': 'LineString',
+              'coordinates': [
+                [from.lng, from.lat],
+                [to.lng, to.lat],
+              ]
+            }
+          }
       },
       generateLineFeatures(points) {
         let features = []
@@ -469,7 +509,6 @@
       },
       replacePoints() {
         let coords = this.lineGeojson.geometry.coordinates;
-        console.log(coords);
         if (coords.length) {
           this.points = coords.map(coord => {
             return {
@@ -500,7 +539,6 @@
           points: this.points.map(generatePointJson)
         };
         if (this.creating) {
-          console.log(data);
           shapesAPI.shapesAPI.create(this.project, data).then(response => {
             console.log(response);
             this.$emit('close');
@@ -508,7 +546,6 @@
         } else {
           data.id = this.shape.id;
           data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(generatePointJson);
-          console.log(data);
           shapesAPI.shapesAPI.put(this.project, data).then(response => {
             console.log(response);
             this.$emit('close');

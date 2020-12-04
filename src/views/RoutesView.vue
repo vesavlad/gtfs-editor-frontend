@@ -3,7 +3,7 @@
         <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
             :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
             <template slot="additional-actions" slot-scope="props">
-                <button class="btn icon" @click="goToRoute(props)" alt="Go to route">
+                <button class="btn icon" @click="goToRoute(props)" alt="Go to trips">
                     <span class="material-icons">map</span>
                 </button>
             </template>

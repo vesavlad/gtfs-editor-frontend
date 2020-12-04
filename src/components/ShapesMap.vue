@@ -17,6 +17,7 @@
     mixins: [],
     data: function () {
       return {
+        shapeColor: "#55CCFF",
         geojson: {
           'type': 'Feature',
           'properties': {},
@@ -68,7 +69,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': '#3333CC',
+            'line-color': this.shapeColor,
             'line-width': 2
           }
         });
@@ -85,7 +86,7 @@
                 [20, 180]
               ]
             },
-            "circle-color": "#2222DD"
+            "circle-color": this.shapeColor,
           }
         });
         this.map.addLayer({
@@ -122,12 +123,29 @@
             }
           });
         });
+        this.map.on('click', 'shape-circle-layer', (evt) => {
+          let feature = evt.features[0];
+          if(this.selectingRange) {
+            this.range.push(feature.properties.label);
+            if(this.range.length === 2) {
+              this.$emit("range", {
+                start: this.range[0],
+                finish: this.range[1],
+              }) 
+              this.selectingRange = false;
+            }
+          }
+        })
 
+      },
+      beginPointSelection() {
+        this.selectingRange = true;
+        this.range = [];
       },
       displayShape(shape) {
         shapesAPI.shapesAPI.detail(this.project, shape.id).then(response => {
           let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-          this.pointsGeojson.features = points.map(point => {
+          this.pointsGeojson.features = response.data.points.map(point => {
             return {
               type: 'Feature',
               geometry: {
@@ -144,7 +162,6 @@
           })
           this.map.getSource('shape-pts').setData(this.pointsGeojson);
           this.setShapeCoordinates(points);
-          console.log(this.map.getSource('shape-pts'));
         }).catch(err => console.log(err));
       },
       setShapeCoordinates(points) {
