@@ -97,26 +97,26 @@
                     </tr>
                     <tr>
                         <td>Status</td>
-                        <td>{{ project.gtfsvalidation.status }}</td>
+                        <td>{{ project.gtfsvalidation?project.gtfsvalidation.status:'' }}</td>
                     </tr>
                     <tr>
                         <td>Execution</td>
-                        <td>{{ (new Date(project.gtfsvalidation.ran_at)).toLocaleString() }}</td>
+                        <td>{{ project.gtfsvalidation?(new Date(project.gtfsvalidation.ran_at)).toLocaleString():'' }}</td>
                     </tr>
                     <tr>
                         <td>Duration</td>
-                        <td>{{ project.gtfsvalidation.duration }}</td>
+                        <td>{{ project.gtfsvalidation?project.gtfsvalidation.duration:'' }}</td>
                     </tr>
                     <tr>
                         <td>Errors</td>
-                        <td>{{ project.gtfsvalidation.error_number }}</td>
+                        <td>{{ project.gtfsvalidation?project.gtfsvalidation.error_number:'' }}</td>
                     </tr>
                     <tr>
                         <td>Warnings</td>
-                        <td>{{ project.gtfsvalidation.warning_number }}</td>
+                        <td>{{ project.gtfsvalidation?project.gtfsvalidation.warning_number:'' }}</td>
                     </tr>
                     <tr>
-                        <td colspan="2"><button class="btn list-item" style="width: 100%" :disabled="['finished', 'error'].indexOf(project.gtfsvalidation.status)<0" @click="seeGTFSValidationResults">see results</button></td>
+                        <td colspan="2"><button class="btn list-item" style="width: 100%" :disabled="project.gtfsvalidation && ['finished', 'error'].indexOf(project.gtfsvalidation.status)<0" @click="seeGTFSValidationResults">see results</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -225,7 +225,8 @@
                 this.interval = setInterval(() => {
                     console.log('updated gtfs validation status...');
                     projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
-                        if (['finished', 'error', 'canceled'].indexOf(response.data.gtfsvalidation.status) > -1 && ['finished', 'error'].indexOf(response.data.gtfs_creation_status) > -1) {
+                        if (response.data.gtfsvalidation && ['finished', 'error', 'canceled'].indexOf(response.data.gtfsvalidation.status) > -1 &&
+                           ['finished', 'error'].indexOf(response.data.gtfs_creation_status) > -1) {
                             clearInterval(this.interval);
                         }
                         this.project = response.data;
