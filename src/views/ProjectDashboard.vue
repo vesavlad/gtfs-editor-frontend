@@ -14,6 +14,7 @@
                 </tbody>
             </table>
         </div>
+        <EnvelopeMap :project="project"></EnvelopeMap>
         <div id="Buttons" class="list-container" style="flex: 1">
             <div class="list">
                 <button class="btn list-item" style="width: 100%">Project Settings</button>
@@ -128,12 +129,14 @@
 
 <script>
     import projectsAPI from '@/api/projects.api';
-    import Modal from '@/components/Modal.vue'
+    import Modal from '@/components/Modal.vue';
+    import EnvelopeMap from '@/components/EnvelopeMap.vue';
 
     export default {
         name: 'ProjectDashboard',
         components: {
-            Modal
+            Modal,
+            EnvelopeMap
         },
         data() {
             return {
