@@ -59,10 +59,12 @@
       },
       setCoordinates() {
         let coordinates = this.project.envelope.geometry.coordinates[0];
-        var bounds = coordinates.reduce(function (bounds, coord) {
-          return bounds.extend(coord);
-        }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
-        this.map.fitBounds(bounds, {padding: 20});
+        if (coordinates.length > 0) {
+          var bounds = coordinates.reduce(function (bounds, coord) {
+            return bounds.extend(coord);
+          }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+          this.map.fitBounds(bounds, {padding: 20});
+        }
       }
     }
   };
