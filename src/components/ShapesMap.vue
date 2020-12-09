@@ -10,11 +10,14 @@
 <script>
   import shapesAPI from "@/api/shapes.api";
   const mapboxgl = require('mapbox-gl');
+  import shapeMapMixin from "@/mixins/shapeMapMixin"
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
   export default {
     name: "ShapesMap",
     components: {},
-    mixins: [],
+    mixins: [
+      shapeMapMixin,
+    ],
     data: function () {
       return {
         shapeColor: "#55CCFF",
@@ -125,13 +128,13 @@
         });
         this.map.on('click', 'shape-circle-layer', (evt) => {
           let feature = evt.features[0];
-          if(this.selectingRange) {
+          if (this.selectingRange) {
             this.range.push(feature.properties.label);
-            if(this.range.length === 2) {
+            if (this.range.length === 2) {
               this.$emit("range", {
                 start: this.range[0],
                 finish: this.range[1],
-              }) 
+              })
               this.selectingRange = false;
             }
           }
@@ -146,14 +149,15 @@
         shapesAPI.shapesAPI.detail(this.project, shape.id).then(response => {
           let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
           this.pointsGeojson.features = response.data.points.map(point => {
+            let coordinates = [
+              point.shape_pt_lon,
+              point.shape_pt_lat,
+            ];
             return {
               type: 'Feature',
               geometry: {
                 type: 'Point',
-                coordinates: [
-                  point.shape_pt_lon,
-                  point.shape_pt_lat,
-                ]
+                coordinates,
               },
               properties: {
                 label: point.shape_pt_sequence,
@@ -171,24 +175,6 @@
           padding: 50
         });
       },
-      getBounds(points) {
-        // We start with the entire world
-        let minlon = 180;
-        let minlat = 90;
-        let maxlon = -180;
-        let maxlat = -90;
-        // First point is gonna override all 4 defaults, then we slowly expand the square to incorporate any new points
-        points.forEach(point => {
-          minlon = Math.min(point[0], minlon)
-          minlat = Math.min(point[1], minlat)
-          maxlon = Math.max(point[0], maxlon)
-          maxlat = Math.max(point[1], maxlat)
-        });
-        return [
-          [minlon, minlat],
-          [maxlon, maxlat],
-        ]
-      }
     },
   };
 </script>

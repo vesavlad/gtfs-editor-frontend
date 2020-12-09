@@ -1,6 +1,6 @@
 <template>
   <div id='map-container'>
-    <div id='map'>
+    <div id='map' ref='map'>
     </div>
     <div class="map-overlay top">
       <div class="map-overlay-inner" v-if="map">
@@ -17,19 +17,33 @@
         <div v-if="error" style="color: #AA0000;">
           {{error.code}}
           <br>
-          {{error.message}}
+          <div v-for="(text, index) in error.message.split('\n')" :key="index">
+            {{ text }}
+          </div>
         </div>
         <div v-if="warning" style="color: #AAAA00;">
           {{warning}}
         </div>
+        <button class="btn btn-outline-secondary" @click="invertPoints">
+          Invert Shape
+        </button>
         <button v-if="mapMatching" class="btn btn-outline-secondary" @click="replacePoints">
           Replace points
         </button>
         <button class="btn btn-outline-secondary" @click="saveAndExit">
           Save and exit
         </button>
+        <button class="btn btn-outline-secondary" @click="exitModal.visible = true">
+          Exit
+        </button>
       </div>
     </div>
+    <Modal v-if="exitModal.visible" :showCancelButton="true" @close="exitModal.visible=false"
+      @cancel="exitModal.visible=false" @ok="exit">
+      <template slot="title">
+        <h2>Are you sure you want to exit and discard your changes?</h2>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -37,10 +51,19 @@
   import shapesAPI from '@/api/shapes.api';
   import mapMatching from '@/api/mapMatching.api';
   const mapboxgl = require('mapbox-gl');
+  import errorMessageMixin from '@/mixins/shapeMapMixin';
+  import shapeMapMixin from '@/mixins/errorMessageMixin';
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
+  import Modal from "@/components/Modal.vue";
   export default {
     name: 'ShapeEditor',
-    components: {},
+    components: {
+      Modal,
+    },
+    mixins: [
+      errorMessageMixin,
+      shapeMapMixin,
+    ],
     data() {
       return {
         map: false,
@@ -75,6 +98,9 @@
         shape_id: this.shape ? this.shape.shape_id : "",
         warning: false,
         error: false,
+        exitModal: {
+          visible: false,
+        }
       }
     },
     props: {
@@ -107,13 +133,6 @@
         this.addSources();
         this.addLayers();
         this.addListeners();
-        let bounds = [
-          [-70.56838236216876, -33.404765845817025],
-          [-70.74230047225737, -33.51957585338732]
-        ]
-        this.map.fitBounds(bounds, {
-          linear: false
-        });
         this.$emit('load');
       })
     },
@@ -144,7 +163,7 @@
           'type': 'geojson',
           'data': fixedPointsGeojson,
         });
-        
+
         this.map.addSource('connecting-line', {
           'type': 'geojson',
           'data': this.connectingLineGeojson,
@@ -172,8 +191,8 @@
                 finish: finishingPoints,
               }
               points = points.slice(start, finish);
-              if(points.length > 1){
-                points = [points[0], points[points.length-1]]
+              if (points.length > 1) {
+                points = [points[0], points[points.length - 1]]
               }
               [startingPoints, finishingPoints].map(pointSeq => {
                 let feature = {
@@ -189,11 +208,21 @@
               this.map.getSource('fixedPoints').setData(fixedPointsGeojson);
             }
             this.points = points;
+            let bounds = this.getBounds(this.points);
+            let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth)*2/5;
+            this.map.fitBounds(bounds, {
+              padding,
+              linear: false,
+            });
             this.reGeneratePoints();
           });
         }
       },
+      exit() {
+        this.$emit('close');
+      },
       addLayers() {
+        // Line for the shape itself
         this.map.addLayer({
           'id': 'point-line-layer',
           'type': 'line',
@@ -316,6 +345,10 @@
         }
         return -1;
       },
+      invertPoints() {
+        this.points = this.points.reverse();
+        this.reGeneratePoints();
+      },
       addListeners() {
         let map = this.map;
         let canvas = map.getCanvas();
@@ -432,43 +465,46 @@
           }).catch(err => {
             console.log(err.response);
             this.error = err.response.data;
+            this.lineGeojson.geometry.coordinates = [];
+            this.map.getSource('line').setData(this.lineGeojson);
           });
         } else {
           this.lineGeojson.geometry.coordinates = [];
           this.map.getSource('line').setData(this.lineGeojson);
         }
         let connectingLines = [];
-        if(this.fixedPoints.start.length > 0){
+        if (this.fixedPoints.start.length > 0) {
           let connectee = this.points.concat(this.fixedPoints.finish);
-          if(connectee.length) {
-            connectingLines.push(this.generateLine(this.fixedPoints.start[this.fixedPoints.start.length-1], connectee[0]))
+          if (connectee.length) {
+            connectingLines.push(this.generateLine(this.fixedPoints.start[this.fixedPoints.start.length - 1], connectee[
+              0]))
           }
         }
-        if(this.fixedPoints.finish.length > 0){
+        if (this.fixedPoints.finish.length > 0) {
           let connectee = this.fixedPoints.start.concat(this.points);
-          if(connectee.length) {
-            connectingLines.push(this.generateLine(connectee[connectee.length-1], this.fixedPoints.finish[0]))
+          if (connectee.length) {
+            connectingLines.push(this.generateLine(connectee[connectee.length - 1], this.fixedPoints.finish[0]))
           }
         }
         this.connectingLineGeojson.features = connectingLines;
         this.map.getSource('connecting-line').setData(this.connectingLineGeojson);
         this.warning = false;
       },
-      generateLine(from, to){
+      generateLine(from, to) {
         return {
-            'type': 'Feature',
-            'properties': {
-              from: from.id,
-              to: to.id,
-            },
-            'geometry': {
-              'type': 'LineString',
-              'coordinates': [
-                [from.lng, from.lat],
-                [to.lng, to.lat],
-              ]
-            }
+          'type': 'Feature',
+          'properties': {
+            from: from.id,
+            to: to.id,
+          },
+          'geometry': {
+            'type': 'LineString',
+            'coordinates': [
+              [from.lng, from.lat],
+              [to.lng, to.lat],
+            ]
           }
+        }
       },
       generateLineFeatures(points) {
         let features = []
@@ -521,6 +557,23 @@
           this.reGeneratePoints();
         }
       },
+      generateErrorMessage(errData) {
+        if (errData[0]) {
+          this.error = {
+            code: "Error storing Shape",
+            message: errData.join("\n")
+          }
+        }
+        this.error = {
+          message: Object.entries(errData).map(entry => {
+            let val = entry[0];
+            let errors = entry[1];
+            return val + ":\n" + errors.join("\n");
+          }).join("\n"),
+          code: "Unable to create shape"
+        };
+
+      },
       saveAndExit() {
         if (this.mapMatching) {
           this.warning =
@@ -538,18 +591,26 @@
           shape_id: this.shape_id,
           points: this.points.map(generatePointJson)
         };
-        if (this.creating) {
+        console.log(this.mode);
+        if (this.creating || this.mode === "duplicate") {
           shapesAPI.shapesAPI.create(this.project, data).then(response => {
             console.log(response);
             this.$emit('close');
-          })
+          }).catch(err => {
+            console.log(err.response);
+            this.generateErrorMessage(err.response.data);
+          });
         } else {
           data.id = this.shape.id;
-          data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(generatePointJson);
+          data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(
+            generatePointJson);
           shapesAPI.shapesAPI.put(this.project, data).then(response => {
             console.log(response);
             this.$emit('close');
-          })
+          }).catch(err => {
+            console.log(err.response);
+            this.generateErrorMessage(err.response.data);
+          });
         }
       }
     },

@@ -1,7 +1,12 @@
 <template>
     <div>
         <EditableTable :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
-      :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+            :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+            <template slot="additional-buttons">
+                <button class="btn btn-outline-secondary" @click="$router.push({ name: 'Shapes', params: $router.params })">
+                    Edit Shapes
+                </button>
+            </template>
         </EditableTable>
     </div>
 </template>

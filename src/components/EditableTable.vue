@@ -52,6 +52,7 @@
         <button class="btn btn-outline-secondary" @click="createModal.visible=true">
           Add row
         </button>
+        <slot name="additional-buttons"></slot>
       </div>
     </div>
     <Modal v-if="uploadModal.visible" @close="uploadModal.visible = false" :showCancelButton="true">

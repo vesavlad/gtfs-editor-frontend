@@ -10,10 +10,10 @@
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
         @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
         <div slot="actions" slot-scope="props" style="display: flex; flex-direction: row;">
-          <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
+          <button class="btn icon" @click="$emit('delete-shape', props.rowData)" alt="Delete shape.">
             <span class="material-icons">delete</span>
           </button>
-          <button class="btn icon" @click="$emit('edit-shape', props.rowData)" alt="Delete entry.">
+          <button class="btn icon" @click="$emit('edit-shape', props.rowData)" alt="Edit shape.">
             <span class="material-icons">edit</span>
           </button>
           <button class="btn icon" @click="$emit('focus-shape', props.rowData)" alt="Display shape.">
@@ -91,7 +91,7 @@
         }
         this.$refs.vuetable.changePage(page);
       },
-      reloadTable() {
+      refresh() {
         this.$refs.vuetable.refresh();
       },
       makeQueryParams(sortOrder, currentPage, perPage) {
@@ -108,7 +108,7 @@
       },
     },
     mounted() {
-      this.doSearch = debounce(this.reloadTable, 300);
+      this.doSearch = debounce(this.refresh, 300);
       this.$nextTick(() => {
         $("select.vuetable-pagination-dropdown").select2({
           matcher(query, option) {
