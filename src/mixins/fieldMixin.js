@@ -28,8 +28,14 @@ let fieldMixin = {
     getFKText(field, data) {
       return data[this.getFieldName(field)];
     },
-    getProperFields(fields){
-      let properFields = fields.filter(field => (this.getFieldName(field) !== "actions"));
+    getProperFields(fields, params){
+      if(!params) {
+        params = {}
+      }
+      if(!params.exclusions){
+        params.exclusions = ['actions']
+      }
+      let properFields = fields.filter(field => !params.exclusions.includes(this.getFieldName(field)));
       return properFields;
     }
   }

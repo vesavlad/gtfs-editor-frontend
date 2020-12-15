@@ -11,12 +11,14 @@
   import shapesAPI from "@/api/shapes.api";
   const mapboxgl = require('mapbox-gl');
   import shapeMapMixin from "@/mixins/shapeMapMixin"
+  import envelopeMixin from "@/mixins/envelopeMixin"
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
   export default {
     name: "ShapesMap",
     components: {},
     mixins: [
       shapeMapMixin,
+      envelopeMixin,
     ],
     data: function () {
       return {
@@ -48,6 +50,7 @@
         });
         this.map = map;
         map.on('load', () => {
+          this.envelope(this.map, this.project);
           this.addLayers();
           this.$emit('load');
         })

@@ -51,8 +51,11 @@
   import shapesAPI from '@/api/shapes.api';
   import mapMatching from '@/api/mapMatching.api';
   const mapboxgl = require('mapbox-gl');
+
   import errorMessageMixin from '@/mixins/shapeMapMixin';
   import shapeMapMixin from '@/mixins/errorMessageMixin';
+  import envelopeMixin from "@/mixins/envelopeMixin"
+
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
   import Modal from "@/components/Modal.vue";
   export default {
@@ -63,6 +66,7 @@
     mixins: [
       errorMessageMixin,
       shapeMapMixin,
+      envelopeMixin,
     ],
     data() {
       return {
@@ -134,7 +138,7 @@
         this.addLayers();
         this.addListeners();
         this.$emit('load');
-      })
+      });
     },
     methods: {
       addSources() {
@@ -209,13 +213,15 @@
             }
             this.points = points;
             let bounds = this.getBounds(this.points);
-            let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth)*2/5;
+            let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 2 / 5;
             this.map.fitBounds(bounds, {
               padding,
               linear: false,
             });
             this.reGeneratePoints();
           });
+        } else {
+          this.envelope(this.map, this.project);
         }
       },
       exit() {
@@ -293,7 +299,7 @@
               base: 2,
               stops: [
                 [14, 8],
-                [17, 25]
+                [16, 20]
               ]
             },
             "circle-color": "#33CC33"

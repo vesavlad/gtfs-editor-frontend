@@ -14,6 +14,8 @@
     </div>
     <div class="map-overlay top">
       <div class="map-overlay-inner" v-if="map">
+        Display Shape
+        <FKSelect :field="shape_field" :data="{}" v-on:input="loadShape($event)"></FKSelect>
         <button v-if="!creation.creating" class="btn icon" alt="Create Stop" @click="beginCreation">
           <span class="material-icons">add</span>
         </button>
@@ -44,8 +46,12 @@
 
 <script>
   import stopsAPI from '@/api/stops.api';
+  import shapesAPI from '@/api/shapes.api';
+  import shapeMapMixin from "@/mixins/shapeMapMixin"
   import PopupContent from '@/components/PopupContent.vue';
+  import FKSelect from '@/components/FKSelect.vue';
   import Modal from "@/components/Modal.vue";
+  import envelopeMixin from "@/mixins/envelopeMixin"
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
 
@@ -54,7 +60,12 @@
     components: {
       PopupContent,
       Modal,
+      FKSelect,
     },
+    mixins: [
+      envelopeMixin,
+      shapeMapMixin,
+    ],
     data() {
       return {
         stops: [],
@@ -69,6 +80,18 @@
           errors: {},
           disableClose: false,
         },
+        shape_field: {
+          name: 'shape_id',
+          title: 'Shape',
+          sortField: 'shape',
+          foreignKey: true,
+          nullable: true,
+          id_field: 'shape',
+          ajax_params: {
+            url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectid),
+          }
+        },
+        shape: {},
         map: false,
         dragging: false,
         geojson: {},
@@ -82,6 +105,14 @@
           geojson: {
             type: 'FeatureCollection',
             features: [] // We use feature collection to allow either 0 or 1
+          }
+        },
+        shapeGeojson: {
+          'type': 'Feature',
+          'properties': {},
+          'geometry': {
+            'type': 'LineString',
+            'coordinates': []
           }
         },
       }
@@ -107,6 +138,7 @@
           });
           this.map = map;
           map.on('load', () => {
+            this.envelope(map, this.project);
             this.addStops();
             this.addListeners();
             this.$emit('load');
@@ -119,6 +151,25 @@
       });
     },
     methods: {
+      loadShape(event) {
+        if (this.shape.id !== event) {
+          this.shape = {
+            id: event
+          }
+          shapesAPI.shapesAPI.detail(this.project, this.shape.id).then(response => {
+            this.shape = response.data;
+            this.reGenerateShape();
+          })
+        }
+      },
+      reGenerateShape() {
+        this.shapeGeojson.geometry.coordinates = this.shape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+        console.log(this.shapeGeojson);
+        this.map.getSource('shape').setData(this.shapeGeojson);
+        this.map.fitBounds(this.getBounds(this.shapeGeojson.geometry.coordinates), {
+          padding: 50
+        });
+      },
       beginStopDeletion() {
         let stop = this.popup.stop;
         this.deleteModal.visible = true;
@@ -206,7 +257,7 @@
           }
         }
       },
-      reGenerateStops(){
+      reGenerateStops() {
         this.geojson.features = this.stops.map(this.generateStopGeoJson);
         this.map.getSource('stops').setData(this.geojson);
       },
@@ -271,6 +322,45 @@
             "circle-color": "#DD9911",
           }
         });
+        this.map.addSource('shape', {
+          'type': 'geojson',
+          'data': this.shapeGeojson,
+        });
+        this.map.addLayer({
+          'id': 'shape-layer',
+          'type': 'line',
+          'source': 'shape',
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': "#55CCFF",
+            'line-width': 2
+          }
+        });
+        let img = require('../assets/png/arrow-small.png')
+        this.map.loadImage(img, (err, image) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          this.map.addImage('arrow', image);
+          this.map.addLayer({
+            'id': 'arrowId',
+            'type': 'symbol',
+            'source': 'shape',
+            'layout': {
+              'symbol-placement': 'line',
+              'symbol-spacing': 100,
+              'icon-allow-overlap': true,
+              'icon-ignore-placement': true,
+              'icon-image': 'arrow',
+              'icon-size': 1,
+              'visibility': 'visible'
+            }
+          });
+        });
       },
       updateCreationCoords(coords) {
         this.creation.data.stop_lon = coords.lng;
@@ -287,7 +377,7 @@
       findStop(id) {
         let s = null;
         this.stops.forEach(stop => {
-          if(stop.id === id){
+          if (stop.id === id) {
             s = stop;
           }
         })
@@ -317,10 +407,11 @@
               stopsAPI.stopsAPI.update(this.project, this.popup.stop).then(response => {
                 console.log(response);
                 this.stops = this.stops.map(stop => {
-                  if(this.popup.stop.id === stop.id){
-                    return {...this.popup.stop};
-                  }
-                  else {
+                  if (this.popup.stop.id === stop.id) {
+                    return {
+                      ...this.popup.stop
+                    };
+                  } else {
                     return stop;
                   }
                 });
@@ -348,7 +439,7 @@
           map.once('mouseup', evt_up => {
             let coords = evt_up.lngLat;
             let distance = self.calcDistance(evt_down, evt_up);
-            if(!distance){
+            if (!distance) {
               return;
             }
             self.updateStop(activeStop, coords);
@@ -371,16 +462,16 @@
       calcDistance(e1, e2) {
         e1 = e1.point;
         e2 = e2.point;
-        let xdif = e1.x-e2.x;
-        let ydif = e2.y-e2.y;
-        return Math.sqrt(xdif*xdif+ydif*ydif)
+        let xdif = e1.x - e2.x;
+        let ydif = e2.y - e2.y;
+        return Math.sqrt(xdif * xdif + ydif * ydif)
       },
       log() {
         console.log(...arguments);
       },
       updateStop(stop, coords) {
         this.stops = this.stops.map(s => {
-          if(s.id !== stop.properties.stop_id){
+          if (s.id !== stop.properties.stop_id) {
             return s;
           }
           s.stop_lon = coords.lng;
