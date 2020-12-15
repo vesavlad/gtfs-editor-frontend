@@ -10,6 +10,7 @@ import MyProjects from '../views/MyProjects.vue'
 import ProjectDashboard from '../views/ProjectDashboard.vue'
 import CalendarView from '../views/CalendarView.vue'
 import TripsView from '../views/TripsView.vue'
+import StopTimes from '../views/StopTimes.vue'
 import AgencyView from '../views/AgencyView.vue'
 import StopsView from '../views/StopsView.vue'
 import RoutesView from '../views/RoutesView.vue'
@@ -79,6 +80,14 @@ const routes = [{
         component: TripsView,
         meta: {
           breadcrumb: 'Trips'
+        },
+      },
+      {
+        path: '/project/:projectid/stoptimes',
+        name: 'Stop Times',
+        component: StopTimes,
+        meta: {
+          breadcrumb: 'StopTimes'
         },
       },
       {
