@@ -72,6 +72,11 @@
             name: "end_time",
             title: "End Time"
           },
+          {
+            name: "shape",
+            title: "Has Shape",
+            formatter: shape=>shape?"Yes":"No",
+          },
         ],
         url: tripsAPI.tripsAPI.getFullBaseURL(this.project),
       };
