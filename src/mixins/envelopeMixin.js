@@ -1,4 +1,3 @@
-
 import projectsAPI from "@/api/projects.api";
 const mapboxgl = require('mapbox-gl');
 
@@ -17,7 +16,8 @@ let envelopeMixin = {
             return bounds.extend(coord);
           }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
           this.map.fitBounds(bounds, {
-            padding: 20
+            padding: 20,
+            animate: false,
           });
         }
       } else {

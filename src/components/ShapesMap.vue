@@ -175,7 +175,7 @@
         this.geojson.geometry.coordinates = points;
         this.map.getSource('shape').setData(this.geojson);
         this.map.fitBounds(this.getBounds(points), {
-          padding: 50
+          padding: 50,
         });
       },
     },

@@ -216,7 +216,7 @@
             let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 2 / 5;
             this.map.fitBounds(bounds, {
               padding,
-              linear: false,
+              animate: false,
             });
             this.reGeneratePoints();
           });
