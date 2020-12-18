@@ -9,7 +9,7 @@
           </div>
         </form>
       </template>
-      <button class="btn icon" @click="informationModal.visible=true" alt="Go to GTFS specification.">
+      <button class="btn icon" @click="openInfo" alt="Go to GTFS specification.">
         <span class="material-icons">info</span>
       </button>
       <div>
@@ -99,17 +99,6 @@
       </template>
       <template slot="close-button-name">Delete</template>
     </Modal>
-    <Modal v-if="informationModal.visible" @ok="informationModal.visible = false"
-      @close="informationModal.visible = false" @cancel="informationModal.visible = false">
-      <template slot="title">
-        <h2>Table information</h2>
-      </template>
-      <template slot="content">
-        <span>
-          <slot name="information">Table Information Not Available</slot>
-        </span>
-      </template>
-    </Modal>
   </div>
 
 </template>
@@ -150,9 +139,6 @@
       return {
         errorModal: {
           message: '',
-        },
-        informationModal: {
-          visible: false,
         },
         deleteModal: {
           visible: false,
@@ -207,9 +193,17 @@
       searchable: {
         type: Boolean,
         default: false,
-      }
+      },
+      infoURL: {
+        type: String,
+        required: false,
+        default: "https://developers.google.com/transit/gtfs/reference",
+      },
     },
     methods: {
+      openInfo() {
+        window.open(this.infoURL);
+      },
       setDefaultCreationValue(field, data = this.createModal.data) {
         if (field === "actions") {
           return;
@@ -273,7 +267,6 @@
               row.changed = false;
               console.log(response);
             }).catch(error => {
-              window.error = error;
               let response = error.response;
               console.log(response.data);
               window.alert(`Error sending HTTP request\n${response.data.message}`);

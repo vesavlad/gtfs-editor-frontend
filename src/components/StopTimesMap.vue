@@ -155,7 +155,7 @@
           type: "symbol",
           source: "stops",
           filter:  ["==", "selected", "selected"],
-          minzoom: 14,
+          minzoom: 16,
           layout: {
             "text-field": "{label}",
             "text-anchor": "top",

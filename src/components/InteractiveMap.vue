@@ -293,7 +293,7 @@
           id: "layer-stops-label",
           type: "symbol",
           source: "stops",
-          minzoom: 14,
+          minzoom: 16,
           layout: {
             "text-field": "{label}",
             "text-anchor": "top",

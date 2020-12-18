@@ -27,8 +27,8 @@
         </button>
       </template>
     </Modal>
-    <Modal v-if="editingModal.duplicating" @close="editingModal.duplicating = false"
-      @cancel="editingModal.duplicating = false" :showCancelButton="true" :showBase="false">
+    <Modal v-if="editingModal.duplicating" @ok="duplicateST" @close="editingModal.duplicating = false"
+      @cancel="editingModal.duplicating = false" :showCancelButton="true">
       <template slot="title">
         <h2>Creating copy of trip {{editingModal.trip.trip_id}}</h2>
       </template>
@@ -88,9 +88,55 @@
       };
     },
     methods: {
+      timeToSeconds(timeString) {
+        let times = timeString.split(":").map(t=>parseInt(t));
+        let seconds = 0;
+        for(let i=0; i<times.length; i++){
+          seconds*=60;
+          seconds+=times[i];
+        }
+        return seconds;
+      },
+      secondsToTime(seconds) {
+        return new Date(null, null, null, null, null, seconds).toTimeString().match(
+              /\d{2}:\d{2}:\d{2}/)[0];
+      },
+      addHeadway(time, headway) {
+        return this.secondsToTime(this.timeToSeconds(time) + headway);
+      },
+      duplicateST() {
+        let trip = {
+          ...this.editingModal.trip,
+          trip_id: this.editingModal.trip_id,
+        }
+        let headway = parseInt(this.editingModal.headway);
+        if(isNaN(headway)) {
+          this.editingModal.error = "Headway is not a valid number";
+          return;
+        }
+        trip.stop_times = trip.stop_times.map(st => {
+          st = {...st}
+          if(st.arrival_time) {
+            st.arrival_time = this.addHeadway(st.arrival_time, headway);
+          }
+          if(st.departure_time) {
+            st.departure_time = this.addHeadway(st.departure_time, headway);
+          }
+          delete st.id;
+          return st;
+        });
+        tripsAPI.tripsAPI.create(this.$route.params.projectid, trip).then(()=>{
+          this.editingModal.duplicating = false;
+          this.$refs.table.refresh();
+        }).catch(err => {
+          console.log(err.response);
+          this.editingModal.error = err.response.data.join("\n");
+        });
+      },
       openEditingModal(trip) {
         this.editingModal.trip = trip
         this.editingModal.visible = true;
+        this.editingModal.error = "";
       },
       beginDeleteST(trip) {
         console.log(trip);

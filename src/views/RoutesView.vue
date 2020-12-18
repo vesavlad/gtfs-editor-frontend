@@ -78,7 +78,7 @@
                     },
                     {
                         name: 'route_color',
-                        title: 'Color',
+                        title: 'Route Color',
                         remember_creation_value: true,
                         sortField: 'route_color',
                     },

@@ -99,7 +99,7 @@
           id: "shape-label-layer",
           type: "symbol",
           source: "shape-pts",
-          minzoom: 14,
+          minzoom: 16,
           layout: {
             "text-field": "{label}",
             "text-anchor": "top",

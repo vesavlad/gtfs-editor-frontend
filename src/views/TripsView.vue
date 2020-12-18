@@ -65,6 +65,7 @@
                         title: "Direction",
                         type: "select-simple",
                         options: {
+                            'N/A': null,
                             'Going': true,
                             'Back': false,
                         },
@@ -82,7 +83,7 @@
                         title: "Wheelchair Accessible",
                         type: "select-simple",
                         options: {
-                            'Unknown': null,
+                            'No Info': null,
                             'Yes': 1,
                             'No': 0,
                         },
@@ -92,7 +93,7 @@
                         title: "Bikes Allowed",
                         type: "select-simple",
                         options: {
-                            'Unknown': null,
+                            'No Info': null,
                             'Yes': 1,
                             'No': 0,
                         },

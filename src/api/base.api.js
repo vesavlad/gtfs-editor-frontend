@@ -36,7 +36,6 @@ const BaseAPI = class {
         return httpClient.put(this.getDetailURL(projectid, data.id), data);
     }
     create(projectid, data){
-        console.log(this);
         return httpClient.post(this.getBaseURL(projectid), data);
     }
     remove(projectid, data){

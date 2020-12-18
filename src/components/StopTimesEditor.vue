@@ -209,7 +209,7 @@
           id: "layer-stops-label",
           type: "symbol",
           source: "stops",
-          minzoom: 14,
+          minzoom: 16,
           layout: {
             "text-field": "{label}",
             "text-anchor": "top",
@@ -222,7 +222,7 @@
           type: "symbol",
           source: "stops",
           filter: ['get', 'selected'],
-          minzoom: 14,
+          minzoom: 16,
           layout: {
             "text-field": "Seq: {sequence}",
             "text-anchor": "top",
@@ -235,7 +235,7 @@
           type: "symbol",
           source: "stops",
           filter: ['get', 'selected'],
-          minzoom: 14,
+          minzoom: 16,
           layout: {
             "text-field": "{arrival_time}",
             "text-anchor": "top",
