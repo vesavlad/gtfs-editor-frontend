@@ -4,6 +4,7 @@
     </div>
     <div class="map-overlay top">
       <div class="map-overlay-inner" v-if="map">
+        <div>Largo de shape: {{ shapeLength }}</div>
         <div>
           shape ID
           <input v-model="shape_id">
@@ -50,7 +51,8 @@
 <script>
   import shapesAPI from '@/api/shapes.api';
   import mapMatching from '@/api/mapMatching.api';
-  const mapboxgl = require('mapbox-gl');
+  import * as mapboxgl from 'mapbox-gl';
+  import * as turf from '@turf/turf';
 
   import errorMessageMixin from '@/mixins/shapeMapMixin';
   import shapeMapMixin from '@/mixins/errorMessageMixin';
@@ -126,6 +128,16 @@
       creating() {
         return this.shape ? false : true;
       },
+      shapeLength() {
+        let result = 0;
+        if (this.points.length > 1) {
+          let points = this.points.map(el => [el.lng, el.lat]);
+          let turfShape = turf.lineString(points);
+          let answer = turf.nearestPointOnLine(turfShape, turf.point(points[points.length -1]));
+          result = answer.properties.location.toFixed(2) + " kms";
+        }
+        return result;
+      }
     },
     mounted() {
       let map = new mapboxgl.Map({
