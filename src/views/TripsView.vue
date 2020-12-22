@@ -1,7 +1,7 @@
 <template>
     <div>
         <EditableTable :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
-            :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+            :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
             <template slot="additional-buttons">
                 <button class="btn btn-outline-secondary" @click="$router.push({ name: 'Shapes', params: $router.params })">
                     Edit Shapes
@@ -23,6 +23,7 @@
         data() {
             return {
                 url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectid),
+                infoURL: "https://developers.google.com/transit/gtfs/reference#tripstxt",
                 downloadURL: tripsAPI.tripsAPI.getDownloadURL(this.$route.params.projectid),
                 fields: [
                     'actions',

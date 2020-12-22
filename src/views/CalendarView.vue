@@ -1,7 +1,7 @@
 <template>
   <div>
     <EditableTable :fields="fields" :url="url" :updateMethod="updateCalendar" :deleteMethod="removeCalendar"
-      :createMethod="createCalendar" :downloadURL="downloadURL" :uploadCSV="uploadCSV">
+      :createMethod="createCalendar" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :infoURL="infoURL">
       <template slot="information">
         Calendars are amazing!!!
       </template>
@@ -21,6 +21,7 @@
       return {
         downloadURL: calendarAPI.calendarAPI.getDownloadURL(this.$route.params.projectid),
         url: calendarAPI.calendarAPI.getFullBaseURL(this.$route.params.projectid),
+        infoURL: "https://developers.google.com/transit/gtfs/reference#calendartxt",
         days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
         fields: [
           'actions',

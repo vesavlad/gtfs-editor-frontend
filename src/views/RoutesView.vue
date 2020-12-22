@@ -1,7 +1,7 @@
 <template>
     <div>
         <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-            :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+            :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
             <template slot="additional-actions" slot-scope="props">
                 <button class="btn icon" @click="goToRoute(props)" alt="Go to trips">
                     <span class="material-icons">map</span>
@@ -22,6 +22,7 @@
         data() {
             return {
                 url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
+                infoURL: "https://developers.google.com/transit/gtfs/reference#routestxt",
                 downloadURL: routesAPI.routesAPI.getDownloadURL(this.$route.params.projectid),
                 fields: [
                     'actions',

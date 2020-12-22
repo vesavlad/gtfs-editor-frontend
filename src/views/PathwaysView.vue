@@ -1,7 +1,7 @@
 <template>
     <div>
         <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-            :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+            :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
         </EditableTable>
     </div>
 </template>
@@ -18,6 +18,7 @@
             return {
                 url: pathwaysAPI.pathwaysAPI.getFullBaseURL(this.$route.params.projectid),
                 downloadURL: pathwaysAPI.pathwaysAPI.getDownloadURL(this.$route.params.projectid),
+                infoURL: "https://developers.google.com/transit/gtfs/reference#pathwaystxt",
                 fields: [
                     'actions',
                     {

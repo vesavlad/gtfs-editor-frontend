@@ -1,7 +1,7 @@
 <template>
   <div>
     <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-      :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+      :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
     </EditableTable>
   </div>
 </template>
@@ -18,6 +18,7 @@
       return {
         downloadURL: fareAttributesAPI.fareAttributesAPI.getDownloadURL(this.$route.params.projectid),
         url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectid),
+        infoURL: "https://developers.google.com/transit/gtfs/reference#fare_attributestxt",
         fields: [
           'actions',
           {
@@ -65,7 +66,7 @@
           },
           {
             name: 'transfer_duration',
-            title: 'Duration*',
+            title: 'Duration [s]*',
             data_type: 'number',
           },
         ],

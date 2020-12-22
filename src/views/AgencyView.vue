@@ -1,7 +1,8 @@
 <template>
   <div>
     <EditableTable :fields="fields" :url="url" :updateMethod="updateAgency" :deleteMethod="removeAgency"
-      :createMethod="createAgency" :downloadURL="downloadURL" :uploadCSV="uploadCSV">
+      :createMethod="createAgency" :downloadURL="downloadURL" :uploadCSV="uploadCSV"
+      :infoURL="infoURL">
     </EditableTable>
   </div>
 </template>
@@ -18,6 +19,7 @@
       return {
         downloadURL: agenciesAPI.agenciesAPI.getDownloadURL(this.$route.params.projectid),
         url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectid),
+        infoURL: "https://developers.google.com/transit/gtfs/reference#agencytxt",
         fields: [
           'actions',
           {

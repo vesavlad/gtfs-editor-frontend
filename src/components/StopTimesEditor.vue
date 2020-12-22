@@ -409,7 +409,6 @@
         return nearest.properties.location.toFixed(3);
       },
       saveAndExit() {
-        console.log("SAE-v2");
         let data = {
           ...this.trip,
           stop_times: this.stop_times,
