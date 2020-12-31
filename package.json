@@ -33,6 +33,8 @@
     "vue-echarts": "^5.0.0-beta.0",
     "vue-mapbox": "^0.4.1",
     "vue-router": "^3.4.5",
+    "vue-sortable-list": "^0.1.2",
+    "vuedraggable": "^2.24.3",
     "vuetable-2": "^2.0.0-beta.4",
     "vuex": "^3.5.1"
   },

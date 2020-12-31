@@ -7,22 +7,60 @@
         <input type="checkbox" id="optional-fields" v-model="show_optional_fields">
         <label for="optional-fields">Show Optional Fields</label>
       </div>
+      <button class="btn btn-outline-secondary" @click="orderModal.visible = true">
+        Automatically order using shape
+      </button>
+      <button class="btn btn-outline-secondary" @click="speedModal.visible = true">
+        Automatically calculate times
+      </button>
       <div class="horizontal-display">
-        <input type="checkbox" id="automatic-time" v-model="automatic_times">
-        <label for="automatic-time">Automatically calculate times using a speed of </label>
-        <input v-model="speed" type="number">[km/h]
+        <input type="checkbox" id="enable-drag" v-model="drag_enabled">
+        <label for="enable-drag">Enable drag</label>
       </div>
-      <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times">
+      <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times" v-show="!drag_enabled">
         <GeneralizedInput :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})"
           :slot="getFieldName(field)" slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
           v-model="properties.rowData[getFieldID(properties.rowField)]">
         </GeneralizedInput>
       </vuetable>
+      <DraggableTable :fields="base_fields" :rows="stop_times" v-show="drag_enabled" v-model="stop_times"
+        @input="$nextTick(calculateSeqs)"></DraggableTable>
       Trip ID:<input v-model="trip.trip_id">
       <button class="btn btn-outline-secondary" @click="saveAndExit">
         Save changes and exit
       </button>
     </div>
+    <Modal v-if="orderModal.visible" @ok="automaticallyOrder" @close="orderModal.visible = false"
+      @cancel="orderModal.visible = false" :showCancelButton="true">
+      <template slot="title">
+        <h2>Are you sure you want to automatically order the stops?</h2>
+      </template>
+      <template slot="content">
+        <span>
+          The current Stop Sequence will be overwritten. The closest point of the Shape will be used to determine the
+          position,
+          however this may fail if there's no way to accurately determine where this is. For instance, if the Shape
+          passes twice next to the same Stop.
+        </span>
+      </template>
+      <template slot="close-button-name">Ok</template>
+    </Modal>
+    <Modal v-if="speedModal.visible" @ok="calculateTimes" @close="speedModal.visible = false"
+      @cancel="speedModal.visible = false" :showCancelButton="true">
+      <template slot="title">
+        <h2>Are you sure you want to replace the current times?</h2>
+      </template>
+      <template slot="content">
+        <span>
+          The current Arrival and Departure times will be replaced. The arrival time of the first stop will be used
+          as a starting point and all other arrival/departure times will be recalculated based on that.
+          <br>
+          <label for="automatic-time">Automatically calculate times using a speed of </label>
+          <input v-model="speed" type="number">[km/h]
+        </span>
+      </template>
+      <template slot="close-button-name">Ok</template>
+    </Modal>
   </div>
 </template>
 
@@ -35,6 +73,9 @@
   import shapesAPI from "@/api/shapes.api";
   import fieldMixin from "@/mixins/fieldMixin.js";
   import GeneralizedInput from "@/components/GeneralizedInput.vue";
+  import DraggableTable from "@/components/DraggableTable.vue";
+  import Modal from "@/components/Modal.vue";
+
   let Vuetable = require('vuetable-2')
   import envelopeMixin from "@/mixins/envelopeMixin"
   const mapboxgl = require('mapbox-gl');
@@ -48,10 +89,10 @@
       title: "Stop ID",
       name: "stop_id",
     },
-    {
-      title: "Distance [km]",
-      name: "distance",
-    },
+    // {
+    //   title: "Distance [km]",
+    //   name: "distance",
+    // },
     {
       title: "Arrival Time",
       name: "arrival_time",
@@ -92,6 +133,8 @@
     components: {
       Vuetable: Vuetable.Vuetable,
       GeneralizedInput,
+      DraggableTable,
+      Modal,
     },
     mixins: [
       envelopeMixin,
@@ -100,8 +143,9 @@
     data: function () {
       return {
         speed: 60,
-        automatic_times: false,
+        drag_enabled: false,
         exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
+        base_fields: base_fields,
         fields: base_fields,
         show_optional_fields: false,
         stop_times: this.trip.stop_times,
@@ -110,6 +154,12 @@
         stop_map: new Map(),
         shape: false,
         turfShape: false,
+        orderModal: {
+          visible: false,
+        },
+        speedModal: {
+          visible: false,
+        },
       };
     },
     props: {
@@ -126,12 +176,6 @@
     watch: {
       show_optional_fields(val) {
         this.fields = val ? full_fields : base_fields;
-      },
-      automatic_times() {
-        this.updateStops();
-      },
-      speed() {
-        this.updateStops();
       },
     },
     mounted() {
@@ -153,22 +197,57 @@
       });
     },
     methods: {
-      reCalculateTimes() {
-        if (this.automatic_times) {
+      log() {
+        console.log(...arguments)
+      },
+      timeToSeconds(timeString) {
+        let times = timeString.split(":").map(t => parseInt(t));
+        let seconds = 0;
+        for (let i = 0; i < times.length; i++) {
+          seconds *= 60;
+          seconds += times[i];
+        }
+        return seconds;
+      },
+      secondsToTime(seconds) {
+        seconds = Math.floor(seconds);
+        let pad = (s) => s.length < 2 ? "0" + s : s;
+        let hours = (seconds / 3600 | 0).toString()
+        seconds = seconds % 3600
+        let minutes = (seconds / 60 | 0).toString()
+        seconds = (seconds % 60).toString()
+
+        hours = pad(hours);
+        minutes = pad(minutes);
+        seconds = pad(seconds);
+        return `${hours}:${minutes}:${seconds}`;
+      },
+      addHeadway(time, headway) {
+        return this.secondsToTime(this.timeToSeconds(time) + headway);
+      },
+      calculateTimes() {
+        if (this.stop_times.length) {
           let speed = Number(this.speed);
           if (Number.isNaN(speed)) {
             return;
           }
+          let first = this.stop_times[0];
+          if (!first.arrival_time) {
+            return;
+          }
+          let headway = this.timeToSeconds(first.arrival_time);
           speed = speed * 1.0;
           this.stop_times = this.stop_times.map(st => {
-            let seconds = st.distance / speed * 3600;
-            let formatted_time = new Date(null, null, null, null, null, seconds).toTimeString().match(
-              /\d{2}:\d{2}:\d{2}/)[0]
-            st.arrival_time = formatted_time;
+            let seconds = (st.distance - first.distance) / speed * 3600;
+            let formatted_time = this.secondsToTime(seconds + headway);
+            if (st.stop_sequence > 1) {
+              st.arrival_time = formatted_time;
+            }
             st.departure_time = formatted_time;
             return st;
           })
         }
+        this.speedModal.visible = false;
       },
       addSources() {
         this.addStops();
@@ -282,9 +361,13 @@
           this.updateStops();
         });
       },
+      automaticallyOrder() {
+        this.stop_times.sort((st1, st2) => st1.distance - st2.distance);
+        this.orderModal.visible = false;
+        this.updateStops();
+      },
       updateStops() {
         this.calculateSTPositions();
-        this.reCalculateTimes();
         let geojson = {
           type: 'FeatureCollection',
           features: this.generateStopFeatures(),
@@ -350,7 +433,7 @@
           },
           'paint': {
             'line-color': this.shapeColor,
-            'line-width': 2
+            'line-width': 3
           }
         });
         let img = require('../assets/png/arrow-small.png')
@@ -388,6 +471,14 @@
           window.alert("Warning: editing a StopTimes without a shape is not supported");
         }
       },
+      calculateSeqs() {
+        let stop_times = this.stop_times;
+        for (let i = 0; i < stop_times.length; i++) {
+          stop_times[i].stop_sequence = i + 1;
+        }
+        this.stop_times = stop_times;
+        console.log(this.stop_times);
+      },
       calculateSTPositions() {
         let stop_times = this.stop_times.map(st => {
           return {
@@ -395,17 +486,13 @@
             distance: this.calculatePosition(st),
           }
         });
-        stop_times.sort((st1, st2) => st1.distance - st2.distance);
-        for (let i = 0; i < stop_times.length; i++) {
-          stop_times[i].stop_sequence = i + 1;
-        }
         this.stop_times = stop_times;
+        this.calculateSeqs();
       },
       calculatePosition(st) {
         let stop = this.stop_map.get(st.stop);
         let point = turf.point([stop.stop_lon, stop.stop_lat]);
         let nearest = turf.nearestPointOnLine(this.turfShape, point);
-        console.log(nearest)
         return nearest.properties.location.toFixed(3);
       },
       saveAndExit() {
@@ -414,7 +501,7 @@
           stop_times: this.stop_times,
         }
         let save = undefined;
-        switch(this.mode) {
+        switch (this.mode) {
           case 'edit':
             save = tripsAPI.tripsAPI.update.bind(tripsAPI.tripsAPI);
             break;
