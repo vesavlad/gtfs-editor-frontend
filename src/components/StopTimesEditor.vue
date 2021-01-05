@@ -18,10 +18,17 @@
         <label for="enable-drag">Enable drag</label>
       </div>
       <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times" v-show="!drag_enabled">
-        <GeneralizedInput :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})"
-          :slot="getFieldName(field)" slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
-          v-model="properties.rowData[getFieldID(properties.rowField)]">
-        </GeneralizedInput>
+        <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="getFieldName(field)"
+          slot-scope="properties" v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
+          <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
+            v-model="properties.rowData[getFieldID(properties.rowField)]">
+          </GeneralizedInput>
+          <div v-if="errors.stop_times">
+            <span class="error" :key="error" v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
+              {{error}}
+            </span>
+          </div>
+        </div>
       </vuetable>
       <DraggableTable :fields="base_fields" :rows="stop_times" v-show="drag_enabled" v-model="stop_times"
         @input="$nextTick(calculateSeqs)"></DraggableTable>
@@ -143,6 +150,7 @@
     data: function () {
       return {
         speed: 60,
+        errors: {},
         drag_enabled: false,
         exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
         base_fields: base_fields,
@@ -273,7 +281,7 @@
               stops: [
                 [12, 1.5],
                 [14, 4],
-                [20, 180]
+                [18, 250]
               ]
             },
             "circle-color": [
@@ -477,7 +485,6 @@
           stop_times[i].stop_sequence = i + 1;
         }
         this.stop_times = stop_times;
-        console.log(this.stop_times);
       },
       calculateSTPositions() {
         let stop_times = this.stop_times.map(st => {
@@ -512,7 +519,8 @@
         save(this.project, data).then(() => {
           this.$emit('close');
         }).catch(err => {
-          console.log(err);
+          this.errors = err.response.data;
+          console.log(this.errors);
         })
       }
     }
@@ -523,5 +531,11 @@
   .horizontal-display {
     display: flex;
     flex-direction: row
+  }
+  div.error > input {
+    background-color: red;
+  }
+  span.error {
+    color: red;
   }
 </style>
