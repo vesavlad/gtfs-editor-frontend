@@ -80,10 +80,12 @@
         <div :key="`create-${getFieldName(field)}`" v-for="field in getProperFields(fields)">
           <label>{{getFieldTitle(field)}}</label>
           <GeneralizedInput :data="createModal.data" :field="field" :value="createModal.data[getFieldName(field)]"
-            v-model="createModal.data[getFieldID(field)]">
+            v-model="createModal.data[getFieldID(field)]" :errors="createModal.errors[getFieldName(field)]">
           </GeneralizedInput>
+          <span v-for="(error) in createModal.errors[getFieldName(field)]" v-bind:key="error" class="error">
+            {{error}}
+          </span>
         </div>
-        <div ref="errorDiv" v-html="errorModal.message" />
       </template>
       <template slot="close-button-name">Create Entry</template>
     </Modal>
@@ -137,9 +139,6 @@
       let created_data = {};
       this.fields.forEach((field) => this.setDefaultCreationValue(field, created_data));
       return {
-        errorModal: {
-          message: '',
-        },
         deleteModal: {
           visible: false,
           data: {},
@@ -147,6 +146,7 @@
         },
         createModal: {
           data: created_data,
+          errors: {},
           visible: false,
         },
         uploadModal: {
@@ -367,7 +367,7 @@
           console.log(response);
           this.createModal.visible = false;
           this.reloadTable();
-          this.errorModal.message = "";
+          this.createModal.errors = {};
           this.fields.filter(field => field !== "actions").forEach(field => {
             if (field instanceof Object) {
               if (!field.remember_creation_value) {
@@ -379,7 +379,7 @@
           });
         }).catch(error => {
           console.log(error.response.data);
-          this.errorModal.message = this.getErrorMessage(error.response.data);
+          this.createModal.errors = error.response.data;
         });
       },
       uploadCSVFile(file) {
@@ -480,6 +480,10 @@
   tr.edited {
     background: yellow !important;
     color: #ffff7d !important;
+  }
+  
+  span.error {
+    color: red;
   }
 
   @import "../../node_modules/select2/dist/css/select2.min.css";

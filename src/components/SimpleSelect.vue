@@ -19,6 +19,10 @@
         required: true,
       },
       value: {},
+      hasErrors: {
+        type: Boolean,
+        default: false,
+      },
     },
     watch: {
       value() {

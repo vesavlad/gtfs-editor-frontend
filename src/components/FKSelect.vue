@@ -1,5 +1,5 @@
 <template>
-  <select class="select-data" ref="select" v-model="val">
+  <select class="select-data" ref="select" v-model="val" v-bind:class="{}">
   </select>
 </template>
 
@@ -22,6 +22,10 @@
         required: true,
       },
       value: {},
+      hasErrors: {
+        type: Boolean,
+        default: false,
+      },
     },
     watch: {
       value() {
