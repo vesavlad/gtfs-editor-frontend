@@ -14,7 +14,7 @@
       </button>
       <div>
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getTitledFields(fields)" data-path="results"
-          pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
+          pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :row-class="getRowClass">
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
           </template>
@@ -228,11 +228,7 @@
         console.log(arguments);
       },
       changeHandler(props) {
-        console.log(props.rowData[this.getFieldName(props.rowField)])
-        let table = $("table.vuetable");
-        table.children("tbody:first").children().eq(props.rowIndex).addClass("edited");
         this.hasChanged = true;
-        console.log(props.rowIndex, "Changed")
         props.rowData.changed = true;
       },
       getOption(value, options) {
@@ -265,11 +261,12 @@
             console.log(row);
             this.updateMethod(row).then(response => {
               row.changed = false;
+              row.error = false;
               console.log(response);
             }).catch(error => {
               let response = error.response;
+              row.error = true;
               console.log(response.data);
-              window.alert(`Error sending HTTP request\n${response.data.message}`);
             });
           }
         );
@@ -405,6 +402,12 @@
       hasUnsavedChanges() {
         return this.$refs.vuetable.$data.tableData.reduce((changed, row) => row.changed || changed, false);
       },
+      getRowClass(data, index){
+        console.log(data, index);
+        if(data.error) return "error";
+        if(data.changed) return "changed";
+        return "";
+      },
       onChangePage(page) {
         if (page == this.current_page) {
           return;
@@ -416,7 +419,10 @@
           }
         }
         this.$refs.vuetable.changePage(page);
-        this.$nextTick(() => this.$refs.vuetable.$data.tableData.forEach(row => row.changed = false));
+        this.$nextTick(() => this.$refs.vuetable.$data.tableData.forEach(row => {
+          row.changed = false;
+          row.error = false;
+        }));
       },
       onPaginationData(paginationData) {
         if (paginationData.current_page !== this.current_page || paginationData.last_page !== this.last_page) {
@@ -476,10 +482,11 @@
   div.pagination {
     width: 160px;
   }
-
-  tr.edited {
-    background: yellow !important;
-    color: #ffff7d !important;
+  tr.error > td {
+    background-color: rgba(255,0,0,0.4);
+  }
+  tr.changed > td{
+    background-color: rgba(255,255,0,0.4);
   }
   
   span.error {
