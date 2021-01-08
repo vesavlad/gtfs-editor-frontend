@@ -59,6 +59,11 @@
           {
             name: 'service_id',
             title: 'Service',
+            foreignKey: true,
+            id_field: 'service_id',
+            ajax_params: {
+              url: 'http://127.0.0.1:8000/api/projects/1/services/',
+            }
           },
           {
             name: 'trip_headsign',

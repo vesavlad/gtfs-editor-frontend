@@ -19,12 +19,14 @@
       </div>
       <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times" v-show="!drag_enabled">
         <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="getFieldName(field)"
-          slot-scope="properties" v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
+          slot-scope="properties"
+          v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
           <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
             v-model="properties.rowData[getFieldID(properties.rowField)]">
           </GeneralizedInput>
           <div v-if="errors.stop_times">
-            <span class="error" :key="error" v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
+            <span class="error" :key="error"
+              v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
               {{error}}
             </span>
           </div>
@@ -43,7 +45,7 @@
         <h2>Are you sure you want to automatically order the stops?</h2>
       </template>
       <template slot="content">
-        <span>
+        <span class="warning">
           The current Stop Sequence will be overwritten. The closest point of the Shape will be used to determine the
           position,
           however this may fail if there's no way to accurately determine where this is. For instance, if the Shape
@@ -58,13 +60,13 @@
         <h2>Are you sure you want to replace the current times?</h2>
       </template>
       <template slot="content">
-        <span>
+        <span class="warning">
           The current Arrival and Departure times will be replaced. The arrival time of the first stop will be used
           as a starting point and all other arrival/departure times will be recalculated based on that.
-          <br>
-          <label for="automatic-time">Automatically calculate times using a speed of </label>
-          <input v-model="speed" type="number">[km/h]
         </span>
+        <br>
+        <label for="automatic-time">Automatically calculate times using a speed of </label>
+        <input v-model="speed" type="number">[km/h]
       </template>
       <template slot="close-button-name">Ok</template>
     </Modal>
@@ -96,10 +98,6 @@
       title: "Stop ID",
       name: "stop_id",
     },
-    // {
-    //   title: "Distance [km]",
-    //   name: "distance",
-    // },
     {
       title: "Arrival Time",
       name: "arrival_time",
@@ -532,10 +530,15 @@
     display: flex;
     flex-direction: row
   }
-  div.error > input {
+
+  div.error>input {
     background-color: red;
   }
+
   span.error {
     color: red;
+  }
+  span.warning {
+    color: rgb(200,200,0);
   }
 </style>

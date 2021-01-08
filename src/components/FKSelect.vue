@@ -1,5 +1,5 @@
 <template>
-  <select class="select-data" ref="select" v-model="val" v-bind:class="{}">
+  <select class="select-data" ref="select" v-model="val">
   </select>
 </template>
 
