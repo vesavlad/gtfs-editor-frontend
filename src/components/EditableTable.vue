@@ -13,7 +13,7 @@
         <span class="material-icons">info</span>
       </button>
       <div>
-        <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="fields" data-path="results"
+        <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getTitledFields(fields)" data-path="results"
           pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
@@ -78,7 +78,7 @@
       </template>
       <template slot="content">
         <div :key="`create-${getFieldName(field)}`" v-for="field in getProperFields(fields)">
-          <label>{{getFieldName(field)}}</label>
+          <label>{{getFieldTitle(field)}}</label>
           <GeneralizedInput :data="createModal.data" :field="field" :value="createModal.data[getFieldName(field)]"
             v-model="createModal.data[getFieldID(field)]">
           </GeneralizedInput>
@@ -154,7 +154,7 @@
           visible: false,
         },
         test: true,
-        quickSearch: this.$route.query.search?this.$route.query.search:'',
+        quickSearch: this.$route.query.search ? this.$route.query.search : '',
         hasChanged: false,
         current_page: -1000,
         last_page: -1000,
@@ -320,7 +320,6 @@
           });
         });
         this.fields.filter((f) => f.options).forEach((field) => {
-          console.log(field);
           $(`.create-select.options.${this.getFieldName(field)}`).select2().on('change', (evt) => {
             console.log(this.getFieldName(field), evt.target.value);
             this.createModal.data[field.name] = evt.target.value;

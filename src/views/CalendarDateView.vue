@@ -24,17 +24,20 @@
           {
             name: 'service_id',
             sortField: 'service_id',
-            title: 'Service ID*',
+            title: 'Service ID',
+            required: true,
           },
           {
             name: 'date',
             sortField: 'date',
             data_type: 'date',
-            title: 'Date*',
+            title: 'Date',
+            required: true,
           },
           {
             name: 'exception_type',
             title: 'Exception Type',
+            required: true,
             type: "select-simple",
             options: {
               'Service Added': 1,

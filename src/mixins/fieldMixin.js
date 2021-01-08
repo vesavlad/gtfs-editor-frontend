@@ -1,6 +1,17 @@
 
 let fieldMixin = {
   methods: {
+    getTitledFields(fields) {
+      return fields.map(field => {
+        if(field instanceof Object){
+          field = {
+            ...field
+          };
+          field.title = this.getFieldTitle(field);
+        }
+        return field;
+      });
+    },
     getFieldName(field) {
       if (field instanceof Object) {
         return field.name;
@@ -9,9 +20,13 @@ let fieldMixin = {
     },
     getFieldTitle(field) {
       if (field instanceof Object) {
-        return field.title || field.name
+        let title = field.title || field.name
+        if(field.required){
+          title+="*";
+        }
+        return title
       }
-      return this.getFieldName(field);
+      return  this.getFieldName(field);
     },
     getFKName(field) {
       if (field.fk_name) {

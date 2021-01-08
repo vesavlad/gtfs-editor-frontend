@@ -23,18 +23,21 @@
           {
             name: 'level_id',
             sortField: 'level_id',
-            title: 'Level ID*',
+            title: 'Level ID',
+            required: true,
           },
           {
             name: 'level_index',
             sortField: 'level_index',
             data_type: 'number',
-            title: 'Index*',
+            title: 'Index',
+            required: true,
           },
           {
             name: 'level_name',
-            title: 'Name*',
+            title: 'Name',
             sortField: 'level_name',
+            required: true,
           },
         ],
       };

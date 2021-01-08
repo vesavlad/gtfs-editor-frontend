@@ -1,8 +1,7 @@
 <template>
   <div>
     <EditableTable :fields="fields" :url="url" :updateMethod="updateAgency" :deleteMethod="removeAgency"
-      :createMethod="createAgency" :downloadURL="downloadURL" :uploadCSV="uploadCSV"
-      :infoURL="infoURL">
+      :createMethod="createAgency" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :infoURL="infoURL">
     </EditableTable>
   </div>
 </template>
@@ -25,25 +24,31 @@
           {
             name: 'agency_id',
             sortField: 'agency_id',
-            title: 'Agency ID*',
+            title: 'Agency ID',
+            required: true,
           },
           {
             name: 'agency_name',
             sortField: 'agency_name',
-            title: 'Name*',
+            title: 'Name',
+            required: true,
           },
           {
             name: 'agency_url',
             sortField: 'agency_url',
-            title: 'URL*',
+            title: 'URL',
+            required: true,
           },
           {
             name: 'agency_timezone',
             remember_creation_value: true,
             sortField: 'agency_timezone',
-            title: 'Timezone*',
+            title: 'Timezone',
             type: "select-simple",
-            options: timezones.timezones.reduce((o, k) => Object.assign(o, {[k]:k}),{}),
+            options: timezones.timezones.reduce((o, k) => Object.assign(o, {
+              [k]: k
+            }), {}),
+            required: true,
           },
           {
             name: 'agency_lang',

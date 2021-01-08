@@ -24,10 +24,11 @@
           'actions',
           {
             name: 'fare_id',
-            title: 'Fare ID*',
+            title: 'Fare ID',
             sortField: 'fare_id',
             foreignKey: true,
             id_field: 'fare_attribute',
+            required: true,
             ajax_params: {
               url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectid),
             }

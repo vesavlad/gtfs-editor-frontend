@@ -1,7 +1,7 @@
 <template>
   <div>
       <div v-for="field in fields" v-bind:key="field.name">
-        <label>{{field.title}}</label>
+        <label>{{field.title}}{{field.required?"*":""}}</label>
         <span style="color:red;">
           <div v-for="error in error_data[field.name]" v-bind:key="error">
             <br>
@@ -27,36 +27,43 @@
             title: "Publisher Name",
             name: "feed_publisher_name",
             type: "text",
+            required: true,
           },
           {
             title: "Publisher URL",
             name: "feed_publisher_url",
             type: "url",
+            required: true,
           },
           {
             title: "Language",
             name: "feed_lang",
             type: "text",
+            required: true,
           },
           {
             title: "Start date",
             name: "feed_start_date",
             type: "date",
+            required: true,
           },
           {
             title: "End Date",
             name: "feed_end_date",
             type: "date",
+            required: true,
           },
           {
             title: "Version",
             name: "feed_version",
             type: "text",
+            required: true,
           },
           {
             title: "ID",
             name: "feed_id",
             type: "text",
+            required: true,
           },
         ]
       }

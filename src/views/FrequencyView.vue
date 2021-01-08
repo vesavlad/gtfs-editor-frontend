@@ -23,8 +23,9 @@
           'actions',
           {
             name: 'trip_id',
-            title: 'Trip*',
+            title: 'Trip',
             sortField: 'trip_id',
+            required: true,
             foreignKey: true,
             id_field: 'trip',
             ajax_params: {
@@ -35,21 +36,25 @@
             name: 'start_time',
             sortField: 'start_time',
             data_type: 'time',
-            title: 'Start Time*',
+            title: 'Start Time',
+            required: true,
           },
           {
             name: 'end_time',
             sortField: 'end_time',
             data_type: 'time',
-            title: 'End Time*',
+            title: 'End Time',
+            required: true,
           },
           {
             name: 'headway_secs',
             title: 'Headway Seconds',
+            required: true,
           },
           {
             name: 'exact_times',
             title: 'Exact Times',
+            required: true,
             type: "select-simple",
             options: {
               'Yes': 1,

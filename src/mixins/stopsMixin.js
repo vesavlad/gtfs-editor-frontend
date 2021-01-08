@@ -9,26 +9,31 @@ let stopsMixin = {
         'actions',
         {
           name: 'stop_id',
-          title: 'Stop ID*',
+          title: 'Stop ID',
           sortField: 'stop_id',
+          required: true,
         },
         {
           name: 'stop_code',
           title: 'Code',
           sortField: 'stop_code',
+          required: true,
         },
         {
           name: 'stop_name',
-          title: 'Name*',
+          title: 'Name',
           sortField: 'stop_name',
+          required: true,
         },
         {
           name: 'stop_lat',
-          title: 'Lat*',
+          title: 'Lat',
+          required: true,
         },
         {
           name: 'stop_lon',
-          title: 'Lon*',
+          title: 'Lon',
+          required: true,
         },
         {
           name: 'stop_url',

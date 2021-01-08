@@ -24,17 +24,20 @@
           {
             name: 'fare_id',
             sortField: 'fare_id',
-            title: 'Fare ID*',
+            title: 'Fare ID',
+            required: true,
           },
           {
             name: 'price',
             sortField: 'price',
             data_type: 'number',
-            title: 'Price*',
+            title: 'Price',
+            required: true,
           },
           {
             name: 'currency_type',
-            title: 'Currency Code*',
+            title: 'Currency Code',
+            required: true,
           },
           {
             name: 'payment_method',
@@ -43,6 +46,7 @@
               'Before Boarding': 1,
               'On Board': 0,
             },
+            required: true,
           },
           {
             name: 'transfers',
@@ -53,11 +57,13 @@
               2:2,
               'Unlimited': null,
             },
+            required: true,
           },
           {
             name: 'agency_id',
-            title: 'Agency*',
+            title: 'Agency',
             sortField: 'agency_id',
+            required: true,
             foreignKey: true,
             id_field: 'agency',
             ajax_params: {
@@ -66,8 +72,9 @@
           },
           {
             name: 'transfer_duration',
-            title: 'Duration [s]*',
+            title: 'Duration [s]',
             data_type: 'number',
+            required: true,
           },
         ],
       };
