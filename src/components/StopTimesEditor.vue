@@ -10,7 +10,7 @@
       <button class="btn btn-outline-secondary" @click="orderModal.visible = true">
         Automatically order using shape
       </button>
-      <button class="btn btn-outline-secondary" @click="speedModal.visible = true">
+      <button class="btn btn-outline-secondary" @click="openSpeedModal">
         Automatically calculate times
       </button>
       <div class="horizontal-display">
@@ -67,6 +67,12 @@
         <br>
         <label for="automatic-time">Automatically calculate times using a speed of </label>
         <input v-model="speed" type="number">[km/h]
+        Starting from stop
+        <SimpleSelect :field="STSelectField" v-model="speedModal.from_stop">
+        </SimpleSelect>
+        to stop
+        <SimpleSelect :field="STSelectField" v-model="speedModal.to_stop">
+        </SimpleSelect>
       </template>
       <template slot="close-button-name">Ok</template>
     </Modal>
@@ -82,6 +88,7 @@
   import shapesAPI from "@/api/shapes.api";
   import fieldMixin from "@/mixins/fieldMixin.js";
   import GeneralizedInput from "@/components/GeneralizedInput.vue";
+  import SimpleSelect from "@/components/SimpleSelect.vue";
   import DraggableTable from "@/components/DraggableTable.vue";
   import Modal from "@/components/Modal.vue";
 
@@ -140,6 +147,7 @@
       GeneralizedInput,
       DraggableTable,
       Modal,
+      SimpleSelect,
     },
     mixins: [
       envelopeMixin,
@@ -147,6 +155,11 @@
     ],
     data: function () {
       return {
+        STSelectField: {
+          name: "stop",
+          type: "select-simple",
+          options: {},
+        },
         speed: 60,
         errors: {},
         drag_enabled: false,
@@ -165,6 +178,8 @@
         },
         speedModal: {
           visible: false,
+          from_stop: null,
+          to_stop: null,
         },
       };
     },
@@ -203,6 +218,16 @@
       });
     },
     methods: {
+      openSpeedModal() {
+        this.speedModal.from_stop = this.stop_times[0].stop_sequence;
+        this.speedModal.to_stop = this.stop_times[this.stop_times.length - 1].stop_sequence;
+        this.speedModal.visible = true;
+        this.STSelectField.options = {};
+        this.stop_times.forEach((st) => {
+          let title = `${st.stop_id} (${st.stop_sequence})`
+          this.STSelectField.options[title] = st.stop_sequence;
+        })
+      },
       log() {
         console.log(...arguments)
       },
@@ -237,16 +262,21 @@
           if (Number.isNaN(speed)) {
             return;
           }
-          let first = this.stop_times[0];
+          let first = this.stop_times[this.speedModal.from_stop - 1];
+          console.log(first);
           if (!first.arrival_time) {
             return;
           }
           let headway = this.timeToSeconds(first.arrival_time);
           speed = speed * 1.0;
           this.stop_times = this.stop_times.map(st => {
+            if (st.stop_sequence < this.speedModal.from_stop ||
+              st.stop_sequence > this.speedModal.to_stop) {
+              return st;
+            }
             let seconds = (st.distance - first.distance) / speed * 3600;
             let formatted_time = this.secondsToTime(seconds + headway);
-            if (st.stop_sequence > 1) {
+            if (st.stop_sequence > first.stop_sequence) {
               st.arrival_time = formatted_time;
             }
             st.departure_time = formatted_time;
@@ -538,7 +568,8 @@
   span.error {
     color: red;
   }
+
   span.warning {
-    color: rgb(200,200,0);
+    color: rgb(200, 200, 0);
   }
 </style>
