@@ -1,6 +1,9 @@
 <template>
   <div class="horizontal-display">
-    <div id="map" ref="mapContainer">
+    <div class="map-info">
+      <InfoButton :info="info"></InfoButton>
+      <div id="map" ref="mapContainer">
+      </div>
     </div>
     <div>
       <div class="horizontal-display">
@@ -90,6 +93,7 @@
   import GeneralizedInput from "@/components/GeneralizedInput.vue";
   import SimpleSelect from "@/components/SimpleSelect.vue";
   import DraggableTable from "@/components/DraggableTable.vue";
+  import InfoButton from "@/components/InfoButton.vue";
   import Modal from "@/components/Modal.vue";
 
   let Vuetable = require('vuetable-2')
@@ -141,13 +145,14 @@
   let full_fields = base_fields.concat(optional_fields);
 
   export default {
-    name: "SopTimesMap",
+    name: "StopTimesEditor",
     components: {
       Vuetable: Vuetable.Vuetable,
       GeneralizedInput,
       DraggableTable,
       Modal,
       SimpleSelect,
+      InfoButton,
     },
     mixins: [
       envelopeMixin,
@@ -181,6 +186,10 @@
           from_stop: null,
           to_stop: null,
         },
+        info: [
+          "Click on a Stop to add it to map",
+          "Right click on a Stop to remove it",
+        ]
       };
     },
     props: {
@@ -324,7 +333,7 @@
           id: "layer-stops-label",
           type: "symbol",
           source: "stops",
-          minzoom: 16,
+          minzoom: 14,
           layout: {
             "text-field": "{label}",
             "text-anchor": "top",
@@ -337,7 +346,7 @@
           type: "symbol",
           source: "stops",
           filter: ['get', 'selected'],
-          minzoom: 16,
+          minzoom: 14,
           layout: {
             "text-field": "Seq: {sequence}",
             "text-anchor": "top",
@@ -349,8 +358,8 @@
           id: "layer-stops-time",
           type: "symbol",
           source: "stops",
-          filter: ['get', 'selected'],
-          minzoom: 16,
+          filter: ['get', 'arrival_time'],
+          minzoom: 14,
           layout: {
             "text-field": "{arrival_time}",
             "text-anchor": "top",
@@ -558,7 +567,8 @@
 <style scoped>
   .horizontal-display {
     display: flex;
-    flex-direction: row
+    flex-direction: row;
+    width: 100%;
   }
 
   div.error>input {
@@ -571,5 +581,9 @@
 
   span.warning {
     color: rgb(200, 200, 0);
+  }
+
+  .map-info {
+    width: 300px;
   }
 </style>

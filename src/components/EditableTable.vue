@@ -14,7 +14,8 @@
       </button>
       <div>
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getTitledFields(fields)" data-path="results"
-          pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :row-class="getRowClass">
+          pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams"
+          :row-class="getRowClass">
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
           </template>
@@ -262,7 +263,7 @@
             this.updateMethod(row).then(response => {
               row.changed = false;
               row.error = false;
-              console.log(response);
+              this.$emit('update', response.data);
             }).catch(error => {
               let response = error.response;
               row.error = true;
@@ -402,10 +403,10 @@
       hasUnsavedChanges() {
         return this.$refs.vuetable.$data.tableData.reduce((changed, row) => row.changed || changed, false);
       },
-      getRowClass(data, index){
+      getRowClass(data, index) {
         console.log(data, index);
-        if(data.error) return "error";
-        if(data.changed) return "changed";
+        if (data.error) return "error";
+        if (data.changed) return "changed";
         return "";
       },
       onChangePage(page) {
@@ -436,7 +437,7 @@
         }
       },
       reloadTable() {
-        this.$refs.vuetable.refresh();
+        this.$refs.vuetable.reload();
       },
       makeQueryParams(sortOrder, currentPage, perPage) {
         let sorting = ""
@@ -482,13 +483,15 @@
   div.pagination {
     width: 160px;
   }
-  tr.error > td {
-    background-color: rgba(255,0,0,0.4);
+
+  tr.error>td {
+    background-color: rgba(255, 0, 0, 0.4);
   }
-  tr.changed > td{
-    background-color: rgba(255,255,0,0.4);
+
+  tr.changed>td {
+    background-color: rgba(255, 255, 0, 0.4);
   }
-  
+
   span.error {
     color: red;
   }

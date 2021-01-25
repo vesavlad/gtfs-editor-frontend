@@ -5,8 +5,8 @@
       <button class="tablinks" @click="switchTab('map')">Map</button>
     </div>
     <div v-show="tab==='table'" class="table-container">
-      <EditableTable :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
-        :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
+      <EditableTable ref='table' :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
+        :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" @update="onUpdate">
         <template slot="additional-actions" slot-scope="props">
           <button class="btn icon" @click="focusStop(props)" alt="Focus Stop on interactive map.">
             <span class="material-icons">map</span>
@@ -48,12 +48,21 @@
         console.log(...arguments);
       },
       switchTab(tab) {
-        this.tab = tab;
         if (tab === "map") {
+          if (this.$refs.table.hasUnsavedChanges()) {
+            let answer = window.confirm("There are unsaved changes, are you sure you want to proceed?");
+            if (!answer) {
+              return;
+            }
+          }
+          this.tab = tab;
           this.$nextTick(this.$refs.map.resize);
+        } else if (tab === "table") {
+          this.tab = tab;
+          this.$refs.table.reloadTable();
         }
       },
-      focusStop(props){
+      focusStop(props) {
         this.switchTab("map");
         this.$refs.map.focusStop(props.rowData);
       },
@@ -69,6 +78,9 @@
       uploadCSV(file) {
         return stopsAPI.stopsAPI.uploadCSV(this.$route.params.projectid, file);
       },
+      onUpdate(stop) {
+        this.$refs.map.updateStopData(stop);
+      }
     },
   };
 </script>

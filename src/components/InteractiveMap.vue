@@ -229,6 +229,20 @@
       resize() {
         this.map.resize();
       },
+      updateStopData(stop) {
+        console.log(stop);
+        this.stops = this.stops.map( s => {
+          if(s.id === stop.id) {
+            console.log('Match');
+            console.log(stop);
+            return {
+              ...stop
+              };
+          }
+          return s;
+        });
+        this.reGenerateStops();
+      },
       generatePopup(stop) {
         this.popup.stop = stop;
         this.popup.errors = {};

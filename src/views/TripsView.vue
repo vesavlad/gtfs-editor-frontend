@@ -75,8 +75,8 @@
             type: "select-simple",
             options: {
               'N/A': null,
-              'Going': true,
-              'Back': false,
+              'Going': false,
+              'Back': true,
             },
           },
           {

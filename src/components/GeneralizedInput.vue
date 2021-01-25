@@ -1,6 +1,7 @@
 <template>
   <!-- Foreign key -->
-  <FKSelect v-if="field.foreignKey" :field="field" :data="data" v-model="val" @input="onInput" :hasErrors="has_errors()">
+  <FKSelect v-if="field.foreignKey" :field="field" :data="data" v-model="val" @input="onInput"
+    :hasErrors="has_errors()">
   </FKSelect>
   <!-- Options -->
   <SimpleSelect v-else-if="field.options" :field="field" v-model="val" @input="onInput" :hasErrors="has_errors()">
@@ -8,8 +9,8 @@
   <!-- Default -->
   <SimpleInput v-else :field="field" v-model="val" @input="onInput" :hasErrors="has_errors()">
   </SimpleInput>
-
 </template>
+
 <script>
   import fieldMixin from "@/mixins/fieldMixin.js";
   import SimpleInput from './SimpleInput.vue';
@@ -36,7 +37,7 @@
       },
       errors: {
         type: Array,
-        default: ()=>[],
+        default: () => [],
       },
     },
     data() {
@@ -52,9 +53,9 @@
         console.log(...arguments);
       },
       has_errors() {
-        return (this.errors instanceof Array)? this.errors.length>0:false;
+        return (this.errors instanceof Array) ? this.errors.length > 0 : false;
       },
-      onInput(event){
+      onInput(event) {
         this.$emit('input', event);
       }
     },
