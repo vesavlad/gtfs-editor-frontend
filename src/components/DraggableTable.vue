@@ -43,13 +43,3 @@
     }
   };
 </script>
-
-<style scoped>
-  .v-draggable__placeholder {
-    background: darkred;
-  }
-
-  .handle {
-    cursor: grab;
-  }
-</style>

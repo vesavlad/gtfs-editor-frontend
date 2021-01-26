@@ -2,8 +2,7 @@
   <div class="TransportModeTable">
     <div>
       <template v-if="searchable">
-        <form class="form-inline d-flex mx-1 justify-content-end" @submit.stop.prevent="doSearch"
-          style="min-width:500px; max-width:50%">
+        <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
           <div class="input-group">
             <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
           </div>
@@ -19,7 +18,7 @@
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
           </template>
-          <div slot="actions" slot-scope="props" style="display: flex; flex-direction: row;">
+          <div slot="actions" slot-scope="props" class="flex">
             <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
               <span class="material-icons">delete</span>
             </button>
@@ -32,14 +31,14 @@
             v-model="properties.rowData[getFieldID(properties.rowField)]" v-on:input="changeHandler(properties)">
           </GeneralizedInput>
         </vuetable>
-        <div style="display: flex;">
+        <div class="flex">
           <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
           </VuetablePagination>
           <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
           </VuetablePaginationDropDown>
         </div>
       </div>
-      <div style="display: flex;">
+      <div class="flex">
         <button class="btn btn-outline-secondary" @click="saveChanges">
           Save
         </button>
@@ -65,7 +64,7 @@
           Upload CSV file.
         </span>
         <br>
-        <span v-if="uploadModal.error" style="color: red;">{{uploadModal.error}}</span>
+        <span v-if="uploadModal.error" class="error">{{uploadModal.error}}</span>
       </template>
       <template slot="base">
         <FileReader @load="uploadCSVFile($event)"></FileReader>
@@ -472,29 +471,3 @@
     },
   };
 </script>
-
-<style>
-  button.ui.button {
-    padding: 8px 3px 8px 10px;
-    margin-top: 1px;
-    margin-bottom: 1px;
-  }
-
-  div.pagination {
-    width: 160px;
-  }
-
-  tr.error>td {
-    background-color: rgba(255, 0, 0, 0.4);
-  }
-
-  tr.changed>td {
-    background-color: rgba(255, 255, 0, 0.4);
-  }
-
-  span.error {
-    color: red;
-  }
-
-  @import "../../node_modules/select2/dist/css/select2.min.css";
-</style>

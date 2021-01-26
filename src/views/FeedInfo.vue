@@ -2,7 +2,7 @@
   <div>
       <div v-for="field in fields" v-bind:key="field.name">
         <label>{{field.title}}{{field.required?"*":""}}</label>
-        <span style="color:red;">
+        <span class="error">
           <div v-for="error in error_data[field.name]" v-bind:key="error">
             <br>
           {{error}}

@@ -118,8 +118,3 @@
   }
 </script>
 
-<style>
-  span.select2-selection {
-    min-width: 80px;
-  }
-</style>

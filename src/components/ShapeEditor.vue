@@ -15,14 +15,14 @@
           <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
           <span class="slider round"></span>
         </label>
-        <div v-if="error" style="color: #AA0000;">
+        <div v-if="error" class="error">
           {{error.code}}
           <br>
           <div v-for="(text, index) in error.message.split('\n')" :key="index">
             {{ text }}
           </div>
         </div>
-        <div v-if="warning" style="color: #AAAA00;">
+        <div v-if="warning" class="warning">
           {{warning}}
         </div>
         <button class="btn btn-outline-secondary" @click="invertPoints">

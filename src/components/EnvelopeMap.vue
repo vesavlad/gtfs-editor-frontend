@@ -2,12 +2,6 @@
   <div id="envelopeMap" ref="mapContainer"></div>
 </template>
 
-<style scoped>
-#envelopeMap {
-  width: 300px;
-  height: 300px;
-}
-</style>
 
 <script>
   const mapboxgl = require('mapbox-gl');

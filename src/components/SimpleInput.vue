@@ -1,5 +1,6 @@
 <template>
-    <input ref="input" :type="field.data_type" v-model="val" @input="$emit('input', getValue($event.target))" v-bind:class="{error: hasErrors}">
+  <input ref="input" :type="field.data_type" v-model="val" @input="$emit('input', getValue($event.target))"
+    v-bind:class="{error: hasErrors}">
 </template>
 
 <script>
@@ -21,45 +22,39 @@
         default: false,
       },
     },
-    data(){
+    data() {
       return {
         val: this.preProcessValue(this.value),
       };
     },
-    watch:{
+    watch: {
       value() {
         this.val = this.preProcessValue(this.value);
       }
     },
     methods: {
-      preProcessValue(value){
-        if(value){
-          if(this.field.data_type === "color" && value.length === 6){
+      preProcessValue(value) {
+        if (value) {
+          if (this.field.data_type === "color" && value.length === 6) {
             value = "#" + value;
           }
         }
         return value;
       },
-      getValue(input){
-        if(this.field.data_type === "checkbox"){
+      getValue(input) {
+        if (this.field.data_type === "checkbox") {
           return input.checked;
         }
         let value = input.value;
-        
-        if(this.field.data_type === "color"){
+
+        if (this.field.data_type === "color") {
           value = value.slice(1);
         }
         return value;
       },
-      log(){
+      log() {
         console.log(...arguments);
       }
     },
   }
 </script>
-
-<style scoped>
-  input.error {
-    background-color: rgba(255, 0, 0, 0.4);;
-  }
-</style>

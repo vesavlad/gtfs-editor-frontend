@@ -2,8 +2,8 @@
   <div class="horizontal-display">
     <div class="map-info">
       <InfoButton :info="info"></InfoButton>
-      <div id="map" ref="mapContainer">
-      </div>
+    </div>
+    <div id="map" ref="mapContainer">
     </div>
     <div>
       <div class="horizontal-display">
@@ -563,27 +563,3 @@
     }
   };
 </script>
-
-<style scoped>
-  .horizontal-display {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-  }
-
-  div.error>input {
-    background-color: red;
-  }
-
-  span.error {
-    color: red;
-  }
-
-  span.warning {
-    color: rgb(200, 200, 0);
-  }
-
-  .map-info {
-    width: 300px;
-  }
-</style>

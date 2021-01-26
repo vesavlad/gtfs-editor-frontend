@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="display: flex; flex-direction: row;" v-if="!editing">
+    <div class="flex" v-if="!editing">
       <div>
         <StopTimesTable ref="table" :project="$route.params.projectid" @focus-st="displayTrip"
           @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>

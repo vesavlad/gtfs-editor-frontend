@@ -23,9 +23,10 @@
 @import "../node_modules/material-icons/css/material-icons.css";
 @import "./assets/css/base.css";
 @import "./assets/css/style.css";
-#app {
-  height: 100vh;
-}
+@import "./assets/css/temp.css";
+@import "../node_modules/select2/dist/css/select2.min.css";
+@import url("https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css");
+
 </style>
 <script>
 require('material-icons')

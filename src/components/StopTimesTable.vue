@@ -1,7 +1,6 @@
 <template>
   <div>
-    <form class="form-inline d-flex mx-1 justify-content-end" @submit.stop.prevent="doSearch"
-      style="min-width:500px; max-width:50%">
+    <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
       <div class="input-group">
         <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
       </div>
@@ -9,7 +8,7 @@
     <div>
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
         @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :transform="transformData">
-        <div slot="actions" slot-scope="props" style="display: flex; flex-direction: row;">
+        <div slot="actions" slot-scope="props" class="flex">
           <button class="btn icon" @click="$emit('delete-st', props.rowData)" alt="Delete stop-times.">
             <span class="material-icons">delete</span>
           </button>
@@ -146,21 +145,5 @@
   };
 </script>
 
-<style>
-  button.ui.button {
-    padding: 8px 3px 8px 10px;
-    margin-top: 1px;
-    margin-bottom: 1px;
-  }
 
-  div.pagination {
-    width: 160px;
-  }
 
-  tr.edited {
-    background: yellow !important;
-    color: #ffff7d !important;
-  }
-
-  @import "../../node_modules/select2/dist/css/select2.min.css";
-</style>
