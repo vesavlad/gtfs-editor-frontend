@@ -20,7 +20,7 @@
 
 <script>
 export default {
-  name: 'ModalWarning',
+  name: 'Modal',
   props: {
     showBase: {
       type: Boolean,

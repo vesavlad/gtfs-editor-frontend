@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="display: flex; flex-direction: row;" v-if="!editing">
+    <div class="flex" v-if="!editing">
       <div>
         <ShapesTable ref="table" :project="$route.params.projectid" @focus-shape="displayShape"
           @edit-shape="openEditingModal" @delete-shape="beginDeleteShape"></ShapesTable>

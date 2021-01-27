@@ -187,8 +187,8 @@
           to_stop: null,
         },
         info: [
-          "Click on a Stop to add it to map",
-          "Right click on a Stop to remove it",
+          "Click on a Stop to add it to the sequence",
+          "Right click on a Stop to remove it from the sequence",
         ]
       };
     },

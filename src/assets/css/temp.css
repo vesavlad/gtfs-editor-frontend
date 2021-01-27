@@ -228,3 +228,7 @@ button.ui.button {
     min-width: 500px;
     max-width: 50%;
 }
+
+#map-container {
+    min-width: 1000px;
+}

@@ -1,50 +1,55 @@
 <template>
-  <div id='map-container'>
-    <div id='map' ref='map'>
+  <div class="flex">
+    <div class="map-info">
+      <InfoButton :info="info"></InfoButton>
     </div>
-    <div class="map-overlay top">
-      <div class="map-overlay-inner" v-if="map">
-        <div>Largo de shape: {{ shapeLength }}</div>
-        <div>
-          shape ID
-          <input v-model="shape_id">
-        </div>
-        Map Matching
-        <br>
-        <label class="switch">
-          <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
-          <span class="slider round"></span>
-        </label>
-        <div v-if="error" class="error">
-          {{error.code}}
-          <br>
-          <div v-for="(text, index) in error.message.split('\n')" :key="index">
-            {{ text }}
-          </div>
-        </div>
-        <div v-if="warning" class="warning">
-          {{warning}}
-        </div>
-        <button class="btn btn-outline-secondary" @click="invertPoints">
-          Invert Shape
-        </button>
-        <button v-if="mapMatching" class="btn btn-outline-secondary" @click="replacePoints">
-          Replace points
-        </button>
-        <button class="btn btn-outline-secondary" @click="saveAndExit">
-          Save and exit
-        </button>
-        <button class="btn btn-outline-secondary" @click="exitModal.visible = true">
-          Exit
-        </button>
+    <div id='map-container'>
+      <div id='map' ref='map'>
       </div>
+      <div class="map-overlay top">
+        <div class="map-overlay-inner" v-if="map">
+          <div>Largo de shape: {{ shapeLength }}</div>
+          <div>
+            shape ID
+            <input v-model="shape_id">
+          </div>
+          Map Matching
+          <br>
+          <label class="switch">
+            <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
+            <span class="slider round"></span>
+          </label>
+          <div v-if="error" class="error">
+            {{error.code}}
+            <br>
+            <div v-for="(text, index) in error.message.split('\n')" :key="index">
+              {{ text }}
+            </div>
+          </div>
+          <div v-if="warning" class="warning">
+            {{warning}}
+          </div>
+          <button class="btn btn-outline-secondary" @click="invertPoints">
+            Invert Shape
+          </button>
+          <button v-if="mapMatching" class="btn btn-outline-secondary" @click="replacePoints">
+            Replace points
+          </button>
+          <button class="btn btn-outline-secondary" @click="saveAndExit">
+            Save and exit
+          </button>
+          <button class="btn btn-outline-secondary" @click="exitModal.visible = true">
+            Exit
+          </button>
+        </div>
+      </div>
+      <Modal v-if="exitModal.visible" :showCancelButton="true" @close="exitModal.visible=false"
+        @cancel="exitModal.visible=false" @ok="exit">
+        <template slot="title">
+          <h2>Are you sure you want to exit and discard your changes?</h2>
+        </template>
+      </Modal>
     </div>
-    <Modal v-if="exitModal.visible" :showCancelButton="true" @close="exitModal.visible=false"
-      @cancel="exitModal.visible=false" @ok="exit">
-      <template slot="title">
-        <h2>Are you sure you want to exit and discard your changes?</h2>
-      </template>
-    </Modal>
   </div>
 </template>
 
@@ -60,10 +65,12 @@
 
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
   import Modal from "@/components/Modal.vue";
+  import InfoButton from "@/components/InfoButton.vue";
   export default {
     name: 'ShapeEditor',
     components: {
       Modal,
+      InfoButton,
     },
     mixins: [
       errorMessageMixin,
@@ -106,7 +113,13 @@
         error: false,
         exitModal: {
           visible: false,
-        }
+        },
+        info: [
+          "Drag to move points in a Shape",
+          "Double click to add a point at the end of the Shape",
+          "Right click a point to remove it",
+          "Click on a line to add a point in that position",
+        ],
       }
     },
     props: {
@@ -133,7 +146,7 @@
         if (this.points.length > 1) {
           let points = this.points.map(el => [el.lng, el.lat]);
           let turfShape = turf.lineString(points);
-          let answer = turf.nearestPointOnLine(turfShape, turf.point(points[points.length -1]));
+          let answer = turf.nearestPointOnLine(turfShape, turf.point(points[points.length - 1]));
           result = answer.properties.location.toFixed(2) + " kms";
         }
         return result;

@@ -1,46 +1,49 @@
 <template>
-  <div id='map-container'>
-    <div id='map'>
-      <div ref="popup" v-show="popup.open">
-        <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
-        </popup-content>
-        <button class="btn icon" alt="Delete" @click="beginStopDeletion">
-          <span class="material-icons">delete</span>
-        </button>
-        <!-- <button class="btn icon" alt="Save" @click="log">
+  <div class='horizontal-display'>
+    <InfoButton :info="info"></InfoButton>
+    <div id='map-container'>
+      <div id='map'>
+        <div ref="popup" v-show="popup.open">
+          <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
+          </popup-content>
+          <button class="btn icon" alt="Delete" @click="beginStopDeletion">
+            <span class="material-icons">delete</span>
+          </button>
+          <!-- <button class="btn icon" alt="Save" @click="log">
           <span class="material-icons">save</span>
         </button> -->
-      </div>
-    </div>
-    <div class="map-overlay top">
-      <div class="map-overlay-inner" v-if="map">
-        Display Shape
-        <FKSelect :field="shape_field" :data="{}" v-on:input="loadShape($event)"></FKSelect>
-        <button v-if="!creation.creating" class="btn icon" alt="Create Stop" @click="beginCreation">
-          <span class="material-icons">add</span>
-        </button>
-        <div v-if="creation.creating">
-          <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
-            v-model="creation.data">
-          </popup-content>
-          <button class="btn icon" alt="Create" @click="create">
-            <span class="material-icons">add_location</span>
-          </button>
         </div>
       </div>
+      <div class="map-overlay top">
+        <div class="map-overlay-inner" v-if="map">
+          Display Shape
+          <FKSelect :field="shape_field" :data="{}" v-on:input="loadShape($event)"></FKSelect>
+          <button v-if="!creation.creating" class="btn icon" alt="Create Stop" @click="beginCreation">
+            <span class="material-icons">add</span>
+          </button>
+          <div v-if="creation.creating">
+            <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
+              v-model="creation.data">
+            </popup-content>
+            <button class="btn icon" alt="Create" @click="create">
+              <span class="material-icons">add_location</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <Modal v-if="deleteModal.visible" @ok="deleteStop" @close="deleteModal.visible = false"
+        @cancel="deleteModal.visible = false" :showCancelButton="true">
+        <template slot="title">
+          <h2>Are you sure you want to delete this stop?</h2>
+        </template>
+        <template slot="content">
+          <span>
+            {{deleteModal.message}}
+          </span>
+        </template>
+        <template slot="close-button-name">Delete</template>
+      </Modal>
     </div>
-    <Modal v-if="deleteModal.visible" @ok="deleteStop" @close="deleteModal.visible = false"
-      @cancel="deleteModal.visible = false" :showCancelButton="true">
-      <template slot="title">
-        <h2>Are you sure you want to delete this stop?</h2>
-      </template>
-      <template slot="content">
-        <span>
-          {{deleteModal.message}}
-        </span>
-      </template>
-      <template slot="close-button-name">Delete</template>
-    </Modal>
   </div>
 </template>
 
@@ -51,6 +54,7 @@
   import PopupContent from '@/components/PopupContent.vue';
   import FKSelect from '@/components/FKSelect.vue';
   import Modal from "@/components/Modal.vue";
+  import InfoButton from "@/components/InfoButton.vue";
   import envelopeMixin from "@/mixins/envelopeMixin"
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
@@ -61,6 +65,7 @@
       PopupContent,
       Modal,
       FKSelect,
+      InfoButton,
     },
     mixins: [
       envelopeMixin,
@@ -115,6 +120,11 @@
             'coordinates': []
           }
         },
+        info: [
+          "Drag a Stop to update its coordinates",
+          "Click on a Stop to edit its data",
+          "Click outside the popup to open it",
+        ],
       }
     },
     props: {
@@ -163,7 +173,8 @@
         }
       },
       reGenerateShape() {
-        this.shapeGeojson.geometry.coordinates = this.shape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+        this.shapeGeojson.geometry.coordinates = this.shape.points.map(point => [point.shape_pt_lon, point
+          .shape_pt_lat]);
         console.log(this.shapeGeojson);
         this.map.getSource('shape').setData(this.shapeGeojson);
         this.map.fitBounds(this.getBounds(this.shapeGeojson.geometry.coordinates), {
@@ -231,13 +242,13 @@
       },
       updateStopData(stop) {
         console.log(stop);
-        this.stops = this.stops.map( s => {
-          if(s.id === stop.id) {
+        this.stops = this.stops.map(s => {
+          if (s.id === stop.id) {
             console.log('Match');
             console.log(stop);
             return {
               ...stop
-              };
+            };
           }
           return s;
         });
