@@ -5,7 +5,7 @@
 
 <script>
   const mapboxgl = require('mapbox-gl');
-  mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
+  mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
   export default {
     name: "EnvelopeMap",
     props: {

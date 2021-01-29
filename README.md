@@ -9,6 +9,7 @@ Create virtual environement file at root place with name `.env.development` with
 ```
 NODE_ENV=development
 VUE_APP_BASE_URL=http://endpoint_to_api
+VUE_APP_MAPBOX_TOKEN=<your_mapbox_token>
 ```
 
 ### Compiles and hot-reloads for development
@@ -22,6 +23,7 @@ Before to create production files we need to add `.env.production` file with con
 ```
 NODE_ENV=production
 VUE_APP_BASE_URL=http://production_endpoint_to_api
+VUE_APP_MAPBOX_TOKEN=<your_mapbox_token>
 ```
 
 After that run:

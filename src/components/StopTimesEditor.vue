@@ -100,7 +100,7 @@
   import envelopeMixin from "@/mixins/envelopeMixin"
   import config from "@/config.js"
   const mapboxgl = require('mapbox-gl');
-  mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
+  mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
   let turf = require('@turf/turf');
   let base_fields = [{
       title: "Seq",
