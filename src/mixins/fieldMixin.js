@@ -1,8 +1,8 @@
 
 let fieldMixin = {
   methods: {
-    getTitledFields(fields) {
-      return fields.map(field => {
+    getProcessedFields(fields) {
+      let result = fields.map(field => {
         if(field instanceof Object){
           field = {
             ...field
@@ -11,6 +11,7 @@ let fieldMixin = {
         }
         return field;
       });
+      return result;
     },
     getFieldName(field) {
       if (field instanceof Object) {

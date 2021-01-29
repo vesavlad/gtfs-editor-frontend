@@ -9,9 +9,6 @@
           <button class="btn icon" alt="Delete" @click="beginStopDeletion">
             <span class="material-icons">delete</span>
           </button>
-          <!-- <button class="btn icon" alt="Save" @click="log">
-          <span class="material-icons">save</span>
-        </button> -->
         </div>
       </div>
       <div class="map-overlay top">

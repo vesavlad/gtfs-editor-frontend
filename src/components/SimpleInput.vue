@@ -1,6 +1,6 @@
 <template>
   <input ref="input" :type="field.data_type" v-model="val" @input="$emit('input', getValue($event.target))"
-    v-bind:class="{error: hasErrors}">
+    v-bind:class="{error: hasErrors}" :data-error="errors.length?errors[0]:''">
 </template>
 
 <script>
@@ -21,6 +21,9 @@
         type: Boolean,
         default: false,
       },
+      errors: {
+        type: Array,
+      }
     },
     data() {
       return {
@@ -30,7 +33,7 @@
     watch: {
       value() {
         this.val = this.preProcessValue(this.value);
-      }
+      },
     },
     methods: {
       preProcessValue(value) {
@@ -46,7 +49,6 @@
           return input.checked;
         }
         let value = input.value;
-
         if (this.field.data_type === "color") {
           value = value.slice(1);
         }
