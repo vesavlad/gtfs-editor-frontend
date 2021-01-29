@@ -12,8 +12,10 @@
   import stopsAPI from "@/api/stops.api";
   import shapesAPI from "@/api/shapes.api";
   import envelopeMixin from "@/mixins/envelopeMixin"
+  import config from "@/config.js"
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
+
   export default {
     name: "SopTimesMap",
     mixins: [
@@ -21,7 +23,6 @@
     ],
     data: function () {
       return {
-        shapeColor: "#55CCFF",
         geojson: {
           'type': 'Feature',
           'properties': {},
@@ -34,7 +35,7 @@
           type: 'FeatureCollection',
           features: []
         },
-        stops: {},  
+        stops: {},
       };
     },
     props: {
@@ -100,7 +101,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': this.shapeColor,
+            'line-color': config.shape_line_color,
             'line-width': 2
           }
         });
@@ -130,30 +131,34 @@
           id: "layer-stops-icon",
           type: "circle",
           source: "stops",
-          filter:  ["==", "selected", "selected"],
+          filter: ["==", "selected", "selected"],
           paint: {
-            "circle-radius": {
-              base: 2,
-              stops: [
-                [12, 1.5],
-                [14, 4],
-                [20, 180]
-              ]
-            },
-            "circle-color": [
-              'match',
-              ['get', 'selected'],
-              'selected',
-              '#FF2222',
-              "#2222DD" //default
-            ]
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+            ].concat(config.stoptimes_stop_zoom),
+            "circle-color": config.stop_selected_color
+          }
+        });
+        this.map.addLayer({
+          id: "layer-stops-seq",
+          type: "symbol",
+          source: "stops",
+          filter: ["==", "selected", "selected"],
+          minzoom: 14,
+          layout: {
+            "text-field": "Seq: {sequence}",
+            "text-anchor": "top",
+            "text-offset": [0, -0.5],
+            "text-allow-overlap": true,
           }
         });
         this.map.addLayer({
           id: "layer-stops-label",
           type: "symbol",
           source: "stops",
-          filter:  ["==", "selected", "selected"],
+          filter: ["==", "selected", "selected"],
           minzoom: 16,
           layout: {
             "text-field": "{label}",
@@ -176,7 +181,7 @@
             return feature;
           });
           this.map.getSource('stops').setData(this.stopsGeojson);
-          let coordinates = response.data.stop_times.map(st=>st.stop).map(id => {
+          let coordinates = response.data.stop_times.map(st => st.stop).map(id => {
             let stop = this.stops[id];
             return [stop.stop_lon, stop.stop_lat];
           });

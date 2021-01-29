@@ -98,6 +98,7 @@
 
   let Vuetable = require('vuetable-2')
   import envelopeMixin from "@/mixins/envelopeMixin"
+  import config from "@/config.js"
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
   let turf = require('@turf/turf');
@@ -173,7 +174,6 @@
         fields: base_fields,
         show_optional_fields: false,
         stop_times: this.trip.stop_times,
-        shapeColor: "#55CCFF",
         stops: [],
         stop_map: new Map(),
         shape: false,
@@ -313,19 +313,16 @@
           type: "circle",
           source: "stops",
           paint: {
-            "circle-radius": {
-              base: 2,
-              stops: [
-                [12, 1.5],
-                [14, 4],
-                [18, 250]
-              ]
-            },
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+            ].concat(config.stoptimes_stop_zoom),
             "circle-color": [
               'case',
               ['get', 'selected'],
-              '#DD2222',
-              "#2222DD" //default
+              config.stop_selected_color,
+              config.stop_color //default
             ]
           }
         });
@@ -477,7 +474,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': this.shapeColor,
+            'line-color': config.shape_line_color,
             'line-width': 3
           }
         });

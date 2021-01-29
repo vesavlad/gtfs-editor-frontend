@@ -53,6 +53,7 @@
   import Modal from "@/components/Modal.vue";
   import InfoButton from "@/components/InfoButton.vue";
   import envelopeMixin from "@/mixins/envelopeMixin"
+  import config from "@/config.js"
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
 
@@ -171,8 +172,8 @@
       },
       reGenerateShape() {
         this.shapeGeojson.geometry.coordinates = this.shape.points.map(point => [point.shape_pt_lon, point
-          .shape_pt_lat]);
-        console.log(this.shapeGeojson);
+          .shape_pt_lat
+        ]);
         this.map.getSource('shape').setData(this.shapeGeojson);
         this.map.fitBounds(this.getBounds(this.shapeGeojson.geometry.coordinates), {
           padding: 50
@@ -197,7 +198,6 @@
           this.reGenerateStops();
           console.log("removed");
         }).catch((err) => {
-          console.log(err);
           let data = err.response.data;
           this.deleteModal.message = data.message;
         });
@@ -213,7 +213,6 @@
         let data = this.creation.data;
         stopsAPI.stopsAPI.create(this.project, data).then(() => {
           this.addStop(data);
-          console.log(this.creation);
           this.creation.errors = {};
           this.creation.creating = false;
           this.creation.data = {
@@ -223,7 +222,6 @@
           this.creation.geojson.features = [];
           this.map.getSource('creating').setData(this.creation.geojson);
         }).catch((err) => {
-          console.log(err);
           console.log(err.response);
           this.creation.errors = err.response.data;
         });
@@ -238,11 +236,8 @@
         this.map.resize();
       },
       updateStopData(stop) {
-        console.log(stop);
         this.stops = this.stops.map(s => {
           if (s.id === stop.id) {
-            console.log('Match');
-            console.log(stop);
             return {
               ...stop
             };
@@ -276,7 +271,8 @@
           properties: {
             stop_id: stop.id,
             label: this.createLabel(stop),
-          }
+          },
+          id: stop.id,
         }
       },
       reGenerateStops() {
@@ -300,15 +296,17 @@
           type: "circle",
           source: "stops",
           paint: {
-            "circle-radius": {
-              base: 2,
-              stops: [
-                [12, 1.5],
-                [14, 4],
-                [20, 180]
-              ]
-            },
-            "circle-color": "#2222DD"
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+            ].concat(config.stop_zoom),
+            "circle-color": [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              config.stop_hover_color,
+              config.stop_color,
+            ]
           }
         });
         this.map.addLayer({
@@ -334,14 +332,12 @@
           type: "circle",
           source: "creating",
           paint: {
-            "circle-radius": {
-              base: 2,
-              stops: [
-                [12, 4],
-                [20, 240]
-              ]
-            },
-            "circle-color": "#DD9911",
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+            ].concat(config.stop_creation_zoom),
+            "circle-color": config.stop_creation_color,
           }
         });
         this.map.addSource('shape', {
@@ -357,7 +353,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': "#55CCFF",
+            'line-color': config.shape_line_color,
             'line-width': 2
           }
         });
@@ -443,11 +439,31 @@
           this.popup.popup = popup;
           this.popup.open = true;
         });
-        this.map.on('mouseenter', 'layer-stops-icon', function () {
+        let hovered_stops = [];
+        this.map.on('mouseenter', 'layer-stops-icon', function (e) {
           if (this.dragging) return;
           canvas.style.cursor = 'pointer';
+          e.features.forEach(feature => {
+            hovered_stops.push(feature);
+            map.setFeatureState({
+              source: 'stops',
+              id: feature.id,
+            }, {
+              hover: true
+            });
+          });
         });
         this.map.on('mouseleave', 'layer-stops-icon', function () {
+          hovered_stops.forEach(feature => {
+            hovered_stops.push(feature.id);
+            map.setFeatureState({
+              source: 'stops',
+              id: feature.id,
+            }, {
+              hover: false
+            });
+          });
+          hovered_stops = [];
           if (this.dragging) return;
           canvas.style.cursor = '';
         });
@@ -456,7 +472,6 @@
           evt_down.preventDefault();
           canvas.style.cursor = 'grab';
           let activeStop = evt_down.features[0]
-          console.log(evt_down.features);
 
           map.once('mouseup', evt_up => {
             let coords = evt_up.lngLat;
@@ -498,7 +513,6 @@
           }
           s.stop_lon = coords.lng;
           s.stop_lat = coords.lat;
-          console.log(s);
           return s;
         });
         this.reGenerateStops();
