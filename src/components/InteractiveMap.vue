@@ -70,6 +70,7 @@
     ],
     data() {
       return {
+        active_stops: [],
         stops: [],
         deleteModal: {
           visible: false,
@@ -302,6 +303,8 @@
             ].concat(config.stop_zoom),
             "circle-color": [
               'case',
+              ['boolean', ['feature-state', 'active'], false],
+              config.stop_selected_color,
               ['boolean', ['feature-state', 'hover'], false],
               config.stop_hover_color,
               config.stop_color,
@@ -406,7 +409,8 @@
         let self = this;
         this.map.on('click', 'layer-stops-icon', (evt) => {
           var coordinates = evt.features[0].geometry.coordinates.slice();
-          var id = evt.features[0].properties.stop_id;
+          let feature = evt.features[0];
+          var id = feature.properties.stop_id;
 
           // Ensure that if the map is zoomed out such that multiple
           // copies of the feature are visible, the popup appears
@@ -418,11 +422,26 @@
           let popup = new mapboxgl.Popup()
             .setLngLat(coordinates)
             .setDOMContent(this.generatePopup(stop))
+          map.setFeatureState({
+            source: 'stops',
+            id: feature.id,
+          }, {
+            active: true
+          });
+          this.active_stops.push(feature);
           popup.addTo(map)
             .on('close', () => {
               if (this.popup.disableClose) return;
               stopsAPI.stopsAPI.update(this.project, this.popup.stop).then(response => {
                 console.log(response);
+                this.active_stops.forEach(feature => {
+                  map.setFeatureState({
+                    source: 'stops',
+                    id: feature.id,
+                  }, {
+                    active: false
+                  });
+                });
                 this.stops = this.stops.map(stop => {
                   if (this.popup.stop.id === stop.id) {
                     return {
@@ -439,10 +458,23 @@
           this.popup.open = true;
         });
         let hovered_stops = [];
-        this.map.on('mouseenter', 'layer-stops-icon', function (e) {
+        this.map.on('mouseenter', 'layer-stops-icon', function () {
           if (this.dragging) return;
           canvas.style.cursor = 'pointer';
-          e.features.forEach(feature => {
+        });
+        this.map.on('mousemove', 'layer-stops-icon', function (e) {
+          if (this.dragging) return;
+          hovered_stops.forEach(feature => {
+            hovered_stops.push(feature.id);
+            map.setFeatureState({
+              source: 'stops',
+              id: feature.id,
+            }, {
+              hover: false
+            });
+          });
+          hovered_stops = [];
+          [e.features[0]].forEach(feature => {
             hovered_stops.push(feature);
             map.setFeatureState({
               source: 'stops',
@@ -471,8 +503,9 @@
           evt_down.preventDefault();
           canvas.style.cursor = 'grab';
           let activeStop = evt_down.features[0]
-
+          this.dragging = true;
           map.once('mouseup', evt_up => {
+            this.dragging = false;
             let coords = evt_up.lngLat;
             let distance = self.calcDistance(evt_down, evt_up);
             if (!distance) {
