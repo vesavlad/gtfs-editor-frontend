@@ -48,7 +48,6 @@
       VuetablePagination,
       VuetablePaginationDropDown: Vuetable.VuetablePaginationDropDown,
     },
-    mixins: [],
     data: function () {
       return {
         quickSearch: "",

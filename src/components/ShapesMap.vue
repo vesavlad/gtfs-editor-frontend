@@ -15,7 +15,6 @@
   mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
   export default {
     name: "ShapesMap",
-    components: {},
     mixins: [
       shapeMapMixin,
       envelopeMixin,

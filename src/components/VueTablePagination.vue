@@ -6,7 +6,7 @@
           <span>&laquo;</span>
         </a>
       </li>
-      
+
       <template v-if="notEnoughPages">
         <li v-for="n in totalPage" :key="n" :class="['page-item', {'active': isCurrentPage(n)}]">
           <a class="page-link" @click.prevent="loadPage(n)" v-html="n"></a>
@@ -23,14 +23,16 @@
           <span>&raquo;</span>
         </a>
       </li>
-    </ul>  
+    </ul>
   </nav>
 </template>
 
 <script>
-import VuetablePaginationMixin from "vuetable-2/src/components/VuetablePaginationMixin";
+  import VuetablePaginationMixin from "vuetable-2/src/components/VuetablePaginationMixin";
 
-export default {
-  mixins: [VuetablePaginationMixin]
-};
+  export default {
+    mixins: [
+      VuetablePaginationMixin,
+    ]
+  };
 </script>

@@ -19,9 +19,6 @@
         rows: this.value,
       }
     },
-    watch: {
-
-    },
     props: {
       value: {},
     },
