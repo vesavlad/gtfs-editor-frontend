@@ -7,7 +7,7 @@ let config = {
     // Pairs of zoom level - radius of ball (in pixels). Gets interpolated
     12, 1.5,
     14, 4,
-    20, 40,
+    20, 10,
   ],
   stop_creation_zoom: [
     12, 1.5,
@@ -23,13 +23,13 @@ let config = {
   shape_point_zoom: [
     12, 1.5,
     14, 4,
-    20, 40,
+    20, 10,
   ],
 
   stoptimes_stop_zoom: [
     12, 1.5,
     14, 4,
-    20, 40,
+    20, 10,
   ],
 
 }
