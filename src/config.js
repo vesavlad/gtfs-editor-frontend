@@ -12,7 +12,7 @@ let config = {
   stop_creation_zoom: [
     12, 1.5,
     14, 4,
-    24, 180,
+    20, 30,
   ],
 
   shape_line_color: "#55CCFF",
