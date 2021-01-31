@@ -1,5 +1,8 @@
 <template>
   <div>
+    <button class="btn icon" @click="openInfo" alt="Go to GTFS specification.">
+      <span class="material-icons">info</span>
+    </button>
     <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
       <div class="input-group">
         <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
@@ -52,6 +55,7 @@
       return {
         quickSearch: "",
         doSearch: false,
+        infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
         fields: [
           "actions",
           {
@@ -72,6 +76,9 @@
       }
     },
     methods: {
+      openInfo() {
+        window.open(this.infoURL);
+      },
       onPaginationData(paginationData) {
         if (paginationData.current_page !== this.current_page || paginationData.last_page !== this.last_page) {
           this.current_page = paginationData.current_page;

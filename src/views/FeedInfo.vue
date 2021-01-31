@@ -1,18 +1,21 @@
 <template>
   <div>
-      <div v-for="field in fields" v-bind:key="field.name">
-        <label>{{field.title}}{{field.required?"*":""}}</label>
-        <span class="error">
-          <div v-for="error in error_data[field.name]" v-bind:key="error">
-            <br>
-          {{error}}
-          </div>
-        </span>
-        <input :type="field.type" v-model="feedInfo[field.name]">
-      </div>
-      <button class="btn btn-outline-secondary" @click="save">
-        Save and return
-      </button>
+    <button class="btn icon" @click="openInfo" alt="Go to GTFS specification.">
+      <span class="material-icons">info</span>
+    </button>
+    <div v-for="field in fields" v-bind:key="field.name">
+      <label>{{field.title}}{{field.required?"*":""}}</label>
+      <span class="error">
+        <div v-for="error in error_data[field.name]" v-bind:key="error">
+          <br>
+        {{error}}
+        </div>
+      </span>
+      <input :type="field.type" v-model="feedInfo[field.name]">
+    </div>
+    <button class="btn btn-outline-secondary" @click="save">
+      Save and return
+    </button>
   </div>
 </template>
 
@@ -23,6 +26,7 @@
       return {
         feedInfo: false,
         error_data: {},
+        infoURL: "https://developers.google.com/transit/gtfs/reference#feed_infotxt",
         fields: [{
             title: "Publisher Name",
             name: "feed_publisher_name",
@@ -78,6 +82,9 @@
       });
     },
     methods: {
+      openInfo() {
+        window.open(this.infoURL);
+      },
       save() {
         let method = this.feedInfo.id ? feedInfoAPI.update : feedInfoAPI.create;
         method(this.$route.params.projectid, this.feedInfo).then(() => {
