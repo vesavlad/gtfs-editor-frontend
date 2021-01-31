@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import ECharts from 'vue-echarts'
 import VueBreadcrumbs from 'vue-2-breadcrumbs'
+import i18n from './i18n'
 
 require('@/assets/css/base.css')
 require('@/assets/css/style.css')
@@ -24,5 +25,6 @@ Vue.config.productionTip = false
 new Vue({
   router,
   store,
+  i18n,
   render: h => h(App)
 }).$mount('#app')

@@ -3,10 +3,10 @@
     <header>
         <div class="container full grid">
             <div class="logo">
-                <span>GTFS Editor</span>
+                <span>{{ $t('appName') }}</span>
             </div>
             <div class="menu">
-                <router-link :to="{name: 'myprojects'}" class="btn">My Projects</router-link>
+                <router-link :to="{name: 'myprojects'}" class="btn">{{ $t('myProjects') }}</router-link>
             </div>
         </div>
     </header>
