@@ -1,6 +1,77 @@
 <template>
-  <div class="ProjectDashboard flex">
-    <div id="TablesTable" class="flex">
+  <div class="ProjectDashboard container">
+    <div class="header">
+      <div class="grid">
+        <h1>Project name</h1>
+        <button class="btn icon flat"><i class="material-icons">edit</i></button>
+      </div>
+      <span>Last Edited 22/12/2020 16:54:43</span>
+    </div>
+    <div class="project-details">
+      <div class="card">
+        <div class="card-content">
+          <div class="header">
+            <h2>División de Transporte Público Regional</h2>
+            <button class="btn icon flat"><i class="material-icons">edit</i></button>
+          </div>
+          <div class="grid">
+            <div class="grid">
+              <i class="material-icons">language</i>
+              <span>https://www.dtpr.gob.cl</span>
+            </div>
+            <div class="grid">
+              <i class="material-icons">flag</i>
+              <span>ES</span>
+            </div>
+          </div>
+          <div class="grid-project-info">
+            <div class="project-card-map">
+              <EnvelopeMap></EnvelopeMap>
+            </div>
+            <div class="project-info-details">
+              <h5>Version</h5>
+              <span>AN_CA-20200825</span>
+              <h5>Feed ID</h5>
+              <span>Calama</span>
+              <div class="grid">
+                <div>
+                  <h5>Feed ID</h5>
+                  <span>Calama</span>
+                </div>
+                <div>
+                  <h5>Feed ID</h5>
+                  <span>Calama</span>
+                </div>
+              </div>
+              <div class="grid">
+                <div>
+                  <h5>Feed ID</h5>
+                  <span>Calama</span>
+                </div>
+                <div>
+                  <h5>Feed ID</h5>
+                  <span>Calama</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="required-data">
+      <h2>GTFS Required data</h2>
+      <div class="grid-required-data">
+
+      </div>
+    </div>
+    <div class="optional-data">
+      <h2>GTFS optional data</h2>
+      <div class="grid-optional-data">
+
+      </div>
+    </div>
+
+    <div id="TablesTable">
       <table>
         <tbody>
           <tr>
