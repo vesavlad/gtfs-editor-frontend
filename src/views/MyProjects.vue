@@ -1,10 +1,10 @@
 <template>
   <div class="dashboard">
     <div class="header">          
-        <h1>Dashboard</h1>
+      <h1>{{ $t('myProjects')}}</h1>
     </div>
     <section class='pheader'>
-    <ProjectsList :rows='projects' />
+      <ProjectsList :rows='projects' />
     </section>
   </div>
 </template>
@@ -16,22 +16,21 @@ import projectsAPI from '@/api/projects.api';
 export default {
   name: 'MyProjects',
   components: {
-      ProjectsList
+    ProjectsList
   },
   data() {
-      return {
-          projects: []
-      }
+    return {
+      projects: []
+    }
   },
   methods: {
-      setData(projects){
-        this.projects = projects
-      }
+    setData(projects){
+      this.projects = projects
+    }
   },
   beforeRouteEnter (to, from, next) {
     projectsAPI.getAllProjects().then(response => {
-      console.log(response)
-        next(vm => vm.setData(response.data));
+      next(vm => vm.setData(response.data));
     });
   },
 }
