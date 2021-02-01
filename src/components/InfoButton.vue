@@ -3,8 +3,8 @@
     <button class="btn icon" @click="openInfo" alt="Commands">
       <span class="material-icons">info</span>
     </button>
-    <Modal v-if="modal.visible" @close="modal.visible = false" @cancel="modal.visible = false" :showCancelButton="true">
-      <template slot="title">
+    <Modal v-show="modal.visible" @close="closeInfo" @cancel="closeInfo" :showCancelButton="false">
+      <template slot="title" @ok="closeInfo">
         <h2>Usage Info</h2>
       </template>
       <template slot="content">
@@ -13,7 +13,7 @@
           <br>
         </div>
       </template>
-      <template slot="close-button-name">Delete</template>
+      <template slot="close-button-name">Close</template>
     </Modal>
   </div>
 
@@ -46,6 +46,9 @@
     methods: {
       openInfo() {
         this.modal.visible = true;
+      },
+      closeInfo() {
+        this.modal.visible = false;
       }
     }
   }

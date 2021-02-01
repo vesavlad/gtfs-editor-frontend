@@ -71,20 +71,14 @@
       </div>
     </div>
 
-    <div id="TablesTable">
-      <table>
-        <tbody>
-          <tr>
-            <th>GTFS Tables</th>
-          </tr>
-          <tr v-for="table in tables" :key="table">
-            <td>
-              <router-link :to="{ name: table, params: { projectid: $route.params.projectid }}">{{table}}
-              </router-link>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div id="TablesTable" class="flex">
+      <Vuetable ref="vuetable" :fields="fields" :data="data" :api-mode="false">
+        <div slot="name" slot-scope="props">
+          <router-link :to="{name:props.rowData[props.rowField.name], params: { projectid: $route.params.projectid }}">
+            {{props.rowData[props.rowField.name]}}
+          </router-link>
+        </div>
+      </Vuetable>
     </div>
     <EnvelopeMap :project="project"></EnvelopeMap>
     <div id="Buttons" class="list-container flex">
@@ -209,28 +203,82 @@
 
 <script>
   import projectsAPI from '@/api/projects.api';
+  import tablesAPI from '@/api/tables.api';
   import Modal from '@/components/Modal.vue';
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
+  let Vuetable = require('vuetable-2')
 
   export default {
     name: 'ProjectDashboard',
     components: {
+      Vuetable: Vuetable.Vuetable,
       Modal,
       EnvelopeMap
     },
     data() {
+      let data = [{
+          name: "FeedInfo",
+          id: "feed_info",
+        }, {
+          name: "Agencies",
+          id: "agency",
+        }, {
+          name: "Calendars",
+          id: "calendar",
+        }, {
+          name: "Stops",
+          id: "stops",
+        }, {
+          name: "Routes",
+          id: "routes",
+        }, {
+          name: "Shapes",
+          id: "shapes",
+        }, {
+          name: "Trips",
+          id: "trips",
+        }, {
+          name: "Stop Times",
+          id: "stop_times",
+        }, {
+          name: "Frequencies",
+          id: "frequencies",
+        }, {
+          name: "Calendar Dates",
+          id: "calendar_dates",
+        }, {
+          name: "Fare Attributes",
+          id: "fare_attributes",
+        }, {
+          name: "Fare Rules",
+          id: "fare_rules",
+        }, {
+          name: "Transfers",
+          id: "transfers",
+        }, {
+          name: "Pathways",
+          id: "pathways",
+        },{
+          name: "Levels",
+          id: "levels",
+        },
+      ];
       return {
         project: {
           feedInfo: {},
           gtfsvalidation: {}
         },
+        fields: [{
+            name: "name",
+            title: "Table",
+          },
+          {
+            name: "entries",
+          },
+        ],
+        data,
         showModal: false,
         modalContent: '',
-        tables: [
-          "FeedInfo", "Agencies", "Calendars", "Stops", "Routes", "Shapes", "Trips", "Stop Times",
-          "Frequencies", "Calendar Dates", "Fare Attributes", "Fare Rules", "Transfers", "Pathways",
-          "Levels"
-        ]
       }
     },
     methods: {
@@ -240,6 +288,19 @@
             response.data.gtfsvalidation = {};
           }
           this.project = response.data;
+        });
+        tablesAPI.list_tables(this.$route.params.projectid).then(response => {
+          let data = response.data;
+          this.data = this.data.map(datum => {
+            let entry = data[datum.id];
+            if(entry) {
+              return {
+                ...entry,
+                ...datum,
+              }
+            }
+            return datum;
+          });
         });
       },
       dowloadGTFS() {

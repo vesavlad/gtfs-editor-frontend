@@ -7,7 +7,8 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/undefined/**/*.json'"
   },
   "dependencies": {
     "@turf/turf": "^5.1.6",
@@ -31,6 +32,7 @@
     "vue-2-breadcrumbs": "^0.7.9",
     "vue-datatables-net": "git+https://github.com/niiknow/vue-datatables-net.git",
     "vue-echarts": "^5.0.0-beta.0",
+    "vue-i18n": "^8.17.3",
     "vue-mapbox": "^0.4.1",
     "vue-router": "^3.4.5",
     "vue-sortable-list": "^0.1.2",
@@ -51,6 +53,7 @@
     "chai": "^4.1.2",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "vue-cli-plugin-i18n": "~1.0.1",
     "vue-template-compiler": "^2.6.12"
   },
   "eslintConfig": {

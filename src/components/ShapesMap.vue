@@ -12,17 +12,17 @@
   const mapboxgl = require('mapbox-gl');
   import shapeMapMixin from "@/mixins/shapeMapMixin"
   import envelopeMixin from "@/mixins/envelopeMixin"
-  mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
+  mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
+  import config from "@/config.js"
+
   export default {
     name: "ShapesMap",
-    components: {},
     mixins: [
       shapeMapMixin,
       envelopeMixin,
     ],
     data: function () {
       return {
-        shapeColor: "#55CCFF",
         geojson: {
           'type': 'Feature',
           'properties': {},
@@ -75,7 +75,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': this.shapeColor,
+            'line-color': config.shape_line_color,
             'line-width': 2
           }
         });
@@ -84,15 +84,12 @@
           type: "circle",
           source: "shape-pts",
           paint: {
-            "circle-radius": {
-              base: 2,
-              stops: [
-                [12, 1.5],
-                [14, 4],
-                [20, 180]
-              ]
-            },
-            "circle-color": this.shapeColor,
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+            ].concat(config.shape_point_zoom),
+            "circle-color": config.shape_point_color,
           }
         });
         this.map.addLayer({

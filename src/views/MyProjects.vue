@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard container">
     <div class="header">
-      <h1>Dashboard</h1>
+      <h1>{{ $t('myProjects')}}</h1>
       <button class="btn"><span>New project</span><i class="material-icons">add</i></button>
     </div>
     <section class='content'>
@@ -22,22 +22,21 @@ export default {
   name: 'MyProjects',
   components: {
     ProjectCard,
-      ProjectsList
+    ProjectsList
   },
   data() {
-      return {
-          projects: []
-      }
+    return {
+      projects: []
+    }
   },
   methods: {
-      setData(projects){
-        this.projects = projects
-      }
+    setData(projects){
+      this.projects = projects
+    }
   },
   beforeRouteEnter (to, from, next) {
     projectsAPI.getAllProjects().then(response => {
-      console.log(response)
-        next(vm => vm.setData(response.data));
+      next(vm => vm.setData(response.data));
     });
   },
 }

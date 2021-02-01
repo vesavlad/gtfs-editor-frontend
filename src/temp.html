@@ -66,7 +66,7 @@
 
   <script>
     // Add your Mapbox access token
-    mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
+    mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
     var map = new mapboxgl.Map({
       container: 'map', // Specify the container ID
       style: 'mapbox://styles/mapbox/streets-v11', // Specify which map style to use

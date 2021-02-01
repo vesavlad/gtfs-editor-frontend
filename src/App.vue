@@ -15,7 +15,8 @@
                 </svg>
             </div>
             <div class="top-menu">
-                <router-link :to="{name: 'myprojects'}" class="btn-top"><span>My Projects</span><i class="material-icons">layers</i></router-link>
+                <locale-switcher />
+                <router-link :to="{name: 'myprojects'}" class="btn-top"><span>{{ $t('myProjects') }}</span><i class="material-icons">layers</i></router-link>
                 <button class="btn-top"><span>Website</span><i class="material-icons">public</i></button>
                 <button class="btn-top"><span>Contact</span><i class="material-icons">mail</i></button>
             </div>
@@ -41,6 +42,16 @@
 @import url("https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css");
 
 </style>
+
 <script>
+import LocaleSwitcher from './components/LocaleSwitcher'
+
 require('material-icons')
+
+export default {
+  name: 'App',
+  components: {
+    LocaleSwitcher
+  }
+}
 </script>>

@@ -12,9 +12,9 @@
         <span class="material-icons">info</span>
       </button>
       <div>
-        <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getTitledFields(fields)" data-path="results"
-          pagination-path="pagination" @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams"
-          :row-class="getRowClass">
+        <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getProcessedFields(fields)"
+          data-path="results" pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
+          :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData"> 
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
           </template>
@@ -28,7 +28,8 @@
           <!-- This is where the fields are converted into inputs to make the table editable -->
           <GeneralizedInput :key="index" v-for="(field, index) in getProperFields(fields)" :slot="getFieldName(field)"
             slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
-            v-model="properties.rowData[getFieldID(properties.rowField)]" v-on:input="changeHandler(properties)">
+            v-model="properties.rowData[getFieldID(properties.rowField)]" v-on:input="changeHandler(properties)"
+            :errors="$refs.vuetable.tableData[properties.rowIndex].errors">
           </GeneralizedInput>
         </vuetable>
         <div class="flex">
@@ -230,6 +231,7 @@
       changeHandler(props) {
         this.hasChanged = true;
         props.rowData.changed = true;
+        props.rowData.error = false;
       },
       getOption(value, options) {
         for (const [k, v] of Object.entries(options)) {
@@ -262,14 +264,33 @@
             this.updateMethod(row).then(response => {
               row.changed = false;
               row.error = false;
+              row.errors = {};
               this.$emit('update', response.data);
+              this.reRender();
             }).catch(error => {
               let response = error.response;
               row.error = true;
-              console.log(response.data);
+              row.errors = response.data;
+              this.reRender();
             });
           }
         );
+      },
+      reRender() {
+        this.$refs.vuetable.setData(
+          [...this.$refs.vuetable.$data.tableData]
+        );
+      },
+      transformData(data) {
+        data.results = data.results.map(result => {
+          return {
+            error: false,
+            errors: {},
+            changed: false,
+            ...result,
+          }
+        })
+        return data;
       },
       createModalCreated() {
         this.fields.filter((f) => f.foreignKey).forEach((field) => {
@@ -402,8 +423,7 @@
       hasUnsavedChanges() {
         return this.$refs.vuetable.$data.tableData.reduce((changed, row) => row.changed || changed, false);
       },
-      getRowClass(data, index) {
-        console.log(data, index);
+      getRowClass(data) {
         if (data.error) return "error";
         if (data.changed) return "changed";
         return "";

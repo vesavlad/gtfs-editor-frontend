@@ -2,6 +2,9 @@
   <div>
     <div class="flex" v-if="!editing">
       <div>
+        <button class="btn icon" @click="openInfo" alt="Go to GTFS specification.">
+          <span class="material-icons">info</span>
+        </button>
         <StopTimesTable ref="table" :project="$route.params.projectid" @focus-st="displayTrip"
           @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>
       </div>
@@ -86,9 +89,13 @@
           message: "",
         },
         mode: "",
+        infoURL: "https://developers.google.com/transit/gtfs/reference#stop_timestxt",
       };
     },
     methods: {
+      openInfo() {
+        window.open(this.infoURL);
+      },
       timeToSeconds(timeString) {
         let times = timeString.split(":").map(t => parseInt(t));
         let seconds = 0;

@@ -6,7 +6,7 @@
     </div>
     <div v-show="tab==='table'" class="table-container">
       <EditableTable ref='table' :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
-        :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" @update="onUpdate">
+        :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" @update="onUpdate" :infoURL="infoURL">
         <template slot="additional-actions" slot-scope="props">
           <button class="btn icon" @click="focusStop(props)" alt="Focus Stop on interactive map.">
             <span class="material-icons">map</span>
@@ -27,7 +27,6 @@
   import stopsAPI from '@/api/stops.api';
   import stopsMixin from '@/mixins/stopsMixin.js'
 
-
   export default {
     components: {
       EditableTable,
@@ -38,6 +37,7 @@
     ],
     data() {
       return {
+        infoURL: "https://developers.google.com/transit/gtfs/reference#stopstxt",
         tab: "map",
         url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
         downloadURL: stopsAPI.stopsAPI.getDownloadURL(this.$route.params.projectid),

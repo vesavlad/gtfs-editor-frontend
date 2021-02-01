@@ -1,46 +1,46 @@
 <template>
-  <div id='map-container'>
-    <div id='map'>
-      <div ref="popup" v-show="popup.open">
-        <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
-        </popup-content>
-        <button class="btn icon" alt="Delete" @click="beginStopDeletion">
-          <span class="material-icons">delete</span>
-        </button>
-        <!-- <button class="btn icon" alt="Save" @click="log">
-          <span class="material-icons">save</span>
-        </button> -->
-      </div>
-    </div>
-    <div class="map-overlay top">
-      <div class="map-overlay-inner" v-if="map">
-        Display Shape
-        <FKSelect :field="shape_field" :data="{}" v-on:input="loadShape($event)"></FKSelect>
-        <button v-if="!creation.creating" class="btn icon" alt="Create Stop" @click="beginCreation">
-          <span class="material-icons">add</span>
-        </button>
-        <div v-if="creation.creating">
-          <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
-            v-model="creation.data">
+  <div class='horizontal-display'>
+    <InfoButton :info="info"></InfoButton>
+    <div id='map-container'>
+      <div id='map'>
+        <div ref="popup" v-show="popup.open">
+          <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
           </popup-content>
-          <button class="btn icon" alt="Create" @click="create">
-            <span class="material-icons">add_location</span>
+          <button class="btn icon" alt="Delete" @click="beginStopDeletion">
+            <span class="material-icons">delete</span>
           </button>
         </div>
       </div>
+      <div class="map-overlay top">
+        <div class="map-overlay-inner" v-if="map">
+          Display Shape
+          <FKSelect :field="shape_field" :data="{}" v-on:input="loadShape($event)"></FKSelect>
+          <button v-if="!creation.creating" class="btn icon" alt="Create Stop" @click="beginCreation">
+            <span class="material-icons">add</span>
+          </button>
+          <div v-if="creation.creating">
+            <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
+              v-model="creation.data">
+            </popup-content>
+            <button class="btn icon" alt="Create" @click="create">
+              <span class="material-icons">add_location</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <Modal v-if="deleteModal.visible" @ok="deleteStop" @close="deleteModal.visible = false"
+        @cancel="deleteModal.visible = false" :showCancelButton="true">
+        <template slot="title">
+          <h2>Are you sure you want to delete this stop?</h2>
+        </template>
+        <template slot="content">
+          <span>
+            {{deleteModal.message}}
+          </span>
+        </template>
+        <template slot="close-button-name">Delete</template>
+      </Modal>
     </div>
-    <Modal v-if="deleteModal.visible" @ok="deleteStop" @close="deleteModal.visible = false"
-      @cancel="deleteModal.visible = false" :showCancelButton="true">
-      <template slot="title">
-        <h2>Are you sure you want to delete this stop?</h2>
-      </template>
-      <template slot="content">
-        <span>
-          {{deleteModal.message}}
-        </span>
-      </template>
-      <template slot="close-button-name">Delete</template>
-    </Modal>
   </div>
 </template>
 
@@ -51,16 +51,18 @@
   import PopupContent from '@/components/PopupContent.vue';
   import FKSelect from '@/components/FKSelect.vue';
   import Modal from "@/components/Modal.vue";
+  import InfoButton from "@/components/InfoButton.vue";
   import envelopeMixin from "@/mixins/envelopeMixin"
+  import config from "@/config.js"
   const mapboxgl = require('mapbox-gl');
-  mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
-
+  mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
   export default {
     name: 'InteractiveMap',
     components: {
       PopupContent,
       Modal,
       FKSelect,
+      InfoButton,
     },
     mixins: [
       envelopeMixin,
@@ -68,6 +70,7 @@
     ],
     data() {
       return {
+        active_stops: [],
         stops: [],
         deleteModal: {
           visible: false,
@@ -115,6 +118,11 @@
             'coordinates': []
           }
         },
+        info: [
+          "Drag a Stop to update its coordinates",
+          "Click on a Stop to edit its data",
+          "Click outside the popup to open it",
+        ],
       }
     },
     props: {
@@ -163,8 +171,9 @@
         }
       },
       reGenerateShape() {
-        this.shapeGeojson.geometry.coordinates = this.shape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-        console.log(this.shapeGeojson);
+        this.shapeGeojson.geometry.coordinates = this.shape.points.map(point => [point.shape_pt_lon, point
+          .shape_pt_lat
+        ]);
         this.map.getSource('shape').setData(this.shapeGeojson);
         this.map.fitBounds(this.getBounds(this.shapeGeojson.geometry.coordinates), {
           padding: 50
@@ -189,7 +198,6 @@
           this.reGenerateStops();
           console.log("removed");
         }).catch((err) => {
-          console.log(err);
           let data = err.response.data;
           this.deleteModal.message = data.message;
         });
@@ -205,7 +213,6 @@
         let data = this.creation.data;
         stopsAPI.stopsAPI.create(this.project, data).then(() => {
           this.addStop(data);
-          console.log(this.creation);
           this.creation.errors = {};
           this.creation.creating = false;
           this.creation.data = {
@@ -215,7 +222,6 @@
           this.creation.geojson.features = [];
           this.map.getSource('creating').setData(this.creation.geojson);
         }).catch((err) => {
-          console.log(err);
           console.log(err.response);
           this.creation.errors = err.response.data;
         });
@@ -230,14 +236,11 @@
         this.map.resize();
       },
       updateStopData(stop) {
-        console.log(stop);
-        this.stops = this.stops.map( s => {
-          if(s.id === stop.id) {
-            console.log('Match');
-            console.log(stop);
+        this.stops = this.stops.map(s => {
+          if (s.id === stop.id) {
             return {
               ...stop
-              };
+            };
           }
           return s;
         });
@@ -268,7 +271,8 @@
           properties: {
             stop_id: stop.id,
             label: this.createLabel(stop),
-          }
+          },
+          id: stop.id,
         }
       },
       reGenerateStops() {
@@ -292,15 +296,19 @@
           type: "circle",
           source: "stops",
           paint: {
-            "circle-radius": {
-              base: 2,
-              stops: [
-                [12, 1.5],
-                [14, 4],
-                [20, 180]
-              ]
-            },
-            "circle-color": "#2222DD"
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+            ].concat(config.stop_zoom),
+            "circle-color": [
+              'case',
+              ['boolean', ['feature-state', 'active'], false],
+              config.stop_selected_color,
+              ['boolean', ['feature-state', 'hover'], false],
+              config.stop_hover_color,
+              config.stop_color,
+            ]
           }
         });
         this.map.addLayer({
@@ -326,14 +334,12 @@
           type: "circle",
           source: "creating",
           paint: {
-            "circle-radius": {
-              base: 2,
-              stops: [
-                [12, 4],
-                [20, 240]
-              ]
-            },
-            "circle-color": "#DD9911",
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+            ].concat(config.stop_creation_zoom),
+            "circle-color": config.stop_creation_color,
           }
         });
         this.map.addSource('shape', {
@@ -349,7 +355,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': "#55CCFF",
+            'line-color': config.shape_line_color,
             'line-width': 2
           }
         });
@@ -403,7 +409,8 @@
         let self = this;
         this.map.on('click', 'layer-stops-icon', (evt) => {
           var coordinates = evt.features[0].geometry.coordinates.slice();
-          var id = evt.features[0].properties.stop_id;
+          let feature = evt.features[0];
+          var id = feature.properties.stop_id;
 
           // Ensure that if the map is zoomed out such that multiple
           // copies of the feature are visible, the popup appears
@@ -415,11 +422,26 @@
           let popup = new mapboxgl.Popup()
             .setLngLat(coordinates)
             .setDOMContent(this.generatePopup(stop))
+          map.setFeatureState({
+            source: 'stops',
+            id: feature.id,
+          }, {
+            active: true
+          });
+          this.active_stops.push(feature);
           popup.addTo(map)
             .on('close', () => {
               if (this.popup.disableClose) return;
               stopsAPI.stopsAPI.update(this.project, this.popup.stop).then(response => {
                 console.log(response);
+                this.active_stops.forEach(feature => {
+                  map.setFeatureState({
+                    source: 'stops',
+                    id: feature.id,
+                  }, {
+                    active: false
+                  });
+                });
                 this.stops = this.stops.map(stop => {
                   if (this.popup.stop.id === stop.id) {
                     return {
@@ -435,11 +457,44 @@
           this.popup.popup = popup;
           this.popup.open = true;
         });
+        let hovered_stops = [];
         this.map.on('mouseenter', 'layer-stops-icon', function () {
           if (this.dragging) return;
           canvas.style.cursor = 'pointer';
         });
+        this.map.on('mousemove', 'layer-stops-icon', function (e) {
+          if (this.dragging) return;
+          hovered_stops.forEach(feature => {
+            hovered_stops.push(feature.id);
+            map.setFeatureState({
+              source: 'stops',
+              id: feature.id,
+            }, {
+              hover: false
+            });
+          });
+          hovered_stops = [];
+          [e.features[0]].forEach(feature => {
+            hovered_stops.push(feature);
+            map.setFeatureState({
+              source: 'stops',
+              id: feature.id,
+            }, {
+              hover: true
+            });
+          });
+        });
         this.map.on('mouseleave', 'layer-stops-icon', function () {
+          hovered_stops.forEach(feature => {
+            hovered_stops.push(feature.id);
+            map.setFeatureState({
+              source: 'stops',
+              id: feature.id,
+            }, {
+              hover: false
+            });
+          });
+          hovered_stops = [];
           if (this.dragging) return;
           canvas.style.cursor = '';
         });
@@ -448,9 +503,9 @@
           evt_down.preventDefault();
           canvas.style.cursor = 'grab';
           let activeStop = evt_down.features[0]
-          console.log(evt_down.features);
-
+          this.dragging = true;
           map.once('mouseup', evt_up => {
+            this.dragging = false;
             let coords = evt_up.lngLat;
             let distance = self.calcDistance(evt_down, evt_up);
             if (!distance) {
@@ -490,7 +545,6 @@
           }
           s.stop_lon = coords.lng;
           s.stop_lat = coords.lat;
-          console.log(s);
           return s;
         });
         this.reGenerateStops();

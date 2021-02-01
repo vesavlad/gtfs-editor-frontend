@@ -1,50 +1,55 @@
 <template>
-  <div id='map-container'>
-    <div id='map' ref='map'>
+  <div class="flex">
+    <div class="map-info">
+      <InfoButton :info="info"></InfoButton>
     </div>
-    <div class="map-overlay top">
-      <div class="map-overlay-inner" v-if="map">
-        <div>Largo de shape: {{ shapeLength }}</div>
-        <div>
-          shape ID
-          <input v-model="shape_id">
-        </div>
-        Map Matching
-        <br>
-        <label class="switch">
-          <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
-          <span class="slider round"></span>
-        </label>
-        <div v-if="error" class="error">
-          {{error.code}}
-          <br>
-          <div v-for="(text, index) in error.message.split('\n')" :key="index">
-            {{ text }}
-          </div>
-        </div>
-        <div v-if="warning" class="warning">
-          {{warning}}
-        </div>
-        <button class="btn btn-outline-secondary" @click="invertPoints">
-          Invert Shape
-        </button>
-        <button v-if="mapMatching" class="btn btn-outline-secondary" @click="replacePoints">
-          Replace points
-        </button>
-        <button class="btn btn-outline-secondary" @click="saveAndExit">
-          Save and exit
-        </button>
-        <button class="btn btn-outline-secondary" @click="exitModal.visible = true">
-          Exit
-        </button>
+    <div id='map-container'>
+      <div id='map' ref='map'>
       </div>
+      <div class="map-overlay top">
+        <div class="map-overlay-inner" v-if="map">
+          <div>Largo de shape: {{ shapeLength }}</div>
+          <div>
+            shape ID
+            <input v-model="shape_id">
+          </div>
+          Map Matching
+          <br>
+          <label class="switch">
+            <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
+            <span class="slider round"></span>
+          </label>
+          <div v-if="error" class="error">
+            {{error.code}}
+            <br>
+            <div v-for="(text, index) in error.message.split('\n')" :key="index">
+              {{ text }}
+            </div>
+          </div>
+          <div v-if="warning" class="warning">
+            {{warning}}
+          </div>
+          <button class="btn btn-outline-secondary" @click="invertPoints">
+            Invert Shape
+          </button>
+          <button v-if="mapMatching" class="btn btn-outline-secondary" @click="replacePoints">
+            Replace points
+          </button>
+          <button class="btn btn-outline-secondary" @click="saveAndExit">
+            Save and exit
+          </button>
+          <button class="btn btn-outline-secondary" @click="exitModal.visible = true">
+            Exit
+          </button>
+        </div>
+      </div>
+      <Modal v-if="exitModal.visible" :showCancelButton="true" @close="exitModal.visible=false"
+        @cancel="exitModal.visible=false" @ok="exit">
+        <template slot="title">
+          <h2>Are you sure you want to exit and discard your changes?</h2>
+        </template>
+      </Modal>
     </div>
-    <Modal v-if="exitModal.visible" :showCancelButton="true" @close="exitModal.visible=false"
-      @cancel="exitModal.visible=false" @ok="exit">
-      <template slot="title">
-        <h2>Are you sure you want to exit and discard your changes?</h2>
-      </template>
-    </Modal>
   </div>
 </template>
 
@@ -58,12 +63,16 @@
   import shapeMapMixin from '@/mixins/errorMessageMixin';
   import envelopeMixin from "@/mixins/envelopeMixin"
 
-  mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yb21lcm8iLCJhIjoiY2toa2t2NnBjMDJkYTJzcXQyZThhZTNyNSJ9.Wx6qT7xWJ-hhKHyLMNbnAQ';
+  mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
   import Modal from "@/components/Modal.vue";
+  import InfoButton from "@/components/InfoButton.vue";
+  import config from "@/config.js"
+
   export default {
     name: 'ShapeEditor',
     components: {
       Modal,
+      InfoButton,
     },
     mixins: [
       errorMessageMixin,
@@ -106,7 +115,13 @@
         error: false,
         exitModal: {
           visible: false,
-        }
+        },
+        info: [
+          "Drag to move points in a Shape",
+          "Double click to add a point at the end of the Shape",
+          "Right click a point to remove it",
+          "Click on a line to add a point in that position",
+        ],
       }
     },
     props: {
@@ -133,7 +148,7 @@
         if (this.points.length > 1) {
           let points = this.points.map(el => [el.lng, el.lat]);
           let turfShape = turf.lineString(points);
-          let answer = turf.nearestPointOnLine(turfShape, turf.point(points[points.length -1]));
+          let answer = turf.nearestPointOnLine(turfShape, turf.point(points[points.length - 1]));
           result = answer.properties.location.toFixed(2) + " kms";
         }
         return result;
@@ -250,7 +265,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': '#119911',
+            'line-color': config.shape_line_color,
             'line-width': 7
           }
         });
@@ -266,7 +281,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': '#CC1111',
+            'line-color': config.shape_fixed_line_color,
             'line-width': 5
           }
         });
@@ -280,7 +295,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': '#CC8811',
+            'line-color': config.shape_connecting_line_color,
             'line-width': 5
           }
         });
@@ -295,7 +310,7 @@
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': '#3333CC',
+            'line-color': config.map_matching_color,
             'line-width': 2
           }
         });
@@ -307,14 +322,12 @@
           source: "points",
           filter: ["==", "$type", "Point"],
           paint: {
-            "circle-radius": {
-              base: 2,
-              stops: [
-                [14, 8],
-                [16, 20]
-              ]
-            },
-            "circle-color": "#33CC33"
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+            ].concat(config.shape_point_zoom),
+            "circle-color": config.shape_point_color,
           }
         });
         // Arrow for the shape
@@ -634,148 +647,3 @@
     },
   }
 </script>
-
-<style scoped>
-  @import url("https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css");
-
-  .btn {
-    min-width: 100px;
-    min-height: 40px;
-  }
-
-  #map {
-    width: 100%;
-    height: 100%;
-    min-height: 800px;
-  }
-
-  canvas.mapglbox-canvas {
-    width: 100%;
-    height: 100%;
-  }
-
-  div.mapboxgl-popup-content {
-    overflow-y: scroll;
-    max-height: 400px;
-  }
-
-  #map-container {
-    position: relative;
-  }
-
-  .map-overlay {
-    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-    position: absolute;
-    width: 200px;
-    top: 0;
-    left: 0;
-    padding: 10px;
-  }
-
-  .map-overlay .map-overlay-inner {
-    background-color: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-
-  .map-overlay-inner fieldset {
-    border: none;
-    padding: 0;
-    margin: 0 0 10px;
-  }
-
-  .map-overlay-inner fieldset:last-child {
-    margin: 0;
-  }
-
-  .map-overlay-inner select {
-    width: 100%;
-  }
-
-  .map-overlay-inner label {
-    display: block;
-    font-weight: bold;
-    margin: 0 0 5px;
-  }
-
-  .map-overlay-inner button {
-    display: inline-block;
-    width: 36px;
-    height: 20px;
-    border: none;
-    cursor: pointer;
-  }
-
-  .map-overlay-inner button:focus {
-    outline: none;
-  }
-
-  .map-overlay-inner button:hover {
-    box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.1);
-  }
-
-  /* The switch - the box around the slider */
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-
-  /* Hide default HTML checkbox */
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  /* The slider */
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-
-  input:checked+.slider {
-    background-color: #2196F3;
-  }
-
-  input:focus+.slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-
-  input:checked+.slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-  }
-
-  /* Rounded sliders */
-  .slider.round {
-    border-radius: 34px;
-  }
-
-  .slider.round:before {
-    border-radius: 50%;
-  }
-</style>
