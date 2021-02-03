@@ -1,4 +1,15 @@
 {
   "myProjects": "Mis proyectos",
-  "appName": "Editor de GTFS"
+  "appName": "Editor de GTFS",
+  "newProject": "Nuevo proyecto",
+  "createProject": "Crear proyecto",
+  "projectName": "Nombre del proyecto",
+  "cancel": "Cancelar",
+  "website": "Sitio web",
+  "contact": "Contacto",
+  "projectCard": {
+    "lastChange": "Último cambio",
+    "errors": "Errores",
+    "warnings": "Advertencias"
+  }
 }

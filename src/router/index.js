@@ -36,7 +36,9 @@ const routes = [{
     name: 'myprojects',
     component: MyProjects,
     meta: {
-      breadcrumb: 'My Projects'
+      breadcrumb() {
+        return this.$i18n.t('myProjects');
+      }
     }
   },
   {

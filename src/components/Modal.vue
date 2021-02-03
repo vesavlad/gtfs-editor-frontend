@@ -9,7 +9,7 @@
         </div>
         <div class="modal-base" v-bind:class="{}" v-if="showBase">
             <slot name="base">
-              <button class="btn solo red" @click="$emit('cancel')" v-if="showCancelButton"><slot name='cancel-button-name'>Cancel</slot></button>
+              <button class="btn solo red" @click="$emit('cancel')" v-if="showCancelButton"><slot name='cancel-button-name'>{{ $t('cancel') }}</slot></button>
               <button class="btn solo" @click="$emit('ok')"><slot name="close-button-name">Ok</slot></button>
             </slot>
         </div>

@@ -2,7 +2,7 @@
   <div class="dashboard container">
     <div class="header">
       <h1>{{ $t('myProjects')}}</h1>
-      <button class="btn" @click="creatingProject=true"><span>New project</span><i class="material-icons">add</i></button>
+      <button class="btn" @click="creatingProject=true"><span>{{ $t('newProject') }}</span><i class="material-icons">add</i></button>
     </div>
     <section class='content'>
       <div class="grid projects">
@@ -18,14 +18,14 @@
       :modalClasses="[]"
     >
       <template slot="title">
-        <h2>Create project</h2>
+        <h2>{{ $t('createProject') }}</h2>
       </template>
       <template slot="content">
-        <label for="pname">Project Name:</label>
+        <label for="pname">{{ $t('projectName') }}:</label>
         <input v-model="projectName" type="text" />
       </template>
       <template slot="base"> </template>
-      <template slot="close-button-name">Create Project</template>
+      <template slot="close-button-name">{{ $t('createProject') }}</template>
     </Modal>
   </div>
 </template>
