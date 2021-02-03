@@ -11,5 +11,24 @@
     "lastChange": "Último cambio",
     "errors": "Errores",
     "warnings": "Advertencias"
-  }
+  },
+  "lastEdited": "Última edición",
+  "version": "Versión",
+  "feedID": "Feed ID",
+  "startDate": "Fecha de inicio",
+  "endDate": "Fecha de término",
+  "contactURL": "URL de contacto",
+  "contactEmail": "Email de contacto",
+  "summary": "Sumario",
+  "lastBuild": "Último build",
+  "buildStatus": "Estado",
+  "buildDuration": "Duración",
+  "errors": "Errores",
+  "warnings": "Advertencias",
+  "viewErrors": "Ver errores",
+  "download": "Descargar",
+  "gtfsRequiredData": "GTFS datos requeridos",
+  "gtfsOptionalData": "GTFS datos opcionales",
+  "new": "Nuevo",
+  "noData": "No hay datos"
 }

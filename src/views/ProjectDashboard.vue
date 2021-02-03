@@ -1,73 +1,168 @@
 <template>
   <div class="ProjectDashboard container">
     <div class="header">
-      <div class="grid">
-        <h1>Project name</h1>
+      <div class="grid center">
+        <h1>{{project.name}}</h1>
         <button class="btn icon flat"><i class="material-icons">edit</i></button>
       </div>
-      <span>Last Edited 22/12/2020 16:54:43</span>
+      <span class="side-info">{{ $t('lastEdited')}}: {{ project.last_modification?(new Date(project.last_modification)).toLocaleString():'Never' }}</span>
     </div>
-    <div class="project-details">
-      <div class="card">
-        <div class="card-content">
-          <div class="header">
-            <h2>División de Transporte Público Regional</h2>
-            <button class="btn icon flat"><i class="material-icons">edit</i></button>
-          </div>
-          <div class="grid">
-            <div class="grid">
-              <i class="material-icons">language</i>
-              <span>https://www.dtpr.gob.cl</span>
+    <div class="section-content">
+      <div class="section-details">
+        <div class="card">
+          <div class="card-content">
+            <div class="header">
+              <h2>{{ project.feedinfo?project.feedinfo.feed_publisher_name:'' }}</h2>
+              <button class="btn icon flat"><i class="material-icons">edit</i></button>
             </div>
             <div class="grid">
-              <i class="material-icons">flag</i>
-              <span>ES</span>
-            </div>
-          </div>
-          <div class="grid-project-info">
-            <div class="project-card-map">
-              <EnvelopeMap></EnvelopeMap>
-            </div>
-            <div class="project-info-details">
-              <h5>Version</h5>
-              <span>AN_CA-20200825</span>
-              <h5>Feed ID</h5>
-              <span>Calama</span>
-              <div class="grid">
-                <div>
-                  <h5>Feed ID</h5>
-                  <span>Calama</span>
-                </div>
-                <div>
-                  <h5>Feed ID</h5>
-                  <span>Calama</span>
-                </div>
+              <div class="box-info">
+                <i class="material-icons">language</i>
+                <span>{{ project.feedinfo?project.feedinfo.feed_publisher_url:'' }}</span>
               </div>
-              <div class="grid">
+              <div class="box-info">
+                <i class="material-icons">flag</i>
+                <span>{{ project.feedinfo?project.feedinfo.feed_lang:'ES' }}</span>
+              </div>
+            </div>
+            <div class="grid-project-info">
+              <div class="project-card-map">
+                <EnvelopeMap :project="project"></EnvelopeMap>
+              </div>
+              <div class="project-info-details">
                 <div>
-                  <h5>Feed ID</h5>
-                  <span>Calama</span>
+                  <h5>{{ $t('version')}}</h5>
+                  <span>{{ project.feedinfo?project.feedinfo.feed_version:'' }}</span>
                 </div>
                 <div>
-                  <h5>Feed ID</h5>
-                  <span>Calama</span>
+                  <h5>{{ $t('feedID')}}</h5>
+                  <span>{{ project.feedinfo?project.feedinfo.feed_id:'' }}</span>
+                </div>
+                <div class="grid g2">
+                  <div>
+                    <h5>{{ $t('startDate')}}</h5>
+                    <span>{{ project.feedinfo?project.feedinfo.feed_start_date:'' }}</span>
+                  </div>
+                  <div>
+                    <h5>{{ $t('endDate')}}</h5>
+                    <span>{{ project.feedinfo?project.feedinfo.feed_end_date:'' }}</span>
+                  </div>
+                </div>
+                <div class="grid g2">
+                  <div>
+                    <h5>{{ $t('contactURL')}}</h5>
+                    <span>Calama</span>
+                  </div>
+                  <div>
+                    <h5>{{ $t('contactEmail')}}</h5>
+                    <span>Calama</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <div class="card summary">
+          <div class="card-title">
+            <h4>{{ $t('summary')}}</h4>
+          </div>
+          <div class="card-content">
+            <div class="flex between">
+              <div>
+                <div class="small">{{ $t('lastBuild')}}</div>
+                <div>{{ project.gtfs_file_updated_at?(new Date(project.gtfs_file_updated_at)).toLocaleString():'Never' }}</div>
+              </div>
+              <div>
+                <button class="btn" @click="buildGTFSButtonAction"><span>Run builder</span></button>
+              </div>
+            </div>
+          </div>
+          <ul class="list-summary">
+            <li>
+              <span class="lsh">{{ $t('buildStatus')}}</span>
+              <span class="lst">{{ project.gtfs_creation_status?project.gtfs_creation_status:'' }} {{ project.gtfsvalidation?project.gtfsvalidation.status:'' }}</span>
+            </li>
+            <li>
+              <span class="lsh">{{ $t('buildDuration')}}</span>
+              <span class="lst">{{ project.gtfs_creation_duration?project.gtfs_creation_duration:'' }} {{ project.gtfsvalidation?project.gtfsvalidation.duration:'' }}</span>
+            </li>
+            <!--          <li>
+                        <span class="lsh">Execution</span>
+                        <span class="lst">{{ project.gtfsvalidation?(new Date(project.gtfsvalidation.ran_at)).toLocaleString():'' }}</span>
+                      </li>-->
+            <li>
+              <span class="lsh">{{ $t('errors')}}</span>
+              <span class="lst">{{ project.gtfsvalidation?project.gtfsvalidation.error_number:'' }}</span>
+            </li>
+            <li>
+              <span class="lsh">{{ $t('warnings')}}</span>
+              <span class="lst">{{ project.gtfsvalidation?project.gtfsvalidation.warning_number:'' }}</span>
+            </li>
+          </ul>
+          <div class="card-content grid end">
+            <button class="btn min warning"
+                    :disabled="project.gtfsvalidation && ['finished', 'error'].indexOf(project.gtfsvalidation.status)<0"
+                    @click="seeGTFSValidationResults"><span>{{ $t('viewErrors')}}</span><i class="material-icons">error_outline</i></button>
+            <button class="btn min green" @click="dowloadGTFS"><span>{{ $t('download')}}</span><i class="material-icons">save_alt</i></button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="required-data">
-      <h2>GTFS Required data</h2>
-      <div class="grid-required-data">
+      <div class="box-data">
+        <h2>{{ $t('gtfsRequiredData')}}</h2>
+        <div class="grid-data required">
 
+          <!-- Tipos de DataCard -->
+
+
+          <a href="#" class="card data-card empty">
+            <div class="data-header header">
+              <h4>Agencies</h4>
+              <div class="btn-list">
+                <div class="icon flat warning"><i class="material-icons">warning</i></div>
+                <button class="btn icon flat"><i class="material-icons">more_vert</i></button>
+              </div>
+            </div>
+            <div class="data-content">
+              <div class="data-body">
+                <span><span>{{ $t('noData')}}</span></span>
+              </div>
+              <div class="data-footer">
+                <button class="btn"><span>{{ $t('new')}}</span></button>
+              </div>
+            </div>
+          </a>
+
+
+          <a class="card data-card locked">
+            <div class="data-header header">
+              <h4>Agencies</h4>
+              <div class="btn-list">
+                <div class="icon flat"><i class="material-icons">lock</i></div>
+                <button class="btn icon flat"><i class="material-icons">more_vert</i></button>
+              </div>
+            </div>
+            <div class="data-content">
+              <div class="data-body">
+                <span>Require stops and trips data</span>
+              </div>
+              <div class="data-footer">
+                <button class="btn" disabled><span><span>{{ $t('new')}}</span></span></button>
+              </div>
+            </div>
+          </a>
+
+          <!-- -->
+
+
+          <DataCard></DataCard>
+          <DataCard></DataCard>
+        </div>
       </div>
-    </div>
-    <div class="optional-data">
-      <h2>GTFS optional data</h2>
-      <div class="grid-optional-data">
+      <div class="box-data">
+        <h2>{{ $t('gtfsOptionalData')}}</h2>
+        <div class="grid-data optional">
 
+        </div>
       </div>
     </div>
 
@@ -79,120 +174,6 @@
           </router-link>
         </div>
       </Vuetable>
-    </div>
-    <EnvelopeMap :project="project"></EnvelopeMap>
-    <div id="Buttons" class="list-container flex">
-      <div class="list">
-        <button class="btn list-item">Project Settings</button>
-        <input type="file" ref="file" class="btn list-item" @change="uploadGTFSFile" />Upload GTFS
-        File
-        <button class="btn list-item">Publication</button>
-      </div>
-    </div>
-    <div id="ProjectInfo">
-      <table>
-        <tbody>
-          <tr>
-            <th colspan=2>Feed Information</th>
-          </tr>
-          <tr>
-            <td>Last Edited</td>
-            <td>{{ project.last_modification?(new Date(project.last_modification)).toLocaleString():'Never' }}
-            </td>
-          </tr>
-          <tr>
-            <td>Publisher name</td>
-            <td>{{ project.feedinfo?project.feedinfo.feed_publisher_name:'' }}</td>
-          </tr>
-          <tr>
-            <td>Publisher URL</td>
-            <td>{{ project.feedinfo?project.feedinfo.feed_publisher_url:'' }}</td>
-          </tr>
-          <tr>
-            <td>Start Date</td>
-            <td>{{ project.feedinfo?project.feedinfo.feed_start_date:'' }}</td>
-          </tr>
-          <tr>
-            <td>Lang</td>
-            <td>{{ project.feedinfo?project.feedinfo.feed_lang:'' }}</td>
-          </tr>
-          <tr>
-            <td>End Date</td>
-            <td>{{ project.feedinfo?project.feedinfo.feed_end_date:'' }}</td>
-          </tr>
-          <tr>
-            <td>Version</td>
-            <td>{{ project.feedinfo?project.feedinfo.feed_version:'' }}</td>
-          </tr>
-          <tr>
-            <td>Feed id</td>
-            <td>{{ project.feedinfo?project.feedinfo.feed_id:'' }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <br />
-      <table>
-        <tbody>
-          <tr>
-            <th colspan=2>GTFS</th>
-          </tr>
-          <tr>
-            <td>Last build</td>
-            <td>{{ project.gtfs_file_updated_at?(new Date(project.gtfs_file_updated_at)).toLocaleString():'Never' }}
-            </td>
-          </tr>
-          <tr>
-            <td>Build status</td>
-            <td>{{ project.gtfs_creation_status?project.gtfs_creation_status:'' }}</td>
-          </tr>
-          <tr>
-            <td>Build duration</td>
-            <td>{{ project.gtfs_creation_duration?project.gtfs_creation_duration:'' }}</td>
-          </tr>
-          <tr>
-            <td colspan="2"><button class="btn" @click="buildGTFSButtonAction">Build GTFS</button></td>
-          </tr>
-          <tr>
-            <td colspan="2"><button class="btn" @click="dowloadGTFS">Download
-                GTFS</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <br />
-      <table>
-        <tbody>
-          <tr>
-            <th>Last GTFS Validation</th>
-            <th><button class="btn" @click="validateButtonAction">Validate</button></th>
-          </tr>
-          <tr>
-            <td>Status</td>
-            <td>{{ project.gtfsvalidation?project.gtfsvalidation.status:'' }}</td>
-          </tr>
-          <tr>
-            <td>Execution</td>
-            <td>{{ project.gtfsvalidation?(new Date(project.gtfsvalidation.ran_at)).toLocaleString():'' }}
-            </td>
-          </tr>
-          <tr>
-            <td>Duration</td>
-            <td>{{ project.gtfsvalidation?project.gtfsvalidation.duration:'' }}</td>
-          </tr>
-          <tr>
-            <td>Errors</td>
-            <td>{{ project.gtfsvalidation?project.gtfsvalidation.error_number:'' }}</td>
-          </tr>
-          <tr>
-            <td>Warnings</td>
-            <td>{{ project.gtfsvalidation?project.gtfsvalidation.warning_number:'' }}</td>
-          </tr>
-          <tr>
-            <td colspan="2"><button class="btn list-item"
-                :disabled="project.gtfsvalidation && ['finished', 'error'].indexOf(project.gtfsvalidation.status)<0"
-                @click="seeGTFSValidationResults">see results</button></td>
-          </tr>
-        </tbody>
-      </table>
     </div>
     <Modal v-if="showModal" @cancel="showModal = false" @close="showModal = false" @ok="showModal = false"
       :showCancelButton="false" :modalClasses="['warning']">
@@ -206,14 +187,16 @@
   import tablesAPI from '@/api/tables.api';
   import Modal from '@/components/Modal.vue';
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
+  import DataCard from "@/components/DataCard";
   let Vuetable = require('vuetable-2')
 
   export default {
     name: 'ProjectDashboard',
     components: {
+      DataCard,
       Vuetable: Vuetable.Vuetable,
       Modal,
-      EnvelopeMap
+      EnvelopeMap,
     },
     data() {
       let data = [{

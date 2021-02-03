@@ -11,5 +11,24 @@
     "lastChange": "Last change",
     "errors": "Errors",
     "warnings": "Warnings"
-  }
+  },
+  "lastEdited": "Last edited",
+  "version": "Version",
+  "feedID": "Feed ID",
+  "startDate": "Start date",
+  "endDate": "End date",
+  "contactURL": "Contact URL",
+  "contactEmail": "Contact email",
+  "summary": "Summary",
+  "lastBuild": "Last build",
+  "buildStatus": "Build status",
+  "buildDuration": "Build duration",
+  "errors": "Errors",
+  "warnings": "Warnings",
+  "viewErrors": "View errors",
+  "download": "Download",
+  "gtfsRequiredData": "GTFS required data",
+  "gtfsOptionalData": "GTFS Optional data",
+  "new": "New",
+  "noData": "No data"
 }
