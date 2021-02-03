@@ -32,5 +32,6 @@ let config = {
     20, 10,
   ],
 
+  map_base_zoom: 0,
 }
 export default config;

@@ -4,8 +4,11 @@
 
 
 <script>
+  import config from "@/config.js"
+
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
+
   export default {
     name: "EnvelopeMap",
     props: {
@@ -23,6 +26,7 @@
         this.map = new mapboxgl.Map({
           container: this.$refs.mapContainer,
           center: center,
+          zoom: config.map_base_zoom,
           style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
         });
         this.map.on('load', () => {
