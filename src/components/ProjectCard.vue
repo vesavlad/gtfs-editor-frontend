@@ -20,9 +20,10 @@
                     <span>{{ lastModification }}</span>
                 </div>
             </div>
-            <div v-if="project.gtfsvalidation" class="grid-pills">
-                <PillBase pillClass="error" :pillText="'Errors: ' + project.gtfsvalidation.error_number"></PillBase>
-                <PillBase pillClass="warning" :pillText="'Warnings: ' + project.gtfsvalidation.warning_number"></PillBase>
+            <div class="grid-pills">
+                <PillBase v-if="project.gtfsvalidation" pillClass="error" :pillText="'Errors: ' + project.gtfsvalidation.error_number"></PillBase>
+                <PillBase v-if="project.gtfsvalidation" pillClass="warning" :pillText="'Warnings: ' + project.gtfsvalidation.warning_number"></PillBase>
+                <PillBase v-if="!project.gtfsvalidation" pillClass="empty" :pillText="'without validation'"></PillBase>
             </div>
         </div>
     </a>
