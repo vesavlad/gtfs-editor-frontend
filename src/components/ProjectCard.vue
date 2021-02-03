@@ -3,7 +3,7 @@
         <div class="project-card-map">
             <EnvelopeMap :project="project"></EnvelopeMap>
         </div>
-        <div class="card-content">
+        <div class="card-content" @click="$router.push({ name: 'projectoverview', params: { projectid: project.project_id } })">
             <div class="grid title">
                 <h2>{{project.name}}</h2>
                 <button class="btn icon flat"><i class="material-icons">more_vert</i></button>
