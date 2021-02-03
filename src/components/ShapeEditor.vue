@@ -331,7 +331,7 @@
           }
         });
         // Arrow for the shape
-        let img = require('../assets/png/arrow-small.png')
+        let img = require('../assets/img/arrow-small.png')
         this.map.loadImage(img, (err, image) => {
           if (err) {
             console.log(err);
