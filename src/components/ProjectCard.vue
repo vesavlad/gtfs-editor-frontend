@@ -17,31 +17,38 @@
                 </div>
                 <div class="project-last-edit">
                     <span>Last edit: </span>
-                    <span>{{project.last_modification}}</span>
+                    <span>{{ lastModification }}</span>
                 </div>
             </div>
-            <div class="grid-pills">
-                <PillBase pillClass="error" :pillText="'Errors: 1'"></PillBase>
-                <PillBase pillClass="warning" :pillText="'Warnings:3'"></PillBase>
+            <div v-if="project.gtfsvalidation" class="grid-pills">
+                <PillBase pillClass="error" :pillText="'Errors: ' + project.gtfsvalidation.error_number"></PillBase>
+                <PillBase pillClass="warning" :pillText="'Warnings: ' + project.gtfsvalidation.warning_number"></PillBase>
             </div>
         </div>
     </a>
 </template>
 
 <script>
-    import PillBase from "./PillBase";
-    import EnvelopeMap from "./EnvelopeMap";
-export default {
+  import { DateTime } from 'luxon';
+  import PillBase from "./PillBase";
+  import EnvelopeMap from "./EnvelopeMap";
+
+  export default {
     name: 'ProjectCard',
     components: {
-        PillBase,
-        EnvelopeMap
+      PillBase,
+      EnvelopeMap
     },
     props: {
-        project:{
-            type:Object,
-            required:true
-        }
+      project:{
+        type:Object,
+        required:true
+      }
     },
-}
+    computed: {
+      lastModification() {
+        return DateTime.fromISO(this.project.last_modification).toFormat('FF');
+      }
+    }
+  }
 </script>
