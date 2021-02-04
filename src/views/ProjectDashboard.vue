@@ -5,7 +5,7 @@
         <h1>{{project.name}}</h1>
         <button class="btn icon flat"><i class="material-icons">edit</i></button>
       </div>
-      <span class="side-info">{{ $t('lastEdited')}}: {{ project.last_modification?(new Date(project.last_modification)).toLocaleString():'Never' }}</span>
+      <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
     </div>
     <div class="section-content">
       <div class="section-details">
@@ -31,30 +31,30 @@
               </div>
               <div class="project-info-details">
                 <div>
-                  <h5>{{ $t('version')}}</h5>
+                  <h5>{{ $t('projectDashboard.version')}}</h5>
                   <span>{{ project.feedinfo?project.feedinfo.feed_version:'' }}</span>
                 </div>
                 <div>
-                  <h5>{{ $t('feedID')}}</h5>
+                  <h5>{{ $t('projectDashboard.feedID')}}</h5>
                   <span>{{ project.feedinfo?project.feedinfo.feed_id:'' }}</span>
                 </div>
                 <div class="grid g2">
                   <div>
-                    <h5>{{ $t('startDate')}}</h5>
+                    <h5>{{ $t('projectDashboard.startDate')}}</h5>
                     <span>{{ project.feedinfo?project.feedinfo.feed_start_date:'' }}</span>
                   </div>
                   <div>
-                    <h5>{{ $t('endDate')}}</h5>
+                    <h5>{{ $t('projectDashboard.endDate')}}</h5>
                     <span>{{ project.feedinfo?project.feedinfo.feed_end_date:'' }}</span>
                   </div>
                 </div>
                 <div class="grid g2">
                   <div>
-                    <h5>{{ $t('contactURL')}}</h5>
+                    <h5>{{ $t('projectDashboard.contactURL')}}</h5>
                     <span>Calama</span>
                   </div>
                   <div>
-                    <h5>{{ $t('contactEmail')}}</h5>
+                    <h5>{{ $t('projectDashboard.contactEmail')}}</h5>
                     <span>Calama</span>
                   </div>
                 </div>
@@ -64,12 +64,12 @@
         </div>
         <div class="card summary">
           <div class="card-title">
-            <h4>{{ $t('summary')}}</h4>
+            <h4>{{ $t('projectDashboard.summary')}}</h4>
           </div>
           <div class="card-content">
             <div class="flex between">
               <div>
-                <div class="small">{{ $t('lastBuild')}}</div>
+                <div class="small">{{ $t('projectDashboard.lastBuild')}}</div>
                 <div>{{ project.gtfs_file_updated_at?(new Date(project.gtfs_file_updated_at)).toLocaleString():'Never' }}</div>
               </div>
               <div>
@@ -79,11 +79,11 @@
           </div>
           <ul class="list-summary">
             <li>
-              <span class="lsh">{{ $t('buildStatus')}}</span>
+              <span class="lsh">{{ $t('projectDashboard.buildStatus')}}</span>
               <span class="lst">{{ project.gtfs_creation_status?project.gtfs_creation_status:'' }} {{ project.gtfsvalidation?project.gtfsvalidation.status:'' }}</span>
             </li>
             <li>
-              <span class="lsh">{{ $t('buildDuration')}}</span>
+              <span class="lsh">{{ $t('projectDashboard.buildDuration')}}</span>
               <span class="lst">{{ project.gtfs_creation_duration?project.gtfs_creation_duration:'' }} {{ project.gtfsvalidation?project.gtfsvalidation.duration:'' }}</span>
             </li>
             <!--          <li>
@@ -91,24 +91,24 @@
                         <span class="lst">{{ project.gtfsvalidation?(new Date(project.gtfsvalidation.ran_at)).toLocaleString():'' }}</span>
                       </li>-->
             <li>
-              <span class="lsh">{{ $t('errors')}}</span>
+              <span class="lsh">{{ $t('projectDashboard.errors')}}</span>
               <span class="lst">{{ project.gtfsvalidation?project.gtfsvalidation.error_number:'' }}</span>
             </li>
             <li>
-              <span class="lsh">{{ $t('warnings')}}</span>
+              <span class="lsh">{{ $t('projectDashboard.warnings')}}</span>
               <span class="lst">{{ project.gtfsvalidation?project.gtfsvalidation.warning_number:'' }}</span>
             </li>
           </ul>
           <div class="card-content grid end">
             <button class="btn min warning"
                     :disabled="project.gtfsvalidation && ['finished', 'error'].indexOf(project.gtfsvalidation.status)<0"
-                    @click="seeGTFSValidationResults"><span>{{ $t('viewErrors')}}</span><i class="material-icons">error_outline</i></button>
-            <button class="btn min green" @click="dowloadGTFS"><span>{{ $t('download')}}</span><i class="material-icons">save_alt</i></button>
+                    @click="seeGTFSValidationResults"><span>{{ $t('projectDashboard.viewErrors')}}</span><i class="material-icons">error_outline</i></button>
+            <button class="btn min green" @click="dowloadGTFS"><span>{{ $t('projectDashboard.download')}}</span><i class="material-icons">save_alt</i></button>
           </div>
         </div>
       </div>
       <div class="box-data">
-        <h2>{{ $t('gtfsRequiredData')}}</h2>
+        <h2>{{ $t('projectDashboard.gtfsRequiredData')}}</h2>
         <div class="grid-data required">
 
           <!-- Tipos de DataCard -->
@@ -124,10 +124,10 @@
             </div>
             <div class="data-content">
               <div class="data-body">
-                <span><span>{{ $t('noData')}}</span></span>
+                <span><span>{{ $t('projectDashboard.noData')}}</span></span>
               </div>
               <div class="data-footer">
-                <button class="btn"><span>{{ $t('new')}}</span></button>
+                <button class="btn"><span>{{ $t('projectDashboard.new')}}</span></button>
               </div>
             </div>
           </a>
@@ -146,7 +146,7 @@
                 <span>Require stops and trips data</span>
               </div>
               <div class="data-footer">
-                <button class="btn" disabled><span><span>{{ $t('new')}}</span></span></button>
+                <button class="btn" disabled><span><span>{{ $t('projectDashboard.new')}}</span></span></button>
               </div>
             </div>
           </a>
@@ -159,7 +159,7 @@
         </div>
       </div>
       <div class="box-data">
-        <h2>{{ $t('gtfsOptionalData')}}</h2>
+        <h2>{{ $t('projectDashboard.gtfsOptionalData')}}</h2>
         <div class="grid-data optional">
 
         </div>
@@ -183,6 +183,7 @@
 </template>
 
 <script>
+  import { DateTime } from 'luxon';
   import projectsAPI from '@/api/projects.api';
   import tablesAPI from '@/api/tables.api';
   import Modal from '@/components/Modal.vue';
@@ -262,6 +263,11 @@
         data,
         showModal: false,
         modalContent: '',
+      }
+    },
+    computed: {
+      lastModification() {
+        return DateTime.fromISO(this.project.last_modification).toRelative({locale: this.$i18n.locale });
       }
     },
     methods: {

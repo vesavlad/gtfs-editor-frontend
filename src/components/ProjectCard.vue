@@ -48,7 +48,7 @@
     },
     computed: {
       lastModification() {
-        return DateTime.fromISO(this.project.last_modification).toFormat('FF');
+        return DateTime.fromISO(this.project.last_modification).toRelative({locale: this.$i18n.locale });
       }
     }
   }
