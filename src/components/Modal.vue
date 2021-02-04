@@ -1,14 +1,14 @@
 <template>
   <div class="modal-container" @click="$emit('close')">
     <div class="modal" :class="modalClasses" @click.stop>
-        <div class="modal-title">
-            <slot name="title"></slot>
+        <div class="modal-header">
+            <slot name="mHeader"></slot>
         </div>
         <div class="modal-content">
-            <slot name="content"></slot>
+            <slot name="mContent"></slot>
         </div>
-        <div class="modal-base" v-bind:class="{}" v-if="showBase">
-            <slot name="base">
+        <div class="modal-footer" v-bind:class="{}" v-if="showBase">
+            <slot name="mFooter">
               <button class="btn solo red" @click="$emit('cancel')" v-if="showCancelButton"><slot name='cancel-button-name'>{{ $t('cancel') }}</slot></button>
               <button class="btn solo" @click="$emit('ok')"><slot name="close-button-name">Ok</slot></button>
             </slot>
