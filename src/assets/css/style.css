@@ -338,6 +338,7 @@ input[type="checkbox"]{background: none; box-shadow: none;}
 .modal-message .m-footer {padding: 20px 40px;}
 .message-title {display: grid; grid-gap: 10px; justify-content: flex-start; grid-auto-flow: column; color: var(--warning);}
 .message-title h2 {font-size: 28px; font-weight: bolder;}
+.message-title .material-icons {font-size: 36px;}
 
 /* ============  Dashboard  ============== */
 
