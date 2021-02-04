@@ -26,6 +26,7 @@ html,body {background-color:var(--gris-claro); -webkit-font-smoothing: antialias
     --secundario-osc:#03363E;
     --typo:'Roboto', sans-serif;
     --aspect-ratio:1/1;
+    --border:1px solid var(--gris-claro);
 }
 
 
@@ -59,7 +60,7 @@ code:last-child {margin-bottom: 0;}
 button {all: unset; cursor: pointer;}
 footer .full.grid {grid-template-columns: 1fr 1fr;}
 .small {font-size: 14px; color: var(--gris-medio2);}
-
+.error-message {color: var(--error); font-weight: 500; font-size: 14px;}
 
 
 /* ============  HEADERS  ============== */
@@ -297,18 +298,34 @@ input[type="checkbox"]{background: none; box-shadow: none;}
     padding: 0 100px;
 }
 .modal {
-    background: var(--gris-claro);
+    background: var(--base);
     box-shadow: 0 15px 40px 0 rgba(0,0,0,0.50);
     border-radius: 20px;
     min-width: 550px;
     width: max-content;
     max-width: 900px;
-    max-height: 100%; overflow: hidden;
+    overflow: hidden;
     cursor: initial;
     display: grid;
     grid-template-rows: auto minmax(auto, 1fr) auto;
     max-height: calc(100vh - 200px);
 }
+.m-header {
+    padding: 28px 20px 20px;
+    display: grid; grid-template-columns: 1fr auto; grid-gap: 10px;
+    border-bottom: var(--border) ;
+}
+.m-header h2 {font-size: 20px; color: var(--gris-osc2);}
+.m-content {padding: 20px; max-height: 500px; overflow-y: auto; display: grid;}
+.m-footer {padding: 20px; border-top: var(--border);}
+.m-content li {display: grid; grid-template-columns: 3fr 5fr; grid-gap: 20px; padding: 10px 20px; align-items: center;}
+.input-row-title span {font-size: 16px; color: var(--gris-medio2); font-weight: 500;}
+.input-row-content.double {display: grid; grid-template-columns: 1fr 1fr; grid-gap: 10px;}
+.m-footer {display: grid; justify-content: flex-end; grid-auto-flow: column; grid-gap: 10px; align-items: center;}
+.modal.input-data .m-footer {grid-template-columns: 1fr auto;}
+.m-footer .error-message {border-left: 4px solid var(--error); padding: 7px 7px 7px 10px;}
+.m-footer .option-buttons {display: grid; grid-gap: 10px; grid-auto-flow: column;}
+.option-buttons button {min-width: 130px;}
 
 /* ============  Dashboard  ============== */
 
