@@ -5,7 +5,7 @@
       <button class="btn" @click="creatingProject=true"><span>{{ $t('newProject') }}</span><i class="material-icons">add</i></button>
     </div>
     <section class='content'>
-      <div class="grid projects">
+      <div class="projects">
         <ProjectCard v-for="project in projects" v-bind:key="project.project_id" :project="project"></ProjectCard>
       </div>
     </section>
@@ -17,14 +17,14 @@
       :showCancelButton="true"
       :modalClasses="[]"
     >
-      <template slot="title">
+      <template slot="mHeader">
         <h2>{{ $t('createProject') }}</h2>
       </template>
-      <template slot="content">
+      <template slot="mContent">
         <label for="pname">{{ $t('projectName') }}:</label>
         <input v-model="projectName" type="text" />
       </template>
-      <template slot="base"> </template>
+      <template slot="mFooter"> </template>
       <template slot="close-button-name">{{ $t('createProject') }}</template>
     </Modal>
   </div>
