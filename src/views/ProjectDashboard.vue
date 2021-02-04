@@ -2,8 +2,10 @@
   <div class="ProjectDashboard container">
     <div class="header">
       <div class="grid center">
-        <h1>{{project.name}}</h1>
-        <button class="btn icon flat"><i class="material-icons">edit</i></button>
+        <h1><input v-model="project.name" :disabled="!projectName.edit" v-bind:class="{error: projectName.hasError}" :data-error="projectName.errorMessage" /></h1>
+        <button v-if="!projectName.edit" @click="projectName.oldValue=project.name;projectName.edit=true" class="btn icon flat"><i class="material-icons">edit</i></button>
+        <button v-if="projectName.edit" @click="updateProjectName" class="btn icon flat"><i class="material-icons">check</i></button>
+        <button v-if="projectName.edit" @click="projectName.edit=false;project.name=projectName.oldValue" class="btn icon flat"><i class="material-icons">close</i></button>
       </div>
       <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
     </div>
@@ -153,7 +155,6 @@
 
           <!-- -->
 
-
           <DataCard></DataCard>
           <DataCard></DataCard>
         </div>
@@ -248,6 +249,12 @@
         },
       ];
       return {
+        projectName: {
+          HasError: false,
+          errorMessage: '',
+          oldValue: null,
+          edit: false,
+        },
         project: {
           feedInfo: {},
           gtfsvalidation: {}
@@ -290,6 +297,17 @@
             }
             return datum;
           });
+        });
+      },
+      updateProjectName() {
+        projectsAPI.updateProject(this.$route.params.projectid, {name: this.project.name}).then(() => {
+          this.projectName.oldValue = null;
+          this.projectName.edit = false;
+          this.projectName.hasError = false;
+          this.projectName.errorMessage = '';
+        }).catch(error => {
+          this.projectName.hasError = true;
+          this.projectName.errorMessage = error.response.data.name[0];
         });
       },
       dowloadGTFS() {
