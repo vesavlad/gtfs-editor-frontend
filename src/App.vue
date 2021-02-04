@@ -10,8 +10,8 @@
             <div class="top-menu">
                 <locale-switcher />
                 <router-link :to="{name: 'myprojects'}" class="btn-top"><span>{{$t('myProjects')}}</span><i class="material-icons">layers</i></router-link>
-                <button class="btn-top"><span>{{ $t('website') }}</span><i class="material-icons">public</i></button>
-                <button class="btn-top"><span>{{ $t('contact') }}</span><i class="material-icons">mail</i></button>
+                <a target="_blank" href="https://www.transapp.cl" class="btn-top"><span>{{ $t('website') }}</span><i class="material-icons">public</i></a>
+                <a target="_blank" href="https://www.transapp.cl/servicios-transapp/#contacto" class="btn-top"><span>{{ $t('contact') }}</span><i class="material-icons">mail</i></a>
             </div>
         </div>
     </header>
