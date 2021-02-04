@@ -3,7 +3,9 @@
     <header>
         <div class="container full grid">
             <div class="logo">
+              <router-link :to="{name: 'myprojects'}">
                 <img src="@/assets/img/logo.svg" />
+              </router-link>
             </div>
             <div class="top-menu">
                 <locale-switcher />
