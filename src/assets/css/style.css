@@ -41,7 +41,7 @@ footer {background-color: var(--secundario); padding: 20px 0; position: fixed; w
 a {color: var(--link);}
 h1,h2,h3,h4,h5,h6 {margin: 0;}
 h1 {font-size: 36px; color: white;}
-h2 {font-size: 22px; color: var(--link2); font-weight: 500;}
+h2 {font-size: 22px; font-weight: 500;}
 h3 {font-weight: 500; font-size: 20px; color: var(--gris-medio); text-transform: uppercase;}
 h4 {font-weight: 500; font-size: 18px;}
 dl {margin: 0;}
@@ -230,6 +230,10 @@ input[type="checkbox"]{background: none; box-shadow: none;}
 }
 .green {background-color: var(--primario);}
 .warning {background-color: var(--warning);}
+.btn.error {background-color: var(--error);}
+.btn.flat {background-color: transparent; color: var(--gris-medio
+);}
+.btn.flat:hover {background-color: var(--gris-claro); color: var(--gris-medio2);}
 .icon.flat.warning {color: var(--warning); background-color: transparent;}
 .icon.flat.green {color: var(--primario); background-color: transparent;}
 .icon-link {font-size: 24px; line-height: 0;}
@@ -315,7 +319,7 @@ input[type="checkbox"]{background: none; box-shadow: none;}
     display: grid; grid-template-columns: 1fr auto; grid-gap: 10px;
     border-bottom: var(--border) ;
 }
-.m-header h2 {font-size: 20px; color: var(--gris-osc2);}
+.m-header {font-size: 20px; color: var(--gris-osc2);}
 .m-content {padding: 20px; max-height: 500px; overflow-y: auto; display: grid;}
 .m-footer {padding: 20px; border-top: var(--border);}
 .m-content li {display: grid; grid-template-columns: 3fr 5fr; grid-gap: 20px; padding: 10px 20px; align-items: center;}
@@ -324,9 +328,16 @@ input[type="checkbox"]{background: none; box-shadow: none;}
 .input-row-content.double {display: grid; grid-template-columns: 1fr 1fr; grid-gap: 10px;}
 .m-footer {display: grid; justify-content: flex-end; grid-auto-flow: column; grid-gap: 10px; align-items: center;}
 .modal.input-data .m-footer {grid-template-columns: 1fr auto;}
+.modal.modal-message .m-content {color: var(--gris-medio2);}
 .m-footer .error-message {border-left: 4px solid var(--error); padding: 7px 7px 7px 10px;}
 .m-footer .option-buttons {display: grid; grid-gap: 10px; grid-auto-flow: column;}
 .option-buttons button {min-width: 130px;}
+
+.modal-message .m-header {padding: 40px; border-bottom: none;}
+.modal-message .m-content {padding: 0 40px 40px;}
+.modal-message .m-footer {padding: 20px 40px;}
+.message-title {display: grid; grid-gap: 10px; justify-content: flex-start; grid-auto-flow: column; color: var(--warning);}
+.message-title h2 {font-size: 28px; font-weight: bolder;}
 
 /* ============  Dashboard  ============== */
 
