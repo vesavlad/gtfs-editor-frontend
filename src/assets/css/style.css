@@ -320,6 +320,7 @@ input[type="checkbox"]{background: none; box-shadow: none;}
 .m-footer {padding: 20px; border-top: var(--border);}
 .m-content li {display: grid; grid-template-columns: 3fr 5fr; grid-gap: 20px; padding: 10px 20px; align-items: center;}
 .input-row-title span {font-size: 16px; color: var(--gris-medio2); font-weight: 500;}
+.input-row-title.required span {color: var(--secundario);}
 .input-row-content.double {display: grid; grid-template-columns: 1fr 1fr; grid-gap: 10px;}
 .m-footer {display: grid; justify-content: flex-end; grid-auto-flow: column; grid-gap: 10px; align-items: center;}
 .modal.input-data .m-footer {grid-template-columns: 1fr auto;}
