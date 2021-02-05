@@ -1,8 +1,5 @@
 <template>
   <div class="dashboard container">
-    <button @click="showBaseModal=true" class="btn">show baseModal</button> <!-- delete -->
-    <button @click="showInputDataModal=true" class="btn">show inputDataModal</button> <!-- delete -->
-    <button @click="showMessageModal=true" class="btn">show messageModal</button> <!-- delete -->
     <div class="header">
       <h1>{{ $t('myProjects')}}</h1>
       <button class="btn" @click="creatingProject=true"><span>{{ $t('newProject') }}</span><i class="material-icons">add</i></button>
@@ -12,44 +9,41 @@
         <ProjectCard v-for="project in projects" v-bind:key="project.project_id" :project="project"></ProjectCard>
       </div>
     </section>
-    <Modal
-      v-if="creatingProject"
-      @cancel="creatingProject=false"
-      @close="creatingProject=false"
-      @ok="createProject"
-      :showCancelButton="true"
-      :modalClasses="[]"
+    <BaseModal
+        v-if="creatingProject"
+        @cancel="creatingProject=false"
+        @close="creatingProject=false"
+        @ok="createProject"
+        :showCancelButton="true"
+        :modalClasses="['modal-new-project']"
     >
-      <template slot="mHeader">
-        <h2>{{ $t('createProject') }}</h2>
-      </template>
-      <template slot="mContent">
-        <label for="pname">{{ $t('projectName') }}:</label>
-        <input v-model="projectName" type="text" />
-      </template>
-      <template slot="mFooter"> </template>
-      <template slot="close-button-name">{{ $t('createProject') }}</template>
-    </Modal>
-    <BaseModal v-if="showBaseModal" @close="showBaseModal=false">
       <template v-slot:mcontent>
-        hola1
+        <div class="modal-new-header">
+          <h2>{{ $t('createProject') }}</h2>
+          <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('projectName')"/>
+        </div>
+        <div class="content grid g2">
+          <div class="new-box">
+            <img src="@/assets/img/new-scratch.svg" alt="New from scratch image"/>
+            <p>Start a new project from scratch</p>
+            <button class="btn"><span>Start</span></button>
+          </div>
+          <div class="new-box">
+            <img src="@/assets/img/new-file.svg" alt="New from scratch image"/>
+            <p>Start a new project from a GTFS file</p>
+            <button class="btn"><span>Upload</span><i class="material-icons">file_upload</i></button>
+          </div>
+        </div>
       </template>
     </BaseModal><!-- delete -->
     <InputDataModal v-if="showInputDataModal" @close="showInputDataModal=false">
-      <template v-slot:mcontent>
-        hola2
-      </template>
     </InputDataModal><!-- delete -->
     <MessageModal v-if="showMessageModal" @close="showMessageModal=false">
-      <template v-slot:mcontent>
-        hola3
-      </template>
     </MessageModal><!-- delete -->
   </div>
 </template>
 
 <script>
-import Modal from "@/components/Modal.vue";
 import BaseModal from "@/components/BaseModal.vue";  // delete
 import InputDataModal from "@/components/InputDataModal.vue";  // delete
 import MessageModal from "@/components/MessageModal.vue";  // delete
@@ -60,7 +54,6 @@ export default {
   name: 'MyProjects',
   components: {
     ProjectCard,
-    Modal,
     BaseModal, // delete
     InputDataModal,  // delete
     MessageModal // delete
