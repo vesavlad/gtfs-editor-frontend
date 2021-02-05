@@ -1,6 +1,7 @@
 {
   "myProjects": "Mis proyectos",
   "appName": "Editor de GTFS",
+  "project": "Proyecto",
   "newProject": "Nuevo proyecto",
   "createProject": "Crear proyecto",
   "projectName": "Nombre del proyecto",

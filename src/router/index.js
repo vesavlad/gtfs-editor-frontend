@@ -45,7 +45,9 @@ const routes = [{
     path: '/project/:projectid',
     component: {render(c) { return c('router-view'); }},
     meta: {
-      breadcrumb: routeParams => `Project ${routeParams.projectid}`
+      breadcrumb(routeParams){
+        return this.$i18n.t('project') + ' ' + routeParams.projectid;
+      }
     },
     children: [
       {
