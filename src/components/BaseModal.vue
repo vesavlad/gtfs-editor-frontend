@@ -1,7 +1,7 @@
 <template>
   <div class="modal-container" @click="$emit('close')">
-    <div class="modal" :class="modalClasses" @click.stop>
-      <slot name="mcontent"></slot>
+    <div class="modal" :class="classes" @click.stop>
+      <slot name="m-content"></slot>
     </div>
   </div>
 </template>
@@ -10,7 +10,7 @@
 export default {
   name: 'BaseModal',
   props: {
-    modalClasses: {
+    classes: {
       type: Array,
       default: () => []
     }
