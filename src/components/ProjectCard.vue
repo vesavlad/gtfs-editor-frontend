@@ -1,7 +1,7 @@
 <template>
   <router-link class="card project-card" :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
     <div class="project-card-map">
-      <EnvelopeMap :project="project"></EnvelopeMap>
+      <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
     </div>
     <div class="card-content">
       <div class="grid title">

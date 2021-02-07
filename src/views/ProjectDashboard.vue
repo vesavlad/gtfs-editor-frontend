@@ -29,7 +29,7 @@
             </div>
             <div class="grid-project-info">
               <div class="project-card-map">
-                <EnvelopeMap :project="project"></EnvelopeMap>
+                <EnvelopeMap :project="project" :width="274" :height="204"></EnvelopeMap>
               </div>
               <div class="project-info-details">
                 <div>

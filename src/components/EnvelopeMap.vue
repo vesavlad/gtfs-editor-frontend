@@ -1,11 +1,12 @@
 <template>
-  <div id="envelopeMap" ref="mapContainer"></div>
+  <div style="height: 100%;">
+    <img v-if="showStaticMap" :width="width" :height="height" :src="createURL()" @error="replaceByDefault" @click="enableMapInteraction" />
+    <div v-if="!showStaticMap" id="envelopeMap" ref="mapContainer"></div>
+  </div>
 </template>
-
 
 <script>
   import config from "@/config.js"
-
   const mapboxgl = require('mapbox-gl');
   mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 
@@ -13,29 +14,64 @@
     name: "EnvelopeMap",
     props: {
       project: {
+        type: Object,
         required: true,
+      },
+      width: {
+        type: Number,
+        required: true
+      },
+      height: {
+        type: Number,
+        required: true
+      },
+      enableInteraction: {
+        type: Boolean,
+        required: false,
+        default: true
       }
     },
     data() {
       return {
-        map: null
-      };
-    },
-    mounted() {
-        let center = this.project.envelope?this.project.envelope.geometry.coordinates[0][0]:[0,0];
-        this.map = new mapboxgl.Map({
-          container: this.$refs.mapContainer,
-          center: center,
-          zoom: config.map_base_zoom,
-          style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
-        });
-        this.map.on('load', () => {
-          this.addLayers();
-          this.setCoordinates();
-          this.$emit('load');
-        })
+        showStaticMap: true,
+        errorToLoadStaticImage: false,
+        map: null,
+      }
     },
     methods: {
+      createURL() {
+        let mapStyle = 'streets-v11';
+        let mapboxAccessToken = process.env.VUE_APP_MAPBOX_TOKEN;
+        let geojson = encodeURIComponent(JSON.stringify(this.project.envelope)).replace(/\s/g, '');
+        let url = `https://api.mapbox.com/styles/v1/mapbox/${mapStyle}/static/geojson(${geojson})/auto/${this.width}x${this.height}?access_token=${mapboxAccessToken}`;
+        return url;
+      },
+      replaceByDefault(e) {
+        let img = require('@/assets/img/logo.svg')
+        e.target.src = img;
+        this.errorToLoadStaticImage = true;
+      },
+      enableMapInteraction() {
+        if (!this.errorToLoadStaticImage && this.enableInteraction) {
+          this.showStaticMap = false;
+          this.$nextTick(() => {
+            console.log(this.$refs.mapContainer);
+            let center = this.project.envelope?this.project.envelope.geometry.coordinates[0][0]:[0,0];
+            this.map = new mapboxgl.Map({
+              container: this.$refs.mapContainer,
+              center: center,
+              zoom: config.map_base_zoom,
+              style: 'mapbox://styles/mapbox/streets-v11'
+            });
+            this.map.on('load', () => {
+              this.addLayers();
+              this.setCoordinates();
+              this.$emit('load');
+              this.map.resize();
+            });
+          });
+        }
+      },
       addLayers() {
         this.map.addSource('envelope-source', {
           'type': 'geojson',
@@ -47,7 +83,7 @@
           'source': 'envelope-source',
           'layout': {},
           'paint': {
-            'fill-outline-color': 'red',
+            'fill-outline-color': 'gray',
             'fill-color': '#000',
             'fill-opacity': 0.4
           }
