@@ -10,16 +10,13 @@
       </div>
     </div>
     <div class="data-content">
-      <div class="data-body" v-if="state===DataCardEnum.EMPTY">
-        <span><span>{{ $t('projectDashboard.noData')}}</span></span>
-      </div>
-      <div class="data-body" v-if="state===DataCardEnum.BLOCKED">
-        <span>Require stops and trips data</span>
+      <div class="data-body" v-if="[DataCardEnum.EMPTY,DataCardEnum.BLOCKED].indexOf(state)>-1">
+        <span><span>{{ message }}</span></span>
       </div>
       <ul class="data-body" v-if="state===DataCardEnum.ENABLED">
         <li>
           <span class="big">{{ quantity }}</span>
-          <span>Records</span>
+          <span>{{ $t('dataCard.records') }}</span>
         </li>
       </ul>
       <div class="data-footer">
@@ -48,6 +45,10 @@ export default {
     quantity: {
       type: Number,
       default: null,
+    },
+    message: {
+      type: String,
+      default: ''
     },
     errorNumber: {
       type: Number,

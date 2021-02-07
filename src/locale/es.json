@@ -13,6 +13,9 @@
     "errors": "Errores",
     "warnings": "Advertencias"
   },
+  "dataCard": {
+    "records": "Registros"
+  },
   "projectDashboard": {
     "lastChange": "Última edición",
     "version": "Versión",

@@ -113,8 +113,8 @@
         <h2>{{ $t('projectDashboard.gtfsRequiredData')}}</h2>
         <div class="grid-data required">
           <DataCard :filename="'Agencies'" :quantity="24" :errorNumber="3" :warningNumber="4" :state="'enabled'"></DataCard>
-          <DataCard :filename="'PP'" :quantity="24" :errorNumber="5" :warningNumber="6" :state="'blocked'"></DataCard>
-          <DataCard :filename="'CC'" :quantity="24" :errorNumber="7" :warningNumber="8" :state="'empty'"></DataCard>
+          <DataCard :filename="'PP'" :quantity="24" :errorNumber="5" :warningNumber="6" :state="'blocked'" :message="'Require stops and trips data'"></DataCard>
+          <DataCard :filename="'CC'" :quantity="24" :errorNumber="7" :warningNumber="8" :state="'empty'" :message="$t('projectDashboard.noData')"></DataCard>
         </div>
       </div>
       <div class="box-data">
