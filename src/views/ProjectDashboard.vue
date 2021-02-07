@@ -112,57 +112,15 @@
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsRequiredData')}}</h2>
         <div class="grid-data required">
-
-          <!-- Tipos de DataCard -->
-
-
-          <a href="#" class="card data-card empty">
-            <div class="data-header header">
-              <h4>Agencies</h4>
-              <div class="btn-list">
-                <div class="icon flat warning"><i class="material-icons">warning</i></div>
-                <button class="btn icon flat"><i class="material-icons">more_vert</i></button>
-              </div>
-            </div>
-            <div class="data-content">
-              <div class="data-body">
-                <span><span>{{ $t('projectDashboard.noData')}}</span></span>
-              </div>
-              <div class="data-footer">
-                <button class="btn"><span>{{ $t('projectDashboard.new')}}</span></button>
-              </div>
-            </div>
-          </a>
-
-
-          <a class="card data-card locked">
-            <div class="data-header header">
-              <h4>Agencies</h4>
-              <div class="btn-list">
-                <div class="icon flat"><i class="material-icons">lock</i></div>
-                <button class="btn icon flat"><i class="material-icons">more_vert</i></button>
-              </div>
-            </div>
-            <div class="data-content">
-              <div class="data-body">
-                <span>Require stops and trips data</span>
-              </div>
-              <div class="data-footer">
-                <button class="btn" disabled><span><span>{{ $t('projectDashboard.new')}}</span></span></button>
-              </div>
-            </div>
-          </a>
-
-          <!-- -->
-
-          <DataCard></DataCard>
-          <DataCard></DataCard>
+          <DataCard :filename="'Agencies'" :quantity="24" :errorNumber="3" :warningNumber="4" :state="'enabled'"></DataCard>
+          <DataCard :filename="'PP'" :quantity="24" :errorNumber="5" :warningNumber="6" :state="'blocked'"></DataCard>
+          <DataCard :filename="'CC'" :quantity="24" :errorNumber="7" :warningNumber="8" :state="'empty'"></DataCard>
         </div>
       </div>
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsOptionalData')}}</h2>
         <div class="grid-data optional">
-
+          
         </div>
       </div>
     </div>
@@ -190,6 +148,8 @@
   import Modal from '@/components/Modal.vue';
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
   import DataCard from "@/components/DataCard";
+  
+  //import Enums from '@/utils/enums'
   let Vuetable = require('vuetable-2')
 
   export default {

@@ -1,44 +1,92 @@
 <template>
-    <a href="#" class="card data-card">
-        <div class="data-header header">
-          <h4>Agencies</h4>
-          <div class="btn-list">
-            <button class="btn icon flat"><i class="material-icons">edit</i></button>
-            <button class="btn icon flat"><i class="material-icons">more_vert</i></button>
-          </div>
-        </div>
-        <div class="data-content">
-          <ul class="data-body">
-            <li>
-              <span class="big">24</span>
-              <span>Added</span>
-            </li>
-          </ul>
-          <div class="data-footer">
-            <PillBase pillClass="warning" :pillText="3"></PillBase>
-            <PillBase pillClass="error" :pillText="3"></PillBase>
-          </div>
-        </div>
-    </a>
+  <a href="#" class="card data-card" :class="[cardClass]">
+    <div class="data-header header">
+      <h4>{{ filename }}</h4>
+      <div class="btn-list">
+        <div class="icon flat" v-if="state===DataCardEnum.BLOCKED"><i class="material-icons">lock</i></div>
+        <div class="icon flat warning" v-if="state===DataCardEnum.EMPTY"><i class="material-icons">warning</i></div>
+        <button class="btn icon flat" v-if="state===DataCardEnum.ENABLED"><i class="material-icons">edit</i></button>
+        <button class="btn icon flat"><i class="material-icons">more_vert</i></button>
+      </div>
+    </div>
+    <div class="data-content">
+      <div class="data-body" v-if="state===DataCardEnum.EMPTY">
+        <span><span>{{ $t('projectDashboard.noData')}}</span></span>
+      </div>
+      <div class="data-body" v-if="state===DataCardEnum.BLOCKED">
+        <span>Require stops and trips data</span>
+      </div>
+      <ul class="data-body" v-if="state===DataCardEnum.ENABLED">
+        <li>
+          <span class="big">{{ quantity }}</span>
+          <span>Records</span>
+        </li>
+      </ul>
+      <div class="data-footer">
+        <button class="btn" v-if="[DataCardEnum.EMPTY,DataCardEnum.BLOCKED].indexOf(state)>-1" :disabled="state===DataCardEnum.BLOCKED"><span>{{ $t('projectDashboard.new')}}</span></button>
+        <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="warning" :pillText="warningNumber"></PillBase>
+        <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="error" :pillText="errorNumber"></PillBase>
+      </div>
+    </div>
+  </a>
 </template>
 
 <script>
-    import PillBase from "./PillBase";
-export default {
-    name: 'DataCard',
-    components: {
-        PillBase
-    },
-    props: {
-        project:{
-            type:Object,
-            required:true
-        },
-      state: {
-          type:Number,
-          required: true
+import PillBase from "./PillBase"
+import Enums from '@/utils/enums'
 
-      }
+export default {
+  name: 'DataCard',
+  components: {
+    PillBase
+  },
+  props: {
+    filename: {
+      type: String,
+      required: true
     },
+    quantity: {
+      type: Number,
+      default: null,
+    },
+    errorNumber: {
+      type: Number,
+      default: 0
+    },
+    warningNumber: {
+      type: Number,
+      default: 0
+    },
+    state: {
+      type: String,
+      default: Enums.DataCard.ENABLED,
+      required: true,
+      validation(value) {
+        return [Enums.DataCard.Empty, Enums.DataCard.BLOCKED, Enums.DataCard.ENABLED].indexOf(value) !== -1;
+      }
+    }
+  },
+  data() {
+    return {
+      DataCardEnum: Enums.DataCard
+    }
+  },
+  computed: {
+    cardClass() {
+      let className = null;
+      switch(this.state) {
+        case Enums.DataCard.EMPTY:
+          className = 'empty';
+          break;
+        case Enums.DataCard.BLOCKED:
+          className = 'locked';
+          break;
+        case Enums.DataCard.ENABLED:
+          className = null;
+          break;
+      }
+      return className;
+    }
+  }
 }
 </script>
