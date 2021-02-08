@@ -112,19 +112,18 @@
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsRequiredData')}}</h2>
         <div class="grid-data required">
-          <DataCard v-for="file in dataTables" v-bind:key="file.id" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
+          <DataCard v-for="file in dataTables.slice(0, 9)" v-bind:key="file.id" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
         </div>
       </div>
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsOptionalData')}}</h2>
         <div class="grid-data optional">
-          
+          <DataCard v-for="file in dataTables.slice(9)" v-bind:key="file.id" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
         </div>
       </div>
     </div>
 
     <div id="TablesTable" class="flex">
-      <div>{{ data }}</div>
       <Vuetable ref="vuetable" :fields="fields" :data="data" :api-mode="false">
         <div slot="name" slot-scope="props">
           <router-link :to="{name:props.rowData[props.rowField.name], params: { projectid: $route.params.projectid }}">
