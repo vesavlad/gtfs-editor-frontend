@@ -1,8 +1,5 @@
 <template>
-  <div style="height: 100%;">
-    <img v-if="showStaticMap" :width="width" :height="height" :src="createURL()" @error="replaceByDefault" @click="enableMapInteraction" @dragstart="enableMapInteraction" />
-    <div v-if="!showStaticMap" id="envelopeMap" ref="mapContainer"></div>
-  </div>
+  <div v-bind:style="{ 'background-image': 'url(\'' + createURL() + '\'), url(\'' + require('@/assets/img/logo.svg') + '\')' }" :width="width" :height="height" id="envelopeMap" ref="mapContainer" @click="enableMapInteraction" @dragstart="enableMapInteraction"></div>
 </template>
 
 <script>
@@ -33,8 +30,6 @@
     },
     data() {
       return {
-        showStaticMap: true,
-        errorToLoadStaticImage: false,
         map: null,
       }
     },
@@ -55,29 +50,19 @@
         }
         return url;
       },
-      replaceByDefault(e) {
-        let img = require('@/assets/img/logo.svg')
-        e.target.src = img;
-        this.errorToLoadStaticImage = true;
-      },
       enableMapInteraction() {
-        if (!this.errorToLoadStaticImage && this.enableInteraction) {
-          this.showStaticMap = false;
-          this.$nextTick(() => {
-            console.log(this.$refs.mapContainer);
-            let center = this.project.envelope?this.project.envelope.geometry.coordinates[0][0]:[0,0];
-            this.map = new mapboxgl.Map({
-              container: this.$refs.mapContainer,
-              center: center,
-              zoom: config.map_base_zoom,
-              style: 'mapbox://styles/mapbox/streets-v11'
-            });
-            this.map.on('load', () => {
-              this.addLayers();
-              this.setCoordinates();
-              this.$emit('load');
-              this.map.resize();
-            });
+        if (this.enableInteraction) {
+          let center = this.project.envelope?this.project.envelope.geometry.coordinates[0][0]:[0,0];
+          this.map = new mapboxgl.Map({
+            container: this.$refs.mapContainer,
+            center: center,
+            zoom: config.map_base_zoom,
+            style: 'mapbox://styles/mapbox/streets-v11'
+          });
+          this.map.on('load', () => {
+            this.addLayers();
+            this.setCoordinates();
+            this.$emit('load');
           });
         }
       },
@@ -107,7 +92,7 @@
           this.map.fitBounds(bounds, {
             padding: 20,
             animate: false,
-            });
+          });
         }
       }
     }
