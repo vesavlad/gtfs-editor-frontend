@@ -14,7 +14,8 @@
     "warnings": "Warnings"
   },
   "dataCard": {
-    "records": "Records"
+    "records": "Records",
+    "add": "Add"
   },
   "projectDashboard": {
     "lastChange": "Last edited",
@@ -34,7 +35,6 @@
     "download": "Download",
     "gtfsRequiredData": "GTFS required data",
     "gtfsOptionalData": "GTFS Optional data",
-    "add": "Add",
     "dataCard": {
       "noData": "No data",
       "routesBlockMessage": "Require agency",

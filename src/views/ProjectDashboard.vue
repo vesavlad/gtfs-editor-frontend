@@ -112,9 +112,7 @@
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsRequiredData')}}</h2>
         <div class="grid-data required">
-          <DataCard :filename="'Agencies'" :quantity="24" :errorNumber="3" :warningNumber="4" :state="'enabled'"></DataCard>
-          <DataCard :filename="'PP'" :quantity="24" :errorNumber="5" :warningNumber="6" :state="'blocked'" :message="'Require stops and trips data'"></DataCard>
-          <DataCard :filename="'CC'" :quantity="24" :errorNumber="7" :warningNumber="8" :state="'empty'" :message="$t('projectDashboard.noData')"></DataCard>
+          <DataCard v-for="file in dataTables" v-bind:key="file.id" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
         </div>
       </div>
       <div class="box-data">
@@ -126,6 +124,7 @@
     </div>
 
     <div id="TablesTable" class="flex">
+      <div>{{ data }}</div>
       <Vuetable ref="vuetable" :fields="fields" :data="data" :api-mode="false">
         <div slot="name" slot-scope="props">
           <router-link :to="{name:props.rowData[props.rowField.name], params: { projectid: $route.params.projectid }}">
@@ -148,8 +147,8 @@
   import Modal from '@/components/Modal.vue';
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
   import DataCard from "@/components/DataCard";
-  
-  //import Enums from '@/utils/enums'
+  import Enums from '@/utils/enums';
+
   let Vuetable = require('vuetable-2')
 
   export default {
@@ -162,50 +161,47 @@
     },
     data() {
       let data = [{
-          name: "FeedInfo",
-          id: "feed_info",
-        }, {
           name: "Agencies",
-          id: "agency",
+          id: "agency"
         }, {
           name: "Calendars",
-          id: "calendar",
+          id: "calendar"
         }, {
           name: "Stops",
-          id: "stops",
+          id: "stops"
         }, {
           name: "Routes",
-          id: "routes",
+          id: "routes"
         }, {
           name: "Shapes",
-          id: "shapes",
+          id: "shapes"
         }, {
           name: "Trips",
-          id: "trips",
+          id: "trips"
         }, {
           name: "Stop Times",
-          id: "stop_times",
+          id: "stop_times"
         }, {
           name: "Frequencies",
-          id: "frequencies",
+          id: "frequencies"
         }, {
           name: "Calendar Dates",
-          id: "calendar_dates",
+          id: "calendar_dates"
         }, {
           name: "Fare Attributes",
-          id: "fare_attributes",
+          id: "fare_attributes"
         }, {
           name: "Fare Rules",
-          id: "fare_rules",
+          id: "fare_rules"
         }, {
           name: "Transfers",
-          id: "transfers",
+          id: "transfers"
         }, {
           name: "Pathways",
-          id: "pathways",
+          id: "pathways"
         },{
           name: "Levels",
-          id: "levels",
+          id: "levels"
         },
       ];
       return {
@@ -235,6 +231,9 @@
     computed: {
       lastModification() {
         return DateTime.fromISO(this.project.last_modification).toRelative({locale: this.$i18n.locale });
+      },
+      dataTables() {
+        return this.data;
       }
     },
     methods: {
@@ -250,6 +249,32 @@
           this.data = this.data.map(datum => {
             let entry = data[datum.id];
             if(entry) {
+              entry.errorNumber= 1;
+              entry.warningNumber= 1;
+              entry.state= Enums.DataCard.ENABLED;
+
+              if (entry.entries===0) {
+                datum.message= 'projectDashboard.dataCard.noData';
+                datum.state = Enums.DataCard.EMPTY
+              }
+
+              if (datum.id==='routes' && data.agency.entries===0) {
+                datum.message = 'projectDashboard.dataCard.routesBlockMessage';
+                datum.state = Enums.DataCard.BLOCKED;
+              } else if (datum.id==='trips' && (data.routes.entries===0 || data.calendar.entries===0 || data.shapes.entries===0)) {
+                datum.message = 'projectDashboard.dataCard.tripsBlockMessage';
+                datum.state = Enums.DataCard.BLOCKED;
+              } else if (datum.id==='frequencies' && data.trips.entries===0) {
+                datum.message = 'projectDashboard.dataCard.frequenciesBlockMessage';
+                datum.state = Enums.DataCard.BLOCKED;
+              } else if (datum.id==='transfers' && data.stops.entries===0) {
+                datum.message = 'projectDashboard.dataCard.transfersBlockMessage';
+                datum.state = Enums.DataCard.BLOCKED;
+              } else if (datum.id==='pathways' && data.stops.entries===0) {
+                datum.message = 'projectDashboard.dataCard.pathwaysBlockMessage';
+                datum.state = Enums.DataCard.BLOCKED;
+              }
+
               return {
                 ...entry,
                 ...datum,

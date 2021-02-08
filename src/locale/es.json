@@ -14,7 +14,8 @@
     "warnings": "Advertencias"
   },
   "dataCard": {
-    "records": "Registros"
+    "records": "Registros",
+    "add": "Agregar"
   },
   "projectDashboard": {
     "lastChange": "Última edición",
@@ -34,7 +35,6 @@
     "download": "Descargar",
     "gtfsRequiredData": "GTFS datos requeridos",
     "gtfsOptionalData": "GTFS datos opcionales",
-    "add": "Agregar",
     "dataCard": {
       "noData": "No hay datos",
       "routesBlockMessage": "",
