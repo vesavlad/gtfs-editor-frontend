@@ -40,10 +40,19 @@
     },
     methods: {
       createURL() {
-        let mapStyle = 'streets-v11';
-        let mapboxAccessToken = process.env.VUE_APP_MAPBOX_TOKEN;
-        let geojson = encodeURIComponent(JSON.stringify(this.project.envelope)).replace(/\s/g, '');
-        let url = `https://api.mapbox.com/styles/v1/mapbox/${mapStyle}/static/geojson(${geojson})/auto/${this.width}x${this.height}?access_token=${mapboxAccessToken}`;
+        let url = '';
+        if (this.project.envelope) {
+          let mapStyle = 'streets-v11';
+          let mapboxAccessToken = process.env.VUE_APP_MAPBOX_TOKEN;
+          let geojson = JSON.parse(JSON.stringify(this.project.envelope));
+          geojson.properties.stroke = '#ff0000';
+          geojson.properties['stroke-opacity'] = 0.4;
+          geojson.properties['stroke-width'] = 5;
+          geojson.properties.fill = '#ff0000';
+          geojson.properties['fill-opacity'] = 0.5;
+          geojson = encodeURIComponent(JSON.stringify(geojson)).replace(/\s/g, '');
+          url = `https://api.mapbox.com/styles/v1/mapbox/${mapStyle}/static/geojson(${geojson})/auto/${this.width}x${this.height}?access_token=${mapboxAccessToken}`;
+        }
         return url;
       },
       replaceByDefault(e) {
