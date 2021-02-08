@@ -20,7 +20,7 @@
         </li>
       </ul>
       <div class="data-footer">
-        <button class="btn" v-if="[DataCardEnum.EMPTY,DataCardEnum.BLOCKED].indexOf(state)>-1" :disabled="state===DataCardEnum.BLOCKED"><span>{{ $t('projectDashboard.new')}}</span></button>
+        <button class="btn" v-if="[DataCardEnum.EMPTY,DataCardEnum.BLOCKED].indexOf(state)>-1" :disabled="state===DataCardEnum.BLOCKED"><span>{{ $t('projectDashboard.add')}}</span></button>
         <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="warning" :pillText="warningNumber"></PillBase>
         <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="error" :pillText="errorNumber"></PillBase>
       </div>

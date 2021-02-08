@@ -34,7 +34,14 @@
     "download": "Descargar",
     "gtfsRequiredData": "GTFS datos requeridos",
     "gtfsOptionalData": "GTFS datos opcionales",
-    "new": "Nuevo",
-    "noData": "No hay datos"
+    "add": "Agregar",
+    "dataCard": {
+      "noData": "No hay datos",
+      "routesBlockMessage": "",
+      "tripsBlockMessage": "",
+      "frequenciesBlockMessage": "",
+      "transfersBlockMessage": "",
+      "pathwaysBlockMessage": ""
+    }    
   }
 }

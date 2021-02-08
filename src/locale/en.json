@@ -34,7 +34,14 @@
     "download": "Download",
     "gtfsRequiredData": "GTFS required data",
     "gtfsOptionalData": "GTFS Optional data",
-    "new": "New",
-    "noData": "No data"
+    "add": "Add",
+    "dataCard": {
+      "noData": "No data",
+      "routesBlockMessage": "Require agency",
+      "tripsBlockMessage": "Require route, calendar and shape",
+      "frequenciesBlockMessage": "Require trip",
+      "transfersBlockMessage": "Require stop",
+      "pathwaysBlockMessage": "Require stop"
+    }    
   }
 }
