@@ -112,25 +112,15 @@
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsRequiredData')}}</h2>
         <div class="grid-data required">
-          <DataCard v-for="file in dataTables.slice(0, 9)" v-bind:key="file.id" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
+          <DataCard v-for="file in dataTables.slice(0, 9)" v-bind:key="file.id" :projectId="$route.params.projectid" :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
         </div>
       </div>
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsOptionalData')}}</h2>
         <div class="grid-data optional">
-          <DataCard v-for="file in dataTables.slice(9)" v-bind:key="file.id" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
+          <DataCard v-for="file in dataTables.slice(9)" v-bind:key="file.id" :projectId="$route.params.projectid" :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
         </div>
       </div>
-    </div>
-
-    <div id="TablesTable" class="flex">
-      <Vuetable ref="vuetable" :fields="fields" :data="data" :api-mode="false">
-        <div slot="name" slot-scope="props">
-          <router-link :to="{name:props.rowData[props.rowField.name], params: { projectid: $route.params.projectid }}">
-            {{props.rowData[props.rowField.name]}}
-          </router-link>
-        </div>
-      </Vuetable>
     </div>
     <Modal v-if="showModal" @cancel="showModal = false" @close="showModal = false" @ok="showModal = false"
       :showCancelButton="false" :modalClasses="['warning']">
@@ -148,58 +138,69 @@
   import DataCard from "@/components/DataCard";
   import Enums from '@/utils/enums';
 
-  let Vuetable = require('vuetable-2')
-
   export default {
     name: 'ProjectDashboard',
     components: {
       DataCard,
-      Vuetable: Vuetable.Vuetable,
       Modal,
       EnvelopeMap,
     },
     data() {
       let data = [{
           name: "Agencies",
+          viewName: "Agencies",
           id: "agency"
         }, {
           name: "Calendars",
+          viewName: "Calendars",
           id: "calendar"
         }, {
           name: "Stops",
+          viewName: "Stops",
           id: "stops"
         }, {
           name: "Routes",
+          viewName: "Routes",
           id: "routes"
         }, {
           name: "Shapes",
+          viewName: "Shapes",
           id: "shapes"
         }, {
           name: "Trips",
+          viewName: "Trips",
           id: "trips"
         }, {
           name: "Stop Times",
+          viewName: "StopTimes",
           id: "stop_times"
         }, {
           name: "Frequencies",
+          viewName: "Frequencies",
           id: "frequencies"
         }, {
           name: "Calendar Dates",
+          viewName: "CalendarDates",
           id: "calendar_dates"
         }, {
           name: "Fare Attributes",
+          viewName: "FareAttributes",
           id: "fare_attributes"
         }, {
           name: "Fare Rules",
+          viewName: "FareRules",
           id: "fare_rules"
         }, {
           name: "Transfers",
+          viewName: "Transfers",
           id: "transfers"
         }, {
           name: "Pathways",
+          viewName: "Pathways",
           id: "pathways"
         },{
           name: "Levels",
+          viewName: "Levels",
           id: "levels"
         },
       ];
