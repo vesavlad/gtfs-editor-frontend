@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100%;">
-    <img v-if="showStaticMap" :width="width" :height="height" :src="createURL()" @error="replaceByDefault" @click="enableMapInteraction" />
+    <img v-if="showStaticMap" :width="width" :height="height" :src="createURL()" @error="replaceByDefault" @click="enableMapInteraction" @dragstart="enableMapInteraction" />
     <div v-if="!showStaticMap" id="envelopeMap" ref="mapContainer"></div>
   </div>
 </template>
