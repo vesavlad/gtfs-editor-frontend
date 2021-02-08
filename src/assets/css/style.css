@@ -299,7 +299,7 @@ input[type="checkbox"]{background: none; box-shadow: none;}
 
 .container.full {max-width: none;}
 .container {margin: 0 auto; min-width: 980px; max-width: 1100px; width: calc(100vw - 60px); padding: 0 10px;}
-.card {overflow: hidden; background: var(--base); box-shadow: 0 2px 14px 0 rgba(0,0,0,0.14); border-radius: 20px; transition: box-shadow .3s;}
+.card {background: var(--base); box-shadow: 0 2px 14px 0 rgba(0,0,0,0.14); border-radius: 20px; transition: box-shadow .3s;}
 .card[href]:hover {box-shadow: 0 4px 15px rgba(0,0,0,.25);}
 .grid.title {grid-template-columns: 1fr auto; width: 100%; align-items: flex-start; grid-gap: 0;}
 .card-content {padding: 20px; display: grid; grid-gap: 20px;}
@@ -369,14 +369,25 @@ input[type="checkbox"]{background: none; box-shadow: none;}
     font-size: 18px;
 }
 
+/* ============  MENU LIST  ============== */
+
+.btn-options {position: relative;}
+.menu-box {position: absolute; left: 10px; top: 20px; text-transform: none; color: var(--gris-medio2); font-size: 14px; z-index: 1; text-align: left; min-width: 170px; border-radius: 10px; overflow: hidden;}
+.menu-option {display: grid; grid-template-columns: auto 1fr; grid-gap: 5px; padding: 10px; align-items: center;}
+.menu-option.delete {color: var(--error);}
+.menu-option:hover {background-color: var(--gris-claro);}
+.menu-option.disabled,.menu-option.disabled:hover {background-color: transparent; opacity: .5; cursor: default;}
+.menu-option span {display: block; text-align: left; white-space: nowrap;}
+
+
 /* ============  Dashboard  ============== */
 
 
 .projects {display: grid; grid-gap: 20px; grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;}
 .project-details {margin-bottom: 10px; display: grid; grid-template-columns: auto 1fr; grid-gap: 20px;}
-.project-card-map {width: 100%; height: 170px; background-color: var(--gris-claro);}
+.project-card-map {border-top-left-radius:30px; border-top-right-radius:30px; overflow: hidden; width: 100%; height: 170px; background-color: var(--gris-claro);}
 .project-last-edit {color: var(--gris-medio2);}
-.ProjectDashboard h1 input {color: white; font-size: 36px; font-weight: bolder; padding: 0; background-color: transparent; border-bottom: 2px solid white; border-radius: 0;}
+.ProjectDashboard h1 input {color: white; font-size: 36px; font-weight: bolder; padding: 0; background-color: transparent; border-bottom: 2px solid white; border-radius: 0; width: auto;}
 .ProjectDashboard h1 input:disabled {border-color: transparent;}
 
 /* ============  PROJECT DETAILS  ============== */

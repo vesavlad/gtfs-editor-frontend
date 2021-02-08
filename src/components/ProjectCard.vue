@@ -6,7 +6,10 @@
     <div class="card-content">
       <div class="grid title">
         <h2>{{project.name}}</h2>
-        <button class="btn icon flat"><i class="material-icons">more_vert</i></button>
+        <button class="btn icon flat btn-options">
+          <i class="material-icons">more_vert</i>
+          <MenuBox></MenuBox>
+        </button>
       </div>
       <div class="grid project-details">
         <div class="project-id">
@@ -33,12 +36,14 @@
   import { DateTime } from 'luxon';
   import PillBase from "./PillBase";
   import EnvelopeMap from "./EnvelopeMap";
+  import MenuBox from "@/components/MenuBox";
 
   export default {
     name: 'ProjectCard',
     components: {
       PillBase,
-      EnvelopeMap
+      EnvelopeMap,
+      MenuBox
     },
     props: {
       project:{
