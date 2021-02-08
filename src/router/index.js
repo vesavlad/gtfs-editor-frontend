@@ -81,7 +81,7 @@ const routes = [{
       },
       {
         path: '/project/:projectid/calendardates',
-        name: 'Calendar Dates',
+        name: 'CalendarDates',
         component: CalendarDateView,
         meta: {
           breadcrumb: 'CalendarDates'
@@ -97,7 +97,7 @@ const routes = [{
       },
       {
         path: '/project/:projectid/stoptimes',
-        name: 'Stop Times',
+        name: 'StopTimes',
         component: StopTimes,
         meta: {
           breadcrumb: 'StopTimes'
@@ -129,7 +129,7 @@ const routes = [{
       },
       {
         path: '/project/:projectid/fareattributes',
-        name: 'Fare Attributes',
+        name: 'FareAttributes',
         component: FareAttributesView,
         meta: {
           breadcrumb: 'Fare Attributes'
@@ -137,7 +137,7 @@ const routes = [{
       },
       {
         path: '/project/:projectid/farerules',
-        name: 'Fare Rules',
+        name: 'FareRules',
         component: FareRulesView,
         meta: {
           breadcrumb: 'Fare Rules'

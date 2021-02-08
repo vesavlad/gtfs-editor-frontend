@@ -1,5 +1,5 @@
 <template>
-  <a href="#" class="card data-card" :class="[cardClass]">
+  <router-link class="card data-card" :class="[cardClass]" :event="state===DataCardEnum.BLOCKED?'':'click'" :to="{name: viewName, params: { projectid: projectId }}">
     <div class="data-header header">
       <h4>{{ filename }}</h4>
       <div class="btn-list">
@@ -25,7 +25,7 @@
         <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="error" :pillText="errorNumber"></PillBase>
       </div>
     </div>
-  </a>
+  </router-link>
 </template>
 
 <script>
@@ -39,6 +39,14 @@ export default {
   },
   props: {
     filename: {
+      type: String,
+      required: true
+    },
+    projectId: {
+      type: [String, Number],
+      required: true
+    },
+    viewName: {
       type: String,
       required: true
     },

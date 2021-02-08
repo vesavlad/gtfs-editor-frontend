@@ -37,11 +37,11 @@
     "gtfsOptionalData": "GTFS datos opcionales",
     "dataCard": {
       "noData": "No hay datos",
-      "routesBlockMessage": "",
-      "tripsBlockMessage": "",
-      "frequenciesBlockMessage": "",
-      "transfersBlockMessage": "",
-      "pathwaysBlockMessage": ""
+      "routesBlockMessage": "Necesita agency",
+      "tripsBlockMessage": "Necesita routes, calendar y shape",
+      "frequenciesBlockMessage": "Necesita trip",
+      "transfersBlockMessage": "Necesita stop",
+      "pathwaysBlockMessage": "Necesita stop"
     }    
   }
 }
