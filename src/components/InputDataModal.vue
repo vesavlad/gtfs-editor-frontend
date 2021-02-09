@@ -14,7 +14,7 @@
             <span>{{ field.label }}</span>
           </div>
           <div class="input-row-content single">
-            <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.label.toLowerCase()}`" :class="{error: errors[field.name]}" :data-error="errors[field.name]?errors[field.name][0]:''"/>
+            <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.label.toLowerCase()}`" @focus="$emit('removeError', field.name)" :class="{error: errors[field.name]}" :data-error="errors[field.name]?errors[field.name][0]:''" v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"/>
           </div>
         </li>
       </ul>
@@ -78,7 +78,7 @@ export default {
   methods: {
     openLink() {
       window.open(this.link);
-    },
+    }
   },
   mounted() {
     this.fields.forEach(field => {

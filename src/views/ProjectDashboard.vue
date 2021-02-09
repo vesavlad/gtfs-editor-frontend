@@ -126,7 +126,7 @@
       :showCancelButton="false" :modalClasses="['warning']">
       <p slot="content" v-html="modalContent"></p>
     </Modal>
-    <InputDataModal v-if="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo"
+    <InputDataModal v-if="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo" @removeError="removeMessageError"
       :title="feedInfo.config.title" :link="feedInfo.config.link" :fields="feedInfo.config.fields" :data="project.feedinfo" :errors="feedInfo.config.errors">
     </InputDataModal>
   </div>
@@ -360,6 +360,9 @@
         }).catch(err => {
           this.feedInfo.config.errors = err.response.data;
         });
+      },
+      removeMessageError(fieldName) {
+        this.$delete(this.feedInfo.config.errors, fieldName);
       },
       dowloadGTFS() {
         projectsAPI.downloadGTFS(this.$route.params.projectid).then(response => {
