@@ -36,6 +36,7 @@
     "vue-datatables-net": "git+https://github.com/niiknow/vue-datatables-net.git",
     "vue-echarts": "^5.0.0-beta.0",
     "vue-i18n": "^8.17.3",
+    "vue-input-autowidth": "^1.0.10",
     "vue-mapbox": "^0.4.1",
     "vue-router": "^3.4.5",
     "vue-sortable-list": "^0.1.2",

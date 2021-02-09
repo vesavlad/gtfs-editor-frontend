@@ -5,10 +5,12 @@ import store from './store'
 import VueBreadcrumbs from 'vue-2-breadcrumbs'
 import i18n from './i18n'
 import VTooltip from 'v-tooltip'
+import VueInputAutowidth from 'vue-input-autowidth'
 
 require('@/assets/css/base.css')
 require('@/assets/css/style.css')
 
+Vue.use(VueInputAutowidth)
 Vue.use(VTooltip, {
   themes: {
     'error-tooltip': {
