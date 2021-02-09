@@ -1,5 +1,5 @@
 <template>
-  <div v-bind:style="{ 'background-image': 'url(\'' + createURL() + '\'), url(\'' + require('@/assets/img/logo.svg') + '\')' }" :width="width" :height="height" id="envelopeMap" ref="mapContainer" @click="enableMapInteraction" @dragstart="enableMapInteraction"></div>
+  <div v-bind:style="{ 'background-image': 'url(\'' + createURL() + '\'), url(\'' + require('@/assets/img/bg-empty-map.svg') + '\')' }" :width="width" :height="height" id="envelopeMap" class="envelope-map" ref="mapContainer" @click="enableMapInteraction" @dragstart="enableMapInteraction"></div>
 </template>
 
 <script>
@@ -79,7 +79,7 @@
           'paint': {
             'fill-outline-color': 'gray',
             'fill-color': '#000',
-            'fill-opacity': 0.4
+            'fill-opacity': 0.5
           }
         });
       },
