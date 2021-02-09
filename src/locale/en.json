@@ -11,7 +11,8 @@
   "projectCard": {
     "lastChange": "Last change",
     "errors": "Errors",
-    "warnings": "Warnings"
+    "warnings": "Warnings",
+    "neverValidated": "Never validated"
   },
   "dataCard": {
     "records": "Records",
