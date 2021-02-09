@@ -21,7 +21,6 @@ import FareRulesView from '../views/FareRulesView.vue'
 import LevelsView from '../views/LevelsView.vue'
 import TransfersView from '../views/TransfersView.vue'
 import PathwaysView from '../views/PathwaysView.vue'
-import FeedInfo from '../views/FeedInfo.vue'
 import Shapes from '../views/Shapes.vue'
 
 
@@ -54,14 +53,6 @@ const routes = [{
         path: '',
         name: 'projectoverview',
         component: ProjectDashboard,
-      },
-      {
-        path: '/project/:projectid/feedinfo',
-        name: 'FeedInfo',
-        component: FeedInfo,
-        meta: {
-          breadcrumb: 'Feed Info'
-        },
       },
       {
         path: '/project/:projectid/agencies',
