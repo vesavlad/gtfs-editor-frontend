@@ -11,7 +11,7 @@
       <ul class="m-content">
         <li v-for="field in fields" :key="field.name">
           <div class="input-row-title h4" :class="{required: field.required}">
-            <span>{{ field.label }}</span>
+            <span>{{ field.label }}{{ field.required?'*':'' }}</span>
           </div>
           <div class="input-row-content single">
             <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.label.toLowerCase()}`" @focus="$emit('removeError', field.name)" :class="{error: errors[field.name]}" :data-error="errors[field.name]?errors[field.name][0]:''" v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"/>
