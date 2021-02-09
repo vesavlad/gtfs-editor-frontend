@@ -2,10 +2,10 @@
   <div class="ProjectDashboard container">
     <div class="header">
       <div class="grid center">
-        <input v-model="project.name" :disabled="!projectName.edit" v-bind:class="{error: projectName.hasError}" :data-error="projectName.errorMessage" v-autowidth="{minWidth: '60px'}" />
-        <button v-if="!projectName.edit" @click="projectName.oldValue=project.name;projectName.edit=true" class="btn icon flat"><i class="material-icons">edit</i></button>
+        <input ref="projectName" v-model="project.name" :disabled="!projectName.edit" v-bind:class="{error: projectName.hasError}" v-tooltip="{ theme: 'error-tooltip', content: projectName.errorMessage, shown: projectName.hasError }" v-autowidth="{minWidth: '60px'}" />
+        <button v-if="!projectName.edit" @click="enableEditProjectName" class="btn icon flat"><i class="material-icons">edit</i></button>
         <button v-if="projectName.edit" @click="updateProjectName" class="btn icon flat green"><i class="material-icons">check</i></button>
-        <button v-if="projectName.edit" @click="projectName.edit=false;project.name=projectName.oldValue" class="btn icon flat red"><i class="material-icons">close</i></button>
+        <button v-if="projectName.edit" @click="projectName.edit=false;project.name=projectName.oldValue;projectName.hasError=false" class="btn icon flat red"><i class="material-icons">close</i></button>
       </div>
       <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
     </div>
@@ -331,6 +331,13 @@
             }
             return datum;
           });
+        });
+      },
+      enableEditProjectName() {
+        this.projectName.oldValue=this.project.name;
+        this.projectName.edit=true;
+        this.$nextTick(() => {
+          this.$refs.projectName.focus();
         });
       },
       updateProjectName() {
