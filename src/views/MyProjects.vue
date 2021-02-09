@@ -62,6 +62,7 @@ export default {
     },
     createProject() {
       projectsAPI.createProject(this.projectName).then((response) => {
+        this.project.config.errors = {};
         this.$router.push({ name: "projectoverview", params: {projectid: response.data.project_id} });
       })
       .catch((error) => {
