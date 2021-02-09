@@ -2,18 +2,18 @@
   <div class="dashboard container">
     <div class="header">
       <h1>{{ $t('myProjects')}}</h1>
-      <button class="btn" @click="creatingProject=true"><span>{{ $t('newProject') }}</span><i class="material-icons">add</i></button>
+      <button class="btn" @click="project.create=true"><span>{{ $t('newProject') }}</span><i class="material-icons">add</i></button>
     </div>
     <section class='content'>
       <div class="projects">
         <ProjectCard v-for="project in projects" v-bind:key="project.project_id" :project="project"></ProjectCard>
       </div>
     </section>
-    <BaseModal v-if="creatingProject" @close="creatingProject=false" :classes="['modal-new-project']">
+    <BaseModal v-if="project.create" @close="project.create=false" :classes="['modal-new-project']">
       <template v-slot:m-content>
         <div class="modal-new-header">
           <h2>{{ $t('createProject') }}</h2>
-          <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('projectName')"/>
+          <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('projectName')" :class="{error: project.config.errors.name }" :data-error="project.config.errors.name?project.config.errors.name[0]:''"/>
         </div>
         <div class="content grid g2">
           <div class="new-box">
@@ -47,7 +47,12 @@ export default {
   data() {
     return {
       projects: [],
-      creatingProject: false,
+      project: {
+        create: false,
+        config: {
+          errors: {}
+        }
+      },
       projectName: null
     }
   },
@@ -60,7 +65,7 @@ export default {
         this.$router.push({ name: "projectoverview", params: {projectid: response.data.project_id} });
       })
       .catch((error) => {
-        this.errorMessage = error;
+        this.project.config.errors = error.response.data;
       });
     },
   },
