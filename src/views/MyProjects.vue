@@ -9,11 +9,11 @@
         <ProjectCard v-for="project in projects" v-bind:key="project.project_id" :project="project"></ProjectCard>
       </div>
     </section>
-    <BaseModal v-if="project.create" @close="project.create=false" :classes="['modal-new-project']">
+    <BaseModal v-if="project.create" @close="project.create=false;project.config.errors={}" :classes="['modal-new-project']">
       <template v-slot:m-content>
         <div class="modal-new-header">
           <h2>{{ $t('createProject') }}</h2>
-          <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('projectName')" :class="{error: project.config.errors.name }" :data-error="project.config.errors.name?project.config.errors.name[0]:''"/>
+          <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('projectName')" :class="{error: project.config.errors.name }" v-tooltip="{ theme: 'error-tooltip', content: project.config.errors.name?project.config.errors.name[0]:'', shown: project.config.errors.name !== undefined }"/>
         </div>
         <div class="content grid g2">
           <div class="new-box">

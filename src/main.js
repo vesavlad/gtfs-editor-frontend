@@ -2,14 +2,22 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import ECharts from 'vue-echarts'
 import VueBreadcrumbs from 'vue-2-breadcrumbs'
 import i18n from './i18n'
+import VTooltip from 'v-tooltip'
 
 require('@/assets/css/base.css')
 require('@/assets/css/style.css')
 
-Vue.component('v-chart', ECharts)
+Vue.use(VTooltip, {
+  themes: {
+    'error-tooltip': {
+      $extend: 'tooltip',
+      triggers: [],
+      placement: 'bottom'
+    }
+  }
+})
 Vue.use(VueBreadcrumbs, {
   template:
     '        <nav v-if="$breadcrumbs.length" aria-label="breadcrumb" class="breadcrumbs">\n' +

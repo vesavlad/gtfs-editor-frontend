@@ -39,6 +39,7 @@
 
 <script>
 import LocaleSwitcher from './components/LocaleSwitcher'
+import 'v-tooltip/dist/v-tooltip.css';
 
 require('material-icons')
 

@@ -29,6 +29,7 @@
     "moment": "^2.29.1",
     "package.json": "^2.0.1",
     "select2": "^4.0.13",
+    "v-tooltip": "^3.0.0-alpha.20",
     "vis-network": "^8.5.2",
     "vue": "^2.6.12",
     "vue-2-breadcrumbs": "^0.7.9",
