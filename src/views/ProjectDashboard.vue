@@ -15,7 +15,7 @@
           <div class="card-content">
             <div class="header">
               <h2>{{ project.feedinfo?project.feedinfo.feed_publisher_name:'' }}</h2>
-              <button class="btn icon flat"><i class="material-icons">edit</i></button>
+              <button class="btn icon flat" @click="feedInfo.edit=true"><i class="material-icons">edit</i></button>
             </div>
             <div class="grid">
               <div class="box-info">
@@ -126,6 +126,9 @@
       :showCancelButton="false" :modalClasses="['warning']">
       <p slot="content" v-html="modalContent"></p>
     </Modal>
+    <InputDataModal v-if="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo"
+      :title="feedInfo.config.title" :link="feedInfo.config.link" :fields="feedInfo.config.fields" :data="project.feedinfo" :errors="feedInfo.config.errors">
+    </InputDataModal>
   </div>
 </template>
 
@@ -133,7 +136,9 @@
   import { DateTime } from 'luxon';
   import projectsAPI from '@/api/projects.api';
   import tablesAPI from '@/api/tables.api';
+  import feedInfoAPI from '@/api/feedinfo.api';
   import Modal from '@/components/Modal.vue';
+  import InputDataModal from '@/components/InputDataModal.vue';
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
   import DataCard from "@/components/DataCard";
   import Enums from '@/utils/enums';
@@ -143,6 +148,7 @@
     components: {
       DataCard,
       Modal,
+      InputDataModal,
       EnvelopeMap,
     },
     data() {
@@ -211,18 +217,61 @@
           oldValue: null,
           edit: false,
         },
+        feedInfo: {
+          edit: false,
+          config: {
+            title: 'Feed info',
+            link: 'https://developers.google.com/transit/gtfs/reference#feed_infotxt',
+            errors: {},
+            fields: [{
+              label: "Publisher Name",
+              name: "feed_publisher_name",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Publisher URL",
+              name: "feed_publisher_url",
+              type: "url",
+              required: true,
+            },
+            {
+              label: "Language",
+              name: "feed_lang",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Start date",
+              name: "feed_start_date",
+              type: "date",
+              required: true,
+            },
+            {
+              label: "End Date",
+              name: "feed_end_date",
+              type: "date",
+              required: true,
+            },
+            {
+              label: "Version",
+              name: "feed_version",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "ID",
+              name: "feed_id",
+              type: "text",
+              required: true,
+            },
+          ]
+          }
+        },
         project: {
-          feedInfo: {},
+          feedinfo: {},
           gtfsvalidation: {}
         },
-        fields: [{
-            name: "name",
-            title: "Table",
-          },
-          {
-            name: "entries",
-          },
-        ],
         data,
         showModal: false,
         modalContent: '',
@@ -293,6 +342,16 @@
         }).catch(error => {
           this.projectName.hasError = true;
           this.projectName.errorMessage = error.response.data.name[0];
+        });
+      },
+      saveFeedInfo(feedInfoData) {
+        let method = this.project.feedinfo.id ? feedInfoAPI.update : feedInfoAPI.create;
+        method(this.$route.params.projectid, feedInfoData).then((response) => {
+          this.project.feedinfo = response.data;
+          this.feedInfo.edit = false;
+          this.feedInfo.config.errors = {};
+        }).catch(err => {
+          this.feedInfo.config.errors = err.response.data;
         });
       },
       dowloadGTFS() {
