@@ -17,23 +17,6 @@
             <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.label.toLowerCase()}`" :class="{error: errors[field.name]}" :data-error="errors[field.name]?errors[field.name][0]:''"/>
           </div>
         </li>
-        <li>
-          <div class="input-row-title h4">
-            <span>First name input / second name input </span>
-          </div>
-          <div class="input-row-content double">
-            <select>
-              <option selected disabled>Select</option>
-              <option>Option 1</option>
-              <option>Option 2</option>
-            </select>
-            <select>
-              <option selected disabled>Select</option>
-              <option>Option 1</option>
-              <option>Option 2</option>
-            </select>
-          </div>
-        </li>
       </ul>
       <div class="m-footer">
         <div class="error-message" v-if="errors.non_field_errors">
