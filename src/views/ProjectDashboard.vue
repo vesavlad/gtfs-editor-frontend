@@ -9,9 +9,9 @@
       </div>
       <div class="grid center">
         <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
-        <button class="btn icon flat">
+        <button class="btn icon flat" @click="showMenuBox=!showMenuBox">
           <i class="material-icons">more_vert</i>
-          <MenuBox placement="upperRight"></MenuBox>
+          <MenuBox v-if="showMenuBox" placement="upperRight"></MenuBox>
         </button>
       </div>
     </div>
@@ -281,6 +281,7 @@
           gtfsvalidation: {}
         },
         data,
+        showMenuBox: false,
         showModal: false,
         modalContent: '',
       }
