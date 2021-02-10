@@ -1,5 +1,5 @@
 <template>
-  <BaseModal>
+  <BaseModal :classes="ownClasses">
     <template v-slot:m-content>
       <div class="m-header">
         <div class="message-title">
@@ -58,6 +58,9 @@ export default {
     }
   },
   computed: {
+    ownClasses() {
+      return ['modal-message'].concat(this.classes);
+    },
     icon() {
       let icon = null;
       switch(this.type) {

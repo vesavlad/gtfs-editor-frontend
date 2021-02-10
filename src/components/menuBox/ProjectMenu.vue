@@ -2,7 +2,7 @@
   <div>
     <BaseMenuBox :placement="placement" :options="options" @delete="showConfirmationModal=true" ></BaseMenuBox>
     <MessageModal v-if="showConfirmationModal" @close="showConfirmationModal=false" @cancel="showConfirmationModal=false" 
-      @ok="deleteProject" :okButtonLabel="$t('delete')" :type="ModalType.ERROR">
+      @ok="deleteProject" :okButtonLabel="$t('delete')" :type="ModalType.WARNING">
       <template v-slot:m-title>{{ $t('projectMenu.deleteModalTitle') }}</template>
       <template v-slot:m-content>{{ $t('projectMenu.deleteModalMessage') }}</template>
     </MessageModal>
