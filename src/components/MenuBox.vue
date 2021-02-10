@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-box card" :class="[boxClass]">
+  <div class="menu-box card" :class="[boxClass]" @click.stop.prevent>
     <ul>
       <li class="menu-option">
         <i class="material-icons">edit</i>

@@ -6,9 +6,9 @@
     <div class="card-content">
       <div class="grid title">
         <h2>{{project.name}}</h2>
-        <button class="btn icon flat btn-options">
+        <button class="btn icon flat btn-options" @click.stop.prevent="showMenuBox=!showMenuBox">
           <i class="material-icons">more_vert</i>
-          <MenuBox></MenuBox>
+          <MenuBox v-if="showMenuBox"></MenuBox>
         </button>
       </div>
       <div class="grid project-details">
@@ -49,6 +49,11 @@
       project:{
         type:Object,
         required:true
+      }
+    },
+    data() {
+      return {
+        showMenuBox: false
       }
     },
     computed: {
