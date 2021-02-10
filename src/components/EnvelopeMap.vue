@@ -40,11 +40,10 @@
           let mapStyle = 'streets-v11';
           let mapboxAccessToken = process.env.VUE_APP_MAPBOX_TOKEN;
           let geojson = JSON.parse(JSON.stringify(this.project.envelope));
-          geojson.properties.stroke = '#ff0000';
-          geojson.properties['stroke-opacity'] = 0.4;
-          geojson.properties['stroke-width'] = 5;
-          geojson.properties.fill = '#ff0000';
-          geojson.properties['fill-opacity'] = 0.5;
+          geojson.properties.stroke = '#7DC242';
+          geojson.properties['stroke-width'] = 1;
+          geojson.properties.fill = '#7DC242';
+          geojson.properties['fill-opacity'] = 0.05;
           geojson = encodeURIComponent(JSON.stringify(geojson)).replace(/\s/g, '');
           url = `https://api.mapbox.com/styles/v1/mapbox/${mapStyle}/static/geojson(${geojson})/auto/${this.width}x${this.height}?access_token=${mapboxAccessToken}`;
         }
@@ -78,8 +77,18 @@
           'layout': {},
           'paint': {
             'fill-outline-color': 'gray',
-            'fill-color': '#000',
-            'fill-opacity': 0.5
+            'fill-color': '#7DC242',
+            'fill-opacity': 0.05
+          }
+        });
+        this.map.addLayer({
+          'id': 'envelope-stroke',
+          'type': 'line',
+          'source': 'envelope-source',
+          'layout': {},
+          'paint': {
+            'line-color': '#7DC242',
+            'line-width': 1
           }
         });
       },

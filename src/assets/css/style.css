@@ -1,9 +1,8 @@
 @charset "UTF-8";
 /* CSS Document */
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&display=swap');
 
 /* Colores */
-html,body {background-color:var(--gris-claro); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; margin: 0; min-height: 100vh; color: var(--gris-osc2); min-width: 980px;}
+html,body {background-color:var(--gris-claro); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; margin: 0; min-height: 100vh; color: var(--gris-osc2); min-width: 980px; font-family: 'Roboto', sans-serif;}
 :root {
     --semi-blanco:rgba(255,255,255,.5);
     --base:#FAFAFA;
@@ -76,6 +75,8 @@ header {padding-bottom: 270px;}
 .main-header {background-color: var(--secundario);}
 header .grid {grid-template-columns: 1fr auto; align-items: center;}
 .header {margin-bottom: 30px; display: grid; grid-template-columns: 1fr auto; grid-gap: 10px;}
+.language-switch {display: grid; grid-auto-flow: column; align-items: center; grid-gap: 10px; font-style: normal;}
+.language-switch li {text-decoration: none;}
 
 /* ============  TABLAS  ============== */
 
@@ -110,8 +111,8 @@ input, select {
     padding: 10px;
     color: var(--gris-osc2);
     width: 100%;
-    border: 0;
     font: 400 16px 'Roboto';
+    border: 1px solid transparent;
 }
 select {cursor: pointer;}
 input:focus {box-shadow: 0 2px 5px rgba(0,0,0,0.05), 0 4px 10px rgba(84,101,115,0.15); background-color: white;}
@@ -382,6 +383,7 @@ input[type="checkbox"]{background: none; box-shadow: none;}
 
 .btn-options {position: relative;}
 .menu-box {position: absolute; left: 10px; top: 20px; text-transform: none; color: var(--gris-medio2); font-size: 14px; z-index: 1; text-align: left; min-width: 170px; border-radius: 10px; overflow: hidden;}
+.menu-box.upper-right {right: calc(100% - 24px); left: auto;}
 .menu-option {display: grid; grid-template-columns: auto 1fr; grid-gap: 5px; padding: 10px; align-items: center;}
 .menu-option.delete {color: var(--error);}
 .menu-option:hover {background-color: var(--gris-claro);}
@@ -402,7 +404,7 @@ input[type="checkbox"]{background: none; box-shadow: none;}
 /* ============  PROJECT DETAILS  ============== */
 
 .section-details {margin-bottom: 10px; display: grid; grid-template-columns: 7fr 5fr; grid-gap: 20px;}
-.section-details .project-card-map {height: 100%;}
+.section-details .project-card-map {height: 100%; border-radius: 0;}
 .list-summary li {display: grid; grid-gap: 20px; grid-template-columns: 2fr 4fr; padding: 14px 20px; border-bottom: 1px solid var(--gris-claro);}
 .lsh {font-size: 16px; font-weight: 500; color: var(--gris-medio);}
 .lst {font-size: 16px;}

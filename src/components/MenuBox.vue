@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-box card">
+  <div class="menu-box card" :class="[boxClass]">
     <ul>
       <li class="menu-option">
         <i class="material-icons">edit</i>
@@ -23,6 +23,25 @@
 
 <script>
 export default {
-  name: 'MenuBox'
+  name: 'MenuBox',
+  props:{
+    placement: {
+      type: String,
+      default: 'upperLeft',
+      validation(value) {
+        return ['upperLeft', 'upperRight'].indexOf(value) !== -1;
+      }
+    }
+  },
+  computed: {
+    boxClass(){
+      if (this.placement==='upperLeft') {
+        return 'upper-left';
+      }else if (this.placement==='upperRight') {
+        return  'upper-right';
+      }
+      return '';
+    }
+  }
 }
 </script>

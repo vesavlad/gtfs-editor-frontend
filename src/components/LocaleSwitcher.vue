@@ -1,7 +1,7 @@
 <template>
-  <ul>
+  <ul class="language-switch">
     <li v-for="locale in locales" :key="locale" @click="switchLocale(locale)">
-      {{locale}}
+      <span>{{locale}}</span>
     </li>
   </ul>
 </template>

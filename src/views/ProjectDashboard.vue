@@ -7,7 +7,13 @@
         <button v-if="projectName.edit" @click="updateProjectName" class="btn icon flat green"><i class="material-icons">check</i></button>
         <button v-if="projectName.edit" @click="projectName.edit=false;project.name=projectName.oldValue;projectName.hasError=false" class="btn icon flat red"><i class="material-icons">close</i></button>
       </div>
-      <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
+      <div class="grid center">
+        <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
+        <button class="btn icon flat">
+          <i class="material-icons">more_vert</i>
+          <MenuBox placement="upperRight"></MenuBox>
+        </button>
+      </div>
     </div>
     <div class="section-content">
       <div class="section-details">
@@ -142,10 +148,12 @@
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
   import DataCard from "@/components/DataCard";
   import Enums from '@/utils/enums';
+  import MenuBox from "@/components/MenuBox";
 
   export default {
     name: 'ProjectDashboard',
     components: {
+      MenuBox,
       DataCard,
       Modal,
       InputDataModal,
