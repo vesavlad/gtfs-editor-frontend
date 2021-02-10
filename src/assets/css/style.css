@@ -315,7 +315,7 @@ input[type="checkbox"]{background: none; box-shadow: none;}
 .grid-pills {display: grid; grid-auto-flow: column; grid-gap: 5px; justify-content: flex-start;}
 .card-title {padding: 20px; padding-bottom: 15px; background-color: var(--secundario-osc); color: white;}
 .card-title h3 {color: white;}
-.envelope-map {background-size: cover; background-position: center;}
+.envelope-map {background-size: cover; background-position: center; width: 100%; height: 100%;}
 
 /* Modal */
 
