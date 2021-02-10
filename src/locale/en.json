@@ -1,14 +1,21 @@
 {
-  "myProjects": "My projects",
-  "appName": "GTFS editor",
-  "project": "Project",
-  "newProject": "New project",
-  "createProject": "Create project",
-  "projectName": "Project name",
-  "cancel": "Cancel",
-  "delete": "Delete",
-  "website": "Website",
-  "contact": "Contact",
+  "general": {
+    "project": "Project",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "create": "Create",
+    "upload": "Upload",
+    "website": "Website",
+    "contact": "Contact"
+  },
+  "myProjects": {
+    "myProjects": "My projects",
+    "newProject": "New project",
+    "createProject": "Create project",
+    "projectName": "Project name",
+    "startEmptyProject": "Start new empty project",
+    "startProjectFromGTFS": "Start new project from GTFS file"
+  },
   "projectMenu": {
     "deleteModalTitle": "Delete Project",
     "deleteModalMessage": "Are you sure you want to delete project? this action cannot be undone."

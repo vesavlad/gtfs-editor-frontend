@@ -36,7 +36,7 @@ const routes = [{
     component: MyProjects,
     meta: {
       breadcrumb() {
-        return this.$i18n.t('myProjects');
+        return this.$i18n.t('myProjects.myProjects');
       }
     }
   },
@@ -45,7 +45,7 @@ const routes = [{
     component: {render(c) { return c('router-view'); }},
     meta: {
       breadcrumb(routeParams){
-        return this.$i18n.t('project') + ' ' + routeParams.projectid;
+        return this.$i18n.t('general.project') + ' ' + routeParams.projectid;
       }
     },
     children: [

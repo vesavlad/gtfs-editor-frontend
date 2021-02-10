@@ -1,14 +1,21 @@
 {
-  "myProjects": "Mis proyectos",
-  "appName": "Editor de GTFS",
-  "project": "Proyecto",
-  "newProject": "Nuevo proyecto",
-  "createProject": "Crear proyecto",
-  "projectName": "Nombre del proyecto",
-  "cancel": "Cancelar",
-  "delete": "Eliminar",
-  "website": "Sitio web",
-  "contact": "Contacto",
+  "general": {
+    "project": "Proyecto",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "create": "Crear",
+    "upload": "Subir",
+    "website": "Sitio web",
+    "contact": "Contacto"
+  },
+  "myProjects": {
+    "myProjects": "Mis proyectos",
+    "newProject": "Nuevo proyecto",
+    "createProject": "Crear proyecto",
+    "projectName": "Nombre del proyecto",
+    "startEmptyProject": "Comenzar proyecto vacío",
+    "startProjectFromGTFS": "Comenzar proyecto a partir de un archivo GTFS"
+  },
   "projectMenu": {
     "deleteModalTitle": "Eliminar proyecto",
     "deleteModalMessage": "¿Está seguro de eliminar el proyecto? esta acción es irreversible."

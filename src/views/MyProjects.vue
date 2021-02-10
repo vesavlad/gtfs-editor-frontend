@@ -1,8 +1,8 @@
 <template>
   <div class="dashboard container">
     <div class="header">
-      <h1>{{ $t('myProjects')}}</h1>
-      <button class="btn" @click="project.create=true"><span>{{ $t('newProject') }}</span><i class="material-icons">add</i></button>
+      <h1>{{ $t('myProjects.myProjects')}}</h1>
+      <button class="btn" @click="project.create=true"><span>{{ $t('myProjects.newProject') }}</span><i class="material-icons">add</i></button>
     </div>
     <section class='content'>
       <div class="projects">
@@ -12,20 +12,20 @@
     <BaseModal v-if="project.create" @close="project.create=false;project.config.errors={}" :classes="['modal-new-project']">
       <template v-slot:m-content>
         <div class="modal-new-header">
-          <h2>{{ $t('createProject') }}</h2>
-          <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('projectName')" :class="{error: project.config.errors.name }" v-tooltip="{ theme: 'error-tooltip', content: project.config.errors.name?project.config.errors.name[0]:'', shown: project.config.errors.name !== undefined }"/>
+          <h2>{{ $t('myProjects.createProject') }}</h2>
+          <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('myProjects.projectName')" :class="{error: project.config.errors.name }" v-tooltip="{ theme: 'error-tooltip', content: project.config.errors.name?project.config.errors.name[0]:'', shown: project.config.errors.name !== undefined }"/>
         </div>
         <div class="content grid g2">
           <div class="new-box">
             <img src="@/assets/img/new-scratch.svg" alt="New from scratch image"/>
-            <p>Start a new project from scratch</p>
-            <button class="btn" @click="createProject"><span>Start</span></button>
+            <p>{{ $t('myProjects.startEmptyProject') }}</p>
+            <button class="btn" @click="createProject"><span>{{ $t('general.create') }}</span></button>
           </div>
           <div class="new-box">
             <img src="@/assets/img/new-file.svg" alt="New from scratch image"/>
-            <p>Start a new project from a GTFS file</p>
+            <p>{{ $t('myProjects.startProjectFromGTFS') }}</p>
             <!-- agregar logica para subir archivo al crear un proyecto -->
-            <button class="btn"><span>Upload</span><i class="material-icons">file_upload</i></button>
+            <button class="btn"><span>{{ $t('general.upload') }}</span><i class="material-icons">file_upload</i></button>
           </div>
         </div>
       </template>
