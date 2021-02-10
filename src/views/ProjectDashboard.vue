@@ -59,11 +59,11 @@
                 <div class="grid g2">
                   <div>
                     <h5>{{ $t('projectDashboard.contactURL')}}</h5>
-                    <span>Calama</span>
+                    <span>{{ project.feedinfo?project.feedinfo.feed_contact_url:'' }}</span>
                   </div>
                   <div>
                     <h5>{{ $t('projectDashboard.contactEmail')}}</h5>
-                    <span>Calama</span>
+                    <span>{{ project.feedinfo?project.feedinfo.feed_contact_email:'' }}</span>
                   </div>
                 </div>
               </div>
@@ -133,7 +133,7 @@
       <p slot="content" v-html="modalContent"></p>
     </Modal>
     <InputDataModal v-if="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo" @removeError="removeMessageError"
-      :title="feedInfo.config.title" :link="feedInfo.config.link" :fields="feedInfo.config.fields" :data="project.feedinfo" :errors="feedInfo.config.errors">
+      :title="feedInfo.config.title" :link="feedInfo.config.link" :fields="feedInfo.config.fields" :data="project.feedinfo?project.feedinfo:{}" :errors="feedInfo.config.errors">
     </InputDataModal>
   </div>
 </template>
@@ -268,6 +268,18 @@
               required: true,
             },
             {
+              label: "Contact URL",
+              name: "feed_contact_url",
+              type: "url",
+              required: false,
+            },
+            {
+              label: "Contact Email",
+              name: "feed_contact_email",
+              type: "text",
+              required: false,
+            },
+            {
               label: "ID",
               name: "feed_id",
               type: "text",
@@ -361,7 +373,7 @@
         });
       },
       saveFeedInfo(feedInfoData) {
-        let method = this.project.feedinfo.id ? feedInfoAPI.update : feedInfoAPI.create;
+        let method = this.project.feedinfo && this.project.feedinfo.id ? feedInfoAPI.update : feedInfoAPI.create;
         method(this.$route.params.projectid, feedInfoData).then((response) => {
           this.project.feedinfo = response.data;
           this.feedInfo.edit = false;
