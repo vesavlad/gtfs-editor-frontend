@@ -13,6 +13,7 @@
 import BaseMenuBox from '@/components/menuBox/BaseMenuBox.vue'
 import Enums from '@/utils/enums.js'
 import MessageModal from '@/components/MessageModal.vue'
+import ProjectsAPI from '@/api/projects.api';
 
 export default {
   name: 'ProjectMenu',
@@ -24,6 +25,10 @@ export default {
     placement: {
       type: String,
       default: Enums.MenuBoxPlacement.UPPER_LEFT,
+    },
+    projectId: {
+      type: [String, Number],
+      required: true
     }
   },
   data() {
@@ -43,11 +48,12 @@ export default {
   },
   methods: {
     deleteProject() {
-      this.showConfirmationModal = false;
-      console.log("delete project");
-      if (this.$route.name !== 'myprojects') {
-        this.$router.push({name: 'myprojects'});
-      }
+      ProjectsAPI.deleteProject(this.projectId).then(() => {
+        this.showConfirmationModal = false;
+        this.$emit('project-deleted', this.projectId);
+      }).catch(error => {
+        console.error(error.response.data);
+      });
     }
   }
 }

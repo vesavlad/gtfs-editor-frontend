@@ -2,13 +2,13 @@ import httpClient from './httpClient';
 
 const BASE_END_POINT = '/api'
 const END_POINT = `${BASE_END_POINT}/projects/`;
-const getAllProjects = () => {
-    return httpClient.get(`${END_POINT}?no_page`);
-}
+const getAllProjects = () => httpClient.get(`${END_POINT}?no_page`);
 
 const createProject = (name) => httpClient.post(`${END_POINT}`, {name});
 const getProjectDetail = (id) => httpClient.get(`${END_POINT}${id}/`);
 const updateProject = (id, data) => httpClient.put(`${END_POINT}${id}/`, data);
+const deleteProject = (id) => httpClient.delete(`${END_POINT}${id}/`);
+
 const runGTFSValidation = (id) => httpClient.post(`${END_POINT}${id}/run_gtfs_validation/`);
 const cancelGTFSValidation = (id) => httpClient.post(`${END_POINT}${id}/cancel_gtfs_validation/`);
 const buildGTFS = (id) => httpClient.post(`${END_POINT}${id}/create_gtfs_file/`);
@@ -29,6 +29,7 @@ export default {
     createProject,
     getProjectDetail,
     updateProject,
+    deleteProject,
     runGTFSValidation,
     cancelGTFSValidation,
     buildGTFS,

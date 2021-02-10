@@ -6,7 +6,7 @@
     </div>
     <section class='content'>
       <div class="projects">
-        <ProjectCard v-for="project in projects" v-bind:key="project.project_id" :project="project"></ProjectCard>
+        <ProjectCard v-for="project in projects" v-bind:key="project.project_id" :project="project" @project-deleted="projectDeleted"></ProjectCard>
       </div>
     </section>
     <BaseModal v-if="project.create" @close="project.create=false;project.config.errors={}" :classes="['modal-new-project']">
@@ -69,6 +69,9 @@ export default {
         this.project.config.errors = error.response.data;
       });
     },
+    projectDeleted(projectId) {
+      this.projects = this.projects.filter(project => project.project_id !== projectId);
+    }
   },
   beforeRouteEnter (to, from, next) {
     projectsAPI.getAllProjects().then(response => {

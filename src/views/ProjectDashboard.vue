@@ -11,7 +11,7 @@
         <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
         <button class="btn icon flat" @click="showMenuBox=!showMenuBox">
           <i class="material-icons">more_vert</i>
-          <ProjectMenu v-if="showMenuBox" placement="upperRight"></ProjectMenu>
+          <ProjectMenu v-if="showMenuBox" placement="upperRight" :projectId="project.project_id" @project-deleted="$router.push({name: 'myprojects'})"></ProjectMenu>
         </button>
       </div>
     </div>

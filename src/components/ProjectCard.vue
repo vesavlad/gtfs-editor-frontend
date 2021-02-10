@@ -8,7 +8,7 @@
         <h2>{{project.name}}</h2>
         <button class="btn icon flat btn-options" @click.stop.prevent="showMenuBox=!showMenuBox">
           <i class="material-icons">more_vert</i>
-          <ProjectMenu v-if="showMenuBox"></ProjectMenu>
+          <ProjectMenu v-if="showMenuBox" :projectId="project.project_id" v-on="$listeners"></ProjectMenu>
         </button>
       </div>
       <div class="grid project-details">
