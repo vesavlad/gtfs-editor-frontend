@@ -8,7 +8,7 @@
         <h2>{{project.name}}</h2>
         <button class="btn icon flat btn-options" @click.stop.prevent="showMenuBox=!showMenuBox">
           <i class="material-icons">more_vert</i>
-          <MenuBox v-if="showMenuBox"></MenuBox>
+          <ProjectMenu v-if="showMenuBox"></ProjectMenu>
         </button>
       </div>
       <div class="grid project-details">
@@ -36,14 +36,14 @@
   import { DateTime } from 'luxon';
   import PillBase from "./PillBase";
   import EnvelopeMap from "./EnvelopeMap";
-  import MenuBox from "@/components/MenuBox";
+  import ProjectMenu from "@/components/menuBox/ProjectMenu.vue";
 
   export default {
     name: 'ProjectCard',
     components: {
       PillBase,
       EnvelopeMap,
-      MenuBox
+      ProjectMenu
     },
     props: {
       project:{

@@ -6,8 +6,13 @@
   "createProject": "Crear proyecto",
   "projectName": "Nombre del proyecto",
   "cancel": "Cancelar",
+  "delete": "Eliminar",
   "website": "Sitio web",
   "contact": "Contacto",
+  "projectMenu": {
+    "deleteModalTitle": "Eliminar proyecto",
+    "deleteModalMessage": "¿Está seguro de eliminar el proyecto? esta acción es irreversible."
+  },
   "projectCard": {
     "lastChange": "Último cambio",
     "errors": "Errores",

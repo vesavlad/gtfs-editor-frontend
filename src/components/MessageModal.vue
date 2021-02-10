@@ -1,6 +1,6 @@
 <template>
   <BaseModal>
-    <template slot:m-content>
+    <template v-slot:m-content>
       <div class="m-header">
         <div class="message-title">
           <i class="material-icons">{{ icon }}</i>
@@ -15,7 +15,7 @@
       </div>
       <div class="m-footer">
         <div class="option-buttons">
-          <button v-if="showCancelButton" class="btn flat" @click="$emit('cancel')"><span>Cancel</span></button>
+          <button v-if="showCancelButton" class="btn flat" @click="$emit('cancel')"><span>{{ $t('cancel') }}</span></button>
           <button class="btn" :class="buttonClasses" @click="$emit('ok')"><span>{{ okButtonLabel }}</span></button>
         </div>
       </div>
@@ -25,6 +25,7 @@
 
 <script>
 import BaseModal from '@/components/BaseModal.vue'
+import Enums from '@/utils/enums.js'
 
 export default {
   name: 'MessageModal',
@@ -52,7 +53,7 @@ export default {
       type: String,
       required: true,
       validator(value) {
-        return ['error', 'warning'].indexOf(value) !== -1;
+        return [Enums.MessageModalType.ERROR, Enums.MessageModalType.WARNING].indexOf(value) !== -1;
       }
     }
   },
@@ -60,10 +61,10 @@ export default {
     icon() {
       let icon = null;
       switch(this.type) {
-        case "error":
+        case Enums.MessageModalType.ERROR:
           icon = "error_outline";
           break;
-        case "warning":
+        case Enums.MessageModalType.WARNING:
           icon = "warning";
           break; 
       }

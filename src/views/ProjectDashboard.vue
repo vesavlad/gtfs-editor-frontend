@@ -11,7 +11,7 @@
         <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
         <button class="btn icon flat" @click="showMenuBox=!showMenuBox">
           <i class="material-icons">more_vert</i>
-          <MenuBox v-if="showMenuBox" placement="upperRight"></MenuBox>
+          <ProjectMenu v-if="showMenuBox" placement="upperRight"></ProjectMenu>
         </button>
       </div>
     </div>
@@ -148,12 +148,12 @@
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
   import DataCard from "@/components/DataCard";
   import Enums from '@/utils/enums';
-  import MenuBox from "@/components/MenuBox";
+  import ProjectMenu from "@/components/menuBox/ProjectMenu.vue";
 
   export default {
     name: 'ProjectDashboard',
     components: {
-      MenuBox,
+      ProjectMenu,
       DataCard,
       Modal,
       InputDataModal,

@@ -6,8 +6,13 @@
   "createProject": "Create project",
   "projectName": "Project name",
   "cancel": "Cancel",
+  "delete": "Delete",
   "website": "Website",
   "contact": "Contact",
+  "projectMenu": {
+    "deleteModalTitle": "Delete Project",
+    "deleteModalMessage": "Are you sure you want to delete project? this action cannot be undone."
+  },
   "projectCard": {
     "lastChange": "Last change",
     "errors": "Errors",
