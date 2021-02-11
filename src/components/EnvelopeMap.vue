@@ -31,6 +31,7 @@
     data() {
       return {
         map: null,
+        mapIsLoading: false
       }
     },
     methods: {
@@ -50,7 +51,8 @@
         return url;
       },
       enableMapInteraction() {
-        if (this.enableInteraction) {
+        if (this.enableInteraction && !this.mapIsLoading && this.map===null) {
+          this.mapIsLoading = true;
           let center = this.project.envelope?this.project.envelope.geometry.coordinates[0][0]:[0,0];
           this.map = new mapboxgl.Map({
             container: this.$refs.mapContainer,
@@ -62,6 +64,7 @@
             this.addLayers();
             this.setCoordinates();
             this.$emit('load');
+            this.mapIsLoading = false;
           });
         }
       },
