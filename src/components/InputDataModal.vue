@@ -24,7 +24,7 @@
         </div>
         <div class="option-buttons">
           <button class="btn flat" @click="$emit('cancel')"><span>Cancel</span></button>
-          <button class="btn green" @click="$emit('save', localData)"><span>Save</span></button>
+          <button class="btn green" @click="$emit('save', nonNullItems)"><span>Save</span></button>
         </div>
       </div>
     </template>
@@ -73,6 +73,10 @@ export default {
   computed: {
     ownClasses() {
       return ['input-data'].concat(this.classes);
+    },
+    nonNullItems() {
+      console.log(this.localData);
+      return this.localData
     }
   },
   methods: {

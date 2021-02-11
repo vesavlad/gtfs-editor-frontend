@@ -1,5 +1,6 @@
 <template>
-  <BaseMenu :placement="placement" :options="options" v-on="$listeners" ></BaseMenu>
+  <BaseMenu :placement="placement" :options="options" v-on="$listeners"
+            @delete="$store.commit('setShowDeletionModal', true)"></BaseMenu>
 </template>
 
 <script>
@@ -15,6 +16,10 @@ export default {
     placement: {
       type: String,
       default: Enums.MenuBoxPlacement.UPPER_LEFT,
+    },
+    project: {
+      type: Object,
+      required: true
     }
   },
   data() {
@@ -29,6 +34,9 @@ export default {
         }
       ]
     }
+  },
+  mounted() {
+    this.$store.commit('setCurrentProject', this.project);
   }
 }
 </script>

@@ -6,7 +6,7 @@
     </div>
     <section class='content'>
       <div class="projects">
-        <ProjectCard v-for="project in projects" v-bind:key="project.project_id" :project="project" @project-deleted="projectDeleted"></ProjectCard>
+        <ProjectCard v-for="project in projectList" v-bind:key="project.project_id" :project="project"></ProjectCard>
       </div>
     </section>
     <BaseModal v-if="project.create" @close="project.create=false;project.config.errors={}" :classes="['modal-new-project']">
@@ -30,23 +30,26 @@
         </div>
       </template>
     </BaseModal>
+    <DeletionModal></DeletionModal>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import BaseModal from "@/components/BaseModal.vue";
 import projectsAPI from '@/api/projects.api';
 import ProjectCard from "../components/ProjectCard";
+import DeletionModal from "@/components/project/DeletionModal";
 
 export default {
   name: 'MyProjects',
   components: {
     ProjectCard,
-    BaseModal
+    BaseModal,
+    DeletionModal
   },
   data() {
     return {
-      projects: [],
       project: {
         create: false,
         config: {
@@ -56,9 +59,12 @@ export default {
       projectName: null
     }
   },
+  computed: mapState([
+    'projectList'
+  ]),
   methods: {
-    setData(projects){
-      this.projects = projects
+    setData(projects) {
+      this.$store.commit('setProjectList', projects);
     },
     createProject() {
       projectsAPI.createProject(this.projectName).then((response) => {
@@ -68,9 +74,6 @@ export default {
       .catch((error) => {
         this.project.config.errors = error.response.data;
       });
-    },
-    projectDeleted(projectId) {
-      this.projects = this.projects.filter(project => project.project_id !== projectId);
     }
   },
   beforeRouteEnter (to, from, next) {
