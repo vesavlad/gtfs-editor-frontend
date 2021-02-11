@@ -11,7 +11,7 @@
         <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
         <button class="btn icon flat" @click="showMenu=!showMenu">
           <i class="material-icons">more_vert</i>
-          <ProjectMenu v-if="showMenu" placement="upperRight" :projectId="project.project_id" @project-deleted="$router.push({name: 'myprojects'})" @close="showMenu=false"></ProjectMenu>
+          <ProjectMenu v-if="showMenu" placement="upperRight" :project="project" @project-deleted="$router.push({name: 'myprojects'})" @close="showMenu=false"></ProjectMenu>
         </button>
       </div>
     </div>
@@ -135,6 +135,7 @@
     <InputDataModal v-if="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo" @removeError="removeMessageError"
       :title="feedInfo.config.title" :link="feedInfo.config.link" :fields="feedInfo.config.fields" :data="project.feedinfo?project.feedinfo:{}" :errors="feedInfo.config.errors">
     </InputDataModal>
+    <DeletionModal></DeletionModal>
   </div>
 </template>
 
@@ -149,6 +150,7 @@
   import DataCard from "@/components/DataCard";
   import Enums from '@/utils/enums';
   import ProjectMenu from "@/components/project/ProjectMenu.vue";
+  import DeletionModal from "@/components/project/DeletionModal";
 
   export default {
     name: 'ProjectDashboard',
@@ -158,6 +160,7 @@
       Modal,
       InputDataModal,
       EnvelopeMap,
+      DeletionModal
     },
     data() {
       let data = [{
