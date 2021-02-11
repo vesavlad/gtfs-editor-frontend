@@ -78,7 +78,7 @@
             <div class="flex between">
               <div>
                 <div class="small">{{ $t('projectDashboard.gtfsBuilder.lastBuild')}}</div>
-                <div>{{ project.gtfs_file_updated_at?(new Date(project.gtfs_file_updated_at)).toLocaleString():'Never' }}</div>
+                <div>{{ project.gtfs_file_updated_at?lastBuildExecution:$t('general.never') }}</div>
               </div>
               <div>
                 <button class="btn" @click="buildGTFSButtonAction"><span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span></button>
@@ -118,13 +118,13 @@
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsRequiredData')}}</h2>
         <div class="grid-data required">
-          <DataCard v-for="file in dataTables.slice(0, 9)" v-bind:key="file.id" :projectId="$route.params.projectid" :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
+          <DataCard v-for="file in data.slice(0, 9)" v-bind:key="file.id" :projectId="$route.params.projectid" :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
         </div>
       </div>
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsOptionalData')}}</h2>
         <div class="grid-data optional">
-          <DataCard v-for="file in dataTables.slice(9)" v-bind:key="file.id" :projectId="$route.params.projectid" :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
+          <DataCard v-for="file in data.slice(9)" v-bind:key="file.id" :projectId="$route.params.projectid" :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state" :errorNumber="file.errorNumber" :warningNumber="file.warningNumber" :message="$t(file.message)"></DataCard>
         </div>
       </div>
     </div>
@@ -305,8 +305,8 @@
       lastModification() {
         return DateTime.fromISO(this.project.last_modification).toRelative({locale: this.$i18n.locale });
       },
-      dataTables() {
-        return this.data;
+      lastBuildExecution() {
+        return DateTime.fromISO(this.project.gtfs_file_updated_at).toRelative({locale: this.$i18n.locale });
       }
     },
     methods: {
