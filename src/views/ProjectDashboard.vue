@@ -39,30 +39,30 @@
               </div>
               <div class="project-info-details">
                 <div>
-                  <h5>{{ $t('projectDashboard.version')}}</h5>
+                  <h5>{{ $t('projectDashboard.feedInfo.version')}}</h5>
                   <span>{{ project.feedinfo?project.feedinfo.feed_version:'' }}</span>
                 </div>
                 <div>
-                  <h5>{{ $t('projectDashboard.feedID')}}</h5>
+                  <h5>{{ $t('projectDashboard.feedInfo.feedID')}}</h5>
                   <span>{{ project.feedinfo?project.feedinfo.feed_id:'' }}</span>
                 </div>
                 <div class="grid g2">
                   <div>
-                    <h5>{{ $t('projectDashboard.startDate')}}</h5>
+                    <h5>{{ $t('projectDashboard.feedInfo.startDate')}}</h5>
                     <span>{{ project.feedinfo?project.feedinfo.feed_start_date:'' }}</span>
                   </div>
                   <div>
-                    <h5>{{ $t('projectDashboard.endDate')}}</h5>
+                    <h5>{{ $t('projectDashboard.feedInfo.endDate')}}</h5>
                     <span>{{ project.feedinfo?project.feedinfo.feed_end_date:'' }}</span>
                   </div>
                 </div>
                 <div class="grid g2">
                   <div>
-                    <h5>{{ $t('projectDashboard.contactURL')}}</h5>
+                    <h5>{{ $t('projectDashboard.feedInfo.contactURL')}}</h5>
                     <span>{{ project.feedinfo?project.feedinfo.feed_contact_url:'' }}</span>
                   </div>
                   <div>
-                    <h5>{{ $t('projectDashboard.contactEmail')}}</h5>
+                    <h5>{{ $t('projectDashboard.feedInfo.contactEmail')}}</h5>
                     <span>{{ project.feedinfo?project.feedinfo.feed_contact_email:'' }}</span>
                   </div>
                 </div>
@@ -72,26 +72,26 @@
         </div>
         <div class="card summary">
           <div class="card-title">
-            <h4>{{ $t('projectDashboard.summary')}}</h4>
+            <h4>{{ $t('projectDashboard.gtfsBuilder.title')}}</h4>
           </div>
           <div class="card-content">
             <div class="flex between">
               <div>
-                <div class="small">{{ $t('projectDashboard.lastBuild')}}</div>
+                <div class="small">{{ $t('projectDashboard.gtfsBuilder.lastBuild')}}</div>
                 <div>{{ project.gtfs_file_updated_at?(new Date(project.gtfs_file_updated_at)).toLocaleString():'Never' }}</div>
               </div>
               <div>
-                <button class="btn" @click="buildGTFSButtonAction"><span>Run builder</span></button>
+                <button class="btn" @click="buildGTFSButtonAction"><span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span></button>
               </div>
             </div>
           </div>
           <ul class="list-summary">
             <li>
-              <span class="lsh">{{ $t('projectDashboard.buildStatus')}}</span>
+              <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.buildStatus')}}</span>
               <span class="lst">{{ project.gtfs_creation_status?project.gtfs_creation_status:'' }} {{ project.gtfsvalidation?project.gtfsvalidation.status:'' }}</span>
             </li>
             <li>
-              <span class="lsh">{{ $t('projectDashboard.buildDuration')}}</span>
+              <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.buildDuration')}}</span>
               <span class="lst">{{ project.gtfs_creation_duration?project.gtfs_creation_duration:'' }} {{ project.gtfsvalidation?project.gtfsvalidation.duration:'' }}</span>
             </li>
             <!--          <li>
@@ -99,19 +99,19 @@
                         <span class="lst">{{ project.gtfsvalidation?(new Date(project.gtfsvalidation.ran_at)).toLocaleString():'' }}</span>
                       </li>-->
             <li>
-              <span class="lsh">{{ $t('projectDashboard.errors')}}</span>
+              <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.errors')}}</span>
               <span class="lst">{{ project.gtfsvalidation?project.gtfsvalidation.error_number:'' }}</span>
             </li>
             <li>
-              <span class="lsh">{{ $t('projectDashboard.warnings')}}</span>
+              <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.warnings')}}</span>
               <span class="lst">{{ project.gtfsvalidation?project.gtfsvalidation.warning_number:'' }}</span>
             </li>
           </ul>
           <div class="card-content grid end">
             <button class="btn min warning"
                     :disabled="project.gtfsvalidation && ['finished', 'error'].indexOf(project.gtfsvalidation.status)<0"
-                    @click="seeGTFSValidationResults"><span>{{ $t('projectDashboard.viewErrors')}}</span><i class="material-icons">error_outline</i></button>
-            <button class="btn min green" @click="dowloadGTFS"><span>{{ $t('projectDashboard.download')}}</span><i class="material-icons">save_alt</i></button>
+                    @click="seeGTFSValidationResults"><span>{{ $t('projectDashboard.gtfsBuilder.viewErrors')}}</span><i class="material-icons">error_outline</i></button>
+            <button class="btn min green" @click="dowloadGTFS"><span>{{ $t('projectDashboard.gtfsBuilder.download')}}</span><i class="material-icons">save_alt</i></button>
           </div>
         </div>
       </div>
