@@ -15,7 +15,7 @@
       </div>
       <div class="m-footer">
         <div class="option-buttons">
-          <button v-if="showCancelButton" class="btn flat" @click="$emit('cancel')"><span>{{ $t('cancel') }}</span></button>
+          <button v-if="showCancelButton" class="btn flat" @click="$emit('cancel')"><span>{{ $t('general.cancel') }}</span></button>
           <button class="btn" :class="buttonClasses" @click="$emit('ok')"><span>{{ okButtonLabel }}</span></button>
         </div>
       </div>
