@@ -6,9 +6,9 @@
     <div class="card-content">
       <div class="grid title">
         <h2>{{project.name}}</h2>
-        <button class="btn icon flat btn-options" @click.stop.prevent="showMenuBox=!showMenuBox">
+        <button class="btn icon flat btn-options" @click.stop.prevent="showMenu=!showMenu">
           <i class="material-icons">more_vert</i>
-          <ProjectMenu v-if="showMenuBox" :projectId="project.project_id" v-on="$listeners"></ProjectMenu>
+          <ProjectMenu v-if="showMenu" :projectId="project.project_id" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
         </button>
       </div>
       <div class="grid project-details">
@@ -36,7 +36,7 @@
   import { DateTime } from 'luxon';
   import PillBase from "./PillBase";
   import EnvelopeMap from "./EnvelopeMap";
-  import ProjectMenu from "@/components/menuBox/ProjectMenu.vue";
+  import ProjectMenu from "@/components/project/ProjectMenu.vue";
 
   export default {
     name: 'ProjectCard',
@@ -53,12 +53,19 @@
     },
     data() {
       return {
-        showMenuBox: false
+        showMenu: false
       }
     },
     computed: {
       lastModification() {
         return DateTime.fromISO(this.project.last_modification).toRelative({locale: this.$i18n.locale });
+      }
+    },
+    watch: {
+      showMenu(newValue) {
+        if (newValue) {
+          this.$store.commit('setCurrentProject', this.project);
+        }
       }
     }
   }

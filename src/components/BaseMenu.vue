@@ -1,9 +1,9 @@
 <template>
-  <div class="menu-box card" :class="[boxClass]" @click.stop.prevent>
+  <div class="menu-box card" :class="[boxClass]" @click.stop.prevent v-on-clickaway="clickOutside">
     <ul>
       <li v-for="option in options" :key="option.name" class="menu-option" :class="option.classes.concat([option.isDisabled?'disabled':''])" @click="$emit(option.eventName)">
         <i class="material-icons">{{ option.icon }}</i>
-        <span>{{ $t(option.name) }}</span>
+        <span>{{ $t(option.label) }}</span>
       </li>
     </ul>
   </div>
@@ -11,9 +11,11 @@
 
 <script>
 import Enums from '@/utils/enums.js'
+import { mixin as clickaway } from 'vue-clickaway';
 
 export default {
-  name: 'BaseMenuBox',
+  name: 'BaseMenu',
+  mixins: [clickaway],
   props:{
     placement: {
       type: String,
@@ -26,7 +28,7 @@ export default {
       type: Array,
       required: true,
       validator(value) {
-        let properties = ['icon', 'name', 'eventName', 'isDisabled', 'classes'];
+        let properties = ['icon', 'label', 'eventName', 'isDisabled', 'classes'];
         for (let i = 0; i < properties.length; i++) {
           for (let j = 0; j < value.length; j++) {
             if (!Object.prototype.hasOwnProperty.call(value[j], properties[i])) {
@@ -47,6 +49,11 @@ export default {
         return  'upper-right';
       }
       return '';
+    }
+  },
+  methods: {
+    clickOutside() {
+      this.$emit('close');
     }
   }
 }

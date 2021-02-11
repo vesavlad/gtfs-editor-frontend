@@ -9,9 +9,9 @@
       </div>
       <div class="grid center">
         <span class="side-info">{{ $t('projectDashboard.lastChange')}}: {{ lastModification }}</span>
-        <button class="btn icon flat" @click="showMenuBox=!showMenuBox">
+        <button class="btn icon flat" @click="showMenu=!showMenu">
           <i class="material-icons">more_vert</i>
-          <ProjectMenu v-if="showMenuBox" placement="upperRight" :projectId="project.project_id" @project-deleted="$router.push({name: 'myprojects'})"></ProjectMenu>
+          <ProjectMenu v-if="showMenu" placement="upperRight" :projectId="project.project_id" @project-deleted="$router.push({name: 'myprojects'})" @close="showMenu=false"></ProjectMenu>
         </button>
       </div>
     </div>
@@ -148,7 +148,7 @@
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
   import DataCard from "@/components/DataCard";
   import Enums from '@/utils/enums';
-  import ProjectMenu from "@/components/menuBox/ProjectMenu.vue";
+  import ProjectMenu from "@/components/project/ProjectMenu.vue";
 
   export default {
     name: 'ProjectDashboard',
@@ -293,7 +293,7 @@
           gtfsvalidation: {}
         },
         data,
-        showMenuBox: false,
+        showMenu: false,
         showModal: false,
         modalContent: '',
       }
