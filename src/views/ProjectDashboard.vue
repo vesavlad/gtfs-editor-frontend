@@ -2,7 +2,7 @@
   <div class="ProjectDashboard container">
     <div class="header">
       <div class="grid center">
-        <input ref="projectName" v-model="project.name" :disabled="!projectName.edit" v-bind:class="{error: projectName.hasError}" v-tooltip="{ theme: 'error-tooltip', content: projectName.errorMessage, shown: projectName.hasError }" v-autowidth="{minWidth: '60px'}" />
+        <input ref="projectName" v-model="project.name" :disabled="!projectName.edit" v-bind:class="{error: projectName.hasError}" v-tooltip="{ theme: 'error-tooltip', content: projectName.errorMessage, shown: projectName.hasError }" v-autowidth="{minWidth: '60px', maxWidth: '800px'}" />
         <button v-if="!projectName.edit" @click="enableEditProjectName" class="btn icon flat"><i class="material-icons">edit</i></button>
         <button v-if="projectName.edit" @click="updateProjectName" class="btn icon flat green"><i class="material-icons">check</i></button>
         <button v-if="projectName.edit" @click="projectName.edit=false;project.name=projectName.oldValue;projectName.hasError=false" class="btn icon flat red"><i class="material-icons">close</i></button>
@@ -223,7 +223,7 @@
       ];
       return {
         projectName: {
-          HasError: false,
+          hasError: false,
           errorMessage: '',
           oldValue: null,
           edit: false,
