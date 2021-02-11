@@ -8,7 +8,7 @@
         <h2>{{project.name}}</h2>
         <button class="btn icon flat btn-options" @click.stop.prevent="showMenu=!showMenu">
           <i class="material-icons">more_vert</i>
-          <ProjectMenu v-if="showMenu" :projectId="project.project_id" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
+          <ProjectMenu v-if="showMenu" :project="project" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
         </button>
       </div>
       <div class="grid project-details">
@@ -59,13 +59,6 @@
     computed: {
       lastModification() {
         return DateTime.fromISO(this.project.last_modification).toRelative({locale: this.$i18n.locale });
-      }
-    },
-    watch: {
-      showMenu(newValue) {
-        if (newValue) {
-          this.$store.commit('setCurrentProject', this.project);
-        }
       }
     }
   }
