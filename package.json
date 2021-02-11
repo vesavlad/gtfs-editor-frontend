@@ -33,6 +33,7 @@
     "vis-network": "^8.5.2",
     "vue": "^2.6.12",
     "vue-2-breadcrumbs": "^0.7.9",
+    "vue-clickaway": "^2.2.2",
     "vue-datatables-net": "git+https://github.com/niiknow/vue-datatables-net.git",
     "vue-echarts": "^5.0.0-beta.0",
     "vue-i18n": "^8.17.3",
