@@ -1,7 +1,7 @@
 <template>
-  <div class="menu-box card" :class="[boxClass]" @click.stop.prevent v-on-clickaway="clickOutside">
+  <div class="menu-box card" :class="[boxClass]" @click.stop.prevent v-on-clickaway="raiseCloseEvent">
     <ul>
-      <li v-for="option in options" :key="option.name" class="menu-option" :class="option.classes.concat([option.isDisabled?'disabled':''])" @click="$emit(option.eventName)">
+      <li v-for="option in options" :key="option.name" class="menu-option" :class="option.classes.concat([option.isDisabled?'disabled':''])" @click="$emit(option.eventName);raiseCloseEvent()">
         <i class="material-icons">{{ option.icon }}</i>
         <span>{{ $t(option.label) }}</span>
       </li>
@@ -52,7 +52,7 @@ export default {
     }
   },
   methods: {
-    clickOutside() {
+    raiseCloseEvent() {
       this.$emit('close');
     }
   }
