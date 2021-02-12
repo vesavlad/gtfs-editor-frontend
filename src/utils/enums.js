@@ -11,6 +11,14 @@ const Enums = {
   MessageModalType: {
     ERROR: 'error',
     WARNING: 'warning'
+  },
+  BuildAndValidateGTFS: {
+    QUEUED: 'queued',
+    BUILDING: 'building',
+    VALIDATING: 'validating',
+    FINISHED: 'finished',
+    ERROR: 'error',
+    CANCELED: 'canceled'
   }
 }
 

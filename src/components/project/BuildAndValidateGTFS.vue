@@ -10,8 +10,13 @@
           <div>{{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}</div>
         </div>
         <div>
-          <button class="btn" @click="buildGTFSButtonAction">
-            <span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span></button>
+          <button v-if="[status.FINISHED, status.CANCELED, status.ERROR].indexOf(project.gtfs_creation_status)>-1"
+                  class="btn" @click="buildGTFS">
+            <span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span>
+          </button>
+          <button v-else class="btn" @click="cancelBuildGTFS">
+            <span><i class='material-icons'>sync</i> {{ $t('projectDashboard.gtfsBuilder.cancelButtonLabel') }}</span>
+          </button>
         </div>
       </div>
     </div>
@@ -55,6 +60,7 @@
 import BaseModal from "@/components/BaseModal";
 import projectsAPI from "@/api/projects.api";
 import {DateTime} from "luxon";
+import Enums from "@/utils/enums";
 
 export default {
   name: 'BuildAndValidateGTFS',
@@ -68,7 +74,8 @@ export default {
   data() {
     return {
       showModal: false,
-      interval: null
+      interval: null,
+      status: Enums.BuildAndValidateGTFS
     }
   },
   computed: {
@@ -88,7 +95,7 @@ export default {
         alert(error.response.data);
       });
     },
-    buildGTFSButtonAction() {
+    buildGTFS() {
       projectsAPI.buildAndValidateGTFS(this.project.project_id).then(response => {
         this.$emit('update-project', response.data);
         this.runPeriodicCall();
@@ -96,7 +103,7 @@ export default {
         alert(error.response.data);
       });
     },
-    cancelGTFSValidation() {
+    cancelBuildGTFS() {
       projectsAPI.cancelBuildAndValidateGTFS(this.project.project_id).then(response => {
         this.$emit('update-project', response.data);
       }).catch(error => {
@@ -108,7 +115,7 @@ export default {
       this.interval = setInterval(() => {
         console.log('updated gtfs validation status...');
         projectsAPI.getProjectDetail(this.project.project_id).then(response => {
-          if (['finished', 'error', 'canceled'].indexOf(response.data.gtfs_creation_status) > -1) {
+          if ([this.status.FINISHED, this.status.ERROR, this.status.CANCELED].indexOf(response.data.gtfs_creation_status) > -1) {
             clearInterval(this.interval);
           }
           this.$emit('update-project', response.data);
