@@ -70,50 +70,7 @@
             </div>
           </div>
         </div>
-        <div class="card summary">
-          <div class="card-title">
-            <h4>{{ $t('projectDashboard.gtfsBuilder.title')}}</h4>
-          </div>
-          <div class="card-content">
-            <div class="flex between">
-              <div>
-                <div class="small">{{ $t('projectDashboard.gtfsBuilder.lastBuild')}}</div>
-                <div>{{ project.gtfs_file_updated_at?lastBuildExecution:$t('general.never') }}</div>
-              </div>
-              <div>
-                <button class="btn" @click="buildGTFSButtonAction"><span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span></button>
-              </div>
-            </div>
-          </div>
-          <ul class="list-summary">
-            <li>
-              <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.buildStatus')}}</span>
-              <span class="lst">{{ project.gtfs_creation_status?project.gtfs_creation_status:'' }} {{ project.gtfsvalidation?project.gtfsvalidation.status:'' }}</span>
-            </li>
-            <li>
-              <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.buildDuration')}}</span>
-              <span class="lst">{{ project.gtfs_creation_duration?project.gtfs_creation_duration:'' }} {{ project.gtfsvalidation?project.gtfsvalidation.duration:'' }}</span>
-            </li>
-            <!--          <li>
-                        <span class="lsh">Execution</span>
-                        <span class="lst">{{ project.gtfsvalidation?(new Date(project.gtfsvalidation.ran_at)).toLocaleString():'' }}</span>
-                      </li>-->
-            <li>
-              <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.errors')}}</span>
-              <span class="lst">{{ project.gtfsvalidation?project.gtfsvalidation.error_number:'' }}</span>
-            </li>
-            <li>
-              <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.warnings')}}</span>
-              <span class="lst">{{ project.gtfsvalidation?project.gtfsvalidation.warning_number:'' }}</span>
-            </li>
-          </ul>
-          <div class="card-content grid end">
-            <button class="btn min warning"
-                    :disabled="project.gtfsvalidation && ['finished', 'error'].indexOf(project.gtfsvalidation.status)<0"
-                    @click="seeGTFSValidationResults"><span>{{ $t('projectDashboard.gtfsBuilder.viewErrors')}}</span><i class="material-icons">error_outline</i></button>
-            <button class="btn min green" @click="dowloadGTFS"><span>{{ $t('projectDashboard.gtfsBuilder.download')}}</span><i class="material-icons">save_alt</i></button>
-          </div>
-        </div>
+        <BuildAndValidateGTFS :project="project" @update-project="updateProjectStatus"></BuildAndValidateGTFS>
       </div>
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsRequiredData')}}</h2>
@@ -128,10 +85,6 @@
         </div>
       </div>
     </div>
-    <Modal v-if="showModal" @cancel="showModal = false" @close="showModal = false" @ok="showModal = false"
-      :showCancelButton="false" :modalClasses="['warning']">
-      <p slot="content" v-html="modalContent"></p>
-    </Modal>
     <InputDataModal v-if="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo" @removeError="removeMessageError"
       :title="feedInfo.config.title" :link="feedInfo.config.link" :fields="feedInfo.config.fields" :data="project.feedinfo?project.feedinfo:{}" :errors="feedInfo.config.errors">
     </InputDataModal>
@@ -144,20 +97,20 @@
   import projectsAPI from '@/api/projects.api';
   import tablesAPI from '@/api/tables.api';
   import feedInfoAPI from '@/api/feedinfo.api';
-  import Modal from '@/components/Modal.vue';
   import InputDataModal from '@/components/InputDataModal.vue';
   import EnvelopeMap from '@/components/EnvelopeMap.vue';
   import DataCard from "@/components/DataCard";
   import Enums from '@/utils/enums';
   import ProjectMenu from "@/components/project/ProjectMenu.vue";
   import DeletionModal from "@/components/project/DeletionModal";
+  import BuildAndValidateGTFS from "@/components/project/BuildAndValidateGTFS";
 
   export default {
     name: 'ProjectDashboard',
     components: {
+      BuildAndValidateGTFS,
       ProjectMenu,
       DataCard,
-      Modal,
       InputDataModal,
       EnvelopeMap,
       DeletionModal
@@ -297,16 +250,11 @@
         },
         data,
         showMenu: false,
-        showModal: false,
-        modalContent: '',
       }
     },
     computed: {
       lastModification() {
         return DateTime.fromISO(this.project.last_modification).toRelative({locale: this.$i18n.locale });
-      },
-      lastBuildExecution() {
-        return DateTime.fromISO(this.project.gtfs_file_updated_at).toRelative({locale: this.$i18n.locale });
       }
     },
     methods: {
@@ -388,56 +336,14 @@
       removeMessageError(fieldName) {
         this.$delete(this.feedInfo.config.errors, fieldName);
       },
-      dowloadGTFS() {
-        projectsAPI.downloadGTFS(this.$route.params.projectid).then(response => {
-          let blob = new Blob([response.data], {
-            type: response.headers['content-type']
-          });
-          let url = window.URL.createObjectURL(blob);
-          window.open(url);
-        }).catch(error => {
-          alert(error.response.data);
-        });
-      },
-      buildGTFSButtonAction() {
-        projectsAPI.buildGTFS(this.$route.params.projectid).then(response => {
-          this.project.gtfs_file_updated_at = response.data.gtfs_file_updated_at;
-          this.project.gtfs_creation_status = response.data.gtfs_creation_status;
-          this.project.gtfs_creation_duration = response.data.gtfs_creation_duration;
-          this.runPeriodicCall();
-        }).catch(error => {
-          alert(error.response.data);
-        });
-      },
-      seeGTFSValidationResults() {
-        let content = this.project.gtfsvalidation.message;
-        this.modalContent = '<pre>' + content + '</pre>';
-        this.showModal = true;
-      },
-      validateButtonAction() {
-        let status = this.project.gtfsvalidation ? this.project.gtfsvalidation.status : null;
-        if (['queued', 'processing'].indexOf(status) >= 0) {
-          this.cancelGTFSValidation();
-        } else {
-          this.runGTFSValidation();
-        }
-      },
-      runGTFSValidation() {
-        projectsAPI.runGTFSValidation(this.$route.params.projectid).then(response => {
-          this.project.gtfsvalidation = response.data;
-          this.runPeriodicCall();
-        }).catch(error => {
-          this.modalContent = error.response.data[0];
-          this.showModal = true;
-        });
-      },
-      cancelGTFSValidation() {
-        projectsAPI.cancelGTFSValidation(this.$route.params.projectid).then(response => {
-          this.project.gtfsvalidation = response.data;
-        }).catch(error => {
-          this.modalContent = error.response.data[0];
-          this.showModal = true;
-        });
+      updateProjectStatus(project) {
+        this.project.gtfs_file_updated_at = project.gtfs_file_updated_at;
+        this.project.gtfs_creation_status = project.gtfs_creation_status;
+        this.project.gtfs_creation_duration = project.gtfs_creation_duration;
+        this.project.gtfs_validation_message = project.gtfs_validation_message;
+        this.project.gtfs_validation_error_number = project.gtfs_validation_error_number;
+        this.project.gtfs_validation_warning_number = project.gtfs_validation_warning_number;
+        this.project.gtfs_validation_duration = project.gtfs_validation_duration;
       },
       uploadGTFSFile() {
         let currentFile = this.$refs.file.files.item(0);
@@ -448,20 +354,6 @@
           console.log(error.data);
           this.$refs.file.value = null;
         });
-      },
-      runPeriodicCall() {
-        clearInterval(this.interval);
-        this.interval = setInterval(() => {
-          console.log('updated gtfs validation status...');
-          projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
-            if (response.data.gtfsvalidation && ['finished', 'error', 'canceled'].indexOf(
-                response.data.gtfsvalidation.status) > -1 && ['finished', 'error']
-              .indexOf(response.data.gtfs_creation_status) > -1) {
-              clearInterval(this.interval);
-            }
-            this.project = response.data;
-          });
-        }, 2000);
       }
     },
     beforeRouteEnter(to, from, next) {

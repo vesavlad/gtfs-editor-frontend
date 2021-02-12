@@ -9,9 +9,8 @@ const getProjectDetail = (id) => httpClient.get(`${END_POINT}${id}/`);
 const updateProject = (id, data) => httpClient.put(`${END_POINT}${id}/`, data);
 const deleteProject = (id) => httpClient.delete(`${END_POINT}${id}/`);
 
-const runGTFSValidation = (id) => httpClient.post(`${END_POINT}${id}/run_gtfs_validation/`);
-const cancelGTFSValidation = (id) => httpClient.post(`${END_POINT}${id}/cancel_gtfs_validation/`);
-const buildGTFS = (id) => httpClient.post(`${END_POINT}${id}/create_gtfs_file/`);
+const cancelBuildAndValidateGTFS = (id) => httpClient.post(`${END_POINT}${id}/cancel_build_and_validate_gtfs_file/`);
+const buildAndValidateGTFS = (id) => httpClient.post(`${END_POINT}${id}/build_and_validate_gtfs_file/`);
 const downloadGTFS = (id) => httpClient.request({url: `${END_POINT}${id}/download/`, method: 'GET', responseType: 'blob'});
 const uploadGTFS = (id, file) => {
     let formData = new FormData();
@@ -30,9 +29,8 @@ export default {
     getProjectDetail,
     updateProject,
     deleteProject,
-    runGTFSValidation,
-    cancelGTFSValidation,
-    buildGTFS,
+    cancelBuildAndValidateGTFS,
+    buildAndValidateGTFS,
     downloadGTFS,
     uploadGTFS
 }
