@@ -1,5 +1,12 @@
 # gtfseditor-ui
 
+## Add a new language
+
+1. create file with language name in locale folder. For instance `es-CL.json`, you can copy another json file and change its name
+2. modify values according to the new language
+3. add new language to `VUE_APP_I18N_SUPPORTED_LOCALE` variable in `.env` file (separated by comma)
+4. compile or run project
+
 ## Project setup
 ```
 npm install
