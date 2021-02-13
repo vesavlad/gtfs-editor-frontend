@@ -344,16 +344,6 @@
         this.project.gtfs_validation_error_number = project.gtfs_validation_error_number;
         this.project.gtfs_validation_warning_number = project.gtfs_validation_warning_number;
         this.project.gtfs_validation_duration = project.gtfs_validation_duration;
-      },
-      uploadGTFSFile() {
-        let currentFile = this.$refs.file.files.item(0);
-        projectsAPI.uploadGTFS(this.$route.params.projectid, currentFile).then(response => {
-          console.log(response.data);
-          this.$refs.file.value = null;
-        }).catch(error => {
-          console.log(error.data);
-          this.$refs.file.value = null;
-        });
       }
     },
     beforeRouteEnter(to, from, next) {
