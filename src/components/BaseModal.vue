@@ -1,6 +1,6 @@
 <template>
   <div class="modal-container" @click="$emit('close')">
-    <div class="modal" :class="classes" @click.stop.prevent>
+    <div class="modal" :class="classes" @click.stop>
       <slot name="m-content"></slot>
     </div>
   </div>
