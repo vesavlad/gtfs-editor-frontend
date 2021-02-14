@@ -338,8 +338,8 @@
       },
       updateProjectStatus(project) {
         this.project.gtfs_file_updated_at = project.gtfs_file_updated_at;
-        this.project.gtfs_creation_status = project.gtfs_creation_status;
-        this.project.gtfs_creation_duration = project.gtfs_creation_duration;
+        this.project.gtfs_building_and_validation_status = project.gtfs_building_and_validation_status;
+        this.project.gtfs_building_duration = project.gtfs_building_duration;
         this.project.gtfs_validation_message = project.gtfs_validation_message;
         this.project.gtfs_validation_error_number = project.gtfs_validation_error_number;
         this.project.gtfs_validation_warning_number = project.gtfs_validation_warning_number;
