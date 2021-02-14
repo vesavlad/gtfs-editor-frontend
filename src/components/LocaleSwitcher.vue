@@ -8,6 +8,8 @@
 
 
 <script>
+  import { LANGUAGE_KEY } from '@/utils/consts.js';
+
   export default {
     name: 'LocaleSwitcher',
     data() {
@@ -19,6 +21,7 @@
       switchLocale(locale) {
         if (this.$i18n.locale !== locale) {
           this.$i18n.locale = locale;
+          window.localStorage.setItem(LANGUAGE_KEY, locale);
         }
       }
     },
