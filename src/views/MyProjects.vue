@@ -38,7 +38,7 @@
 import { mapState } from 'vuex'
 import BaseModal from "@/components/BaseModal.vue";
 import projectsAPI from '@/api/projects.api';
-import ProjectCard from "../components/ProjectCard";
+import ProjectCard from "../components/project/ProjectCard";
 import DeletionModal from "@/components/project/DeletionModal";
 
 export default {

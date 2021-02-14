@@ -34,8 +34,8 @@
 
 <script>
   import { DateTime } from 'luxon';
-  import PillBase from "./PillBase";
-  import EnvelopeMap from "./EnvelopeMap";
+  import PillBase from "../PillBase";
+  import EnvelopeMap from "../EnvelopeMap";
   import ProjectMenu from "@/components/project/ProjectMenu.vue";
 
   export default {
