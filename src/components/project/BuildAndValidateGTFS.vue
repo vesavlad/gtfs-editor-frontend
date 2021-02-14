@@ -10,7 +10,7 @@
           <div>{{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}</div>
         </div>
         <div>
-          <button v-if="[status.FINISHED, status.CANCELED, status.ERROR].indexOf(project.gtfs_creation_status)>-1"
+          <button v-if="[status.FINISHED, status.CANCELED, status.ERROR].indexOf(project.gtfs_building_and_validation_status)>-1"
                   class="btn" @click="buildGTFS">
             <span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span>
           </button>
@@ -23,11 +23,11 @@
     <ul class="list-summary">
       <li>
         <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.buildStatus') }}</span>
-        <span class="lst">{{ project.gtfs_creation_status ? project.gtfs_creation_status : '' }}</span>
+        <span class="lst">{{ project.gtfs_building_and_validation_status ? project.gtfs_building_and_validation_status : '' }}</span>
       </li>
       <li>
         <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.buildDuration') }}</span>
-        <span class="lst">{{ project.gtfs_creation_duration ? project.gtfs_creation_duration : '' }}</span>
+        <span class="lst">{{ project.gtfs_building_duration ? project.gtfs_building_duration : '' }}</span>
       </li>
       <li>
         <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.errors') }}</span>
@@ -115,7 +115,7 @@ export default {
       this.interval = setInterval(() => {
         console.log('updated gtfs validation status...');
         projectsAPI.getProjectDetail(this.project.project_id).then(response => {
-          if ([this.status.FINISHED, this.status.ERROR, this.status.CANCELED].indexOf(response.data.gtfs_creation_status) > -1) {
+          if ([this.status.FINISHED, this.status.ERROR, this.status.CANCELED].indexOf(response.data.gtfs_building_and_validation_status) > -1) {
             clearInterval(this.interval);
           }
           this.$emit('update-project', response.data);
