@@ -51,7 +51,8 @@
       "viewErrors": "Ver errores",
       "download": "Descargar",
       "executeButtonLabel": "Ejecutar",
-      "cancelButtonLabel": "Cancelar ejecución"
+      "cancelButtonLabel": "Cancelar",
+      "executing": "Ejecutando..."
     },
     "gtfsRequiredData": "GTFS datos requeridos",
     "gtfsOptionalData": "GTFS datos opcionales",

@@ -7,7 +7,8 @@
       <div class="flex between">
         <div>
           <div class="small">{{ $t('projectDashboard.gtfsBuilder.lastBuild') }}</div>
-          <div>{{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}</div>
+          <div v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1" >{{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}</div>
+          <div v-else class="grid"><span>{{ $t('projectDashboard.gtfsBuilder.executing') }}</span><i class="material-icons rotating">sync</i></div>
         </div>
         <div>
           <button v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1"
@@ -15,7 +16,7 @@
             <span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span>
           </button>
           <button v-else class="btn" @click="cancelBuildGTFS">
-            <span><i class='material-icons'>sync</i> {{ $t('projectDashboard.gtfsBuilder.cancelButtonLabel') }}</span>
+            <span>{{ $t('projectDashboard.gtfsBuilder.cancelButtonLabel') }}</span>
           </button>
         </div>
       </div>
