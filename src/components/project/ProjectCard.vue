@@ -8,7 +8,7 @@
         <router-link :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
           <h2>{{project.name}}</h2>
         </router-link>
-        <button class="btn icon flat btn-options" @click.stop.prevent="showMenu=!showMenu">
+        <button class="btn icon flat btn-options" @click="showMenu=!showMenu">
           <i class="material-icons">more_vert</i>
           <ProjectMenu v-if="showMenu" :project="project" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
         </button>

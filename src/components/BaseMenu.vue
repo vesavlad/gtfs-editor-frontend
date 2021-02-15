@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-box card" :class="[boxClass]" @click.stop.prevent v-on-clickaway="raiseCloseEvent">
+  <div class="menu-box card" :class="[boxClass]" v-on-clickaway="raiseCloseEvent">
     <ul>
       <li v-for="option in options" :key="option.name" class="menu-option" :class="option.classes.concat([option.isDisabled?'disabled':''])" @click="$emit(option.eventName);raiseCloseEvent()">
         <i class="material-icons">{{ option.icon }}</i>
