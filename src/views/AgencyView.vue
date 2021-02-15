@@ -1,8 +1,18 @@
 <template>
-  <div>
-    <EditableTable :fields="fields" :url="url" :updateMethod="updateAgency" :deleteMethod="removeAgency"
-      :createMethod="createAgency" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :infoURL="infoURL">
-    </EditableTable>
+  <div class="agency container">
+    <div class="header">
+      <div class="grid center">
+        <h1>{{ $t('Agencies')}}</h1>
+        <button class="btn icon flat" alt="Go to GTFS specification.">
+          <span class="material-icons">info</span>
+        </button>
+      </div>
+    </div>
+    <section class="content">
+      <EditableTable :fields="fields" :url="url" :updateMethod="updateAgency" :deleteMethod="removeAgency"
+                     :createMethod="createAgency" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :infoURL="infoURL">
+      </EditableTable>
+    </section>
   </div>
 </template>
 

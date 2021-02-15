@@ -1,11 +1,13 @@
 <template>
-  <router-link class="card project-card" :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
-    <div class="project-card-map">
+  <div class="card project-card">
+    <router-link class="project-card-map" :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
       <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
-    </div>
+    </router-link>
     <div class="card-content">
       <div class="grid title">
-        <h2>{{project.name}}</h2>
+        <router-link :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
+          <h2>{{project.name}}</h2>
+        </router-link>
         <button class="btn icon flat btn-options" @click.stop.prevent="showMenu=!showMenu">
           <i class="material-icons">more_vert</i>
           <ProjectMenu v-if="showMenu" :project="project" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
@@ -31,7 +33,7 @@
         <PillBase v-else pillClass="empty" :pillText="$t('projectCard.neverValidated')"></PillBase>
       </div>
     </div>
-  </router-link>
+  </div>
 </template>
 
 <script>

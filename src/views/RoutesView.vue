@@ -3,7 +3,7 @@
     <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
       :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
       <template slot="additional-actions" slot-scope="props">
-        <button class="btn icon" @click="goToRoute(props)" alt="Go to trips">
+        <button class="btn icon flat" @click="goToRoute(props)" alt="Go to trips">
           <span class="material-icons">map</span>
         </button>
       </template>
@@ -28,7 +28,7 @@
           'actions',
           {
             name: 'route_id',
-            title: 'Route ID',
+            title: 'hola',
             sortField: 'route_id',
             required: true,
           },

@@ -23,7 +23,7 @@ let fieldMixin = {
       if (field instanceof Object) {
         let title = field.title || field.name
         if(field.required){
-          title+="*";
+          title="<span class='required'>"+title+"*</span>";
         }
         return title
       }

@@ -3,7 +3,7 @@
     <ul class="pagination">
       <li :class="['page-item', {'disabled': isOnFirstPage}]">
         <a class="page-link" @click.prevent="loadPage('prev')">
-          <span>&laquo;</span>
+          <i class="material-icons">chevron_left</i>
         </a>
       </li>
 
@@ -20,7 +20,7 @@
 
       <li :class="['page-item', {'disabled': isOnLastPage}]">
         <a class="page-link" href="" @click.prevent="loadPage('next')">
-          <span>&raquo;</span>
+          <i class="material-icons">chevron_right</i>
         </a>
       </li>
     </ul>
