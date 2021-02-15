@@ -10,7 +10,7 @@
           <div>{{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}</div>
         </div>
         <div>
-          <button v-if="[status.FINISHED, status.CANCELED, status.ERROR].indexOf(project.gtfs_building_and_validation_status)>-1"
+          <button v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1"
                   class="btn" @click="buildGTFS">
             <span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span>
           </button>
