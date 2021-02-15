@@ -19,6 +19,12 @@ const Enums = {
     FINISHED: 'finished',
     ERROR: 'error',
     CANCELED: 'canceled'
+  },
+  ProjectCreationStatus: {
+    EMPTY: 'empty',
+    LOADING_GTFS: 'loading_gtfs',
+    ERROR_LOADING_GTFS: 'error_loading_gtfs',
+    FROM_GTFS: 'from_gtfs'
   }
 }
 
