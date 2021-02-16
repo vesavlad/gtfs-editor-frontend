@@ -2,7 +2,7 @@
 import VuetableRowHeader from "vuetable-2/src/components/VuetableRowHeader.vue";
 
 export default {
-  name: 'VueTableRowHeader',
+  name: 'VuetableRowHeader',
   extends: VuetableRowHeader,
   methods: {
     renderTitle(field) {

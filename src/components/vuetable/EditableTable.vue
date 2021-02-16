@@ -16,7 +16,7 @@
                   data-path="results" pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
                   :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData">
           <template slot="tableHeader">
-            <VueTableRowHeader></VueTableRowHeader>
+            <VuetableRowHeader></VuetableRowHeader>
           </template>
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)"/>
@@ -121,7 +121,8 @@ import errorMessageMixin from "@/mixins/errorMessageMixin.js";
 import fieldMixin from "@/mixins/fieldMixin.js";
 import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
 import GeneralizedInput from "@/components/vuetable/GeneralizedInput.vue";
-import VueTableRowHeader from "@/components/vuetable/VueTableRowHeader";
+import VuetableRowHeader from "@/components/vuetable/VuetableRowHeader.vue";
+import VuetablePaginationDropDown from "@/components/vuetable/VuetablePaginationDropDown.vue";
 import $ from 'jquery';
 import 'select2';
 import {debounce} from "debounce";
@@ -131,11 +132,11 @@ export default {
   components: {
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
-    VuetablePaginationDropDown: Vuetable.VuetablePaginationDropDown,
+    VuetablePaginationDropDown,
     Modal,
     FileReader,
     GeneralizedInput,
-    VueTableRowHeader
+    VuetableRowHeader
   },
   mixins: [
     errorMessageMixin,
