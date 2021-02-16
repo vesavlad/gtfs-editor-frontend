@@ -7,16 +7,20 @@
       <div class="flex between">
         <div>
           <div class="small">{{ $t('projectDashboard.gtfsBuilder.lastBuild') }}</div>
-          <div v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1" >{{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}</div>
-          <div v-else class="grid"><span>{{ $t('projectDashboard.gtfsBuilder.executing') }}</span><i class="material-icons rotating">sync</i></div>
+          <div class="msj-builder-execution" v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1" >{{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}</div>
+          <div v-else class="grid center">
+            <span class="msj-builder-execution">{{ $t('projectDashboard.gtfsBuilder.executing') }}</span>
+            <i class="material-icons rotating">autorenew</i>
+          </div>
         </div>
-        <div>
-          <button v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1"
-                  class="btn" @click="buildGTFS">
+        <div class="grid">
+          <button class="btn" v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1" @click="buildGTFS">
             <span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span>
+            <i class="material-icons">not_started</i>
           </button>
-          <button v-else class="btn" @click="cancelBuildGTFS">
+          <button v-else class="btn cancel" @click="cancelBuildGTFS">
             <span>{{ $t('projectDashboard.gtfsBuilder.cancelButtonLabel') }}</span>
+            <i class="material-icons">close</i>
           </button>
         </div>
       </div>
