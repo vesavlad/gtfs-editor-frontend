@@ -28,11 +28,11 @@
 </template>
 
 <script>
-  import VuetablePaginationMixin from "vuetable-2/src/components/VuetablePaginationMixin";
+import VuetablePaginationMixin from "vuetable-2/src/components/VuetablePaginationMixin";
 
-  export default {
-    mixins: [
-      VuetablePaginationMixin,
-    ]
-  };
+export default {
+  mixins: [
+    VuetablePaginationMixin,
+  ]
+};
 </script>

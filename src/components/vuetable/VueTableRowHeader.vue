@@ -1,11 +1,11 @@
 <script>
-import VuetableRowHeader  from "vuetable-2/src/components/VuetableRowHeader.vue";
+import VuetableRowHeader from "vuetable-2/src/components/VuetableRowHeader.vue";
 
 export default {
   name: 'VueTableRowHeader',
   extends: VuetableRowHeader,
   methods: {
-    renderTitle (field) {
+    renderTitle(field) {
       let title = this.getTitle(field)
       if (title.length > 0 && this.isInCurrentSortGroup(field) || this.hasSortableIcon(field)) {
         let style = 'hola';//`opacity:${this.sortIconOpacity(field)};position:relative;float:right`

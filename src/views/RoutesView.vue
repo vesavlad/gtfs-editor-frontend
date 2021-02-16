@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import EditableTable from "@/components/EditableTable.vue";
+import EditableTable from "@/components/vuetable/EditableTable.vue";
 import routesAPI from '@/api/routes.api';
 import agenciesAPI from '@/api/agencies.api'
 
