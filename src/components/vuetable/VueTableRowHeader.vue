@@ -8,12 +8,14 @@ export default {
     renderTitle(field) {
       let title = this.getTitle(field)
       if (title.length > 0 && this.isInCurrentSortGroup(field) || this.hasSortableIcon(field)) {
-        let style = 'hola';//`opacity:${this.sortIconOpacity(field)};position:relative;float:right`
-        let iconTag = this.vuetable.showSortIcons ? this.renderIconTag(['sort-icon', this.sortIcon(field)], `style="${style}"`) : ''
-        return title + ' ' + iconTag
+        let iconTag = this.vuetable.showSortIcons ? this.renderIconTag(['sort-icon', this.sortIcon(field)], ``) : ''
+        return this.formatTitle(title + ' ' + iconTag)
       }
-      return title
+      return this.formatTitle(title);
     },
+    formatTitle(title) {
+      return `<div>${title}</div>`;
+    }
   }
 };
 </script>
