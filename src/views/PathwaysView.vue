@@ -1,8 +1,18 @@
 <template>
-  <div>
-    <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-                   :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
-    </EditableTable>
+  <div class="pathways container">
+    <div class="header">
+      <div class="grid v-center">
+        <h1>Pathways</h1>
+        <button class="btn icon flat" alt="Go to GTFS specification.">
+          <span class="material-icons">info</span>
+        </button>
+      </div>
+    </div>
+    <section class="content">
+      <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
+                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
+      </EditableTable>
+    </section>
   </div>
 </template>
 

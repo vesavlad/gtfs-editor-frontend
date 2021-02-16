@@ -1,5 +1,5 @@
 <template>
-  <div class="grid center">
+  <div class="grid v-center">
     <input ref="propertyName" v-model="value" :disabled="!edit" @keyup.escape="cancelEdit" @keyup.enter="update"
            v-bind:class="{error: hasError}"
            v-tooltip="{ theme: 'error-tooltip', content: errorMessage, shown: hasError }"

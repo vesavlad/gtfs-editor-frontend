@@ -1,11 +1,21 @@
 <template>
-  <div>
-    <EditableTable :fields="fields" :url="url" :updateMethod="updateCalendar" :deleteMethod="removeCalendar"
-                   :createMethod="createCalendar" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :infoURL="infoURL">
-      <template slot="information">
-        Calendars are amazing!!!
-      </template>
-    </EditableTable>
+  <div class="calendar container">
+    <div class="header">
+      <div class="grid v-center">
+        <h1>Calendars</h1>
+        <button class="btn icon flat" alt="Go to GTFS specification.">
+          <span class="material-icons">info</span>
+        </button>
+      </div>
+    </div>
+    <section class="content">
+      <EditableTable :fields="fields" :url="url" :updateMethod="updateCalendar" :deleteMethod="removeCalendar"
+                     :createMethod="createCalendar" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :infoURL="infoURL">
+        <template slot="information">
+          Calendars are amazing!!!
+        </template>
+      </EditableTable>
+    </section>
   </div>
 </template>
 

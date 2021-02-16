@@ -3,7 +3,7 @@
     <div class="table-container card">
       <div class="table-header">
         <template v-if="searchable">
-          <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
+          <form class="search" @submit.stop.prevent="doSearch">
             <div class="input-group">
               <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
             </div>
@@ -32,8 +32,8 @@
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)"/>
           </template>
-          <div slot="actions" slot-scope="props" class="grid center">
-            <button class="btn icon flat" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
+          <div slot="actions" slot-scope="props" class="grid min center">
+            <button class="btn icon flat error" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
               <span class="material-icons">delete</span>
             </button>
             <slot name="additional-actions" v-bind:rowData="props.rowData" v-bind:rowField="props.rowField"
@@ -55,10 +55,11 @@
           <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
           </VuetablePaginationDropDown>
         </div>
-        <slot name="additional-buttons"></slot>
+        <div class="table-errors">a</div>
         <div class="table-footer-buttons">
-          <button class="btn" @click="createModal.visible=true"><span>Add row</span><i class="material-icons">add</i></button>
           <button class="btn green" @click="saveChanges"><span>Save</span></button>
+          <slot name="additional-buttons"></slot>
+          <button class="btn" @click="createModal.visible=true"><span>Add row</span><i class="material-icons">add</i></button>
         </div>
       </div>
     </div>
@@ -168,11 +169,10 @@ export default {
       last_page: -1000,
       doSearch: false,
       css: {
-        ascendingIcon: 'ascendingIcon',
-        descendingIcon: 'descendingIcon',
-        ascendingClass: 'ascendingClass',
-        descendingClass: 'descendingClass',
-        sortableIcon: 'sortableIcon',
+        ascendingIcon: 'expand_less',
+        descendingIcon: 'expand_more',
+        ascendingClass: 'active',
+        sortableIcon: 'expand_more',
         renderIcon(classes) {
           return `<span class="material-icons">${classes[1]}</span>`
         }

@@ -90,11 +90,6 @@ button.ui.button {
     margin-top: 1px;
     margin-bottom: 1px;
 }
-
-div.pagination {
-    width: 160px;
-}
-
 tr.error>td {
     background-color: rgba(255, 0, 0, 0.4);
 }
@@ -114,11 +109,6 @@ button.ui.button {
     margin-top: 1px;
     margin-bottom: 1px;
 }
-
-div.pagination {
-    width: 160px;
-}
-
 tr.edited {
     background: yellow !important;
     color: #ffff7d !important;

@@ -1,14 +1,24 @@
 <template>
-  <div>
-    <EditableTable :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
-                   :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true"
-                   :infoURL="infoURL">
-      <template slot="additional-buttons">
-        <button class="btn btn-outline-secondary" @click="$router.push({ name: 'Shapes', params: $router.params })">
-          Edit Shapes
+  <div class="trips container">
+    <div class="header">
+      <div class="grid v-center">
+        <h1>Trips</h1>
+        <button class="btn icon flat" alt="Go to GTFS specification.">
+          <span class="material-icons">info</span>
         </button>
-      </template>
-    </EditableTable>
+      </div>
+    </div>
+    <section class="content">
+      <EditableTable :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
+                     :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true"
+                     :infoURL="infoURL">
+        <template slot="additional-buttons">
+          <button class="btn btn-outline-secondary" @click="$router.push({ name: 'Shapes', params: $router.params })">
+            Edit Shapes
+          </button>
+        </template>
+      </EditableTable>
+    </section>
   </div>
 </template>
 

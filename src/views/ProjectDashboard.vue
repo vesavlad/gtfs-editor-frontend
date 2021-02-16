@@ -2,7 +2,7 @@
   <div class="ProjectDashboard container">
     <div class="header">
       <ProjectNameEditor :project="project" @project-name-update="updateProjectName"></ProjectNameEditor>
-      <div class="grid center">
+      <div class="grid v-center">
         <span class="side-info">{{ $t('projectDashboard.lastChange') }}: {{ lastModification }}</span>
         <button class="btn icon flat" @click="showMenu=!showMenu">
           <i class="material-icons">more_vert</i>

@@ -1,13 +1,24 @@
 <template>
-  <div>
-    <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-                   :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
-      <template slot="additional-actions" slot-scope="props">
-        <button class="btn icon flat" @click="goToRoute(props)" alt="Go to trips">
-          <span class="material-icons">map</span>
+  <div class="routes container">
+
+    <div class="header">
+      <div class="grid v-center">
+        <h1>Routes</h1>
+        <button class="btn icon flat" alt="Go to GTFS specification.">
+          <span class="material-icons">info</span>
         </button>
-      </template>
-    </EditableTable>
+      </div>
+    </div>
+    <section class="content">
+      <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
+                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
+        <template slot="additional-actions" slot-scope="props">
+          <button class="btn icon flat" @click="goToRoute(props)" alt="Go to trips">
+            <span class="material-icons">map</span>
+          </button>
+        </template>
+      </EditableTable>
+    </section>
   </div>
 </template>
 
