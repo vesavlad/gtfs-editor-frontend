@@ -14,7 +14,7 @@ export default {
       return this.formatTitle(title);
     },
     formatTitle(title) {
-      return `<div>${title}</div>`;
+      return `<div class="table-th">${title}</div>`;
     }
   }
 };

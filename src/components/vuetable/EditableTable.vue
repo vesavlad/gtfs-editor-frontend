@@ -1,17 +1,28 @@
 <template>
-  <div class="TransportModeTable">
-    <div>
-      <template v-if="searchable">
-        <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
-          <div class="input-group">
-            <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
-          </div>
-        </form>
-      </template>
-      <button class="btn icon" @click="openInfo" alt="Go to GTFS specification.">
-        <span class="material-icons">info</span>
-      </button>
-      <div>
+  <div>
+    <div class="table-container card">
+      <div class="table-header">
+        <template v-if="searchable">
+          <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
+            <div class="input-group">
+              <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
+            </div>
+          </form>
+        </template>
+        <div class="table-total-rows"><span>24 registered rows</span></div>
+        <div class="table-option-buttons">
+          <form method="get" :action="downloadURL">
+            <button class="btn flat" type="submit">
+              Download CSV
+            </button>
+          </form>
+          <button class="btn flat" @click="uploadModal.visible=true; uploadModal.error = '';">
+            Upload CSV
+          </button>
+          <button class="btn icon flat"><i class="material-icons">settings</i></button>
+        </div>
+      </div>
+      <div class="table-content">
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getProcessedFields(fields)"
                   data-path="results" pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
                   :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData">
@@ -21,8 +32,8 @@
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)"/>
           </template>
-          <div slot="actions" slot-scope="props" class="flex">
-            <button class="btn icon" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
+          <div slot="actions" slot-scope="props" class="grid center">
+            <button class="btn icon flat" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
               <span class="material-icons">delete</span>
             </button>
             <slot name="additional-actions" v-bind:rowData="props.rowData" v-bind:rowField="props.rowField"
@@ -36,29 +47,19 @@
                             :errors="$refs.vuetable.tableData[properties.rowIndex].errors">
           </GeneralizedInput>
         </vuetable>
-        <div class="flex">
+      </div>
+      <div class="table-footer">
+        <div class="grid-pagination">
           <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
           </VuetablePagination>
           <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
           </VuetablePaginationDropDown>
         </div>
-      </div>
-      <div class="flex">
-        <button class="btn btn-outline-secondary" @click="saveChanges">
-          Save
-        </button>
-        <form method="get" :action="downloadURL">
-          <button class="btn btn-outline-secondary" type="submit">
-            Download CSV
-          </button>
-        </form>
-        <button class="btn btn-outline-secondary" @click="uploadModal.visible=true; uploadModal.error = '';">
-          Upload CSV
-        </button>
-        <button class="btn btn-outline-secondary" @click="createModal.visible=true">
-          Add row
-        </button>
         <slot name="additional-buttons"></slot>
+        <div class="table-footer-buttons">
+          <button class="btn" @click="createModal.visible=true"><span>Add row</span><i class="material-icons">add</i></button>
+          <button class="btn green" @click="saveChanges"><span>Save</span></button>
+        </div>
       </div>
     </div>
     <Modal v-if="uploadModal.visible" @close="uploadModal.visible = false" :showCancelButton="true">

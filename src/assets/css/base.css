@@ -10,6 +10,12 @@ a:hover, button:hover {transition: all .2s;}
 a, button {cursor: pointer;}
 button {border: 0;}
 
+
+/* -- grillas -- */
+.grid {display: grid; grid-gap: 20px; grid-auto-flow: column; justify-content: flex-start;}
+.grid-self-end {align-self: end;}
+.g2 {grid-template-columns: 1fr 1fr;}
+
 /*- Recursos -*/
 html {-webkit-font-smoothing: antialiased;}
 .clearfix:before,.clearfix:after {content: " "; display: table;}
@@ -66,9 +72,3 @@ html {-webkit-font-smoothing: antialiased;}
 .fixed-table {table-layout: fixed;}
 .big {font-size: 1.2em;}
 
-/* -- grillas -- */
-.grid {display: grid; grid-gap: 20px; grid-auto-flow: column; justify-content: flex-start;}
-.grid.flex-top {align-items: flex-start;}
-.grid.end {justify-content: end;}
-.grid-self-end {align-self: end;}
-.g2 {grid-template-columns: 1fr 1fr;}

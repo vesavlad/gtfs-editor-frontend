@@ -13,7 +13,7 @@ html,body {background-color:var(--gris-claro); -webkit-font-smoothing: antialias
     --gris-osc:#4E5F68;
     --gris-osc2:#39505D;
     --bg-error:#F0ECEC;
-    --bg-warning: rgba(217, 155, 32,.2);
+    --bg-warning: rgba(255, 176, 0,.05);
     --link:#21B0CF;
     --link-hover:#03C4D7;
     --link2:#19849C;
@@ -168,7 +168,7 @@ input[type="search"]::-webkit-search-cancel-button {
     grid-gap: 5px;
     background: var(--link);
     border-radius: 50px;
-    padding: 15px 20px;
+    padding: 12px 20px;
     color: white;
     cursor: pointer;
     text-transform: uppercase;
@@ -373,10 +373,12 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .table-container {}
 .table-header {padding: 20px; display: grid; grid-template-columns: 1fr auto; align-items: center;}
-.table-header .table-option-buttons {display: grid; grid-auto-flow: column; grid-gap: 10px; align-items: center;}
+.table-header .table-option-buttons {display: grid; grid-auto-flow: column; grid-gap: 10px; align-items: center; grid-column: 2;}
+.table-total-rows {color: var(--gris-medio2);}
 .table-content {}
 .table-footer {display: grid; grid-gap: 10px; grid-template-columns: auto 1fr auto; padding: 15px 20px; align-items: center;}
-.table-footer-buttons {display: grid; grid-gap: 10px; grid-auto-flow: column;}
+.grid-pagination {display: grid; grid-auto-flow: column; align-items: center; grid-column: 1;}
+.table-footer-buttons {display: grid; grid-gap: 10px; grid-auto-flow: column; grid-column: 3;}
 .table-footer-buttons button {min-width: 130px;}
 
 table {
@@ -385,22 +387,24 @@ table {
     font-size: 16px; max-width: 100%;
     table-layout: fixed;
 }
-table th, table td {padding: 8px 4px;}
+table td {padding: 10px 5px;}
 table th {
+    padding: 10px;
     background-color: var(--gris-claro);
     font-weight: 600;
     color: var(--gris-medio2);
     text-transform: uppercase;
-    font-size: 14px;
+    font-size: 12px;
     border: 1px solid #D4DDE1;
     border-bottom-width: 3px;
 }
-table th.sortable {}
 table td {background: var(--base); box-shadow: inset 0 1px 0 0 #FFFFFF, inset 0 -1px 0 0 rgba(0,0,0,0.10);}
 td input[type="text"] {text-align: center; padding: 8px; min-width: min-content; width: 100%;}
 tr.changed>td {
     background-color: var(--bg-warning);
 }
+.table-th {display: grid; grid-template-columns: 1fr auto; align-items: center; text-align: left;}
+.table-container .vuetable th.sortable:hover {color: var(--link);}
 
 /* ============  PAGINATION  ============== */
 

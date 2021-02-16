@@ -1,7 +1,7 @@
 <template>
   <div class="agency container">
     <div class="header">
-      <div class="grid center">
+      <div class="grid v-center">
         <h1>{{ $t('Agencies') }}</h1>
         <button class="btn icon flat" alt="Go to GTFS specification.">
           <span class="material-icons">info</span>
