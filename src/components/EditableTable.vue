@@ -14,7 +14,10 @@
       <div>
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getProcessedFields(fields)"
           data-path="results" pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
-          :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData"> 
+          :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData">
+          <template slot="tableHeader">
+            <VueTableRowHeader></VueTableRowHeader>
+          </template>
           <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" :print="log($scopedSlots)" />
           </template>
@@ -117,6 +120,7 @@
   import fieldMixin from "@/mixins/fieldMixin.js";
   import VuetablePagination from "@/components/VueTablePagination.vue";
   import GeneralizedInput from "@/components/GeneralizedInput.vue";
+  import VueTableRowHeader from "@/components/VueTableRowHeader";
   import $ from 'jquery';
   import 'select2';
   import {
@@ -131,6 +135,7 @@
       Modal,
       FileReader,
       GeneralizedInput,
+      VueTableRowHeader
     },
     mixins: [
       errorMessageMixin,
