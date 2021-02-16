@@ -1,5 +1,6 @@
 <template>
-  <router-link class="card data-card" :class="[cardClass]" :event="state===DataCardEnum.BLOCKED?'':'click'" :to="{name: viewName, params: { projectid: projectId }}">
+  <router-link class="card data-card" :class="[cardClass]" :event="state===DataCardEnum.BLOCKED?'':'click'"
+               :to="{name: viewName, params: { projectid: projectId }}">
     <div class="data-header header">
       <h4>{{ filename }}</h4>
       <div class="btn-list">
@@ -20,7 +21,8 @@
         </li>
       </ul>
       <div class="data-footer">
-        <button class="btn" v-if="[DataCardEnum.EMPTY,DataCardEnum.BLOCKED].indexOf(state)>-1" :disabled="state===DataCardEnum.BLOCKED"><span>{{ $t('dataCard.add') }}</span></button>
+        <button class="btn" v-if="[DataCardEnum.EMPTY,DataCardEnum.BLOCKED].indexOf(state)>-1"
+                :disabled="state===DataCardEnum.BLOCKED"><span>{{ $t('dataCard.add') }}</span></button>
         <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="warning" :pillText="warningNumber"></PillBase>
         <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="error" :pillText="errorNumber"></PillBase>
       </div>
@@ -29,8 +31,8 @@
 </template>
 
 <script>
-import PillBase from "./PillBase"
-import Enums from '@/utils/enums'
+import PillBase from "@/components/PillBase.vue";
+import Enums from '@/utils/enums';
 
 export default {
   name: 'DataCard',
@@ -83,7 +85,7 @@ export default {
   computed: {
     cardClass() {
       let className = null;
-      switch(this.state) {
+      switch (this.state) {
         case Enums.DataCard.EMPTY:
           className = 'empty';
           break;
