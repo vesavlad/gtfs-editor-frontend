@@ -25,7 +25,7 @@
       <div class="table-content">
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getProcessedFields(fields)"
                   data-path="results" pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
-                  :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData">
+                  :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData" :css="css">
           <template slot="tableHeader">
             <VuetableRowHeader></VuetableRowHeader>
           </template>
@@ -167,6 +167,16 @@ export default {
       current_page: -1000,
       last_page: -1000,
       doSearch: false,
+      css: {
+        ascendingIcon: 'ascendingIcon',
+        descendingIcon: 'descendingIcon',
+        ascendingClass: 'ascendingClass',
+        descendingClass: 'descendingClass',
+        sortableIcon: 'sortableIcon',
+        renderIcon(classes) {
+          return `<span class="material-icons">${classes[1]}</span>`
+        }
+      }
     };
   },
   props: {
