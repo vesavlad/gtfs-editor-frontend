@@ -26,9 +26,9 @@
         </div>
       </div>
       <div class="grid-pills">
-        <template v-if="project.gtfs_validation_error_number!==null || project.gtfs_validation_warning_number !==null">
-          <PillBase pillClass="error" :pillText="$t('projectCard.errors') + ': ' + project.gtfs_validation_error_number"></PillBase>
-          <PillBase pillClass="warning" :pillText="$t('projectCard.warnings')+': ' + project.gtfs_validation_warning_number"></PillBase>
+        <template v-if="project.gtfs_validation.error_number!==null || project.gtfs_validation.warning_number !==null">
+          <PillBase pillClass="error" :pillText="$t('projectCard.errors') + ': ' + project.gtfs_validation.error_number"></PillBase>
+          <PillBase pillClass="warning" :pillText="$t('projectCard.warnings')+': ' + project.gtfs_validation.warning_number"></PillBase>
         </template>
         <PillBase v-else pillClass="empty" :pillText="$t('projectCard.neverValidated')"></PillBase>
       </div>

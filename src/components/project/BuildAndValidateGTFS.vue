@@ -1,5 +1,5 @@
 <template>
-  <div class="card summary">
+  <div class="card summary" v-if="project.gtfs_validation">
     <div class="card-title">
       <h4>{{ $t('projectDashboard.gtfsBuilder.title') }}</h4>
     </div>
@@ -36,18 +36,18 @@
       </li>
       <li>
         <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.errors') }}</span>
-        <span class="lst">{{ project.gtfs_validation_error_number ? project.gtfs_validation_error_number : '' }}</span>
+        <span class="lst">{{ project.gtfs_validation.error_number ? project.gtfs_validation.error_number : '' }}</span>
       </li>
       <li>
         <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.warnings') }}</span>
         <span class="lst">{{
-            project.gtfs_validation_warning_number ? project.gtfs_validation_warning_number : ''
+            project.gtfs_validation.warning_number ? project.gtfs_validation.warning_number : ''
           }}</span>
       </li>
     </ul>
     <div class="card-content grid end">
       <button class="btn min warning"
-              :disabled="!project.gtfs_validation_message"
+              :disabled="!project.gtfs_validation.message"
               @click="showModal=true"><span>{{ $t('projectDashboard.gtfsBuilder.viewErrors') }}</span><i
           class="material-icons">error_outline</i></button>
       <button class="btn min green" @click="dowloadGTFS">
@@ -55,7 +55,7 @@
     </div>
     <BaseModal v-if="showModal" @close="showModal=false">
       <template slot="m-content">
-        <p v-html="project.gtfs_validation_message"></p>
+        <p v-html="project.gtfs_validation.message"></p>
       </template>
     </BaseModal>
   </div>

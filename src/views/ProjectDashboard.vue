@@ -338,10 +338,10 @@ export default {
       this.project.gtfs_file_updated_at = project.gtfs_file_updated_at;
       this.project.gtfs_building_and_validation_status = project.gtfs_building_and_validation_status;
       this.project.gtfs_building_duration = project.gtfs_building_duration;
-      this.project.gtfs_validation_message = project.gtfs_validation_message;
-      this.project.gtfs_validation_error_number = project.gtfs_validation_error_number;
-      this.project.gtfs_validation_warning_number = project.gtfs_validation_warning_number;
-      this.project.gtfs_validation_duration = project.gtfs_validation_duration;
+      this.project.gtfs_validation.message = project.gtfs_validation.message;
+      this.project.gtfs_validation.error_number = project.gtfs_validation.error_number;
+      this.project.gtfs_validation.warning_number = project.gtfs_validation.warning_number;
+      this.project.gtfs_validation.duration = project.gtfs_validation.duration;
     }
   },
   beforeRouteEnter(to, from, next) {
