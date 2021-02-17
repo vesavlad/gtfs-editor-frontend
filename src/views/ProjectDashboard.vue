@@ -181,12 +181,6 @@ export default {
     },
     ];
     return {
-      projectName: {
-        hasError: false,
-        errorMessage: '',
-        oldValue: null,
-        edit: false,
-      },
       feedInfo: {
         edit: false,
         config: {
@@ -309,13 +303,6 @@ export default {
           }
           return datum;
         });
-      });
-    },
-    enableEditProjectName() {
-      this.projectName.oldValue = this.project.name;
-      this.projectName.edit = true;
-      this.$nextTick(() => {
-        this.$refs.projectName.focus();
       });
     },
     updateProjectName(project) {
