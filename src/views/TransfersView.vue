@@ -27,7 +27,10 @@ export default {
       url: transfersAPI.transfersAPI.getFullBaseURL(this.$route.params.projectid),
       downloadURL: transfersAPI.transfersAPI.getDownloadURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'type',
           title: 'Type',

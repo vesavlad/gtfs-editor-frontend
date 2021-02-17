@@ -30,7 +30,10 @@ export default {
       url: calendarAPI.calendarAPI.getFullBaseURL(this.$route.params.projectid),
       days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'service_id',
           sortField: 'service_id',

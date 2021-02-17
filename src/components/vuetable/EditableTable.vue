@@ -5,19 +5,19 @@
         <template v-if="searchable">
           <form class="search" @submit.stop.prevent="doSearch">
             <div class="input-group">
-              <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
+              <input v-model="quickSearch" type="search" :placeholder="$t('vuetable.quickSearch')" v-on:input="doSearch">
             </div>
           </form>
         </template>
-        <div class="table-total-rows"><span>24 registered rows</span></div>
+        <div class="table-total-rows"><span>{{ totalDataInTable }} {{ $t('vuetable.rows') }}</span></div>
         <div class="table-option-buttons">
           <form method="get" :action="downloadURL">
             <button class="btn flat" type="submit">
-              Download CSV
+              {{ $t('vuetable.downloadCSV') }}
             </button>
           </form>
           <button class="btn flat" @click="uploadModal.visible=true; uploadModal.error = '';">
-            Upload CSV
+            {{ $t('vuetable.uploadCSV') }}
           </button>
           <button class="btn icon flat"><i class="material-icons">settings</i></button>
         </div>
@@ -25,7 +25,8 @@
       <div class="table-content">
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getProcessedFields(fields)"
                   data-path="results" pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
-                  :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData" :css="css">
+                  :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData" :css="css"
+                  @vuetable:load-success="updateTotalDataLabel">
           <template slot="tableHeader">
             <VuetableRowHeader></VuetableRowHeader>
           </template>
@@ -52,14 +53,16 @@
         <div class="grid-pagination">
           <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
           </VuetablePagination>
-          <VuetablePaginationDropDown ref="paginationDropDown" :pageText="$t('vuetable.page')" @vuetable-pagination:change-page="onChangePage">
+          <VuetablePaginationDropDown ref="paginationDropDown" :pageText="$t('vuetable.page')"
+                                      @vuetable-pagination:change-page="onChangePage">
           </VuetablePaginationDropDown>
         </div>
         <div class="table-errors">a</div>
         <div class="table-footer-buttons">
-          <button class="btn green" @click="saveChanges"><span>Save</span></button>
+          <button class="btn green" @click="saveChanges"><span>{{ $t('vuetable.save') }}</span></button>
           <slot name="additional-buttons"></slot>
-          <button class="btn" @click="createModal.visible=true"><span>Add row</span><i class="material-icons">add</i></button>
+          <button class="btn" @click="createModal.visible=true"><span>{{ $t('vuetable.addRow') }}</span><i class="material-icons">add</i>
+          </button>
         </div>
       </div>
     </div>
@@ -176,7 +179,8 @@ export default {
         renderIcon(classes) {
           return `<span class="material-icons">${classes[1]}</span>`
         }
-      }
+      },
+      totalDataInTable: 0
     };
   },
   props: {
@@ -214,6 +218,9 @@ export default {
     }
   },
   methods: {
+    updateTotalDataLabel(response) {
+      this.totalDataInTable = response.data.pagination.total;
+    },
     setDefaultCreationValue(field, data = this.createModal.data) {
       if (field === "actions") {
         return;

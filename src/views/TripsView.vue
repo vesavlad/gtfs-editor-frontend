@@ -33,7 +33,10 @@ export default {
       url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectid),
       downloadURL: tripsAPI.tripsAPI.getDownloadURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'trip_id',
           title: 'Trip',

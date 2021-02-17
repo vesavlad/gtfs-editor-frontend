@@ -26,7 +26,10 @@ export default {
       downloadURL: levelsAPI.levelsAPI.getDownloadURL(this.$route.params.projectid),
       url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'level_id',
           sortField: 'level_id',

@@ -27,7 +27,10 @@ export default {
       downloadURL: fareAttributesAPI.fareAttributesAPI.getDownloadURL(this.$route.params.projectid),
       url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'fare_id',
           sortField: 'fare_id',

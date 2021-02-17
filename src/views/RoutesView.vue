@@ -32,10 +32,13 @@ export default {
       url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
       downloadURL: routesAPI.routesAPI.getDownloadURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'route_id',
-          title: 'hola',
+          title: 'Route ID',
           sortField: 'route_id',
           required: true,
         },

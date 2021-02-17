@@ -27,7 +27,10 @@ export default {
       downloadURL: agenciesAPI.agenciesAPI.getDownloadURL(this.$route.params.projectid),
       url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'agency_id',
           sortField: 'agency_id',

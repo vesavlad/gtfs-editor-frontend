@@ -26,7 +26,10 @@ export default {
       downloadURL: calendarDatesAPI.calendarDatesAPI.getDownloadURL(this.$route.params.projectid),
       url: calendarDatesAPI.calendarDatesAPI.getFullBaseURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'service_id',
           sortField: 'service_id',

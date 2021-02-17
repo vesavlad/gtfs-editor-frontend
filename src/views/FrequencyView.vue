@@ -27,7 +27,10 @@ export default {
       downloadURL: frequenciesAPI.frequenciesAPI.getDownloadURL(this.$route.params.projectid),
       url: frequenciesAPI.frequenciesAPI.getFullBaseURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'trip_id',
           title: 'Trip',

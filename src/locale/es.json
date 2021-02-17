@@ -66,6 +66,13 @@
     }
   },
   "vuetable": {
-    "page": "Página"
+    "page": "Página",
+    "quickSearch": "Buscar",
+    "rows": "Filas",
+    "downloadCSV": "Descargar CSV",
+    "uploadCSV": "Subir CSV",
+    "save": "Guardar",
+    "addRow": "Agregar registro",
+    "actions": "Acciones"
   }
 }

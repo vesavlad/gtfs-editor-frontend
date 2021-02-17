@@ -27,7 +27,10 @@ export default {
       url: pathwaysAPI.pathwaysAPI.getFullBaseURL(this.$route.params.projectid),
       downloadURL: pathwaysAPI.pathwaysAPI.getDownloadURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: "pathway_id",
           title: "Pathway ID",

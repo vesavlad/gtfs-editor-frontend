@@ -28,7 +28,10 @@ export default {
       downloadURL: fareRulesAPI.fareRulesAPI.getDownloadURL(this.$route.params.projectid),
       url: fareRulesAPI.fareRulesAPI.getFullBaseURL(this.$route.params.projectid),
       fields: [
-        'actions',
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions')
+        },
         {
           name: 'fare_id',
           title: 'Fare ID',
