@@ -73,7 +73,7 @@
         <div class="grid-data required">
           <DataCard v-for="file in data.slice(0, 9)" v-bind:key="file.id" :projectId="$route.params.projectid"
                     :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state"
-                    :errorNumber="file.errorNumber" :warningNumber="file.warningNumber"
+                    :errorNumber="file.error_number" :warningNumber="file.warning_number"
                     :message="$t(file.message)"></DataCard>
         </div>
       </div>
@@ -262,6 +262,9 @@ export default {
       projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
         this.project = response.data;
       });
+      this.retrieveCardData();
+    },
+    retrieveCardData() {
       tablesAPI.list_tables(this.$route.params.projectid).then(response => {
         let data = response.data;
         this.data = this.data.map(datum => {
@@ -324,6 +327,7 @@ export default {
       this.project.gtfs_validation.error_number = project.gtfs_validation.error_number;
       this.project.gtfs_validation.warning_number = project.gtfs_validation.warning_number;
       this.project.gtfs_validation.duration = project.gtfs_validation.duration;
+      this.retrieveCardData();
     }
   },
   beforeRouteEnter(to, from, next) {
