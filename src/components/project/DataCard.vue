@@ -23,8 +23,10 @@
       <div class="data-footer">
         <button class="btn" v-if="[DataCardEnum.EMPTY,DataCardEnum.BLOCKED].indexOf(state)>-1"
                 :disabled="state===DataCardEnum.BLOCKED"><span>{{ $t('dataCard.add') }}</span></button>
-        <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="warning" :pillText="warningNumber"></PillBase>
-        <PillBase v-if="state===DataCardEnum.ENABLED" pillClass="error" :pillText="errorNumber"></PillBase>
+        <PillBase v-if="state===DataCardEnum.ENABLED && warningNumber !==0" pillClass="warning"
+                  :pillText="warningNumber"></PillBase>
+        <PillBase v-if="state===DataCardEnum.ENABLED && errorNumber !==0" pillClass="error"
+                  :pillText="errorNumber"></PillBase>
       </div>
     </div>
   </router-link>
