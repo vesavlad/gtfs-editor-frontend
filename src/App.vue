@@ -29,15 +29,13 @@
 
 <style scoped>
 
-
-@import "../node_modules/material-icons/css/material-icons.css";
 @import "./assets/css/base.css";
 @import "./assets/css/style.css";
 @import "./assets/css/temp.css";
 @import "../node_modules/select2/dist/css/select2.min.css";
 @import url("https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css");
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Material+Icons+Outlined");
 </style>
 
 <script>
@@ -45,7 +43,7 @@ import {LANGUAGE_KEY} from '@/utils/consts.js';
 import LocaleSwitcher from './components/LocaleSwitcher'
 import 'v-tooltip/dist/v-tooltip.css';
 
-require('material-icons')
+require('material-icons');
 
 
 export default {

@@ -16,7 +16,7 @@
         <div class="grid">
           <button class="btn" v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1" @click="buildGTFS">
             <span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span>
-            <i class="material-icons">not_started</i>
+            <i class="material-icons-outlined">not_started</i>
           </button>
           <button v-else class="btn cancel" @click="cancelBuildGTFS">
             <span>{{ $t('projectDashboard.gtfsBuilder.cancelButtonLabel') }}</span>
