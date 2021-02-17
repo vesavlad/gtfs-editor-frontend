@@ -82,7 +82,7 @@
         <div class="grid-data optional">
           <DataCard v-for="file in data.slice(9)" v-bind:key="file.id" :projectId="$route.params.projectid"
                     :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state"
-                    :errorNumber="file.errorNumber" :warningNumber="file.warningNumber"
+                    :errorNumber="file.error_number" :warningNumber="file.warning_number"
                     :message="$t(file.message)"></DataCard>
         </div>
       </div>
@@ -260,9 +260,6 @@ export default {
   methods: {
     initData() {
       projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
-        if (!response.data.gtfsvalidation) {
-          response.data.gtfsvalidation = {};
-        }
         this.project = response.data;
       });
       tablesAPI.list_tables(this.$route.params.projectid).then(response => {
@@ -270,8 +267,6 @@ export default {
         this.data = this.data.map(datum => {
           let entry = data[datum.id];
           if (entry) {
-            entry.errorNumber = 1;
-            entry.warningNumber = 1;
             entry.state = Enums.DataCard.ENABLED;
 
             if (entry.entries === 0) {
