@@ -211,17 +211,9 @@ export default {
     searchable: {
       type: Boolean,
       default: false,
-    },
-    infoURL: {
-      type: String,
-      required: false,
-      default: "https://developers.google.com/transit/gtfs/reference",
-    },
+    }
   },
   methods: {
-    openInfo() {
-      window.open(this.infoURL);
-    },
     setDefaultCreationValue(field, data = this.createModal.data) {
       if (field === "actions") {
         return;
