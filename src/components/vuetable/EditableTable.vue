@@ -52,7 +52,7 @@
         <div class="grid-pagination">
           <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
           </VuetablePagination>
-          <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
+          <VuetablePaginationDropDown ref="paginationDropDown" :pageText="$t('vuetable.page')" @vuetable-pagination:change-page="onChangePage">
           </VuetablePaginationDropDown>
         </div>
         <div class="table-errors">a</div>
@@ -144,7 +144,7 @@ export default {
     errorMessageMixin,
     fieldMixin
   ],
-  data: function () {
+  data() {
     let created_data = {};
     this.fields.forEach((field) => this.setDefaultCreationValue(field, created_data));
     return {

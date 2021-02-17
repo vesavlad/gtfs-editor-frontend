@@ -63,6 +63,9 @@
       "frequenciesBlockMessage": "Necesita trip",
       "transfersBlockMessage": "Necesita stop",
       "pathwaysBlockMessage": "Necesita stop"
-    }    
+    }
+  },
+  "vuetable": {
+    "page": "Página"
   }
 }
