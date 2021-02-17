@@ -1,16 +1,9 @@
 <template>
   <div class="agency container">
-    <div class="header">
-      <div class="grid v-center">
-        <h1>{{ $t('Agencies') }}</h1>
-        <button class="btn icon flat" alt="Go to GTFS specification.">
-          <span class="material-icons">info</span>
-        </button>
-      </div>
-    </div>
+    <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     <section class="content">
       <EditableTable :fields="fields" :url="url" :updateMethod="updateAgency" :deleteMethod="removeAgency"
-                     :createMethod="createAgency" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :infoURL="infoURL">
+                     :createMethod="createAgency" :downloadURL="downloadURL" :uploadCSV="uploadCSV">
       </EditableTable>
     </section>
   </div>
@@ -20,16 +13,19 @@
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import agenciesAPI from '@/api/agencies.api';
 import timezones from '@/api/timezones';
+import TableHeader from "@/components/vuetable/TableHeader";
 
 export default {
   components: {
     EditableTable,
+    TableHeader
   },
   data() {
     return {
+      tableTitle: 'Agency',
+      infoURL: "https://developers.google.com/transit/gtfs/reference#agencytxt",
       downloadURL: agenciesAPI.agenciesAPI.getDownloadURL(this.$route.params.projectid),
       url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectid),
-      infoURL: "https://developers.google.com/transit/gtfs/reference#agencytxt",
       fields: [
         'actions',
         {

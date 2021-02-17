@@ -1,16 +1,9 @@
 <template>
   <div class="calendar container">
-    <div class="header">
-      <div class="grid v-center">
-        <h1>Calendars</h1>
-        <button class="btn icon flat" alt="Go to GTFS specification.">
-          <span class="material-icons">info</span>
-        </button>
-      </div>
-    </div>
+    <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     <section class="content">
       <EditableTable :fields="fields" :url="url" :updateMethod="updateCalendar" :deleteMethod="removeCalendar"
-                     :createMethod="createCalendar" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :infoURL="infoURL">
+                     :createMethod="createCalendar" :downloadURL="downloadURL" :uploadCSV="uploadCSV">
         <template slot="information">
           Calendars are amazing!!!
         </template>
@@ -22,16 +15,19 @@
 <script>
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import calendarAPI from '@/api/calendar.api';
+import TableHeader from "@/components/vuetable/TableHeader";
 
 export default {
   components: {
     EditableTable,
+    TableHeader
   },
   data() {
     return {
+      tableTitle: 'Calendar',
+      infoURL: "https://developers.google.com/transit/gtfs/reference#calendartxt",
       downloadURL: calendarAPI.calendarAPI.getDownloadURL(this.$route.params.projectid),
       url: calendarAPI.calendarAPI.getFullBaseURL(this.$route.params.projectid),
-      infoURL: "https://developers.google.com/transit/gtfs/reference#calendartxt",
       days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
       fields: [
         'actions',

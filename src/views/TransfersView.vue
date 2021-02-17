@@ -1,16 +1,9 @@
 <template>
   <div class="transfers container">
-    <div class="header">
-      <div class="grid v-center">
-        <h1>Transfers</h1>
-        <button class="btn icon flat" alt="Go to GTFS specification.">
-          <span class="material-icons">info</span>
-        </button>
-      </div>
-    </div>
+    <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     <section class="content">
       <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
+                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
       </EditableTable>
     </section>
   </div>
@@ -20,16 +13,19 @@
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import transfersAPI from '@/api/transfers.api';
 import stopsAPI from '@/api/stops.api'
+import TableHeader from "@/components/vuetable/TableHeader";
 
 export default {
   components: {
     EditableTable,
+    TableHeader
   },
   data() {
     return {
+      tableTitle: 'Transfers',
+      infoURL: "https://developers.google.com/transit/gtfs/reference#transferstxt",
       url: transfersAPI.transfersAPI.getFullBaseURL(this.$route.params.projectid),
       downloadURL: transfersAPI.transfersAPI.getDownloadURL(this.$route.params.projectid),
-      infoURL: "https://developers.google.com/transit/gtfs/reference#transferstxt",
       fields: [
         'actions',
         {

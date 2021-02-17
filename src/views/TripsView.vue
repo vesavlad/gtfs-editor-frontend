@@ -1,17 +1,9 @@
 <template>
   <div class="trips container">
-    <div class="header">
-      <div class="grid v-center">
-        <h1>Trips</h1>
-        <button class="btn icon flat" alt="Go to GTFS specification.">
-          <span class="material-icons">info</span>
-        </button>
-      </div>
-    </div>
+    <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     <section class="content">
       <EditableTable :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
-                     :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true"
-                     :infoURL="infoURL">
+                     :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
         <template slot="additional-buttons">
           <button class="btn btn-outline-secondary" @click="$router.push({ name: 'Shapes', params: $router.params })">
             Edit Shapes
@@ -34,8 +26,9 @@ export default {
   },
   data() {
     return {
-      url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectid),
+      tableTitle: 'Trips',
       infoURL: "https://developers.google.com/transit/gtfs/reference#tripstxt",
+      url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectid),
       downloadURL: tripsAPI.tripsAPI.getDownloadURL(this.$route.params.projectid),
       fields: [
         'actions',

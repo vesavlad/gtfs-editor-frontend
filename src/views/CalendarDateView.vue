@@ -1,16 +1,9 @@
 <template>
   <div class="calendar-dates container">
-    <div class="header">
-      <div class="grid v-center">
-        <h1>Calendar dates</h1>
-        <button class="btn icon flat" alt="Go to GTFS specification.">
-          <span class="material-icons">info</span>
-        </button>
-      </div>
-    </div>
+    <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     <section class="content">
       <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
+                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
       </EditableTable>
     </section>
   </div>
@@ -19,16 +12,19 @@
 <script>
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import calendarDatesAPI from '@/api/calendardates.api';
+import TableHeader from "@/components/vuetable/TableHeader";
 
 export default {
   components: {
     EditableTable,
+    TableHeader
   },
   data() {
     return {
+      tableTitle: 'Calendar dates',
+      infoURL: "https://developers.google.com/transit/gtfs/reference#calendar_datestxt",
       downloadURL: calendarDatesAPI.calendarDatesAPI.getDownloadURL(this.$route.params.projectid),
       url: calendarDatesAPI.calendarDatesAPI.getFullBaseURL(this.$route.params.projectid),
-      infoURL: "https://developers.google.com/transit/gtfs/reference#calendar_datestxt",
       fields: [
         'actions',
         {

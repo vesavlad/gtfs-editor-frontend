@@ -1,17 +1,9 @@
 <template>
   <div class="routes container">
-
-    <div class="header">
-      <div class="grid v-center">
-        <h1>Routes</h1>
-        <button class="btn icon flat" alt="Go to GTFS specification.">
-          <span class="material-icons">info</span>
-        </button>
-      </div>
-    </div>
+    <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     <section class="content">
       <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
+                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
         <template slot="additional-actions" slot-scope="props">
           <button class="btn icon flat" @click="goToRoute(props)" alt="Go to trips">
             <span class="material-icons">map</span>
@@ -26,15 +18,18 @@
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import routesAPI from '@/api/routes.api';
 import agenciesAPI from '@/api/agencies.api'
+import TableHeader from "@/components/vuetable/TableHeader";
 
 export default {
   components: {
-    EditableTable
+    EditableTable,
+    TableHeader
   },
   data() {
     return {
-      url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
+      tableTitle: 'Routes',
       infoURL: "https://developers.google.com/transit/gtfs/reference#routestxt",
+      url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
       downloadURL: routesAPI.routesAPI.getDownloadURL(this.$route.params.projectid),
       fields: [
         'actions',

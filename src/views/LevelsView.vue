@@ -1,16 +1,9 @@
 <template>
   <div class="levels container">
-    <div class="header">
-      <div class="grid v-center">
-        <h1>Levels</h1>
-        <button class="btn icon flat" alt="Go to GTFS specification.">
-          <span class="material-icons">info</span>
-        </button>
-      </div>
-    </div>
+    <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     <section class="content">
       <EditableTable :fields="fields" :url="url" :updateMethod="update" :deleteMethod="remove" :createMethod="create"
-                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true" :infoURL="infoURL">
+                     :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true">
       </EditableTable>
     </section>
   </div>
@@ -19,16 +12,19 @@
 <script>
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import levelsAPI from '@/api/levels.api';
+import TableHeader from "@/components/vuetable/TableHeader";
 
 export default {
   components: {
     EditableTable,
+    TableHeader
   },
   data() {
     return {
+      tableTitle: 'Levels',
+      infoURL: "https://developers.google.com/transit/gtfs/reference#levelstxt",
       downloadURL: levelsAPI.levelsAPI.getDownloadURL(this.$route.params.projectid),
       url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectid),
-      infoURL: "https://developers.google.com/transit/gtfs/reference#levelstxt",
       fields: [
         'actions',
         {
