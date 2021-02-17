@@ -19,10 +19,12 @@ import EditableTable from "@/components/vuetable/EditableTable.vue";
 import tripsAPI from '@/api/trips.api';
 import routesAPI from '@/api/routes.api';
 import shapesAPI from '@/api/shapes.api';
+import TableHeader from "@/components/vuetable/TableHeader";
 
 export default {
   components: {
     EditableTable,
+    TableHeader
   },
   data() {
     return {
