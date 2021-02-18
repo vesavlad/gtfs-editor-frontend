@@ -59,7 +59,8 @@
         <div class="table-footer-buttons">
           <button class="btn green" @click="saveChanges"><span>{{ $t('vuetable.save') }}</span></button>
           <slot name="additional-buttons"></slot>
-          <button class="btn" @click="createModal.visible=true"><span>{{ $t('vuetable.addRow') }}</span><i class="material-icons">add</i>
+          <button class="btn" @click="createModal.visible=true"><span>{{ $t('vuetable.addRow') }}</span><i
+              class="material-icons">add</i>
           </button>
         </div>
       </div>
