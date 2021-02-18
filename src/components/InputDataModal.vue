@@ -23,8 +23,8 @@
           <span>{{ errors.non_field_errors }}</span>
         </div>
         <div class="option-buttons">
-          <button class="btn flat" @click="$emit('cancel')"><span>Cancel</span></button>
-          <button class="btn green" @click="$emit('save', localData)"><span>Save</span></button>
+          <button class="btn flat" @click="$emit('cancel')"><span>{{ $t('general.cancel') }}</span></button>
+          <button class="btn green" @click="$emit('save', localData)"><span>{{ $t('general.save') }}</span></button>
         </div>
       </div>
     </template>
