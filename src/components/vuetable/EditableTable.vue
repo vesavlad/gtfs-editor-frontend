@@ -2,13 +2,11 @@
   <div>
     <div class="table-container card">
       <div class="table-header">
-        <template v-if="searchable">
-          <form class="search" @submit.stop.prevent="doSearch">
-            <div class="input-group">
-              <input v-model="quickSearch" type="search" :placeholder="$t('vuetable.quickSearch')" v-on:input="doSearch">
-            </div>
-          </form>
-        </template>
+        <form v-if="searchable" class="search" @submit.stop.prevent="doSearch">
+          <div class="input-group">
+            <input v-model="quickSearch" type="search" :placeholder="$t('vuetable.quickSearch')" v-on:input="doSearch">
+          </div>
+        </form>
         <div class="table-total-rows"><span>{{ totalDataInTable }} {{ $t('vuetable.rows') }}</span></div>
         <div class="table-option-buttons">
           <form method="get" :action="downloadURL">
