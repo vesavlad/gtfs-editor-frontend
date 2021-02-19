@@ -23,8 +23,9 @@
         </div>
       </div>
       <div class="table-content">
-        <vuetable ref="vuetable" :api-url="url" :multi-sort="true" :fields="getProcessedFields(fields)"
-                  data-path="results" pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
+        <vuetable ref="vuetable" :api-url="url" :multi-sort="true"
+                  :fields="getProcessedFields(getFieldsWithVisibility())" data-path="results"
+                  pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
                   :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData" :css="css"
                   @vuetable:load-success="updateTotalDataLabel">
           <template slot="tableHeader">
@@ -114,8 +115,8 @@
       </template>
       <template slot="close-button-name">Delete</template>
     </Modal>
+    <FieldVisibilityModal :show="settings.show" @close="settings.show=false" :fields="fields"></FieldVisibilityModal>
   </div>
-
 </template>
 
 
@@ -129,6 +130,8 @@ import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
 import GeneralizedInput from "@/components/vuetable/GeneralizedInput.vue";
 import VuetableRowHeader from "@/components/vuetable/VuetableRowHeader.vue";
 import VuetablePaginationDropDown from "@/components/vuetable/VuetablePaginationDropDown.vue";
+import FieldVisibilityModal from '@/components/vuetable/FieldVisibilityModal.vue';
+
 import $ from 'jquery';
 import 'select2';
 import {debounce} from "debounce";
@@ -142,7 +145,8 @@ export default {
     Modal,
     FileReader,
     GeneralizedInput,
-    VuetableRowHeader
+    VuetableRowHeader,
+    FieldVisibilityModal
   },
   mixins: [
     errorMessageMixin,
@@ -181,7 +185,10 @@ export default {
           return `<span class="material-icons">${classes[1]}</span>`
         }
       },
-      totalDataInTable: 0
+      totalDataInTable: 0,
+      settings: {
+        show: false
+      }
     };
   },
   props: {
@@ -221,6 +228,13 @@ export default {
   methods: {
     updateTotalDataLabel(response) {
       this.totalDataInTable = response.data.pagination.total;
+    },
+    getFieldsWithVisibility() {
+      return this.fields.map(field => {
+        let value = JSON.parse(window.localStorage.getItem(field.name));
+        let visible = value === null ? true : value;
+        return {...field, ...{visible}};
+      });
     },
     setDefaultCreationValue(field, data = this.createModal.data) {
       if (field === "actions") {
