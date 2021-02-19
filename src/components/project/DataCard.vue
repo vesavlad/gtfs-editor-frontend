@@ -75,7 +75,7 @@ export default {
       default: Enums.DataCard.ENABLED,
       required: true,
       validator(value) {
-        return [Enums.DataCard.Empty, Enums.DataCard.BLOCKED, Enums.DataCard.ENABLED].indexOf(value) !== -1;
+        return [Enums.DataCard.EMPTY, Enums.DataCard.BLOCKED, Enums.DataCard.ENABLED].indexOf(value) !== -1;
       }
     }
   },
