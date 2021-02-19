@@ -6,6 +6,7 @@
 
 <script>
 import InputDataModal from "@/components/InputDataModal.vue";
+import Enums from "@/utils/enums";
 
 export default {
   name: 'FieldVisibilityModal',
@@ -40,7 +41,7 @@ export default {
           name: field.name,
           label: field.title,
           required: false,
-          type: 'checkbox'
+          type: Enums.InputType.CHECKBOX
         }
       });
     }

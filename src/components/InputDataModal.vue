@@ -14,10 +14,10 @@
             <span>{{ field.label }}{{ field.required?'*':'' }}</span>
           </div>
           <div class="input-row-content single">
-            <template v-if="field.type==='input'">
+            <template v-if="[InputType.INPUT, InputType.DATE, InputType.URL, InputType.EMAIL].indexOf(field.type)>-1">
               <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.label.toLowerCase()}`" @focus="$emit('removeError', field.name)" :class="{error: errors[field.name]}" v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"/>
             </template>
-            <template v-else-if="field.type==='checkbox'">
+            <template v-else-if="field.type===InputType.CHECKBOX">
               <label>
                 <div class="checkbox"></div>
                 <input type="checkbox" v-model="localData[field.name]" />
@@ -41,6 +41,7 @@
 
 <script>
 import BaseModal from '@/components/BaseModal.vue';
+import Enums from "@/utils/enums";
 
 export default {
   name: 'InputDataModal',
@@ -71,6 +72,10 @@ export default {
               console.warn(`Property ${properties[i]} is not present in element ${j+1} of fields prop`);
               return false;
             }
+            if (properties[i]==='type' && Object.values(Enums.InputType).indexOf(value[j])===-1) {
+              console.warn(`value ${value[j]} is not valid for property ${properties[i]} in element ${j+1}`);
+              return false;
+            }
           }
         }
         return true;
@@ -87,7 +92,8 @@ export default {
   },
   data() {
     return {
-      localData: {...this.initialData}
+      localData: {...this.initialData},
+      InputType: Enums.InputType
     }
   },
   computed: {

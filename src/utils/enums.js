@@ -25,6 +25,13 @@ const Enums = {
     LOADING_GTFS: 'loading_gtfs',
     ERROR_LOADING_GTFS: 'error_loading_gtfs',
     FROM_GTFS: 'from_gtfs'
+  },
+  InputType: {
+    INPUT: 'input',
+    DATE: 'date',
+    URL: 'url',
+    EMAIL: 'email',
+    CHECKBOX: 'checkbox'
   }
 }
 
