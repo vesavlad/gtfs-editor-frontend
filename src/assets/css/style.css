@@ -469,7 +469,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 .section-content {display: grid; grid-gap: 40px;}
 .box-data h2 {margin-bottom: 30px;}
 .grid-data {display: grid; grid-template-columns: repeat(4, 1fr); grid-gap: 20px;}
-.data-card {display: grid;}
+.data-card {display: grid; align-content: flex-start;}
 .data-card h4 {color: var(--gris-osc2);}
 .data-header {background-color: var(--gris-claro); padding: 15px 15px 5px; margin: 0; overflow: hidden; border-top-right-radius: 20px; border-top-left-radius: 20px;}
 .data-body {margin-bottom: 10px; min-height: 50px; font-weight: 500; color: var(--negro);}
