@@ -90,7 +90,7 @@
     <InputDataModal v-if="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo"
                     @removeError="removeMessageError"
                     :title="feedInfo.config.title" :link="feedInfo.config.link" :fields="feedInfo.config.fields"
-                    :data="project.feedinfo?project.feedinfo:{}" :errors="feedInfo.config.errors">
+                    :initialData="project.feedinfo?project.feedinfo:{}" :errors="feedInfo.config.errors">
     </InputDataModal>
     <DeletionModal></DeletionModal>
   </div>

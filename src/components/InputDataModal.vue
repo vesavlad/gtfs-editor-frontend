@@ -56,7 +56,7 @@ export default {
       type: Array,
       default: () => []
     },
-    data: {
+    initialData: {
       type: Object,
       required: true,
     },
@@ -67,7 +67,7 @@ export default {
   },
   data() {
     return {
-      localData: {...this.data}
+      localData: {...this.initialData}
     }
   },
   computed: {
