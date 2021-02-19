@@ -391,7 +391,7 @@ table {
     font-size: 16px;
     table-layout: auto;
 }
-table input {width: auto;}
+table input {width: auto; box-sizing: border-box;}
 table td {padding: 10px 5px; border-bottom: var(--border);}
 table th {
     padding: 10px;

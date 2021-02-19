@@ -2,7 +2,7 @@
   <input ref="input" :type="field.data_type" v-model="val" @input="$emit('input', getValue($event.target))"
          v-bind:class="{error: hasErrors}" :data-error="errors.length?errors[0]:''"
          v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: errors.length }"
-         v-autowidth="{minWidth: '100%', maxWidth: '800px'}"/>
+         v-autowidth="{minWidth: 'calc(100% - 20px)', maxWidth: '800px'}"/>
 </template>
 
 <script>
