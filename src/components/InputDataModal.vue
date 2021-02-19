@@ -54,7 +54,19 @@ export default {
     },
     fields: {
       type: Array,
-      default: () => []
+      default: () => [],
+      validator(value) {
+        let properties = ['name', 'required', 'label', 'type'];
+        for (let i = 0; i < properties.length; i++) {
+          for (let j = 0; j < value.length; j++) {
+            if (!Object.prototype.hasOwnProperty.call(value[j], properties[i])) {
+              console.warn(`Property ${properties[i]} is not present in element ${j+1} of fields prop`);
+              return false;
+            }
+          }
+        }
+        return true;
+      }
     },
     initialData: {
       type: Object,
