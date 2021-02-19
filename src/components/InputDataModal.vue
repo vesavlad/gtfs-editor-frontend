@@ -14,7 +14,15 @@
             <span>{{ field.label }}{{ field.required?'*':'' }}</span>
           </div>
           <div class="input-row-content single">
-            <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.label.toLowerCase()}`" @focus="$emit('removeError', field.name)" :class="{error: errors[field.name]}" v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"/>
+            <template v-if="field.type==='input'">
+              <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.label.toLowerCase()}`" @focus="$emit('removeError', field.name)" :class="{error: errors[field.name]}" v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"/>
+            </template>
+            <template v-else-if="field.type==='checkbox'">
+              <label>
+                <div class="checkbox"></div>
+                <input type="checkbox" v-model="localData[field.name]" />
+              </label>
+            </template>
           </div>
         </li>
       </ul>
