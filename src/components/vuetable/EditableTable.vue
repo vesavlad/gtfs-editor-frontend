@@ -31,9 +31,6 @@
           <template slot="tableHeader">
             <VuetableRowHeader></VuetableRowHeader>
           </template>
-          <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-            <slot :name="slot" v-bind="scope" :print="log($scopedSlots)"/>
-          </template>
           <div slot="actions" slot-scope="props" class="grid min center">
             <button class="btn icon flat error" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
               <span class="material-icons">delete</span>
