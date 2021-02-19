@@ -14,10 +14,12 @@
               {{ $t('vuetable.downloadCSV') }}
             </button>
           </form>
-          <button class="btn flat" @click="uploadModal.visible=true; uploadModal.error = '';">
+          <button class="btn flat" @click="uploadModal.visible=true;uploadModal.error='';">
             {{ $t('vuetable.uploadCSV') }}
           </button>
-          <button class="btn icon flat"><i class="material-icons">settings</i></button>
+          <button class="btn icon flat" @click="settings.show=true">
+            <i class="material-icons">settings</i>
+          </button>
         </div>
       </div>
       <div class="table-content">
