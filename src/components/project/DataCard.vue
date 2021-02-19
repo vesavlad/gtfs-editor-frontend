@@ -74,7 +74,7 @@ export default {
       type: String,
       default: Enums.DataCard.ENABLED,
       required: true,
-      validation(value) {
+      validator(value) {
         return [Enums.DataCard.Empty, Enums.DataCard.BLOCKED, Enums.DataCard.ENABLED].indexOf(value) !== -1;
       }
     }
