@@ -1,6 +1,8 @@
 <template>
   <input ref="input" :type="field.data_type" v-model="val" @input="$emit('input', getValue($event.target))"
-         v-bind:class="{error: hasErrors}" :data-error="errors.length?errors[0]:''">
+         v-bind:class="{error: hasErrors}" :data-error="errors.length?errors[0]:''"
+         v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: errors.length }"
+         v-autowidth="{minWidth: '100%', maxWidth: '800px'}"/>
 </template>
 
 <script>
@@ -46,17 +48,15 @@ export default {
       return value;
     },
     getValue(input) {
+      let value = null;
       if (this.field.data_type === "checkbox") {
-        return input.checked;
-      }
-      let value = input.value;
-      if (this.field.data_type === "color") {
-        value = value.slice(1);
+        value = input.checked;
+      } else if (this.field.data_type === "color") {
+        value = input.value.slice(1);
+      } else {
+        value = input.value;
       }
       return value;
-    },
-    log() {
-      console.log(...arguments);
     }
   },
 }
