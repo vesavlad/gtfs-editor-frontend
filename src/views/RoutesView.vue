@@ -102,7 +102,7 @@ export default {
           remember_creation_value: true,
           sortField: 'route_text_color',
         },
-      ],
+      ]
     };
   },
   methods: {
@@ -126,7 +126,7 @@ export default {
     },
     uploadCSV(file) {
       return routesAPI.routesAPI.uploadCSV(this.$route.params.projectid, file);
-    },
+    }
   },
 };
 </script>
