@@ -122,8 +122,8 @@ export default {
         projectsAPI.getProjectDetail(this.project.project_id).then(response => {
           if ([this.status.FINISHED, this.status.ERROR, this.status.CANCELED].indexOf(response.data.gtfs_building_and_validation_status) > -1) {
             clearInterval(this.interval);
+            this.$emit('update-project', response.data);
           }
-          this.$emit('update-project', response.data);
         });
       }, 2000);
     }
