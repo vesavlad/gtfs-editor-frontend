@@ -24,7 +24,7 @@
       </div>
       <div class="table-content">
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true"
-                  :fields="getProcessedFields(getFieldsWithVisibility())" data-path="results"
+                  :fields="getFieldsWithVisibility()" data-path="results"
                   pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
                   :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData" :css="css"
                   @vuetable:load-success="updateTotalDataLabel">
