@@ -6,12 +6,6 @@ let fieldMixin = {
       }
       return field;
     },
-    getFKName(field) {
-      if (field.fk_name) {
-        return field.fk_name;
-      }
-      return field.name;
-    },
     getFieldID(field) {
       if (field instanceof Object && field.id_field) {
         return field.id_field;

@@ -90,7 +90,10 @@ export default {
             return query
           },
           processResults(data) {
-            let name = self.getFKName(field);
+            let name = field.name;
+            if (field.fk_name) {
+              name = field.fk_name;
+            }
             let reply = {
               results: data.results.map(result => {
                 let res = {
