@@ -4,10 +4,7 @@ let fieldMixin = {
     getProcessedFields(fields) {
       let result = fields.map(field => {
         if(field instanceof Object){
-          field = {
-            ...field
-          };
-          field.title = this.getFieldTitle(field);
+          field = {...field};
         }
         return field;
       });
@@ -18,16 +15,6 @@ let fieldMixin = {
         return field.name;
       }
       return field;
-    },
-    getFieldTitle(field) {
-      if (field instanceof Object) {
-        let title = field.title || field.name
-        if(field.required){
-          title="<span class='required'>"+title+"*</span>";
-        }
-        return title
-      }
-      return  this.getFieldName(field);
     },
     getFKName(field) {
       if (field.fk_name) {
