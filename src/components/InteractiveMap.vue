@@ -1,8 +1,18 @@
 <template>
-  <div class='horizontal-display'>
-    <InfoButton :info="info"></InfoButton>
-    <div id='map-container'>
-      <div id='map'>
+    <div class="dynamic-map-container">
+      <div class="top-map-bar">
+        <div class="right-content grid center">
+          <input type="search" placeholder="Search"/>
+          <FKSelect :field="shape_field" :data="{}" v-on:input="loadShape($event)"></FKSelect>
+          <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+        </div>
+      </div>
+      <div id='map' class="map">
+        <button v-if="!creation.creating" class="btn floating" alt="Create Stop" @click="beginCreation">
+          <span class="material-icons">add</span>
+        </button>
+      </div>
+      <div class="map-sidebar">
         <div ref="popup" v-show="popup.open">
           <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
           </popup-content>
@@ -10,14 +20,7 @@
             <span class="material-icons">delete</span>
           </button>
         </div>
-      </div>
-      <div class="map-overlay top">
         <div class="map-overlay-inner" v-if="map">
-          Display Shape
-          <FKSelect :field="shape_field" :data="{}" v-on:input="loadShape($event)"></FKSelect>
-          <button v-if="!creation.creating" class="btn icon" alt="Create Stop" @click="beginCreation">
-            <span class="material-icons">add</span>
-          </button>
           <div v-if="creation.creating">
             <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
                            v-model="creation.data">
@@ -41,7 +44,6 @@
         <template slot="close-button-name">Delete</template>
       </Modal>
     </div>
-  </div>
 </template>
 
 <script>
@@ -51,7 +53,6 @@ import shapeMapMixin from "@/mixins/shapeMapMixin"
 import PopupContent from '@/components/PopupContent.vue';
 import FKSelect from '@/components/vuetable/FKSelect.vue';
 import Modal from "@/components/Modal.vue";
-import InfoButton from "@/components/InfoButton.vue";
 import envelopeMixin from "@/mixins/envelopeMixin"
 import config from "@/config.js"
 
@@ -63,7 +64,6 @@ export default {
     PopupContent,
     Modal,
     FKSelect,
-    InfoButton,
   },
   mixins: [
     envelopeMixin,

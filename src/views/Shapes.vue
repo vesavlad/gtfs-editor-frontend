@@ -1,7 +1,15 @@
 <template>
-  <div>
-    <div class="flex" v-if="!editing">
-      <div>
+  <div class="shapes">
+    <div class="grid container">
+      <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
+    </div>
+    <div class="dynamic-map-container" v-if="!editing">
+      <div class="top-map-bar">
+        <div class="right-content">
+          <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+        </div>
+      </div>
+      <div class="map-sidebar">
         <ShapesTable ref="table" :project="$route.params.projectid" @focus-shape="displayShape"
           @edit-shape="openEditingModal" @delete-shape="beginDeleteShape"></ShapesTable>
         <button class="btn btn-outline-secondary" @click="beginCreation">
@@ -53,15 +61,18 @@
   import ShapeEditor from "@/components/ShapeEditor.vue";
   import Modal from "@/components/Modal.vue";
   import shapesAPI from "@/api/shapes.api";
+  import TableHeader from "@/components/vuetable/TableHeader";
   export default {
     components: {
       ShapesTable,
       ShapesMap,
       ShapeEditor,
       Modal,
+      TableHeader
     },
     data() {
       return {
+        tableTitle: 'Shapes',
         editing: false,
         shape: false,
         range: false,

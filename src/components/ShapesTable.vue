@@ -1,8 +1,5 @@
 <template>
   <div>
-    <button class="btn icon" @click="openInfo" alt="Go to GTFS specification.">
-      <span class="material-icons">info</span>
-    </button>
     <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
       <div class="input-group">
         <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
@@ -23,13 +20,12 @@
           </button>
         </div>
       </Vuetable>
+      <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
+      </VuetablePagination>
+      <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
+      </VuetablePaginationDropDown>
     </div>
-    <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
-    </VuetablePagination>
-    <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
-    </VuetablePaginationDropDown>
   </div>
-
 </template>
 
 
