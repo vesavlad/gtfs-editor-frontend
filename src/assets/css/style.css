@@ -406,8 +406,12 @@ table th {
     border: 1px solid #D4DDE1;
     border-bottom-width: 3px;
 }
-td input[type="text"] {text-align: center; padding: 8px; min-width: min-content; width: 100%;}
+td input[type="text"] {text-align: center; padding: 8px;}
+
+/* Multiselect */
 td .multiselect input[type="text"] {min-width: inherit; box-shadow: none;}
+.multiselect__input, .multiselect__single {white-space: nowrap;}
+
 tr.changed>td {
     background-color: var(--bg-warning);
 }
