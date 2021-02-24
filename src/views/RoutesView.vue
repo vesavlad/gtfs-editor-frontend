@@ -19,6 +19,7 @@ import EditableTable from "@/components/vuetable/EditableTable.vue";
 import routesAPI from '@/api/routes.api';
 import agenciesAPI from '@/api/agencies.api'
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -34,13 +35,15 @@ export default {
       fields: [
         {
           name: 'actions',
-          title: this.$i18n.t('vuetable.actions')
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
         {
           name: 'route_id',
           title: 'Route ID',
           sortField: 'route_id',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'agency_id',
@@ -51,12 +54,12 @@ export default {
           required: true,
           ajax_params: {
             url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: 'route_type',
           title: 'Type',
-          type: "select-simple",
           required: true,
           options: [
             {name: 'Tram, Streetcar, Light rail', value: 0},
@@ -70,37 +73,44 @@ export default {
             {name: 'Trolleybus', value: 11},
             {name: 'Monorail', value: 12},
           ],
+          type: Enums.InputType.SIMPLE_SELECT
         },
         {
           name: 'route_short_name',
           title: 'Short Name',
           sortField: 'route_short_name',
+          type: Enums.InputType.INPUT
         },
         {
           name: 'route_long_name',
           title: 'Long Name',
           sortField: 'route_long_name',
+          type: Enums.InputType.INPUT
         },
         {
           name: 'route_desc',
           title: 'Description',
+          type: Enums.InputType.INPUT
         },
         {
           name: 'route_url',
           title: 'URL',
           sortField: 'route_url',
+          type: Enums.InputType.URL
         },
         {
           name: 'route_color',
           title: 'Route Color',
           remember_creation_value: true,
           sortField: 'route_color',
+          type: Enums.InputType.COLOR
         },
         {
           name: 'route_text_color',
           title: 'Text Color',
           remember_creation_value: true,
           sortField: 'route_text_color',
+          type: Enums.InputType.COLOR
         },
       ]
     };

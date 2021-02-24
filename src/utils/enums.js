@@ -31,7 +31,10 @@ const Enums = {
     DATE: 'date',
     URL: 'url',
     EMAIL: 'email',
-    CHECKBOX: 'checkbox'
+    CHECKBOX: 'checkbox',
+    COLOR: 'color',
+    SIMPLE_SELECT: 'simple-select',
+    FK_SELECT: 'fk-select'
   }
 }
 
