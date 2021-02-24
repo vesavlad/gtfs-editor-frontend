@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="map-sidebar">
     <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
       <div class="input-group">
         <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">

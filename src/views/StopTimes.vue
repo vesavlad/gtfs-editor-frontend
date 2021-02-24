@@ -1,13 +1,16 @@
 <template>
-  <div>
-    <div class="flex" v-if="!editing">
-      <div>
-        <button class="btn icon" @click="openInfo" alt="Go to GTFS specification.">
-          <span class="material-icons">info</span>
-        </button>
+  <div class="section stop-times">
+    <div class="grid container">
+      <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
+    </div>
+    <div v-if="!editing" class="dynamic-map-container">
+      <div class="top-map-bar">
+        <div class="right-content grid center">
+          <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+        </div>
+      </div>
         <StopTimesTable ref="table" :project="$route.params.projectid" @focus-st="displayTrip"
           @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>
-      </div>
       <StopTimesMap ref="map" :project="$route.params.projectid" @range="beginEditing('range', $event)"></StopTimesMap>
     </div>
     <StopTimesEditor v-else :trip="editingModal.trip" v-on:close="finishEditing" :project="$route.params.projectid"
@@ -64,15 +67,18 @@
   import StopTimesEditor from "@/components/StopTimesEditor.vue";
   import Modal from "@/components/Modal.vue";
   import tripsAPI from "@/api/trips.api";
+  import TableHeader from "@/components/vuetable/TableHeader";
   export default {
     components: {
       StopTimesTable,
       StopTimesMap,
       StopTimesEditor,
       Modal,
+      TableHeader
     },
     data() {
       return {
+        tableTitle: 'Stop times',
         editing: false,
         range: false,
         editingModal: {

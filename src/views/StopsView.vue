@@ -1,10 +1,17 @@
 <template>
-  <div>
-    <div class="tab">
-      <button class="tablinks" @click="switchTab('table')">Table</button>
-      <button class="tablinks" @click="switchTab('map')">Map</button>
+  <div class="section stops">
+    <div class="grid container">
+      <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
+      <div class="tab">
+        <button class="tablinks" @click="switchTab('table')"><span>Table view</span><i class="material-icons">view_headline</i></button>
+        <button class="tablinks" @click="switchTab('map')"><span>Map view</span><i class="material-icons">map</i></button>
+      </div>
     </div>
-    <div v-show="tab==='table'" class="table-container">
+    <div v-show="tab==='map'" class="map-container">
+      <InteractiveMap ref="map" :project="$route.params.projectid" :stopFields="fields">
+      </InteractiveMap>
+    </div>
+    <div v-show="tab==='table'" class="table-container container">
       <EditableTable ref='table' :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
                      :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true"
                      @update="onUpdate" :infoURL="infoURL">
@@ -15,10 +22,6 @@
         </template>
       </EditableTable>
     </div>
-    <div v-show="tab==='map'" class="map-container">
-      <InteractiveMap ref="map" :project="$route.params.projectid" :stopFields="fields">
-      </InteractiveMap>
-    </div>
   </div>
 </template>
 
@@ -26,18 +29,21 @@
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import InteractiveMap from "@/components/InteractiveMap.vue";
 import stopsAPI from '@/api/stops.api';
-import stopsMixin from '@/mixins/stopsMixin.js'
+import stopsMixin from '@/mixins/stopsMixin.js';
+import TableHeader from "@/components/vuetable/TableHeader";
 
 export default {
   components: {
     EditableTable,
     InteractiveMap,
+    TableHeader
   },
   mixins: [
     stopsMixin
   ],
   data() {
     return {
+      tableTitle: 'Stops',
       infoURL: "https://developers.google.com/transit/gtfs/reference#stopstxt",
       tab: "map",
       url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),

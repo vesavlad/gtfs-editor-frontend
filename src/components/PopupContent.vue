@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="stop-input-details">
     <div :key="`popup-${getFieldName(field)}`" v-for="field in getProperFields(fields)">
       <label>{{ getFieldName(field) }}</label>
       <div class="error-message" v-for="error in errors[getFieldName(field)]" v-bind:key="error">{{ error }}</div>
