@@ -66,24 +66,41 @@
           <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('myProjects.projectName')"
                  :class="{error: project.config.errors.name }" @focus="project.config.errors={}"
                  v-tooltip="{ theme: 'error-tooltip', content: project.config.errors.name?project.config.errors.name[0]:'', shown: project.config.errors.name !== undefined }"/>
-
-            <div class="new-box">
-              <img src="@/assets/img/new-scratch.svg" alt="New from scratch image"/>
-              <p>{{ $t('myProjects.startEmptyProject') }}</p>
-              <button class="btn" @click="createProjectAndRedirect"><span>Choose</span></button>
+            <div class="title">
+              <h4>Choose how to start</h4>
+              <div class="line"></div>
             </div>
             <div class="new-box">
-              <img src="@/assets/img/new-file.svg" alt="New from scratch image"/>
-              <p>{{ $t('myProjects.startProjectFromGTFS') }}</p>
-              <!-- agregar logica para subir archivo al crear un proyecto -->
-              <label class="upload-gtfs-file">
-                <span class="btn"><span>{{ $t('general.upload') }}</span><i class="material-icons">file_upload</i></span>
-                <input type="file" id="file" ref="file" accept="zip" v-on:change="handleFileUpload"/>
+              <label class="grid-new-box">
+                <input type="radio" name="how-to-start" checked/>
+                <div class="flex center">
+                  <img src="@/assets/img/new-scratch.svg" alt="New from scratch image"/>
+                  <img src="@/assets/img/check.svg" class="check" alt="Check"/>
+                </div>
+                <p>{{ $t('myProjects.startEmptyProject') }}</p>
               </label>
+            </div>
+            <div class="new-box">
+              <label class="grid-new-box">
+                <input type="radio" name="how-to-start"/>
+                <div class="flex center">
+                  <img src="@/assets/img/new-file.svg" alt="New from scratch image"/>
+                  <img src="@/assets/img/check.svg" class="check" alt="Check"/>
+                </div>
+                <p>{{ $t('myProjects.startProjectFromGTFS') }}</p>
+              </label>
+              <!-- agregar logica para subir archivo al crear un proyecto -->
+              <div  class="upload-gtfs-file">
+                <label>
+                  <span class="btn flat"><span>{{ $t('general.upload') }}</span><i class="material-icons">file_upload</i></span>
+                  <input type="file" id="file" ref="file" accept="zip" v-on:change="handleFileUpload"/>
+                </label>
+                <div class="file-name"><span>My file</span><button class="btn flat icon error"><i class="material-icons">close</i></button></div>
+              </div>
             </div>
         </div>
         <div class="modal-footer">
-          <button class="btn" @click="createProjectFromGTFS">
+          <button class="btn green" @click="createProjectFromGTFS">
             <span>{{ $t('general.create') }}</span>
           </button>
         </div>

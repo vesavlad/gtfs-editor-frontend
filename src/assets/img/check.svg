@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="31px" height="31px" viewBox="0 0 31 31" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 6</title>
+    <g id="Editor-GTFS" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Nuevo-proyecto-Copy" transform="translate(-728.000000, -439.000000)" fill-rule="nonzero">
+            <g id="Group-7" transform="translate(310.000000, 140.000000)">
+                <g id="Group-4-Copy" transform="translate(350.000000, 239.000000)">
+                    <g id="Group-6" transform="translate(68.023438, 60.023438)">
+                        <path d="M14.9765625,29.953125 C19.1015625,29.953125 22.6289062,28.4882812 25.5585938,25.5585938 C28.4882812,22.6289062 29.953125,19.1015625 29.953125,14.9765625 C29.953125,10.8515625 28.4882812,7.32421875 25.5585938,4.39453125 C22.6289062,1.46484375 19.1015625,0 14.9765625,0 C10.8515625,0 7.3125,1.4765625 4.359375,4.4296875 C1.453125,7.3359375 0,10.8515625 0,14.9765625 C0,19.1015625 1.46484375,22.6289062 4.39453125,25.5585938 C7.32421875,28.4882812 10.8515625,29.953125 14.9765625,29.953125 Z" id="Path" fill="#7DC242"></path>
+                        <polygon id="Path" fill="#FFFFFF" points="11.953125 23.5 4.5 15.9765625 6.609375 13.8671875 11.953125 19.2109375 23.34375 7.8203125 25.453125 10"></polygon>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
