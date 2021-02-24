@@ -92,7 +92,7 @@ input, select {
     border: 1px solid transparent;
 }
 select {cursor: pointer;}
-input:focus {box-shadow: 0 2px 5px rgba(0,0,0,0.05), 0 4px 10px rgba(84,101,115,0.15); background-color: white;}
+input:focus:not(.multiselect input) {box-shadow: 0 2px 5px rgba(0,0,0,0.05), 0 4px 10px rgba(84,101,115,0.15); background-color: white;}
 input.error {background: #F0ECEC; border: 1px solid rgba(198,59,46,0.40);}
 input:disabled {background: transparent; box-shadow: none; border: none;}
 input[type="checkbox"]{background: none; box-shadow: none;}
@@ -332,7 +332,7 @@ section {padding-bottom: 40px;}
 .m-header {font-size: 20px; color: var(--gris-osc2);}
 .m-content {padding: 20px; max-height: 500px; overflow-y: auto; display: grid;}
 .m-footer {padding: 20px; border-top: var(--border);}
-.m-content li {display: grid; grid-template-columns: 3fr 5fr; grid-gap: 20px; padding: 10px 20px; align-items: center;}
+.m-content > li {display: grid; grid-template-columns: 3fr 5fr; grid-gap: 20px; padding: 10px 20px; align-items: center;}
 .input-row-title span {font-size: 16px; color: var(--gris-medio2); font-weight: 500;}
 .input-row-title.required span {color: var(--link2);}
 .input-row-content.double {display: grid; grid-template-columns: 1fr 1fr; grid-gap: 10px;}
@@ -411,6 +411,7 @@ table th {
 td .multiselect input[type="text"] {min-width: inherit; box-shadow: none;}
 .multiselect__input, .multiselect__single {white-space: nowrap;}
 .multiselect__content-wrapper {width: fit-content;}
+.multiselect__input:focus {border:0; box-shadow: none;}
 
 tr.changed>td {
     background-color: var(--bg-warning);
