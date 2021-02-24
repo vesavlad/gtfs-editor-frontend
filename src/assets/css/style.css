@@ -407,6 +407,7 @@ table th {
     border-bottom-width: 3px;
 }
 td input[type="text"] {text-align: center; padding: 8px; min-width: min-content; width: 100%;}
+td .multiselect input[type="text"] {min-width: inherit; box-shadow: none;}
 tr.changed>td {
     background-color: var(--bg-warning);
 }
