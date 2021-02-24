@@ -81,25 +81,10 @@
       </template>
       <template slot="close-button-name">Upload</template>
     </Modal>
-    <Modal v-if="createModal.visible" @ok="createEntry" @close="createModal.visible = false"
-           @cancel="createModal.visible = false" :showCancelButton="true" @mounted="createModalCreated()">
-      <template slot="title">
-        <h2>Create new</h2>
-      </template>
-      <template slot="content">
-        <div :key="`create-${getFieldName(field)}`" v-for="field in getProperFields(fields)">
-          <label>{{ getFieldTitle(field) }}</label>
-          <GeneralizedInput :data="createModal.data" :field="field" :value="createModal.data[getFieldName(field)]"
-                            v-model="createModal.data[getFieldID(field)]"
-                            :errors="createModal.errors[getFieldName(field)]">
-          </GeneralizedInput>
-          <span v-for="(error) in createModal.errors[getFieldName(field)]" v-bind:key="error" class="error">
-            {{ error }}
-          </span>
-        </div>
-      </template>
-      <template slot="close-button-name">Create Entry</template>
-    </Modal>
+    <InputDataModal v-if="createModal.visible" :title="$t('vuetable.newEntity')" :initialData="createModal.data"
+                    :errors="createModal.errors" :fields="cleanFields" @save="createEntry"
+                    @close="createModal.visible=false" @cancel="createModal.visible=false">
+    </InputDataModal>
     <Modal v-if="deleteModal.visible" @ok="deleteRow" @close="deleteModal.visible = false"
            @cancel="deleteModal.visible = false" :showCancelButton="true">
       <template slot="title">
@@ -118,7 +103,7 @@
 
 
 <script>
-let Vuetable = require('vuetable-2')
+import Enums from "@/utils/enums";
 import Modal from "@/components/Modal.vue";
 import FileReader from "@/components/FileReader.vue";
 import errorMessageMixin from "@/mixins/errorMessageMixin.js";
@@ -128,10 +113,13 @@ import GeneralizedInput from "@/components/vuetable/GeneralizedInput.vue";
 import VuetableRowHeader from "@/components/vuetable/VuetableRowHeader.vue";
 import VuetablePaginationDropDown from "@/components/vuetable/VuetablePaginationDropDown.vue";
 import FieldVisibilityModal from '@/components/vuetable/FieldVisibilityModal.vue';
+import InputDataModal from "@/components/InputDataModal.vue";
 
 import $ from 'jquery';
 import 'select2';
 import {debounce} from "debounce";
+
+let Vuetable = require('vuetable-2')
 
 export default {
   name: "EditableTable",
@@ -143,7 +131,8 @@ export default {
     FileReader,
     GeneralizedInput,
     VuetableRowHeader,
-    FieldVisibilityModal
+    FieldVisibilityModal,
+    InputDataModal
   },
   mixins: [
     errorMessageMixin,
@@ -151,7 +140,9 @@ export default {
   ],
   data() {
     let created_data = {};
-    this.fields.forEach((field) => this.setDefaultCreationValue(field, created_data));
+    if (this.cleanFields) {
+      this.cleanFields.forEach(field => this.setDefaultCreationValue(field, created_data));
+    }
     return {
       deleteModal: {
         visible: false,
@@ -222,6 +213,11 @@ export default {
       default: false,
     }
   },
+  computed: {
+    cleanFields() {
+      return this.fields.filter(field => field.type !== null);
+    }
+  },
   methods: {
     updateTotalDataLabel(response) {
       this.totalDataInTable = response.data.pagination.total;
@@ -234,27 +230,21 @@ export default {
       });
     },
     setDefaultCreationValue(field, data = this.createModal.data) {
-      if (field === "actions") {
-        return;
-      }
       if (field.foreignKey) {
         data[field.name] = null;
       } else if (field.options) {
         data[field.name] = Object.values(field.options)[0];
       } else if (field.data_type) {
         let def = "";
-        if (field.data_type === "checkbox") {
+        if (field.data_type === Enums.InputType.CHECKBOX) {
           def = false;
-        } else if (field.data_type === 'color') {
+        } else if (field.data_type === Enums.InputType.COLOR) {
           def = "#000000"
         }
         data[field.name] = def;
       } else {
         data[this.getFieldName(field)] = "";
       }
-    },
-    printargs() {
-      console.log(arguments);
     },
     changeHandler(props) {
       this.hasChanged = true;
@@ -321,6 +311,10 @@ export default {
       return data;
     },
     createModalCreated() {
+      /*
+      * Al momento de crearse el modal se ejecutaba este código para haibilitar todos los select2 para que funcione
+      * el autocompletado con paginamiento. Si cambiamos por
+      * */
       this.fields.filter((f) => f.foreignKey).forEach((field) => {
         $(`.create-select.data.${this.getFieldName(field)}`).select2({
           ajax: {
@@ -394,27 +388,21 @@ export default {
         this.deleteModal.message = data.message;
       });
     },
-    createEntry() {
-      let data = {
-        ...this.createModal.data
-      }
-      this.fields.forEach(field => {
-        if (data[field.name] === "") {
+    createEntry(data) {
+      this.cleanFields.forEach(field => {
+        if (data[field.name] === '') {
           data[field.name] = null;
         }
-        if (field.data_type === 'color') {
-          if (data[field.name].charAt(0) === '#') {
-            data[field.name] = data[field.name].slice(1, 7)
-          }
+        if (field.data_type === Enums.InputType.COLOR && data[field.name].charAt(0) === '#') {
+          data[field.name] = data[field.name].slice(1, 7);
         }
       });
-      console.log(data);
       this.createMethod(data).then(response => {
         console.log(response);
         this.createModal.visible = false;
         this.reloadTable();
         this.createModal.errors = {};
-        this.fields.filter(field => field !== "actions").forEach(field => {
+        this.cleanFields.forEach(field => {
           if (field instanceof Object) {
             if (!field.remember_creation_value) {
               this.setDefaultCreationValue(field);
