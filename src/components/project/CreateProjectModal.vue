@@ -35,10 +35,10 @@
           </label>
           <div class="upload-gtfs-file" v-tooltip="{ theme: 'error-tooltip', content: errors.file?errors.file[0]:'', shown: errors.file !== undefined, placement:'top' }">
             <label>
-              <span class="btn flat"><span>{{ $t('general.upload') }}</span><i
-                  class="material-icons">file_upload</i></span>
               <input type="file" id="file" ref="file" accept="application/zip" v-on:change="handleFileUpload"
                      :disabled="creationType===projectCreationType.EMPTY"/>
+              <span class="btn flat"><span>{{ $t('general.upload') }}</span><i
+                  class="material-icons">file_upload</i></span>
             </label>
             <div class="file-name" v-if="filename"><span>{{ filename }}</span>
               <button class="btn flat icon error" @click="deleteAttachmentFile"><i class="material-icons">close</i>

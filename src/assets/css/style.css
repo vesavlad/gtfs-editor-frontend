@@ -367,6 +367,7 @@ section {padding-bottom: 40px;}
 .modal-new-project .new-box p {margin: 0;}
 .upload-gtfs-file {display: grid; grid-template-columns:auto 1fr; align-items: center; grid-gap: 10px; text-align: left;}
 .file-name {display: grid; grid-auto-flow: column; align-items: center; justify-content: flex-start; color: var(--gris-medio);}
+input[type="file"]:disabled ~ .btn {color: var(--gris-claro2); cursor: default;}
 .main-input-text {
     background: #FFFFFF;
     box-shadow: 0 4px 10px 0 rgba(31,43,50,0.10);
