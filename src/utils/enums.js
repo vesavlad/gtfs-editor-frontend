@@ -35,6 +35,10 @@ const Enums = {
     COLOR: 'color',
     SIMPLE_SELECT: 'simple-select',
     FK_SELECT: 'fk-select'
+  },
+  ProjectCreationType: {
+    EMPTY: 'empty',
+    FROM_GTFS: 'from_gtfs'
   }
 }
 

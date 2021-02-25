@@ -10,7 +10,8 @@
         <ProjectCard v-for="project in projectList" v-bind:key="project.project_id" :project="project"></ProjectCard>
 
         <div class="card project-card">
-          <router-link class="project-card-map disabled" :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
+          <router-link class="project-card-map disabled"
+                       :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
             <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
           </router-link>
           <div class="card-content">
@@ -32,7 +33,8 @@
           </div>
         </div>
         <div class="card project-card">
-          <router-link class="project-card-map disabled" :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
+          <router-link class="project-card-map disabled"
+                       :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
             <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
           </router-link>
           <div class="card-content">
@@ -56,75 +58,27 @@
         </div>
       </div>
     </section>
-    <BaseModal v-if="project.create" @close="project.create=false;project.config.errors={}"
-               :classes="['modal-new-project']">
-      <template v-slot:m-content>
-        <div class="modal-new-header">
-          <h2>{{ $t('myProjects.createProject') }}</h2>
-        </div>
-        <div class="content">
-          <input v-model="projectName" type="text" class="main-input-text" :placeholder="$t('myProjects.projectName')"
-                 :class="{error: project.config.errors.name }" @focus="project.config.errors={}"
-                 v-tooltip="{ theme: 'error-tooltip', content: project.config.errors.name?project.config.errors.name[0]:'', shown: project.config.errors.name !== undefined }"/>
-            <div class="title">
-              <h4>{{ $t('myProjects.chooseHowToStart') }}</h4>
-              <div class="line"></div>
-            </div>
-            <div class="new-box">
-              <label class="grid-new-box">
-                <input type="radio" name="how-to-start" checked/>
-                <div class="flex center">
-                  <img src="@/assets/img/new-scratch.svg" alt="New from scratch image"/>
-                  <img src="@/assets/img/check.svg" class="check" alt="Check"/>
-                </div>
-                <p>{{ $t('myProjects.startEmptyProject') }}</p>
-              </label>
-            </div>
-            <div class="new-box">
-              <label class="grid-new-box">
-                <input type="radio" name="how-to-start"/>
-                <div class="flex center">
-                  <img src="@/assets/img/new-file.svg" alt="New from scratch image"/>
-                  <img src="@/assets/img/check.svg" class="check" alt="Check"/>
-                </div>
-                <p>{{ $t('myProjects.startProjectFromGTFS') }}</p>
-              </label>
-              <!-- agregar logica para subir archivo al crear un proyecto -->
-              <div  class="upload-gtfs-file">
-                <label>
-                  <span class="btn flat"><span>{{ $t('general.upload') }}</span><i class="material-icons">file_upload</i></span>
-                  <input type="file" id="file" ref="file" accept="zip" v-on:change="handleFileUpload"/>
-                </label>
-                <div class="file-name"><span>My file</span><button class="btn flat icon error"><i class="material-icons">close</i></button></div>
-              </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn green" @click="createProjectFromGTFS">
-            <span>{{ $t('general.create') }}</span>
-          </button>
-        </div>
-      </template>
-    </BaseModal>
+    <CreateProjectModal :isVisible="project.create"
+                        @close="project.create=false;project.errors={}"></CreateProjectModal>
     <DeletionModal></DeletionModal>
   </div>
 </template>
 
 <script>
 import {mapState} from 'vuex'
-import BaseModal from "@/components/BaseModal.vue";
 import projectsAPI from '@/api/projects.api';
 import ProjectCard from "../components/project/ProjectCard";
 import DeletionModal from "@/components/project/DeletionModal";
 import PillBase from "@/components/PillBase";
 import Enums from "@/utils/enums";
 import EnvelopeMap from "@/components/EnvelopeMap";
+import CreateProjectModal from "@/components/project/CreateProjectModal";
 
 export default {
   name: 'MyProjects',
   components: {
     ProjectCard,
-    BaseModal,
+    CreateProjectModal,
     DeletionModal,
     PillBase,
     EnvelopeMap
@@ -132,13 +86,8 @@ export default {
   data() {
     return {
       project: {
-        create: false,
-        config: {
-          errors: {}
-        }
+        create: false
       },
-      projectName: null,
-      fileContent: null,
       interval: null
     }
   },
@@ -148,28 +97,6 @@ export default {
   methods: {
     setData(projects) {
       this.$store.commit('setProjectList', projects);
-    },
-    createProjectAndRedirect() {
-      projectsAPI.createProject(this.projectName).then(response => {
-        this.project.config.errors = {};
-        this.$router.push({name: "projectoverview", params: {projectid: response.data.project_id}});
-      })
-          .catch((error) => {
-            this.project.config.errors = error.response.data;
-          });
-    },
-    createProjectFromGTFS() {
-      projectsAPI.createProjectFromGTFS(this.projectName, this.fileContent).then(response => {
-        this.$refs.file.value = null;
-        this.runPeriodicCall(response.data);
-      }).catch(error => {
-        console.error(error.data);
-        this.project.config.errors = error.response.data;
-        this.$refs.file.value = null;
-      });
-    },
-    handleFileUpload() {
-      this.fileContent = this.$refs.file.files.item(0);
     },
     runPeriodicCall(project) {
       clearInterval(this.interval);
