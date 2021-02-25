@@ -16,7 +16,8 @@
     "createProject": "Create project",
     "projectName": "Project name",
     "startEmptyProject": "Start new empty project",
-    "startProjectFromGTFS": "Start new project from GTFS file"
+    "startProjectFromGTFS": "Start new project from GTFS file",
+    "chooseHowToStart": "Choose how to start"
   },
   "projectMenu": {
     "deleteModalTitle": "Delete Project",

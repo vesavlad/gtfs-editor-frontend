@@ -67,7 +67,7 @@
                  :class="{error: project.config.errors.name }" @focus="project.config.errors={}"
                  v-tooltip="{ theme: 'error-tooltip', content: project.config.errors.name?project.config.errors.name[0]:'', shown: project.config.errors.name !== undefined }"/>
             <div class="title">
-              <h4>Choose how to start</h4>
+              <h4>{{ $t('myProjects.chooseHowToStart') }}</h4>
               <div class="line"></div>
             </div>
             <div class="new-box">
