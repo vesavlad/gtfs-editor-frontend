@@ -127,6 +127,9 @@ export default {
         });
       }, 2000);
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.interval);
   }
 }
 </script>
