@@ -27,7 +27,8 @@
     "lastChange": "Último cambio",
     "errors": "Errores",
     "warnings": "Advertencias",
-    "neverValidated": "No validado"
+    "neverValidated": "No validado",
+    "waitGTFSLoading": "Espera hasta que la carga finalice"
   },
   "dataCard": {
     "records": "Registros",

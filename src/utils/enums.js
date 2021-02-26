@@ -4,6 +4,11 @@ const Enums = {
     BLOCKED: 'blocked',
     ENABLED: 'enabled'
   },
+  ProjectCardStatus: {
+    OK: 'ok',
+    LOADING: 'loading',
+    ERROR: 'error'
+  },
   MenuBoxPlacement: {
     UPPER_LEFT: 'upperLeft',
     UPPER_RIGHT: 'upperRight'

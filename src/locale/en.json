@@ -27,7 +27,8 @@
     "lastChange": "Last change",
     "errors": "Errors",
     "warnings": "Warnings",
-    "neverValidated": "Never validated"
+    "neverValidated": "Never validated",
+    "waitGTFSLoading": "Wait until uploading is complete"
   },
   "dataCard": {
     "records": "Records",
