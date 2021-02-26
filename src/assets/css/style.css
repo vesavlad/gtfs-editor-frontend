@@ -57,7 +57,7 @@ section:last-of-type {margin-bottom: 0;}
 ul {padding: 0;}
 code {margin-bottom: 10px; color: white; background-color: var(--secundario); padding: 10px; font-size: 14px; display: inline-block; border-radius: 4px;}
 code:last-child {margin-bottom: 0;}
-button {all: unset; cursor: pointer;}
+button {all: unset; cursor: pointer; transition: background-color .2s;}
 footer .full.grid {grid-template-columns: 1fr 1fr;}
 .small {font-size: 14px; color: var(--gris-medio2);}
 .error-message {color: var(--error); font-weight: 500; font-size: 14px;}
@@ -333,7 +333,7 @@ section {padding-bottom: 40px;}
     cursor: initial;
     display: grid;
     grid-template-rows: auto minmax(auto, 1fr) auto;
-    max-height: calc(100vh - 40px);
+    max-height: calc(100vh - 200px);
 }
 .m-header {
     padding: 28px 20px 20px;
@@ -341,7 +341,7 @@ section {padding-bottom: 40px;}
     border-bottom: var(--border) ;
 }
 .m-header {font-size: 20px; color: var(--gris-osc2);}
-.m-content {padding: 20px; max-height: 500px; overflow-y: auto; display: grid;}
+.m-content {padding: 20px; overflow-y: auto; display: grid;}
 .m-footer {padding: 20px; border-top: var(--border);}
 .m-content > li {display: grid; grid-template-columns: 3fr 5fr; grid-gap: 20px; padding: 10px 20px; align-items: center;}
 .input-row-title span {font-size: 16px; color: var(--gris-medio2); font-weight: 500;}
@@ -400,6 +400,29 @@ input[type="file"]:disabled ~ .btn:before {display: none;}
 .upload-gtfs-file input {display: none;}
 .modal-new-project .modal-footer {padding: 20px 40px;}
 .modal-new-project .modal-footer .btn {width: 100%;}
+
+/* MODAL ERROR REPORTS */
+
+.report-list.m-content .report-collapse {display: block; padding: 0; border: var(--border);}
+.report-collapse.collapsed .report-body {height: 0;}
+.report-header {display: grid; width: 100%; grid-template-columns: 1fr auto; background-color: var(--base); color: var(--gris-osc); cursor: pointer; user-select: none;}
+.report-header:hover {background-color: var(--gris-claro);}
+.report-collapse.collapsed .report-header { background-color: var(--gris-claro);}
+.report-collapse.collapsed .report-header:hover {background-color: var(--base);}
+.report-header > div {display: grid; padding: 5px 10px; grid-auto-flow: column; align-items: center; justify-content: flex-start; grid-gap: 15px;}
+.report-header h3 {font-weight: bold; text-transform: none; font-size: 18px; color: var(--gris-osc);}
+.report-header .icon {width: 48px; height: 48px; color: var(--gris-osc);}
+.report-content {padding:10px;}
+.report-body {overflow: hidden;}
+.report-box {border-left: 4px solid var(--gris-claro2); padding: 10px 20px; display: grid;}
+.report-box > li {border-bottom: var(--border); padding-top: 10px;}
+.report-box:last-child > li:last-of-type {border: 0;}
+.report-box h4 {font-weight: 600; font-size: 16px; line-height: 1.5;}
+.report-box span {font-size: 14px; color: var(--gris-medio2);}
+.report-box p {margin: 10px 0; font-size: 16px; color: var(--gris-osc2);}
+
+.report-box.errors, .report-box.error h4 {border-color: var(--error); color: var(--error);}
+.report-box.warnings, .report-box.warnings h4 {border-color: var(--warning); color: var(--warning);}
 
     /* ============  TABLES  ============== */
 
