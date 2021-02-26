@@ -2,13 +2,15 @@
   <div class="card project-card">
     <router-link class="project-card-map"
                  :class="{disabled: [creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1}"
+                 :event="[creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1?'':'click'"
                  :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
       <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
     </router-link>
     <div class="card-content">
       <div class="grid title">
         <router-link :to="{name: 'projectoverview', params: {projectid: project.project_id}}"
-                     :class="{disabled: [creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1}">
+                     :class="{disabled: [creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1}"
+                     :event="[creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1?'':'click'">
           <h2>{{ project.name }}</h2>
         </router-link>
         <button class="btn icon flat btn-options" @click="showMenu=!showMenu">
