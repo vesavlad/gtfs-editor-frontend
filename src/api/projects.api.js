@@ -14,7 +14,7 @@ const createProjectFromGTFS = (name, file) => {
       'Content-Type': 'multipart/form-data'
     }
   }
-  return httpClient.post(`${END_POINT}/create_project_from_gtfs/`, formData, headers);
+  return httpClient.post(`${END_POINT}create_project_from_gtfs/`, formData, headers);
 };
 const getProjectDetail = (id) => httpClient.get(`${END_POINT}${id}/`);
 const updateProject = (id, data) => httpClient.put(`${END_POINT}${id}/`, data);
