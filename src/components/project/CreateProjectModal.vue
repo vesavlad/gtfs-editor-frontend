@@ -136,10 +136,6 @@ export default {
         delete this.errors.file;
       }
     }
-  },
-  mounted() {
-    console.log("mounted");
-    console.log(this.fileContent);
   }
 }
 </script>
