@@ -6,13 +6,13 @@
           class="material-icons">add</i></button>
     </div>
     <section class='content'>
-      <div class="projects">
+      <div class="projects" v-if="projectList.length!==0">
         <ProjectCard v-for="project in projectList" v-bind:key="project.project_id" :project="project"
                      @project-updated="updateProject"></ProjectCard>
       </div>
-      <div class="empty-section">
+      <div class="empty-section" v-else>
         <i class="material-icons">announcement</i>
-        <p>There is no projects yet, start one from new project button</p>
+        <p>{{ $t('myprojects.addNewProject') }}</p>
       </div>
     </section>
     <CreateProjectModal :isVisible="project.create" @close="project.create=false"

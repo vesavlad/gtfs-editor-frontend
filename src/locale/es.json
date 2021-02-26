@@ -17,7 +17,8 @@
     "projectName": "Nombre del proyecto",
     "startEmptyProject": "Comenzar proyecto vacío",
     "startProjectFromGTFS": "Comenzar proyecto a partir de un archivo GTFS",
-    "chooseHowToStart": "Escoge como partir"
+    "chooseHowToStart": "Escoge como partir",
+    "addNewProject": "Puedes crear tu primer proyecto desde el botón 'Nuevo proyecto'"
   },
   "projectMenu": {
     "deleteModalTitle": "Eliminar proyecto",
