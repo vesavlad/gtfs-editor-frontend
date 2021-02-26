@@ -49,7 +49,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn green" @click="createProjectAction">
+        <button class="btn green" @click="createProjectAction"
+                :disabled="creationType===projectCreationType.FROM_GTFS && filename===null">
           <span>{{ $t('general.create') }}</span>
         </button>
       </div>
