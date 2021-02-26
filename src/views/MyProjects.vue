@@ -10,6 +10,10 @@
         <ProjectCard v-for="project in projectList" v-bind:key="project.project_id" :project="project"
                      @project-updated="updateProject"></ProjectCard>
       </div>
+      <div class="empty-section">
+        <i class="material-icons">announcement</i>
+        <p>There is no projects yet, start one from new project button</p>
+      </div>
     </section>
     <CreateProjectModal :isVisible="project.create" @close="project.create=false"
                         @project-created="updateProject"></CreateProjectModal>

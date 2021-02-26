@@ -287,6 +287,8 @@ input[type="search"]::-webkit-search-cancel-button {
 
 /* ============  CONTAINERS  ============== */
 
+.empty-section {display: grid; grid-gap: 20px; padding: 140px 20px 20px; justify-items: center; color: var(--gris-claro2); user-select: none; font-size: 18px; font-weight: 500;}
+.empty-section i {font-size: 5rem;}
 .supercontent {margin-top: -210px; min-height: calc(100% - 125px); display: grid; grid-template-rows: auto 1fr; align-content: flex-start;}
 section {padding-bottom: 40px;}
 .section {display: grid; grid-template-rows: auto 1fr;}
