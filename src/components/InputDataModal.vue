@@ -20,7 +20,7 @@
             <template v-else-if="field.type===InputType.CHECKBOX">
               <label class="checkbox">
                 <input type="checkbox" v-model="localData[field.name]" />
-                <div class="checkbox-name"><span>Name</span></div>
+                <div class="checkbox-name"><span>{{ field.label }}</span></div>
               </label>
             </template>
             <template v-else-if="[InputType.SIMPLE_SELECT, InputType.FK_SELECT, InputType.COLOR].indexOf(field.type)>-1">
