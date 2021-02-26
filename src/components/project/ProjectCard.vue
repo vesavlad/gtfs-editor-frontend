@@ -67,6 +67,7 @@ import PillBase from "../PillBase";
 import EnvelopeMap from "../EnvelopeMap";
 import ProjectMenu from "@/components/project/ProjectMenu.vue";
 import Enums from "@/utils/enums";
+import projectsAPI from "@/api/projects.api";
 
 export default {
   name: 'ProjectCard',
@@ -84,7 +85,8 @@ export default {
   data() {
     return {
       showMenu: false,
-      creationStatus: Enums.ProjectCreationStatus
+      creationStatus: Enums.ProjectCreationStatus,
+      interval: null
     }
   },
   computed: {
@@ -107,6 +109,27 @@ export default {
     },
     retryUpload() {
       console.log("retry upload");
+    },
+    runPeriodicCall() {
+      clearInterval(this.interval);
+      this.interval = setInterval(() => {
+        console.log('checking gtfs loading status...');
+        projectsAPI.getProjectDetail(this.project.project_id).then(response => {
+          if ([Enums.ProjectCreationStatus.FROM_GTFS, Enums.ProjectCreationStatus.ERROR_LOADING_GTFS].indexOf(response.data.creation_status) > -1) {
+            clearInterval(this.interval);
+            if (response.data.creation_status === Enums.ProjectCreationStatus.FROM_GTFS) {
+              console.log("gtfs loaded");
+            } else if (response.data.creation_status === Enums.ProjectCreationStatus.ERROR_LOADING_GTFS) {
+              console.log("gtfs was not loaded");
+            }
+            this.project = response.data;
+          }
+        });
+      }, 2000);
+    }
+  }, mounted() {
+    if (this.status === Enums.ProjectCardStatus.LOADING) {
+      this.runPeriodicCall();
     }
   }
 }

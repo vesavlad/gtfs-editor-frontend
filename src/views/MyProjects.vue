@@ -70,7 +70,6 @@ import projectsAPI from '@/api/projects.api';
 import ProjectCard from "../components/project/ProjectCard";
 import DeletionModal from "@/components/project/DeletionModal";
 import PillBase from "@/components/PillBase";
-import Enums from "@/utils/enums";
 import EnvelopeMap from "@/components/EnvelopeMap";
 import CreateProjectModal from "@/components/project/CreateProjectModal";
 
@@ -87,8 +86,7 @@ export default {
     return {
       project: {
         create: false
-      },
-      interval: null
+      }
     }
   },
   computed: mapState([
@@ -97,22 +95,6 @@ export default {
   methods: {
     setData(projects) {
       this.$store.commit('setProjectList', projects);
-    },
-    runPeriodicCall(project) {
-      clearInterval(this.interval);
-      this.interval = setInterval(() => {
-        console.log('checking gtfs loading status...');
-        projectsAPI.getProjectDetail(project.project_id).then(response => {
-          if ([Enums.ProjectCreationStatus.FROM_GTFS, Enums.ProjectCreationStatus.ERROR_LOADING_GTFS].indexOf(response.data.creation_status) > -1) {
-            clearInterval(this.interval);
-            if (response.data.creation_status === Enums.ProjectCreationStatus.FROM_GTFS) {
-              console.log("gtfs loaded");
-            } else if (response.data.creation_status === Enums.ProjectCreationStatus.ERROR_LOADING_GTFS) {
-              console.log("gtfs was not loaded");
-            }
-          }
-        });
-      }, 2000);
     }
   },
   beforeRouteEnter(to, from, next) {
