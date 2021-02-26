@@ -13,10 +13,10 @@
                      :event="[creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1?'':'click'">
           <h2>{{ project.name }}</h2>
         </router-link>
-        <button class="btn icon flat btn-options" @click="showMenu=!showMenu">
-          <i class="material-icons">more_vert</i>
-          <ProjectMenu v-if="showMenu" :project="project" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
-        </button>
+        <div class="btn icon flat btn-options">
+          <i class="material-icons" @click="showMenu=!showMenu">more_vert</i>
+          <ProjectMenu v-if="showMenu" :project="project" @close="showMenu=false"></ProjectMenu>
+        </div>
       </div>
       <template v-if="status===creationStatus.LOADING">
         <div class="project-msj">
