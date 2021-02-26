@@ -115,7 +115,7 @@ export default {
     },
     createProjectFromGTFS() {
       projectsAPI.createProjectFromGTFS(this.projectName, this.fileContent).then(response => {
-        this.$refs.file.value = null;
+        this.setToDefaultValues();
         this.$emit('project-created', response.data);
       }).catch(error => {
         if (Array.isArray(error.response.data)) {
