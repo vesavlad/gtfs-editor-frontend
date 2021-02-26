@@ -4,11 +4,11 @@
       <ProjectNameEditor :project="project" @project-name-update="updateProjectName"></ProjectNameEditor>
       <div class="grid v-center">
         <span class="side-info">{{ $t('projectDashboard.lastChange') }}: {{ lastModification }}</span>
-        <button class="btn icon flat" @click="showMenu=!showMenu">
-          <i class="material-icons">more_vert</i>
+        <div class="btn icon flat">
+          <i class="material-icons" @click="showMenu=!showMenu">more_vert</i>
           <ProjectMenu v-if="showMenu" placement="upperRight" :project="project"
                        @project-deleted="$router.push({name: 'myprojects'})" @close="showMenu=false"></ProjectMenu>
-        </button>
+        </div>
       </div>
     </div>
     <div class="section-content">
