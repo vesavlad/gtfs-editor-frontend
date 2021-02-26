@@ -493,17 +493,5 @@ export default {
   created() {
     this.doSearch = debounce(this.reloadTable, 300);
   },
-  mounted() {
-    this.$nextTick(() => {
-      $("select.vuetable-pagination-dropdown").select2({
-        matcher(query, option) {
-          if (query.term) {
-            return String(option.id).startsWith(query.term) ? option : null;
-          }
-          return option;
-        }
-      }).on('change', (evt) => this.$refs.pagination.loadPage(evt.target.value));
-    });
-  },
 };
 </script>
