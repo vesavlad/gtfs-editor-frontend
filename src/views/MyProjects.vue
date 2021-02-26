@@ -8,58 +8,10 @@
     <section class='content'>
       <div class="projects">
         <ProjectCard v-for="project in projectList" v-bind:key="project.project_id" :project="project"></ProjectCard>
-
-        <div class="card project-card">
-          <router-link class="project-card-map disabled"
-                       :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
-            <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
-          </router-link>
-          <div class="card-content">
-            <div class="grid title">
-              <router-link :to="{name: 'projectoverview', params: {projectid: project.project_id}}" class="disabled">
-                <h2>Name</h2>
-              </router-link>
-              <button class="btn icon flat btn-options" @click="showMenu=!showMenu">
-                <i class="material-icons">more_vert</i>
-                <ProjectMenu v-if="showMenu" :project="project" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
-              </button>
-            </div>
-            <div class="project-msj">
-              <span>Wait until uploading is complete</span>
-            </div>
-            <div class="grid-pills">
-              <PillBase pillClass="loading" pillText="Uploading GTFS"></PillBase>
-            </div>
-          </div>
-        </div>
-        <div class="card project-card">
-          <router-link class="project-card-map disabled"
-                       :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
-            <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
-          </router-link>
-          <div class="card-content">
-            <div class="grid title">
-              <router-link :to="{name: 'projectoverview', params: {projectid: project.project_id}}" class="disabled">
-                <h2>Name</h2>
-              </router-link>
-              <button class="btn icon flat btn-options" @click="showMenu=!showMenu">
-                <i class="material-icons">more_vert</i>
-                <ProjectMenu v-if="showMenu" :project="project" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
-              </button>
-            </div>
-            <div class="project-msj error">
-              <span>GTFS could not upload</span>
-            </div>
-            <div class="grid-buttons">
-              <button class="btn warning"><span>Retry</span></button>
-              <button class="btn cancel"><span>Delete</span></button>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
-    <CreateProjectModal :isVisible="project.create"
-                        @close="project.create=false;project.errors={}"></CreateProjectModal>
+    <CreateProjectModal :isVisible="project.create" @close="project.create=false"
+                        @project-created="addProjectToList"></CreateProjectModal>
     <DeletionModal></DeletionModal>
   </div>
 </template>
@@ -69,8 +21,6 @@ import {mapState} from 'vuex'
 import projectsAPI from '@/api/projects.api';
 import ProjectCard from "../components/project/ProjectCard";
 import DeletionModal from "@/components/project/DeletionModal";
-import PillBase from "@/components/PillBase";
-import EnvelopeMap from "@/components/EnvelopeMap";
 import CreateProjectModal from "@/components/project/CreateProjectModal";
 
 export default {
@@ -78,9 +28,7 @@ export default {
   components: {
     ProjectCard,
     CreateProjectModal,
-    DeletionModal,
-    PillBase,
-    EnvelopeMap
+    DeletionModal
   },
   data() {
     return {
@@ -95,6 +43,12 @@ export default {
   methods: {
     setData(projects) {
       this.$store.commit('setProjectList', projects);
+    },
+    addProjectToList(newProject) {
+      let newProjectList = [...this.projectList];
+      newProjectList.unshift(newProject);
+      this.$store.commit('setProjectList', newProjectList);
+      this.project.create = false;
     }
   },
   beforeRouteEnter(to, from, next) {
