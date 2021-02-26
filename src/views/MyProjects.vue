@@ -7,11 +7,12 @@
     </div>
     <section class='content'>
       <div class="projects">
-        <ProjectCard v-for="project in projectList" v-bind:key="project.project_id" :project="project"></ProjectCard>
+        <ProjectCard v-for="project in projectList" v-bind:key="project.project_id" :project="project"
+                     @project-updated="updateProject"></ProjectCard>
       </div>
     </section>
     <CreateProjectModal :isVisible="project.create" @close="project.create=false"
-                        @project-created="addProjectToList"></CreateProjectModal>
+                        @project-created="updateProject"></CreateProjectModal>
     <DeletionModal></DeletionModal>
   </div>
 </template>
@@ -44,11 +45,16 @@ export default {
     setData(projects) {
       this.$store.commit('setProjectList', projects);
     },
-    addProjectToList(newProject) {
+    updateProject(newProject) {
+      let index = this.projectList.findIndex(project => project.project_id === newProject.project_id);
       let newProjectList = [...this.projectList];
-      newProjectList.unshift(newProject);
+      if (index === -1) {
+        newProjectList.unshift(newProject);
+        this.project.create = false;
+      } else {
+        newProjectList[index] = newProject;
+      }
       this.$store.commit('setProjectList', newProjectList);
-      this.project.create = false;
     }
   },
   beforeRouteEnter(to, from, next) {

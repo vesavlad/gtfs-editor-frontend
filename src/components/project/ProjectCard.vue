@@ -21,7 +21,7 @@
           <span>{{ $t('projectCard.waitGTFSLoading') }}</span>
         </div>
         <div class="grid-pills">
-          <PillBase pillClass="loading" pillText="Uploading GTFS"></PillBase>
+          <PillBase pillClass="loading" :pillText="$t('projectCard.uploadingGTFS')"></PillBase>
         </div>
       </template>
       <template v-else-if="status===creationStatus.ERROR">
@@ -122,6 +122,7 @@ export default {
             } else if (response.data.creation_status === Enums.ProjectCreationStatus.ERROR_LOADING_GTFS) {
               console.log("gtfs was not loaded");
             }
+            this.$emit('project-updated', response.data);
           }
         });
       }, 2000);
