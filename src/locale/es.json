@@ -29,7 +29,9 @@
     "warnings": "Advertencias",
     "neverValidated": "No validado",
     "waitGTFSLoading": "Espera hasta que la carga finalice",
-    "uploadingGTFS": "cargando GTFS..."
+    "uploadingGTFS": "cargando GTFS...",
+    "retry": "Reintentar",
+    "delete": "Eliminar"
   },
   "dataCard": {
     "records": "Registros",

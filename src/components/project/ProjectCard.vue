@@ -31,8 +31,11 @@
           <span>{{ project.loading_gtfs_error_message }}</span>
         </div>
         <div class="grid-buttons">
-          <button class="btn warning" @click="retryUpload"><span>Retry</span></button>
-          <button class="btn cancel" @click="deleteProject"><span>Delete</span></button>
+          <!-- dar formato de botón a este input -->
+          <input class="btn warning" type="file" ref="file" accept="application/zip" v-on:change="uploadGTFSFile"/>
+          <!-- quitar este botón -->
+          <button class="btn warning"><span>{{ $t('projectCard.retry') }}</span></button>
+          <button class="btn cancel" @click="deleteProject"><span>{{ $t('projectCard.delete') }}</span></button>
         </div>
       </template>
       <template v-else>
@@ -109,9 +112,6 @@ export default {
       this.$store.commit('setCurrentProject', this.project);
       this.$store.commit('setShowDeletionModal', true);
     },
-    retryUpload() {
-      console.log("retry upload");
-    },
     runPeriodicCall() {
       clearInterval(this.interval);
       this.interval = setInterval(() => {
@@ -128,11 +128,27 @@ export default {
           }
         });
       }, 2000);
+    },
+    uploadGTFSFile() {
+      if (this.$refs.file.files[0]) {
+        let currentFile = this.$refs.file.files.item(0);
+        projectsAPI.uploadGTFS(this.project.project_id, currentFile).then(response => {
+          this.$refs.file.value = null;
+          this.$emit('project-updated', response.data);
+          this.runPeriodicCall();
+        }).catch(error => {
+          console.log(error.response.data);
+          this.$refs.file.value = null;
+        });
+      }
     }
   }, mounted() {
     if (this.status === Enums.ProjectCardStatus.LOADING) {
       this.runPeriodicCall();
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.interval);
   }
 }
 </script>
