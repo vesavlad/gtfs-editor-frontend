@@ -1,14 +1,14 @@
 <template>
   <div class="card project-card">
     <router-link class="project-card-map"
-                 :class="{disabled: [creationStatus.LOADING_GTFS, creationStatus.ERROR_LOADING_GTFS].indexOf(status)>-1}"
+                 :class="{disabled: [creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1}"
                  :to="{name: 'projectoverview', params: {projectid: project.project_id}}">
       <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
     </router-link>
     <div class="card-content">
       <div class="grid title">
         <router-link :to="{name: 'projectoverview', params: {projectid: project.project_id}}"
-                     :class="{disabled: [creationStatus.LOADING_GTFS, creationStatus.ERROR_LOADING_GTFS].indexOf(status)>-1}">
+                     :class="{disabled: [creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1}">
           <h2>{{ project.name }}</h2>
         </router-link>
         <button class="btn icon flat btn-options" @click="showMenu=!showMenu">
@@ -16,7 +16,7 @@
           <ProjectMenu v-if="showMenu" :project="project" v-on="$listeners" @close="showMenu=false"></ProjectMenu>
         </button>
       </div>
-      <template v-if="status===creationStatus.LOADING_GTFS">
+      <template v-if="status===creationStatus.LOADING">
         <div class="project-msj">
           <span>{{ $t('projectCard.waitGTFSLoading') }}</span>
         </div>
@@ -24,7 +24,7 @@
           <PillBase pillClass="loading" pillText="Uploading GTFS"></PillBase>
         </div>
       </template>
-      <template v-else-if="status===creationStatus.ERROR_LOADING_GTFS">
+      <template v-else-if="status===creationStatus.ERROR">
         <div class="project-msj error">
           <span>{{ project.loading_gtfs_error_message }}</span>
         </div>
@@ -85,7 +85,7 @@ export default {
   data() {
     return {
       showMenu: false,
-      creationStatus: Enums.ProjectCreationStatus,
+      creationStatus: Enums.ProjectCardStatus,
       interval: null
     }
   },
@@ -122,7 +122,6 @@ export default {
             } else if (response.data.creation_status === Enums.ProjectCreationStatus.ERROR_LOADING_GTFS) {
               console.log("gtfs was not loaded");
             }
-            this.project = response.data;
           }
         });
       }, 2000);
