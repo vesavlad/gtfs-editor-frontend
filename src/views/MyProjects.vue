@@ -12,7 +12,7 @@
       </div>
       <div class="empty-section" v-else>
         <i class="material-icons">announcement</i>
-        <p>{{ $t('myprojects.addNewProject') }}</p>
+        <p>{{ $t('myProjects.addNewProject') }}</p>
       </div>
     </section>
     <CreateProjectModal :isVisible="project.create" @close="project.create=false"
