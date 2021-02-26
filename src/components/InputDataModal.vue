@@ -18,9 +18,9 @@
               <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.title.toLowerCase()}`" @focus="$emit('removeError', field.name)" :class="{error: errors[field.name]}" v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"/>
             </template>
             <template v-else-if="field.type===InputType.CHECKBOX">
-              <label>
-                <div class="checkbox"></div>
+              <label class="checkbox">
                 <input type="checkbox" v-model="localData[field.name]" />
+                <div class="checkbox-name"><span>Name</span></div>
               </label>
             </template>
             <template v-else-if="[InputType.SIMPLE_SELECT, InputType.FK_SELECT, InputType.COLOR].indexOf(field.type)>-1">
