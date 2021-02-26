@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-if="isVisible" v-on="$listeners" :classes="['modal-new-project']">
+  <BaseModal v-if="isVisible" v-on="$listeners" :classes="['modal-new-project']" @close="setToDefaultValues">
     <template v-slot:m-content>
       <div class="modal-new-header">
         <h2>{{ $t('myProjects.createProject') }}</h2>
@@ -33,7 +33,8 @@
             </div>
             <p>{{ $t('myProjects.startProjectFromGTFS') }}</p>
           </label>
-          <div class="upload-gtfs-file" v-tooltip="{ theme: 'error-tooltip', content: errors.file?errors.file[0]:'', shown: errors.file !== undefined, placement:'top' }">
+          <div class="upload-gtfs-file"
+               v-tooltip="{ theme: 'error-tooltip', content: errors.file?errors.file[0]:'', shown: errors.file !== undefined, placement:'top' }">
             <label>
               <input type="file" id="file" ref="file" accept="application/zip" v-on:change="handleFileUpload"
                      :disabled="creationType===projectCreationType.EMPTY"/>
@@ -117,7 +118,6 @@ export default {
         this.$refs.file.value = null;
         this.$emit('project-created', response.data);
       }).catch(error => {
-        console.error(error.response.data);
         if (Array.isArray(error.response.data)) {
           this.errors = {file: error.response.data};
         } else {
@@ -126,6 +126,14 @@ export default {
         this.$refs.file.value = null;
       });
     },
+    setToDefaultValues() {
+      this.$refs.file.value = null;
+      this.fileContent = null;
+      this.filename = null;
+      this.projectName = null;
+      this.creationType = Enums.ProjectCreationType.EMPTY;
+      this.errors = {};
+    }
   },
   watch: {
     creationType(newValue) {
