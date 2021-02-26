@@ -31,10 +31,10 @@
           <span>{{ project.loading_gtfs_error_message }}</span>
         </div>
         <div class="grid-buttons">
-          <!-- dar formato de botón a este input -->
-          <input class="btn warning" type="file" ref="file" accept="application/zip" v-on:change="uploadGTFSFile"/>
-          <!-- quitar este botón -->
-          <button class="btn warning"><span>{{ $t('projectCard.retry') }}</span></button>
+          <label class="btn warning">
+            <input class="btn warning" type="file" ref="file" accept="application/zip" v-on:change="uploadGTFSFile"/>
+            <span>{{ $t('projectCard.retry') }}</span>
+          </label>
           <button class="btn cancel" @click="deleteProject"><span>{{ $t('projectCard.delete') }}</span></button>
         </div>
       </template>
