@@ -12,7 +12,7 @@ export default {
   components: {
     BaseMenu
   },
-  props:{
+  props: {
     placement: {
       type: String,
       default: Enums.MenuBoxPlacement.UPPER_LEFT,
