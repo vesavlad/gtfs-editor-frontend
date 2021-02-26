@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 import Enums from '@/utils/enums.js'
 import MessageModal from '@/components/MessageModal.vue'
 

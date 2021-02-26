@@ -1,21 +1,25 @@
 <template>
-  <BaseModal :classes="ownClasses">
+  <BaseModal :classes="ownClasses" v-on="$listeners">
     <template v-slot:m-content>
       <div class="m-header">
         <div class="message-title">
           <i class="material-icons">{{ icon }}</i>
-          <h2><slot name="m-title"></slot></h2>
+          <h2>
+            <slot name="m-title"></slot>
+          </h2>
         </div>
         <div class="grid">
           <button class="btn icon flat" @click="$emit('close')"><i class="material-icons">close</i></button>
         </div>
       </div>
       <div class="m-content">
-          <slot name="m-content"></slot>
+        <slot name="m-content"></slot>
       </div>
       <div class="m-footer">
         <div class="option-buttons">
-          <button v-if="showCancelButton" class="btn flat" @click="$emit('cancel')"><span>{{ $t('general.cancel') }}</span></button>
+          <button v-if="showCancelButton" class="btn flat" @click="$emit('cancel')"><span>{{
+              $t('general.cancel')
+            }}</span></button>
           <button class="btn" :class="buttonClasses" @click="$emit('ok')"><span>{{ okButtonLabel }}</span></button>
         </div>
       </div>
@@ -63,13 +67,13 @@ export default {
     },
     icon() {
       let icon = null;
-      switch(this.type) {
+      switch (this.type) {
         case Enums.MessageModalType.ERROR:
           icon = "error_outline";
           break;
         case Enums.MessageModalType.WARNING:
           icon = "warning";
-          break; 
+          break;
       }
       return icon;
     }
