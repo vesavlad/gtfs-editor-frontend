@@ -82,11 +82,11 @@ export default {
           name: "direction_id",
           title: "Direction",
           type: "select-simple",
-          options: {
-            'N/A': null,
-            'Going': false,
-            'Back': true,
-          },
+          options: [
+            {name: 'N/A', value: null},
+            {name: 'Going', value: false},
+            {name: 'Back', value: true}
+          ],
         },
         {
           name: "trip_short_name",
@@ -100,21 +100,21 @@ export default {
           name: "wheelchair_accessible",
           title: "Wheelchair Accessible",
           type: "select-simple",
-          options: {
-            'No Info': null,
-            'Yes': 1,
-            'No': 0,
-          },
+          options: [
+            {name:'No Info', value: null},
+            {name:'Yes', value: 1},
+            {name:'No', value: 0},
+          ],
         },
         {
           name: "bikes_allowed",
           title: "Bikes Allowed",
           type: "select-simple",
-          options: {
-            'No Info': null,
-            'Yes': 1,
-            'No': 0,
-          },
+          options: [
+            {name:'No Info', value: null},
+            {name:'Yes', value: 1},
+            {name:'No', value: 0},
+          ],
         },
       ],
     };
