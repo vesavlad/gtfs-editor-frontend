@@ -1,19 +1,15 @@
 <template>
-  <Multiselect v-model="val" :options="field.options" track-by="value" label="name" @change="onChange"></Multiselect>
+  <Multiselect v-model="val" :options="field.options" track-by="value" label="name" @input="onChange"></Multiselect>
 </template>
 
 <script>
 import Multiselect from 'vue-multiselect';
-import fieldMixin from "@/mixins/fieldMixin.js";
 
 export default {
   name: 'SimpleSelect',
   components: {
     Multiselect
   },
-  mixins: [
-    fieldMixin,
-  ],
   props: {
     field: {
       type: Object,
@@ -29,21 +25,34 @@ export default {
   },
   data() {
     return {
-      val: this.value,
-      name: this.getFieldName(this.field),
+      val: null
     }
   },
   watch: {
-    value() {
-      this.val = this.value === "" ? null : this.value;
+    value(newValue) {
+      let option = this.translateValueToOption(newValue);
+      this.val = this.value === "" ? null : option;
     }
   },
   methods: {
-    onChange(evt) {
-      this.val = evt.target.value;
-      this.$emit("input", this.val);
+    onChange(option) {
+      this.$emit("input", option.value);
+    },
+    translateValueToOption(value) {
+      let option = null;
+      this.field.options.some(optionEl => {
+        if (optionEl.value === value) {
+          option = optionEl;
+          return true;
+        }
+        return false;
+      });
+      return option;
     }
   },
+  mounted() {
+    this.val = this.translateValueToOption(this.value);
+  }
 }
 </script>
 

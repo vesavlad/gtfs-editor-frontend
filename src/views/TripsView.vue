@@ -84,8 +84,8 @@ export default {
           type: "select-simple",
           options: [
             {name: 'N/A', value: null},
-            {name: 'Going', value: false},
-            {name: 'Back', value: true}
+            {name: 'Going', value: 0},
+            {name: 'Back', value: 1}
           ],
         },
         {
@@ -103,7 +103,7 @@ export default {
           options: [
             {name:'No Info', value: null},
             {name:'Yes', value: 1},
-            {name:'No', value: 0},
+            {name:'No', value: 2},
           ],
         },
         {
@@ -113,7 +113,7 @@ export default {
           options: [
             {name:'No Info', value: null},
             {name:'Yes', value: 1},
-            {name:'No', value: 0},
+            {name:'No', value: 2},
           ],
         },
       ],
