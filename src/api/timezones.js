@@ -2,5 +2,5 @@ const timezones = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Addis_Ababa', 'Afri
 
 
 export default {
-    timezones,
+  timezones,
 }
