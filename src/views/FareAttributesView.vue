@@ -52,21 +52,21 @@ export default {
         {
           name: 'payment_method',
           title: 'Payment Method',
-          options: {
-            'Before Boarding': 1,
-            'On Board': 0,
-          },
+          options: [
+            {name: 'Before Boarding', value: 1},
+            {name: 'On Board', value: 0},
+          ],
           required: true,
         },
         {
           name: 'transfers',
           title: 'Transfers',
-          options: {
-            0: 0,
-            1: 1,
-            2: 2,
-            'Unlimited': null,
-          },
+          options: [
+            {name: 0, value: 0},
+            {name: 1, value: 1},
+            {name: 2, value: 2},
+            {name: 'Unlimited', value: null},
+          ],
           required: true,
         },
         {

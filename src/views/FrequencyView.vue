@@ -66,10 +66,10 @@ export default {
           title: 'Exact Times',
           required: true,
           type: "select-simple",
-          options: {
-            'Yes': 1,
-            'No': 0,
-          },
+          options: [
+            {name: 'Yes', value: 1},
+            {name: 'No', value: 0},
+          ],
         },
       ],
     };

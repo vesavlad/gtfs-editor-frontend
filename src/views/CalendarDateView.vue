@@ -48,10 +48,10 @@ export default {
           title: 'Exception Type',
           required: true,
           type: "select-simple",
-          options: {
-            'Service Added': 1,
-            'Service Removed': 2,
-          },
+          options: [
+            {name: 'Service Added', value: 1},
+            {name: 'Service Removed', value: 2},
+          ],
         },
       ],
     };

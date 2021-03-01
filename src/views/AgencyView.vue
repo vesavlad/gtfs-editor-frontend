@@ -55,9 +55,9 @@ export default {
           sortField: 'agency_timezone',
           title: 'Timezone',
           type: "select-simple",
-          options: timezones.timezones.reduce((o, k) => Object.assign(o, {
-            [k]: k
-          }), {}),
+          options: timezones.timezones.map(tzName => {
+            return {name: tzName, value: tzName};
+          }),
           required: true,
         },
         {

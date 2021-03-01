@@ -36,12 +36,12 @@ export default {
           title: 'Type',
           required: true,
           type: "select-simple",
-          options: {
-            'Recommended transfer point': 0,
-            'Timed transfer': 1,
-            'Requires minimum time': 2,
-            'Transfer not possible': 3,
-          },
+          options: [
+            {name: 'Recommended transfer point', value: 0},
+            {name: 'Timed transfer', value: 1},
+            {name: 'Requires minimum time', value: 2},
+            {name: 'Transfer not possible',value: 3},
+          ],
         },
         {
           name: 'from_stop_id',

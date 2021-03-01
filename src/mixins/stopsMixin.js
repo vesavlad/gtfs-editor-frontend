@@ -69,11 +69,11 @@ let stopsMixin = {
         {
           name: 'wheelchair_boarding',
           title: 'Wheelchair Boarding',
-          options: {
-            'No Info': null,
-            'Yes': 1,
-            'No': 0,
-          },
+          options: [
+            {name: 'No Info', value: null},
+            {name: 'Yes', value: 1},
+            {name: 'No', value: 0},
+          ],
         },
         {
           name: 'platform_code',
