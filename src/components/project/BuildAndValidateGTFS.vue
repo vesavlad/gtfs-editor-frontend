@@ -55,7 +55,124 @@
     </div>
     <BaseModal v-if="showModal" @close="showModal=false">
       <template slot="m-content">
-        <p v-html="project.gtfs_validation.message"></p>
+        <div class="m-header">
+          <h2>Errors report details</h2>
+          <div class="grid">
+            <button v-if="link" class="btn icon flat" @click="openLink"><i class="material-icons">info</i></button>
+            <button class="btn icon flat" @click="$emit('close')"><i class="material-icons">close</i></button>
+          </div>
+        </div>
+        <ul class="report-list m-content">
+          <li class="report-collapse">
+            <button class="report-header">
+              <div>
+                <i class="material-icons">description</i>
+                <h3>routes.txt</h3>
+                <div class="grid min">
+                  <pillBase pillClass="error" pillText="3"></pillBase>
+                  <pillBase pillClass="warning" pillText="5"></pillBase>
+                </div>
+              </div>
+              <div class="icon flat">
+                <i class="material-icons">keyboard_arrow_up</i>
+              </div>
+            </button>
+            <div class="report-body">
+              <div class="report-content">
+                <ul class="report-box errors">
+                  <li>
+                    <h4>`route_color` and `route_text_color` have insufficient contrast</h4>
+                    <span>Code: 8, Entity ID: L</span>
+                    <p>"Contrast ratio should be >= 4.5 but was `1.4932792189163142` for route:`C` in file:`routes.txt`. The `route_text_color` and `route_color` should be set to contrasting colors, as they are used as the text and background color (respectively) for displaying route names. When left blank, `route_text_color` defaults to 000000 (black) and `route_color` defaults to FFFFFF (white). A common source of issues here is setting `route_color` to a dark color, while leaving `route_text_color` set to black. In this case, `route_text_color` should be set to a lighter color like FFFFFF to ensure a legible contrast between the two. The contrast ratio formula used can be found here : https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure"</p>
+                  </li>
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                </ul>
+                <ul class="report-box warnings">
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+          <li class="report-collapse collapsed">
+            <button class="report-header">
+              <div>
+                <i class="material-icons">description</i>
+                <h3>filename</h3>
+                <pillBase pillClass="error" pillText="3"></pillBase>
+                <pillBase pillClass="warning" pillText="5"></pillBase>
+              </div>
+              <div class="icon flat">
+                <i class="material-icons">keyboard_arrow_down</i>
+              </div>
+            </button>
+            <div class="report-body">
+              <div class="report-content">
+                <ul class="report-box errors">
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                </ul>
+                <ul class="report-box warnings">
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                  <li>
+                    <h4>Title</h4>
+                    <span>Code, Entity ID</span>
+                    <p>description</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div class="m-footer">
+          <div class="option-buttons">
+            <button class="btn"><span>Download CSV</span></button>
+          </div>
+        </div>
       </template>
     </BaseModal>
   </div>
@@ -66,10 +183,14 @@ import BaseModal from "@/components/BaseModal";
 import projectsAPI from "@/api/projects.api";
 import {DateTime} from "luxon";
 import Enums from "@/utils/enums";
+import PillBase from "@/components/PillBase";
 
 export default {
   name: 'BuildAndValidateGTFS',
-  components: {BaseModal},
+  components: {
+    BaseModal,
+    PillBase
+  },
   props: {
     project: {
       type: Object,
