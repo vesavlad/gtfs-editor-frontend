@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     onChange(option) {
-      this.$emit("input", option.value);
+      this.$emit("input", option ? option.value : null);
     },
     translateValueToOption(value) {
       let option = null;
