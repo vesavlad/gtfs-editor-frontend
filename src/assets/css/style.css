@@ -461,6 +461,7 @@ td .multiselect input[type="text"] {min-width: inherit; box-shadow: none;}
 .multiselect__input, .multiselect__single {white-space: nowrap;}
 .multiselect__content-wrapper {width: fit-content;}
 .multiselect__input:focus {border:0; box-shadow: none;}
+.multiselect__content-wrapper {position: fixed;}
 
 tr.changed>td {
     background-color: var(--bg-warning);
