@@ -39,7 +39,7 @@ export default {
       return this.optionalFields.map(field => {
         return {
           name: field.name,
-          label: field.title,
+          title: field.title,
           required: false,
           type: Enums.InputType.CHECKBOX
         }

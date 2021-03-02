@@ -11,21 +11,12 @@
       <ul class="m-content">
         <li v-for="field in fields" :key="field.name">
           <div class="input-row-title h4" :class="{required: field.required}">
-            <span>{{ field.title }}{{ field.required?'*':'' }}</span>
+            <span>{{ field.title }}{{ field.required ? '*' : '' }}</span>
           </div>
           <div class="input-row-content single">
-            <template v-if="[InputType.INPUT, InputType.DATE, InputType.URL, InputType.EMAIL].indexOf(field.type)>-1">
-              <input :type="field.type" v-model="localData[field.name]" :placeholder="`Enter ${field.title.toLowerCase()}`" @focus="$emit('removeError', field.name)" :class="{error: errors[field.name]}" v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"/>
-            </template>
-            <template v-else-if="field.type===InputType.CHECKBOX">
-              <label class="checkbox">
-                <input type="checkbox" v-model="localData[field.name]" />
-                <div class="checkbox-name"><span>{{ field.label }}</span></div>
-              </label>
-            </template>
-            <template v-else-if="[InputType.SIMPLE_SELECT, InputType.FK_SELECT, InputType.COLOR].indexOf(field.type)>-1">
-              <GeneralizedInput v-model="localData[field.name]" :field="field" :data="{}" @focus="$emit('removeError', field.name)" v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"></GeneralizedInput>
-            </template>
+            <GeneralizedInput v-model="localData[field.name]" :field="field" :data="{}"
+                              @focus="$emit('removeError', field.name)"
+                              v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"></GeneralizedInput>
           </div>
         </li>
       </ul>
@@ -75,11 +66,11 @@ export default {
         for (let i = 0; i < properties.length; i++) {
           for (let j = 0; j < value.length; j++) {
             if (!Object.prototype.hasOwnProperty.call(value[j], properties[i])) {
-              console.warn(`Property ${properties[i]} is not present in element ${j+1} of fields prop`);
+              console.warn(`Property ${properties[i]} is not present in element ${j + 1} of fields prop`);
               return false;
             }
-            if (properties[i]==='type' && Object.values(Enums.InputType).concat([null]).indexOf(value[j][properties[i]])===-1) {
-              console.warn(`value ${value[j][properties[i]]} is not valid for property ${properties[i]} in element ${j+1}`);
+            if (properties[i] === 'type' && Object.values(Enums.InputType).concat([null]).indexOf(value[j][properties[i]]) === -1) {
+              console.warn(`value ${value[j][properties[i]]} is not valid for property ${properties[i]} in element ${j + 1}`);
               return false;
             }
           }

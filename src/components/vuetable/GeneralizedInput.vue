@@ -6,6 +6,9 @@
   <!-- Options -->
   <SimpleSelect v-else-if="field.options" :field="field" v-model="val" @input="onInput" :hasErrors="has_errors">
   </SimpleSelect>
+  <!-- Checkbox -->
+  <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX" :field="field" v-model="val"
+                  @input="onInput"></SimpleCheckbox>
   <!-- Default -->
   <SimpleInput v-else :field="field" v-model="val" @input="onInput" :hasErrors="has_errors" :errors="field_errors">
   </SimpleInput>
@@ -16,9 +19,12 @@ import fieldMixin from "@/mixins/fieldMixin.js";
 import SimpleInput from './SimpleInput.vue';
 import SimpleSelect from './SimpleSelect.vue';
 import FKSelect from './FKSelect.vue';
+import SimpleCheckbox from "@/components/vuetable/SimpleCheckbox";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
+    SimpleCheckbox,
     SimpleInput,
     SimpleSelect,
     FKSelect,
@@ -48,6 +54,7 @@ export default {
     return {
       name,
       val: this.data[this.getFieldID(this.field)],
+      inputType: Enums.InputType
     }
   },
   computed: {
@@ -69,9 +76,6 @@ export default {
     },
   },
   methods: {
-    log() {
-      console.log(...arguments);
-    },
     onInput(event) {
       this.$emit('input', event);
     }
