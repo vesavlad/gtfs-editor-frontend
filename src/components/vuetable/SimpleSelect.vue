@@ -1,5 +1,6 @@
 <template>
-  <Multiselect v-model="val" :options="field.options" track-by="value" label="name" @input="onChange"></Multiselect>
+  <Multiselect v-model="val" :options="field.options" :showLabels="false" track-by="value" label="name"
+               @input="onChange"></Multiselect>
 </template>
 
 <script>
