@@ -14,6 +14,7 @@ import EditableTable from "@/components/vuetable/EditableTable.vue";
 import frequenciesAPI from '@/api/frequencies.api';
 import tripsAPI from '@/api/trips.api';
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -40,32 +41,34 @@ export default {
           id_field: 'trip',
           ajax_params: {
             url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: 'start_time',
           sortField: 'start_time',
-          data_type: 'time',
           title: 'Start Time',
           required: true,
+          type: Enums.InputType.TIME
         },
         {
           name: 'end_time',
           sortField: 'end_time',
-          data_type: 'time',
           title: 'End Time',
           required: true,
+          type: Enums.InputType.TIME
         },
         {
           name: 'headway_secs',
           title: 'Headway Seconds',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'exact_times',
           title: 'Exact Times',
           required: true,
-          type: "select-simple",
+          type: Enums.InputType.SIMPLE_SELECT,
           options: [
             {name: 'Yes', value: 1},
             {name: 'No', value: 0},

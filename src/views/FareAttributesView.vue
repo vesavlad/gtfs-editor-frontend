@@ -14,6 +14,7 @@ import EditableTable from "@/components/vuetable/EditableTable.vue";
 import fareAttributesAPI from '@/api/fareattributes.api';
 import agenciesAPI from '@/api/agencies.api';
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -36,27 +37,30 @@ export default {
           sortField: 'fare_id',
           title: 'Fare ID',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'price',
           sortField: 'price',
-          data_type: 'number',
           title: 'Price',
           required: true,
+          type: Enums.InputType.NUMBER
         },
         {
           name: 'currency_type',
           title: 'Currency Code',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'payment_method',
           title: 'Payment Method',
+          required: true,
+          type: Enums.InputType.SIMPLE_SELECT,
           options: [
             {name: 'Before Boarding', value: 1},
             {name: 'On Board', value: 0},
-          ],
-          required: true,
+          ]
         },
         {
           name: 'transfers',
@@ -68,6 +72,7 @@ export default {
             {name: 'Unlimited', value: null},
           ],
           required: true,
+          type: Enums.InputType.SIMPLE_SELECT,
         },
         {
           name: 'agency_id',
@@ -78,13 +83,14 @@ export default {
           id_field: 'agency',
           ajax_params: {
             url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT,
         },
         {
           name: 'transfer_duration',
           title: 'Duration [s]',
-          data_type: 'number',
           required: true,
+          type: Enums.InputType.NUMBER,
         },
       ],
     };

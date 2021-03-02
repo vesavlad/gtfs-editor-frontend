@@ -13,6 +13,7 @@
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import calendarDatesAPI from '@/api/calendardates.api';
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -35,19 +36,20 @@ export default {
           sortField: 'service_id',
           title: 'Service ID',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'date',
           sortField: 'date',
-          data_type: 'date',
           title: 'Date',
           required: true,
+          type: Enums.InputType.DATE
         },
         {
           name: 'exception_type',
           title: 'Exception Type',
           required: true,
-          type: "select-simple",
+          type: Enums.InputType.SIMPLE_SELECT,
           options: [
             {name: 'Service Added', value: 1},
             {name: 'Service Removed', value: 2},

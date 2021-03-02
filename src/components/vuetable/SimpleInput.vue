@@ -1,5 +1,5 @@
 <template>
-  <input ref="input" :type="field.data_type" v-model="val" @input="$emit('input', getValue($event.target))"
+  <input ref="input" :type="field.type" v-model="val" @input="$emit('input', getValue($event.target))"
          v-bind:class="{error: hasErrors}" :data-error="errors.length?errors[0]:''"
          v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: errors.length }"
          v-autowidth="{minWidth: 'calc(100% - 20px)'}"/>
@@ -7,6 +7,7 @@
 
 <script>
 import fieldMixin from "@/mixins/fieldMixin.js";
+import Enums from "@/utils/enums";
 
 export default {
   mixins: [
@@ -41,7 +42,7 @@ export default {
   methods: {
     preProcessValue(value) {
       if (value) {
-        if (this.field.data_type === "color" && value.length === 6) {
+        if (this.field.type === Enums.InputType.COLOR && value.length === 6) {
           value = "#" + value;
         }
       }
@@ -49,9 +50,9 @@ export default {
     },
     getValue(input) {
       let value = null;
-      if (this.field.data_type === "checkbox") {
+      if (this.field.type === Enums.InputType.CHECKBOX) {
         value = input.checked;
-      } else if (this.field.data_type === "color") {
+      } else if (this.field.type === Enums.InputType.COLOR) {
         value = input.value.slice(1);
       } else {
         value = input.value;

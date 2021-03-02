@@ -14,6 +14,7 @@ import EditableTable from "@/components/vuetable/EditableTable.vue";
 import transfersAPI from '@/api/transfers.api';
 import stopsAPI from '@/api/stops.api'
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -35,12 +36,12 @@ export default {
           name: 'type',
           title: 'Type',
           required: true,
-          type: "select-simple",
+          type: Enums.InputType.SIMPLE_SELECT,
           options: [
             {name: 'Recommended transfer point', value: 0},
             {name: 'Timed transfer', value: 1},
             {name: 'Requires minimum time', value: 2},
-            {name: 'Transfer not possible',value: 3},
+            {name: 'Transfer not possible', value: 3},
           ],
         },
         {
@@ -53,7 +54,8 @@ export default {
           required: true,
           ajax_params: {
             url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: 'to_stop_id',
@@ -65,11 +67,13 @@ export default {
           required: true,
           ajax_params: {
             url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: 'min_transfer_time',
           title: 'Min Transfer Time',
+          type: Enums.InputType.NUMBER
         },
       ],
     };

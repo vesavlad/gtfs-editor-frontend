@@ -15,6 +15,7 @@ import fareRulesAPI from '@/api/farerules.api';
 import fareAttributesAPI from '@/api/fareattributes.api';
 import routesAPI from '@/api/routes.api';
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -41,7 +42,8 @@ export default {
           required: true,
           ajax_params: {
             url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT,
         },
         {
           name: 'route_id',
@@ -52,19 +54,23 @@ export default {
           id_field: 'route',
           ajax_params: {
             url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT,
         },
         {
           name: "origin_id",
           title: "Origin Zone",
+          type: Enums.InputType.INPUT,
         },
         {
           name: "destination_id",
           title: "Destination Zone",
+          type: Enums.InputType.INPUT,
         },
         {
           name: "contains_id",
           title: "Contained Zone",
+          type: Enums.InputType.INPUT,
         }
       ],
     };

@@ -20,6 +20,7 @@ import tripsAPI from '@/api/trips.api';
 import routesAPI from '@/api/routes.api';
 import shapesAPI from '@/api/shapes.api';
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -42,6 +43,7 @@ export default {
           title: 'Trip',
           sortField: 'trip_id',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'route_id',
@@ -52,7 +54,8 @@ export default {
           required: true,
           ajax_params: {
             url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: 'shape_id',
@@ -63,7 +66,8 @@ export default {
           id_field: 'shape',
           ajax_params: {
             url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: 'service_id',
@@ -72,16 +76,18 @@ export default {
           id_field: 'service_id',
           ajax_params: {
             url: 'http://127.0.0.1:8000/api/projects/1/services/',
-          }
+          },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: 'trip_headsign',
           title: 'Headsign',
+          type: Enums.InputType.INPUT
         },
         {
           name: "direction_id",
           title: "Direction",
-          type: "select-simple",
+          type: Enums.InputType.SIMPLE_SELECT,
           options: [
             {name: 'N/A', value: null},
             {name: 'Going', value: 0},
@@ -91,29 +97,31 @@ export default {
         {
           name: "trip_short_name",
           title: "Short Name",
+          type: Enums.InputType.INPUT
         },
         {
           name: "block_id",
           title: "Block",
+          type: Enums.InputType.INPUT
         },
         {
           name: "wheelchair_accessible",
           title: "Wheelchair Accessible",
-          type: "select-simple",
+          type: Enums.InputType.SIMPLE_SELECT,
           options: [
-            {name:'No Info', value: null},
-            {name:'Yes', value: 1},
-            {name:'No', value: 2},
+            {name: 'No Info', value: null},
+            {name: 'Yes', value: 1},
+            {name: 'No', value: 2},
           ],
         },
         {
           name: "bikes_allowed",
           title: "Bikes Allowed",
-          type: "select-simple",
+          type: Enums.InputType.SIMPLE_SELECT,
           options: [
-            {name:'No Info', value: null},
-            {name:'Yes', value: 1},
-            {name:'No', value: 2},
+            {name: 'No Info', value: null},
+            {name: 'Yes', value: 1},
+            {name: 'No', value: 2},
           ],
         },
       ],

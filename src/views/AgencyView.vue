@@ -14,6 +14,7 @@ import EditableTable from "@/components/vuetable/EditableTable.vue";
 import agenciesAPI from '@/api/agencies.api';
 import timezones from '@/api/timezones';
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -36,25 +37,28 @@ export default {
           sortField: 'agency_id',
           title: 'Agency ID',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'agency_name',
           sortField: 'agency_name',
           title: 'Name',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'agency_url',
           sortField: 'agency_url',
           title: 'URL',
           required: true,
+          type: Enums.InputType.URL
         },
         {
           name: 'agency_timezone',
           remember_creation_value: true,
           sortField: 'agency_timezone',
           title: 'Timezone',
-          type: "select-simple",
+          type: Enums.InputType.SIMPLE_SELECT,
           options: timezones.timezones.map(tzName => {
             return {name: tzName, value: tzName};
           }),
@@ -63,18 +67,22 @@ export default {
         {
           name: 'agency_lang',
           title: 'Language',
+          type: Enums.InputType.INPUT
         },
         {
           name: 'agency_phone',
           title: 'Phone',
+          type: Enums.InputType.INPUT
         },
         {
           name: 'agency_fare_url',
           title: 'Fare URL',
+          type: Enums.InputType.URL
         },
         {
           name: 'agency_email',
           title: 'E-Mail',
+          type: Enums.InputType.EMAIL
         },
       ],
     };

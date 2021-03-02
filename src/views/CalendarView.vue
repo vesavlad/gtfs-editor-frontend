@@ -16,6 +16,7 @@
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import calendarAPI from '@/api/calendar.api';
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -39,11 +40,12 @@ export default {
           sortField: 'service_id',
           title: 'Service ID',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'start_date',
           sortField: 'start_date',
-          data_type: 'date',
+          type: Enums.InputType.DATE,
           remember_creation_value: true,
           title: 'Start Date',
           required: true,
@@ -51,7 +53,7 @@ export default {
         {
           name: 'end_date',
           sortField: 'end_date',
-          data_type: 'date',
+          type: Enums.InputType.DATE,
           remember_creation_value: true,
           title: 'End Date',
           required: true,
@@ -59,43 +61,43 @@ export default {
         {
           name: 'monday',
           title: 'Monday',
-          data_type: 'checkbox',
+          type: Enums.InputType.CHECKBOX,
           required: true,
         },
         {
           name: 'tuesday',
           title: 'Tuesday',
-          data_type: 'checkbox',
+          type: Enums.InputType.CHECKBOX,
           required: true,
         },
         {
           name: 'wednesday',
           title: 'Wednesday',
-          data_type: 'checkbox',
+          type: Enums.InputType.CHECKBOX,
           required: true,
         },
         {
           name: 'thursday',
           title: 'Thursday',
-          data_type: 'checkbox',
+          type: Enums.InputType.CHECKBOX,
           required: true,
         },
         {
           name: 'friday',
           title: 'Friday',
-          data_type: 'checkbox',
+          type: Enums.InputType.CHECKBOX,
           required: true,
         },
         {
           name: 'saturday',
           title: 'Saturday',
-          data_type: 'checkbox',
+          type: Enums.InputType.CHECKBOX,
           required: true,
         },
         {
           name: 'sunday',
           title: 'Sunday',
-          data_type: 'checkbox',
+          type: Enums.InputType.CHECKBOX,
           required: true,
         },
       ],

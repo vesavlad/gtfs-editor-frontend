@@ -13,6 +13,7 @@
 import EditableTable from "@/components/vuetable/EditableTable.vue";
 import levelsAPI from '@/api/levels.api';
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -35,19 +36,21 @@ export default {
           sortField: 'level_id',
           title: 'Level ID',
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'level_index',
           sortField: 'level_index',
-          data_type: 'number',
           title: 'Index',
           required: true,
+          type: Enums.InputType.NUMBER
         },
         {
           name: 'level_name',
           title: 'Name',
           sortField: 'level_name',
           required: true,
+          type: Enums.InputType.INPUT
         },
       ],
     };

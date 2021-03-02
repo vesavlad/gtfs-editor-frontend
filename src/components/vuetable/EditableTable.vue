@@ -234,11 +234,11 @@ export default {
         data[field.name] = null;
       } else if (field.options) {
         data[field.name] = Object.values(field.options)[0];
-      } else if (field.data_type) {
+      } else if (field.type) {
         let def = "";
-        if (field.data_type === Enums.InputType.CHECKBOX) {
+        if (field.type === Enums.InputType.CHECKBOX) {
           def = false;
-        } else if (field.data_type === Enums.InputType.COLOR) {
+        } else if (field.type === Enums.InputType.COLOR) {
           def = "#000000"
         }
         data[field.name] = def;
@@ -271,7 +271,7 @@ export default {
               if (row[fieldName] === '') {
                 row[fieldName] = null;
               }
-              if (field.data_type === 'color') {
+              if (field.type === Enums.InputType.COLOR) {
                 if (row[fieldName].charAt(0) === '#') {
                   row[fieldName] = row[fieldName].slice(0, 1)
                 }
@@ -367,8 +367,7 @@ export default {
       })
     },
     getInputvalue(input, field) {
-      let data_type = field.data_type;
-      if (data_type === 'checkbox')
+      if (field.type === Enums.InputType.CHECKBOX)
         return input.checked;
       return input.value;
     },
@@ -393,7 +392,7 @@ export default {
         if (data[field.name] === '') {
           data[field.name] = null;
         }
-        if (field.data_type === Enums.InputType.COLOR && data[field.name].charAt(0) === '#') {
+        if (field.type === Enums.InputType.COLOR && data[field.name].charAt(0) === '#') {
           data[field.name] = data[field.name].slice(1, 7);
         }
       });

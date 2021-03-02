@@ -14,6 +14,7 @@ import EditableTable from "@/components/vuetable/EditableTable.vue";
 import pathwaysAPI from '@/api/pathways.api';
 import stopsAPI from '@/api/stops.api'
 import TableHeader from "@/components/vuetable/TableHeader";
+import Enums from "@/utils/enums";
 
 export default {
   components: {
@@ -35,11 +36,12 @@ export default {
           name: "pathway_id",
           title: "Pathway ID",
           required: true,
+          type: Enums.InputType.INPUT
         },
         {
           name: 'pathway_mode',
           title: 'Mode',
-          type: "select-simple",
+          type: Enums.InputType.SIMPLE_SELECT,
           required: true,
           options: [
             {name: 'walkway', value: 1},
@@ -62,6 +64,7 @@ export default {
           ajax_params: {
             url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
           },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: 'to_stop_id',
@@ -73,12 +76,13 @@ export default {
           required: true,
           ajax_params: {
             url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
-          }
+          },
+          type: Enums.InputType.FK_SELECT
         },
         {
           name: "is_bidirectional",
           title: "Bidirectional",
-          data_type: 'checkbox',
+          type: Enums.InputType.CHECKBOX,
           required: true,
         },
       ],
