@@ -1,6 +1,7 @@
 <template>
-  <Multiselect v-model="val" :options="field.options" :showLabels="false" track-by="value" label="name"
-               @input="onChange"></Multiselect>
+  <Multiselect ref="multiselect" v-model="val" :options="field.options" :showLabels="false" track-by="value"
+               label="name"
+               @input="onChange" @close="adjustWitdh" @open="repositionDropDown"></Multiselect>
 </template>
 
 <script>
@@ -49,11 +50,29 @@ export default {
         return false;
       });
       return option;
-    }
+    },
+    adjustWitdh() {
+      const ref = this.$refs.multiselect;
+      ref.$refs.tags.style.width = null;
+    },
+    repositionDropDown() {
+      const {top, width, left} = this.$el.getBoundingClientRect();
+      const ref = this.$refs.multiselect;
+      ref.$refs.tags.style.width = `${width}px`;
+      //ref.$refs.list.style.width = `${width}px`;
+      ref.$refs.list.style.position = 'fixed';
+      ref.$refs.list.style.bottom = 'auto';
+      ref.$refs.list.style.top = `${top}px`;
+      ref.$refs.list.style.left = `${left}px`;
+    },
   },
   mounted() {
     this.val = this.translateValueToOption(this.value);
-  }
+    window.addEventListener('scroll', this.repositionDropDown);
+  },
+  destroyed() {
+    window.removeEventListener('scroll', this.repositionDropDown);
+  },
 }
 </script>
 
