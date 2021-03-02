@@ -92,6 +92,22 @@ input, select {
     border: 1px solid transparent;
 }
 input[type="checkbox"],input[type="radio"] {all: revert;}
+input[type="color"] {
+    -webkit-appearance: none;
+    border: var(--border);
+    padding: 0px;
+    margin: 0 10px;
+    min-height: 32px;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 4px;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+}
 select {cursor: pointer;}
 input:focus:not(.multiselect input) {box-shadow: 0 2px 5px rgba(0,0,0,0.05), 0 4px 10px rgba(84,101,115,0.15); background-color: white;}
 input.error {background: #F0ECEC; border: 1px solid rgba(198,59,46,0.40);}
@@ -457,10 +473,20 @@ table th {
 }
 
 /* Multiselect */
+.multiselect {
+    background: var(--gris-claro);
+    box-shadow: inset 0 1px 0 0 rgb(0 0 0 / 5%);
+    border-radius: 8px;
+    color: var(--gris-osc2);
+    font: 400 16px 'Roboto';
+    border: 1px solid transparent;
+}
+.multiselect__input, .multiselect__single {background-color: transparent;}
 td .multiselect input[type="text"] {min-width: inherit; box-shadow: none;}
 .multiselect__input, .multiselect__single {white-space: nowrap;}
 .multiselect__content-wrapper {width: fit-content;}
 .multiselect__input:focus {border:0; box-shadow: none;}
+.multiselect__tags {border: 0; background-color: transparent;}
 
 tr.changed>td {
     background-color: var(--bg-warning);
