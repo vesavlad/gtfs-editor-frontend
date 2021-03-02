@@ -1,17 +1,21 @@
 <template>
-  <select class="select-data" ref="select" v-model="val">
-  </select>
+  <Multiselect v-model="val" :options="options" :loading="isLoading" :searchable="true" :internal-search="false"
+               track-by="value" label="name" :showLabels="false" @input="onChange" @search-change="asyncFind"></Multiselect>
 </template>
 
 <script>
+import Multiselect from "vue-multiselect";
 import fieldMixin from "@/mixins/fieldMixin.js";
-import $ from 'jquery';
-import 'select2';
+import httpClient from "@/api/httpClient";
 
 export default {
+  name: 'FKSelect',
   mixins: [
     fieldMixin,
   ],
+  components: {
+    Multiselect
+  },
   props: {
     field: {
       type: Object,
@@ -21,102 +25,70 @@ export default {
       type: Object,
       required: true,
     },
-    value: {},
+    value: {
+      required: true
+    },
     hasErrors: {
       type: Boolean,
       default: false,
     },
   },
-  watch: {
-    value() {
-      this.changeEnabled = false;
-      this.val = this.value;
-      this.selectDefault(this.getFKText(this.field, this.data), this.value);
-    }
-  },
   data() {
     return {
-      changeEnabled: true,
-      val: this.value,
-      name: this.getFieldName(this.field),
+      val: null,
+      options: [],
+      selectedOption: null,
+      isLoading: false
+    }
+  },
+  watch: {
+    value() {
+      this.setOption();
     }
   },
   mounted() {
-    this.datafy();
-    $(this.$refs.select).on('change', this.onChange);
+    this.setOption();
   },
   methods: {
-    onChange(evt) {
-      this.val = evt.target.value;
-      if (this.changeEnabled) {
-        this.$emit("input", this.val);
+    setOption() {
+      if (this.data[this.field.id_field]) {
+        let option = {
+          name: this.data[this.field.name],
+          value: this.data[this.field.id_field]
+        };
+        this.selectedOption = option;
+        this.options.push(option);
+        this.val = option;
       }
     },
-    log(msg) {
-      console.log(msg);
+    onChange(option) {
+      this.$emit("input", option ? option.value : null);
     },
-    selectDefault(defaultText, defaultValue) {
-      let select = this.$refs.select;
-      // if Option already exists we select it
-      if (defaultValue == null) {
-        defaultText = "Unselected";
-        defaultValue = "";
-      }
-      if ($(select).find("option[value='" + defaultValue + "']").length) {
-        $(select).val(defaultValue).trigger('change');
-      } else {
-        // Otherwise we create it and select it
-        var newOption = new Option(defaultText, defaultValue, true, true);
-        $(select).append(newOption).trigger('change');
-      }
-      this.changeEnabled = true;
-    },
-    datafy() {
-      let select = this.$refs.select;
-      let field = this.field;
-      let defaultText = this.getFKText(field, this.data);
-      let defaultValue = this.value;
-      let self = this;
-      this.selectDefault(defaultText, defaultValue);
-      $(select).select2({
-        ajax: {
-          url: self.field.ajax_params.url,
-          data: function (params) {
-            let query = {
-              search: params.term,
-              per_page: 50,
-              page: params.page,
-            }
-            return query
-          },
-          processResults(data) {
-            let name = field.name;
-            if (field.fk_name) {
-              name = field.fk_name;
-            }
-            let reply = {
-              results: data.results.map(result => {
-                let res = {
-                  id: result.id,
-                  text: result[name]
-                };
-                return res;
-              }),
-              pagination: {
-                more: data.pagination.current_page !== data.pagination.last_page,
-              },
-            }
-            if (field.nullable && data.pagination.current_page === 1) {
-              reply.results.unshift({
-                id: "",
-                text: "Unselected"
-              })
-            }
-            return reply;
-          },
+    asyncFind(query) {
+      this.isLoading = true;
+      let params = {
+        search: query,
+        per_page: 50,
+        page: 1
+      };
+      httpClient.get(this.field.ajax_params.url, params).then(response => {
+        // process results
+        let name = this.field.name;
+        if (this.field.fk_name) {
+          name = this.field.fk_name;
         }
-      }).on('change', this.onChange);
-    },
+        let options = response.data.results.map(result => {
+          let option = {
+            name: result[name],
+            value: result.id
+          };
+          return option;
+        });
+        options.concat([this.selectedOption]);
+        this.options = options;
+        this.isLoading = false;
+      });
+    }
   },
 }
 </script>
