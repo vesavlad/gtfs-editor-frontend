@@ -1,7 +1,7 @@
 <template>
   <div :class="[$_css.wrapperClass]">
     <Multiselect :class="['vuetable-pagination-dropdown', $_css.dropdownClass]" :options="options" label="label"
-                 track-by="value" v-model="value">
+                 track-by="value" v-model="value" :showLabels="false">
     </Multiselect>
   </div>
 </template>
