@@ -109,7 +109,8 @@
         </ul>
         <div class="m-footer">
           <div class="option-buttons">
-            <button class="btn"><span>{{ $t('projectDashboard.gtfsBuilder.validationReport.downloadCSV') }}</span>
+            <button class="btn" @click="downloadCSVData">
+              <span>{{ $t('projectDashboard.gtfsBuilder.validationReport.downloadCSV') }}</span>
             </button>
           </div>
         </div>
@@ -124,6 +125,7 @@ import projectsAPI from "@/api/projects.api";
 import {DateTime} from "luxon";
 import Enums from "@/utils/enums";
 import PillBase from "@/components/PillBase";
+import FileSaver from 'file-saver';
 
 export default {
   name: 'BuildAndValidateGTFS',
@@ -243,6 +245,11 @@ export default {
       } else {
         this.report.show = !this.report.show;
       }
+    },
+    downloadCSVData() {
+      let data = this.project.gtfs_validation.message;
+      let blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+      FileSaver.saveAs(blob, "validation-data.csv");
     }
   },
   beforeDestroy() {
