@@ -7,14 +7,19 @@
       <div class="flex between">
         <div>
           <div class="small">{{ $t('projectDashboard.gtfsBuilder.lastBuild') }}</div>
-          <div class="msj-builder-execution" v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1" >{{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}</div>
+          <div class="msj-builder-execution"
+               v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1">
+            {{ project.gtfs_file_updated_at ? lastBuildExecution : $t('general.never') }}
+          </div>
           <div v-else class="grid center">
             <span class="msj-builder-execution">{{ $t('projectDashboard.gtfsBuilder.executing') }}</span>
             <i class="material-icons rotating">autorenew</i>
           </div>
         </div>
         <div class="grid">
-          <button class="btn" v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1" @click="buildGTFS">
+          <button class="btn"
+                  v-if="[status.FINISHED, status.CANCELED, status.ERROR, null].indexOf(project.gtfs_building_and_validation_status)>-1"
+                  @click="buildGTFS">
             <span>{{ $t('projectDashboard.gtfsBuilder.executeButtonLabel') }}</span>
             <i class="material-icons-outlined">not_started</i>
           </button>
@@ -28,7 +33,9 @@
     <ul class="list-summary">
       <li>
         <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.buildStatus') }}</span>
-        <span class="lst">{{ project.gtfs_building_and_validation_status ? project.gtfs_building_and_validation_status : '' }}</span>
+        <span class="lst">{{
+            project.gtfs_building_and_validation_status ? project.gtfs_building_and_validation_status : ''
+          }}</span>
       </li>
       <li>
         <span class="lsh">{{ $t('projectDashboard.gtfsBuilder.buildDuration') }}</span>
@@ -58,8 +65,8 @@
         <div class="m-header">
           <h2>{{ $t('projectDashboard.gtfsBuilder.validationReport.title') }}</h2>
           <div class="grid">
-            <button v-if="link" class="btn icon flat" @click="openLink"><i class="material-icons">info</i></button>
-            <button class="btn icon flat" @click="$emit('close')"><i class="material-icons">close</i></button>
+            <a class="btn icon flat" target="_blank" href="https://gtfs.mobilitydata.org/spec/gtfs-schedule"><i class="material-icons">info</i></a>
+            <button class="btn icon flat" @click="showModal=false"><i class="material-icons">close</i></button>
           </div>
         </div>
         <ul class="report-list m-content">
@@ -83,7 +90,14 @@
                   <li>
                     <h4>`route_color` and `route_text_color` have insufficient contrast</h4>
                     <span>Code: 8, Entity ID: L</span>
-                    <p>"Contrast ratio should be >= 4.5 but was `1.4932792189163142` for route:`C` in file:`routes.txt`. The `route_text_color` and `route_color` should be set to contrasting colors, as they are used as the text and background color (respectively) for displaying route names. When left blank, `route_text_color` defaults to 000000 (black) and `route_color` defaults to FFFFFF (white). A common source of issues here is setting `route_color` to a dark color, while leaving `route_text_color` set to black. In this case, `route_text_color` should be set to a lighter color like FFFFFF to ensure a legible contrast between the two. The contrast ratio formula used can be found here : https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure"</p>
+                    <p>"Contrast ratio should be >= 4.5 but was `1.4932792189163142` for route:`C` in file:`routes.txt`.
+                      The `route_text_color` and `route_color` should be set to contrasting colors, as they are used as
+                      the text and background color (respectively) for displaying route names. When left blank,
+                      `route_text_color` defaults to 000000 (black) and `route_color` defaults to FFFFFF (white). A
+                      common source of issues here is setting `route_color` to a dark color, while leaving
+                      `route_text_color` set to black. In this case, `route_text_color` should be set to a lighter color
+                      like FFFFFF to ensure a legible contrast between the two. The contrast ratio formula used can be
+                      found here : https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure"</p>
                   </li>
                   <li>
                     <h4>Title</h4>
