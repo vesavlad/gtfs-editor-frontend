@@ -86,7 +86,8 @@
               </div>
             </button>
             <div class="report-body">
-              <transition name="fade">
+              <transition name="fade" v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:before-leave="beforeLeave"
+                          v-on:leave="leave">
                 <div class="report-content" v-if="report.activeRow===file.filename && report.show">
                   <ul class="report-box errors">
                     <li v-for="(row, index) in file.errors" :key="index">
@@ -250,6 +251,18 @@ export default {
       let data = this.project.gtfs_validation.message;
       let blob = new Blob([data], {type: "text/plain;charset=utf-8"});
       FileSaver.saveAs(blob, "validation-data.csv");
+    },
+    beforeEnter: function(el) {
+      el.style.height = '0';
+    },
+    enter: function(el) {
+      el.style.height = el.scrollHeight + 'px';
+    },
+    beforeLeave: function(el) {
+      el.style.height = el.scrollHeight + 'px';
+    },
+    leave: function(el) {
+      el.style.height = '0';
     }
   },
   beforeDestroy() {
