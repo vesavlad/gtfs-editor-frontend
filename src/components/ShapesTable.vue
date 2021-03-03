@@ -14,10 +14,10 @@
           <button class="btn icon flat error" @click="$emit('delete-shape', props.rowData)" alt="Delete shape.">
             <span class="material-icons">delete</span>
           </button>
-          <button class="btn icon" @click="$emit('edit-shape', props.rowData)" alt="Edit shape.">
+          <button class="btn icon flat" @click="$emit('edit-shape', props.rowData)" alt="Edit shape.">
             <span class="material-icons">edit</span>
           </button>
-          <button class="btn icon" @click="$emit('focus-shape', props.rowData)" alt="Display shape.">
+          <button class="btn icon flat" @click="$emit('focus-shape', props.rowData)" alt="Display shape.">
             <span class="material-icons">remove_red_eye</span>
           </button>
         </div>

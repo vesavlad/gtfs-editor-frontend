@@ -1,30 +1,37 @@
 <template>
   <div class="map-sidebar">
-    <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
-      <div class="input-group">
-        <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
+    <div class="side-table-header">
+      <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
+        <div class="input-group">
+          <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
+        </div>
+      </form>
+      <div class="icon-link">
+        <button class="btn icon flat"><i class="material-icons">visibility</i></button>
       </div>
-    </form>
-    <div>
+    </div>
+    <div class="table-content">
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :transform="transformData">
         <div slot="actions" slot-scope="props" class="flex">
-          <button class="btn icon" @click="$emit('delete-st', props.rowData)" alt="Delete stop-times.">
+          <button class="btn flat icon error" @click="$emit('delete-st', props.rowData)" alt="Delete stop-times.">
             <span class="material-icons">delete</span>
           </button>
-          <button class="btn icon" @click="$emit('edit-st', props.rowData)" alt="Edit stop-times.">
+          <button class="btn flat icon" @click="$emit('edit-st', props.rowData)" alt="Edit stop-times.">
             <span class="material-icons">edit</span>
           </button>
-          <button class="btn icon" @click="$emit('focus-st', props.rowData)" alt="Display stop_times.">
+          <button class="btn flat icon" @click="$emit('focus-st', props.rowData)" alt="Display stop_times.">
             <span class="material-icons">remove_red_eye</span>
           </button>
         </div>
       </Vuetable>
     </div>
-    <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
-    </VuetablePagination>
-    <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
-    </VuetablePaginationDropDown>
+    <div class="table-footer">
+      <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
+      </VuetablePagination>
+      <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
+      </VuetablePaginationDropDown>
+    </div>
   </div>
 
 </template>

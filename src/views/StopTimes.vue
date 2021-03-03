@@ -3,15 +3,17 @@
     <div class="grid container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
-    <div v-if="!editing" class="dynamic-map-container">
-      <div class="top-map-bar">
-        <div class="right-content grid center">
-          <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+    <div class="map-container" v-if="!editing">
+      <div class="dynamic-map-container">
+        <div class="top-map-bar">
+          <div class="right-content grid center">
+            <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+          </div>
         </div>
-      </div>
         <StopTimesTable ref="table" :project="$route.params.projectid" @focus-st="displayTrip"
-          @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>
-      <StopTimesMap ref="map" :project="$route.params.projectid" @range="beginEditing('range', $event)"></StopTimesMap>
+                        @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>
+        <StopTimesMap ref="map" :project="$route.params.projectid" @range="beginEditing('range', $event)"></StopTimesMap>
+      </div>
     </div>
     <StopTimesEditor v-else :trip="editingModal.trip" v-on:close="finishEditing" :project="$route.params.projectid"
       :mode="mode">
