@@ -1,7 +1,7 @@
 <template>
   <label class="checkbox">
     <input type="checkbox" v-model="val" @input="$emit('input', $event.target.checked)"/>
-    <div class="checkbox-name"><span>{{ field.name }}</span></div>
+    <div class="checkbox-name"><span>{{ label }}</span></div>
   </label>
 </template>
 
@@ -20,6 +20,14 @@ export default {
     return {
       val: this.value
     };
+  },
+  computed: {
+    label() {
+      if (this.field.inputConfig?.transformLabel) {
+        return this.field.inputConfig.transformLabel(this.field.title);
+      }
+      return this.field.title
+    }
   }
 }
 </script>

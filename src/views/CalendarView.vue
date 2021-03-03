@@ -63,42 +63,63 @@ export default {
           title: 'Monday',
           type: Enums.InputType.CHECKBOX,
           required: true,
+          inputConfig: {
+            transformLabel: (title) => title.toLowerCase().substring(0,3)
+          }
         },
         {
           name: 'tuesday',
           title: 'Tuesday',
           type: Enums.InputType.CHECKBOX,
           required: true,
+          inputConfig: {
+            transformLabel: (title) => title.toLowerCase().substring(0,3)
+          }
         },
         {
           name: 'wednesday',
           title: 'Wednesday',
           type: Enums.InputType.CHECKBOX,
           required: true,
+          inputConfig: {
+            transformLabel: (title) => title.toLowerCase().substring(0,3)
+          }
         },
         {
           name: 'thursday',
           title: 'Thursday',
           type: Enums.InputType.CHECKBOX,
           required: true,
+          inputConfig: {
+            transformLabel: (title) => title.toLowerCase().substring(0,3)
+          }
         },
         {
           name: 'friday',
           title: 'Friday',
           type: Enums.InputType.CHECKBOX,
           required: true,
+          inputConfig: {
+            transformLabel: (title) => title.toLowerCase().substring(0,3)
+          }
         },
         {
           name: 'saturday',
           title: 'Saturday',
           type: Enums.InputType.CHECKBOX,
           required: true,
+          inputConfig: {
+            transformLabel: (title) => title.toLowerCase().substring(0,3)
+          }
         },
         {
           name: 'sunday',
           title: 'Sunday',
           type: Enums.InputType.CHECKBOX,
           required: true,
+          inputConfig: {
+            transformLabel: (title) => title.toLowerCase().substring(0,3)
+          }
         },
       ],
     };
