@@ -70,9 +70,8 @@
             <button class="btn icon flat" @click="showModal=false"><i class="material-icons">close</i></button>
           </div>
         </div>
-        <transition-group class="report-list m-content" name="flip-list" tag="ul">
-          <li class="report-collapse" :class="{collapsed: report.activeRow!==file.filename || !report.show}"
-              v-for="(file, index) in errorData" :key="index">
+        <ul class="report-list m-content">
+          <li class="report-collapse" v-for="(file, index) in errorData" :key="index">
             <button class="report-header" @click="setVisibility(file)">
               <div>
                 <i class="material-icons">description</i>
@@ -87,25 +86,27 @@
               </div>
             </button>
             <div class="report-body">
-              <div class="report-content">
-                <ul class="report-box errors">
-                  <li v-for="(row, index) in file.errors" :key="index">
-                    <h4>{{ row.title }}</h4>
-                    <span>Code: {{ row.code }}, Entity ID: {{ row.entityId }}</span>
-                    <p>{{ row.description }}</p>
-                  </li>
-                </ul>
-                <ul class="report-box warnings">
-                  <li v-for="(row, index) in file.warnings" :key="index">
-                    <h4>{{ row.title }}</h4>
-                    <span>Code: {{ row.code }}, Entity ID: {{ row.entityId }}</span>
-                    <p>{{ row.description }}</p>
-                  </li>
-                </ul>
-              </div>
+              <transition name="fade">
+                <div class="report-content" v-if="report.activeRow===file.filename && report.show">
+                  <ul class="report-box errors">
+                    <li v-for="(row, index) in file.errors" :key="index">
+                      <h4>{{ row.title }}</h4>
+                      <span>Code: {{ row.code }}, Entity ID: {{ row.entityId }}</span>
+                      <p>{{ row.description }}</p>
+                    </li>
+                  </ul>
+                  <ul class="report-box warnings">
+                    <li v-for="(row, index) in file.warnings" :key="index">
+                      <h4>{{ row.title }}</h4>
+                      <span>Code: {{ row.code }}, Entity ID: {{ row.entityId }}</span>
+                      <p>{{ row.description }}</p>
+                    </li>
+                  </ul>
+                </div>
+              </transition>
             </div>
           </li>
-        </transition-group>
+        </ul>
         <div class="m-footer">
           <div class="option-buttons">
             <button class="btn"><span>{{ $t('projectDashboard.gtfsBuilder.validationReport.downloadCSV') }}</span>
