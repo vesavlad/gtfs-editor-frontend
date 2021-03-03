@@ -59,7 +59,11 @@
       "download": "Download",
       "executeButtonLabel": "Run",
       "cancelButtonLabel": "Cancel",
-      "executing": "Executing..."
+      "executing": "Executing...",
+      "validationReport": {
+        "title": "GTFS validation report",
+        "downloadCSV": "Download CSV"
+      }
     },
     "gtfsRequiredData": "GTFS required data",
     "gtfsOptionalData": "GTFS Optional data",

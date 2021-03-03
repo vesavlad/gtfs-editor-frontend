@@ -56,7 +56,7 @@
     <BaseModal v-if="showModal" @close="showModal=false">
       <template slot="m-content">
         <div class="m-header">
-          <h2>Errors report details</h2>
+          <h2>{{ $t('projectDashboard.gtfsBuilder.validationReport.title') }}</h2>
           <div class="grid">
             <button v-if="link" class="btn icon flat" @click="openLink"><i class="material-icons">info</i></button>
             <button class="btn icon flat" @click="$emit('close')"><i class="material-icons">close</i></button>
@@ -170,7 +170,7 @@
         </ul>
         <div class="m-footer">
           <div class="option-buttons">
-            <button class="btn"><span>Download CSV</span></button>
+            <button class="btn"><span>{{ $t('projectDashboard.gtfsBuilder.validationReport.download') }}</span></button>
           </div>
         </div>
       </template>
