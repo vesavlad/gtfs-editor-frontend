@@ -71,7 +71,7 @@
           </div>
         </div>
         <ul class="report-list m-content">
-          <li class="report-collapse" v-for="(file, index) in errorData" :key="index">
+          <li class="report-collapse collapsed" v-for="(file, index) in errorData" :key="index">
             <button class="report-header" @click="setVisibility(file)">
               <div>
                 <i class="material-icons">description</i>
@@ -82,13 +82,12 @@
                 </div>
               </div>
               <div class="icon flat">
-                <i class="material-icons">keyboard_arrow_up</i>
+                <i class="material-icons">keyboard_arrow_down</i>
               </div>
             </button>
-            <div class="report-body">
-              <transition name="fade" v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:before-leave="beforeLeave"
-                          v-on:leave="leave">
-                <div class="report-content" v-if="report.activeRow===file.filename && report.show">
+            <transition name="collapse" v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:before-leave="beforeLeave" v-on:leave="leave">
+            <div class="report-body" v-if="report.activeRow===file.filename && report.show">
+                <div class="report-content">
                   <ul class="report-box errors">
                     <li v-for="(row, index) in file.errors" :key="index">
                       <h4>{{ row.title }}</h4>
@@ -104,8 +103,8 @@
                     </li>
                   </ul>
                 </div>
-              </transition>
             </div>
+            </transition>
           </li>
         </ul>
         <div class="m-footer">

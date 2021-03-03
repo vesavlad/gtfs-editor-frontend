@@ -1,22 +1,22 @@
 <template>
-  <div class="shapes">
+  <div class="section shapes">
     <div class="grid container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
-    <div class="dynamic-map-container" v-if="!editing">
-      <div class="top-map-bar">
-        <div class="right-content">
-          <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+    <div class="map-container" v-if="!editing">
+      <div class="dynamic-map-container">
+        <div class="top-map-bar">
+          <div class="right-content">
+            <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+          </div>
         </div>
+        <div class="map-sidebar">
+          <ShapesTable ref="table" :project="$route.params.projectid" @focus-shape="displayShape"
+                       @edit-shape="openEditingModal" @delete-shape="beginDeleteShape"></ShapesTable>
+        </div>
+        <ShapesMap ref="map" :project="$route.params.projectid" @range="beginEditing('range', $event)"></ShapesMap>
       </div>
-      <div class="map-sidebar">
-        <ShapesTable ref="table" :project="$route.params.projectid" @focus-shape="displayShape"
-          @edit-shape="openEditingModal" @delete-shape="beginDeleteShape"></ShapesTable>
-        <button class="btn btn-outline-secondary" @click="beginCreation">
-          New shape
-        </button>
-      </div>
-      <ShapesMap ref="map" :project="$route.params.projectid" @range="beginEditing('range', $event)"></ShapesMap>
+      <button class="btn floating" @click="beginCreation"><i class="material-icons">add</i></button>
     </div>
     <ShapeEditor v-else :shape="shape" v-on:close="finishEditing" :project="$route.params.projectid" :range="range" :mode="mode">
     </ShapeEditor>

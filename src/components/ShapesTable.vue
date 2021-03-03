@@ -1,15 +1,17 @@
 <template>
   <div>
-    <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
-      <div class="input-group">
-        <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
-      </div>
-    </form>
-    <div>
+    <div class="side-table-header">
+      <form class="search" @submit.stop.prevent="doSearch">
+        <div class="input-group">
+          <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
+        </div>
+      </form>
+    </div>
+    <div class="table-content">
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
         <div slot="actions" slot-scope="props" class="flex">
-          <button class="btn icon" @click="$emit('delete-shape', props.rowData)" alt="Delete shape.">
+          <button class="btn icon flat error" @click="$emit('delete-shape', props.rowData)" alt="Delete shape.">
             <span class="material-icons">delete</span>
           </button>
           <button class="btn icon" @click="$emit('edit-shape', props.rowData)" alt="Edit shape.">
@@ -20,10 +22,14 @@
           </button>
         </div>
       </Vuetable>
-      <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
-      </VuetablePagination>
-      <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
-      </VuetablePaginationDropDown>
+    </div>
+    <div class="table-footer">
+      <div class="grid-pagination">
+        <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
+        </VuetablePagination>
+        <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
+        </VuetablePaginationDropDown>
+      </div>
     </div>
   </div>
 </template>
