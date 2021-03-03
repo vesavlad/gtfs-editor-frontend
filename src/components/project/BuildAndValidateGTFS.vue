@@ -71,7 +71,8 @@
           </div>
         </div>
         <transition-group class="report-list m-content" name="flip-list" tag="ul">
-          <li class="report-collapse" :class="{collapsed: report.activeRow!==file.filename || !report.show}" v-for="(file, index) in errorData" :key="index">
+          <li class="report-collapse" :class="{collapsed: report.activeRow!==file.filename || !report.show}"
+              v-for="(file, index) in errorData" :key="index">
             <button class="report-header" @click="setVisibility(file)">
               <div>
                 <i class="material-icons">description</i>
@@ -153,6 +154,7 @@ export default {
     errorData() {
       let rows = this.project.gtfs_validation.message.split('\n').map(row => row.split(','));
       rows.shift();
+      rows.pop();
       return rows.reduce((accumulator, row, index) => {
         let filename = row[0];
         let code = row[1];
@@ -161,7 +163,7 @@ export default {
         let title = row[4];
         let description = row[5];
 
-        if (index===0) {
+        if (index === 0) {
           this.report.activeRow = filename;
           this.report.show = true;
         }
@@ -234,11 +236,11 @@ export default {
       }, 2000);
     },
     setVisibility(file) {
-      if (this.report.activeRow!==file.filename) {
+      if (this.report.activeRow !== file.filename) {
         this.report.activeRow = file.filename;
         this.report.show = true;
       } else {
-        this.report.show=!this.report.show;
+        this.report.show = !this.report.show;
       }
     }
   },
