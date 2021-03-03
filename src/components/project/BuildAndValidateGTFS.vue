@@ -184,7 +184,7 @@
         </ul>
         <div class="m-footer">
           <div class="option-buttons">
-            <button class="btn"><span>{{ $t('projectDashboard.gtfsBuilder.validationReport.download') }}</span></button>
+            <button class="btn"><span>{{ $t('projectDashboard.gtfsBuilder.validationReport.downloadCSV') }}</span></button>
           </div>
         </div>
       </template>
