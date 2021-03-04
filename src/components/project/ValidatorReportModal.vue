@@ -10,7 +10,8 @@
         </div>
       </div>
       <ul class="report-list m-content">
-        <li class="report-collapse collapsed" v-for="(file, index) in formattedMessage" :key="index">
+        <li class="report-collapse" :class="{collapsed: activeRow!==file.filename || !showDetail}"
+            v-for="(file, index) in formattedMessage" :key="index">
           <button class="report-header" @click="setVisibility(file)">
             <div>
               <i class="material-icons">description</i>
@@ -78,7 +79,7 @@ export default {
   data() {
     return {
       activeRow: null,
-      showDetail: true
+      showDetail: false
     }
   },
   computed: {
@@ -96,7 +97,6 @@ export default {
 
         if (index === 0) {
           this.activeRow = filename;
-          this.showDetail = true;
         }
 
         if (!accumulator[filename]) {
@@ -153,6 +153,9 @@ export default {
     leave: function (el) {
       el.style.height = '0';
     }
+  },
+  mounted() {
+    setTimeout(() => this.showDetail = true, 50)
   }
 }
 </script>
