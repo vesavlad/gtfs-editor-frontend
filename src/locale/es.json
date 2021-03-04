@@ -61,7 +61,7 @@
       "cancelButtonLabel": "Cancelar",
       "executing": "Ejecutando...",
       "validationReport": {
-        "title": "Reporta de validación de GTFS",
+        "title": "Reporte de validación de GTFS",
         "downloadCSV": "Descargar CSV"
       }
     },

@@ -77,8 +77,8 @@
                 <i class="material-icons">description</i>
                 <h3>{{ file.filename }}</h3>
                 <div class="grid min">
-                  <pillBase pillClass="error" :pillText="file.errorNumber"></pillBase>
-                  <pillBase pillClass="warning" :pillText="file.warningNumber"></pillBase>
+                  <pillBase v-if="file.errorNumber>0" pillClass="error" :pillText="file.errorNumber"></pillBase>
+                  <pillBase v-if="file.warningNumber>0" pillClass="warning" :pillText="file.warningNumber"></pillBase>
                 </div>
               </div>
               <div class="icon flat">
@@ -88,14 +88,14 @@
             <transition name="collapse" v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:before-leave="beforeLeave" v-on:leave="leave">
             <div class="report-body" v-if="report.activeRow===file.filename && report.show">
                 <div class="report-content">
-                  <ul class="report-box errors">
+                  <ul class="report-box errors" v-if="file.errorNumber>0">
                     <li v-for="(row, index) in file.errors" :key="index">
                       <h4>{{ row.title }}</h4>
                       <span>Code: {{ row.code }}, Entity ID: {{ row.entityId }}</span>
                       <p>{{ row.description }}</p>
                     </li>
                   </ul>
-                  <ul class="report-box warnings">
+                  <ul class="report-box warnings"  v-if="file.warningNumber>0">
                     <li v-for="(row, index) in file.warnings" :key="index">
                       <h4>{{ row.title }}</h4>
                       <span>Code: {{ row.code }}, Entity ID: {{ row.entityId }}</span>
