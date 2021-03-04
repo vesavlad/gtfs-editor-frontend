@@ -1,16 +1,15 @@
 <template>
-  <Multiselect ref="multiselect" v-model="val" :options="field.options" :showLabels="false" track-by="value"
-               label="name"
-               @input="onChange" @close="adjustWitdh" @open="repositionDropDown"></Multiselect>
+  <MyMultiselect ref="multiselect" v-model="val" :options="field.options" :showLabels="false" track-by="value"
+                 label="name" @input="onChange"></MyMultiselect>
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect';
+import MyMultiselect from "@/components/vuetable/MyMultiselect";
 
 export default {
   name: 'SimpleSelect',
   components: {
-    Multiselect
+    MyMultiselect
   },
   props: {
     field: {
@@ -50,35 +49,11 @@ export default {
         return false;
       });
       return option;
-    },
-    adjustWitdh() {
-      const ref = this.$refs.multiselect;
-      ref.$refs.tags.style.width = null;
-    },
-    repositionDropDown() {
-      const {top, height, left} = this.$el.getBoundingClientRect();
-      const ref = this.$refs.multiselect;
-      if (ref.$refs.list.style.display !== 'none') {
-        ref.$refs.list.style.position = 'fixed';
-        ref.$refs.list.style.bottom = 'auto';
-        ref.$refs.list.style.top = `${top + height}px`;
-        ref.$refs.list.style.left = `${left}px`;
-      }
-    },
+    }
   },
   mounted() {
     this.val = this.translateValueToOption(this.value);
-    window.addEventListener('scroll', this.repositionDropDown);
-    if (document.getElementsByClassName('table-content').length) {
-      document.getElementsByClassName('table-content')[0].addEventListener('scroll', this.repositionDropDown);
-    }
-  },
-  beforeDestroy() {
-    window.removeEventListener('scroll', this.repositionDropDown);
-    if (document.getElementsByClassName('table-content').length) {
-      document.getElementsByClassName('table-content')[0].removeEventListener('scroll', this.repositionDropDown);
-    }
-  },
+  }
 }
 </script>
 
