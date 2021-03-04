@@ -1,18 +1,15 @@
 <template>
-  <input ref="input" :type="field.type" v-model="val" @input="$emit('input', getValue($event.target))"
-         :class="{error: hasErrors}" :data-error="errors.length?errors[0]:''"
-         v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: errors.length }"/>
+  <div :class="{error: hasErrors}"
+       v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: errors.length }">
+    <input type="text" v-model="val" maxlength="6" @input="$emit('input', getValue($event.target))"/>
+    <input type="color" v-model="val" @input="$emit('input', getValue($event.target))" style="width:30px;"/>
+  </div>
 </template>
 
 <script>
-
 export default {
   name: 'ColorInput',
   props: {
-    field: {
-      type: Object,
-      required: true,
-    },
     value: {
       required: true,
     },
@@ -42,8 +39,7 @@ export default {
       return value;
     },
     getValue(input) {
-      let value = input.value.slice(1);
-      return value;
+      return input.value.replace('#', '').toUpperCase();
     }
   },
 }

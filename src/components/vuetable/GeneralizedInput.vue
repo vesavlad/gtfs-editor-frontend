@@ -7,7 +7,7 @@
   </SimpleSelect>
   <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX" :field="field" v-model="val"
                   @input="onInput"></SimpleCheckbox>
-  <ColorInput v-else-if="field.type===inputType.COLOR" :field="field" v-model="val" @input="onInput"
+  <ColorInput v-else-if="field.type===inputType.COLOR" v-model="val" @input="onInput"
               :hasErrors="has_errors" :errors="field_errors"></ColorInput>
   <!-- Default -->
   <SimpleInput v-else :field="field" v-model="val" @input="onInput" :hasErrors="has_errors" :errors="field_errors">
