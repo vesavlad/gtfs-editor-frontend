@@ -69,13 +69,13 @@ export default {
   mounted() {
     this.val = this.translateValueToOption(this.value);
     window.addEventListener('scroll', this.repositionDropDown);
-    if (document.getElementsByClassName('table-content')) {
+    if (document.getElementsByClassName('table-content').length) {
       document.getElementsByClassName('table-content')[0].addEventListener('scroll', this.repositionDropDown);
     }
   },
   destroyed() {
     window.removeEventListener('scroll', this.repositionDropDown);
-    if (document.getElementsByClassName('table-content')) {
+    if (document.getElementsByClassName('table-content').length) {
       document.getElementsByClassName('table-content')[0].removeEventListener('scroll', this.repositionDropDown);
     }
   },
