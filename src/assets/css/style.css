@@ -659,7 +659,10 @@ a.disabled {color: var(--gris-medio); cursor: default;}
   bottom: 0;
   right: 0;
 }
-
+.modal-in {
+    -webkit-animation: modal-in 1.4s linear;
+    animation: modal-in .3s cubic-bezier(0, 0, 0.2, 1);
+}
 
 /* ============  ANIMACIONES Y TRANSICIONES  ============== */
 
@@ -684,10 +687,26 @@ a.disabled {color: var(--gris-medio); cursor: default;}
     transform: rotate(360deg);
   }
 }
+@keyframes modal-in {
+    0% {
+        transform: translateY(300px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+
 .collapse-enter-active, .collapse-leave-active {
     transition: all .5s;
 }
 .collapse-enter, .collapse-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
     height: 0;
+}
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .3s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
 }
