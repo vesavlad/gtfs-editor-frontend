@@ -30,7 +30,8 @@ export default {
       fields: [
         {
           name: 'actions',
-          title: this.$i18n.t('vuetable.actions')
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
         {
           name: 'type',
