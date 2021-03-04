@@ -73,7 +73,7 @@ export default {
       document.getElementsByClassName('table-content')[0].addEventListener('scroll', this.repositionDropDown);
     }
   },
-  destroyed() {
+  beforeDestroy() {
     window.removeEventListener('scroll', this.repositionDropDown);
     if (document.getElementsByClassName('table-content').length) {
       document.getElementsByClassName('table-content')[0].removeEventListener('scroll', this.repositionDropDown);
