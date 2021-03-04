@@ -1,19 +1,15 @@
 <template>
   <input ref="input" :type="field.type" v-model="val" :placeholder="`Enter ${field.title.toLowerCase()}`"
-         @input="$emit('input', getValue($event.target))" :class="{error: hasErrors}"
+         @input="$emit('input', $event.target.value)" :class="{error: hasErrors}"
          :data-error="errors.length?errors[0]:''"
          v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: errors.length }"
          v-autowidth="{minWidth: 'calc(100% - 20px)'}"/>
 </template>
 
 <script>
-import fieldMixin from "@/mixins/fieldMixin.js";
-import Enums from "@/utils/enums";
 
 export default {
-  mixins: [
-    fieldMixin,
-  ],
+  name: 'SimpleInput',
   props: {
     field: {
       type: Object,
@@ -32,34 +28,13 @@ export default {
   },
   data() {
     return {
-      val: this.preProcessValue(this.value),
+      val: this.value,
     };
   },
   watch: {
     value() {
-      this.val = this.preProcessValue(this.value);
+      this.val = this.value;
     },
-  },
-  methods: {
-    preProcessValue(value) {
-      if (value) {
-        if (this.field.type === Enums.InputType.COLOR && value.length === 6) {
-          value = "#" + value;
-        }
-      }
-      return value;
-    },
-    getValue(input) {
-      let value = null;
-      if (this.field.type === Enums.InputType.CHECKBOX) {
-        value = input.checked;
-      } else if (this.field.type === Enums.InputType.COLOR) {
-        value = input.value.slice(1);
-      } else {
-        value = input.value;
-      }
-      return value;
-    }
   },
 }
 </script>

@@ -1,14 +1,14 @@
 <template>
-  <!-- Foreign key -->
-  <FKSelect v-if="field.foreignKey" :field="field" :data="data" v-model="val" @input="onInput"
+  <FKSelect v-if="field.type===inputType.FK_SELECT" :field="field" :data="data" v-model="val" @input="onInput"
             :hasErrors="has_errors">
   </FKSelect>
-  <!-- Options -->
-  <SimpleSelect v-else-if="field.options" :field="field" v-model="val" @input="onInput" :hasErrors="has_errors">
+  <SimpleSelect v-else-if="field.type===inputType.SIMPLE_SELECT" :field="field" v-model="val" @input="onInput"
+                :hasErrors="has_errors">
   </SimpleSelect>
-  <!-- Checkbox -->
   <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX" :field="field" v-model="val"
                   @input="onInput"></SimpleCheckbox>
+  <ColorInput v-else-if="field.type===inputType.COLOR" :field="field" v-model="val" @input="onInput"
+              :hasErrors="has_errors" :errors="field_errors"></ColorInput>
   <!-- Default -->
   <SimpleInput v-else :field="field" v-model="val" @input="onInput" :hasErrors="has_errors" :errors="field_errors">
   </SimpleInput>
@@ -17,17 +17,20 @@
 <script>
 import fieldMixin from "@/mixins/fieldMixin.js";
 import SimpleInput from './SimpleInput.vue';
+import ColorInput from "@/components/vuetable/ColorInput";
 import SimpleSelect from './SimpleSelect.vue';
 import FKSelect from './FKSelect.vue';
 import SimpleCheckbox from "@/components/vuetable/SimpleCheckbox";
 import Enums from "@/utils/enums";
 
 export default {
+  name: 'GeneralizedInput',
   components: {
     SimpleCheckbox,
     SimpleInput,
     SimpleSelect,
     FKSelect,
+    ColorInput
   },
   mixins: [
     fieldMixin,
