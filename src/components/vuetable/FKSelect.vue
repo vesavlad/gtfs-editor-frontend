@@ -1,12 +1,13 @@
 <template>
-  <Multiselect v-model="val" :options="options" :loading="isLoading" :searchable="true" :internal-search="false"
-               track-by="value" label="name" :showLabels="false" @input="onChange" @search-change="asyncFind"></Multiselect>
+  <MyMultiselect v-model="val" :options="options" :loading="isLoading" :searchable="true" :internal-search="false"
+                 track-by="value" label="name" :showLabels="false" @open="onOpen" @input="onChange"
+                 @search-change="asyncFind"></MyMultiselect>
 </template>
 
 <script>
-import Multiselect from "vue-multiselect";
 import fieldMixin from "@/mixins/fieldMixin.js";
 import httpClient from "@/api/httpClient";
+import MyMultiselect from "@/components/vuetable/MyMultiselect";
 
 export default {
   name: 'FKSelect',
@@ -14,7 +15,7 @@ export default {
     fieldMixin,
   ],
   components: {
-    Multiselect
+    MyMultiselect
   },
   props: {
     field: {
@@ -38,7 +39,8 @@ export default {
       val: null,
       options: [],
       selectedOption: null,
-      isLoading: false
+      isLoading: false,
+      page: 1
     }
   },
   watch: {
@@ -64,12 +66,17 @@ export default {
     onChange(option) {
       this.$emit("input", option ? option.value : null);
     },
+    onOpen() {
+      if (this.options.length < 2) {
+        this.asyncFind('');
+      }
+    },
     asyncFind(query) {
       this.isLoading = true;
       let params = {
         search: query,
         per_page: 50,
-        page: 1
+        page: this.page
       };
       httpClient.get(this.field.ajax_params.url, params).then(response => {
         // process results
