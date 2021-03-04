@@ -56,22 +56,28 @@ export default {
       ref.$refs.tags.style.width = null;
     },
     repositionDropDown() {
-      const {top, height,left} = this.$el.getBoundingClientRect();
+      const {top, height, left} = this.$el.getBoundingClientRect();
       const ref = this.$refs.multiselect;
-      //ref.$refs.tags.style.width = `${width}px`;
-      //ref.$refs.list.style.width = `${width}px`;
-      ref.$refs.list.style.position = 'fixed';
-      ref.$refs.list.style.bottom = 'auto';
-      ref.$refs.list.style.top = `${top + height}px`;
-      ref.$refs.list.style.left = `${left}px`;
+      if (ref.$refs.list.style.display !== 'none') {
+        ref.$refs.list.style.position = 'fixed';
+        ref.$refs.list.style.bottom = 'auto';
+        ref.$refs.list.style.top = `${top + height}px`;
+        ref.$refs.list.style.left = `${left}px`;
+      }
     },
   },
   mounted() {
     this.val = this.translateValueToOption(this.value);
     window.addEventListener('scroll', this.repositionDropDown);
+    if (document.getElementsByClassName('table-content')) {
+      document.getElementsByClassName('table-content')[0].addEventListener('scroll', this.repositionDropDown);
+    }
   },
   destroyed() {
     window.removeEventListener('scroll', this.repositionDropDown);
+    if (document.getElementsByClassName('table-content')) {
+      document.getElementsByClassName('table-content')[0].removeEventListener('scroll', this.repositionDropDown);
+    }
   },
 }
 </script>
