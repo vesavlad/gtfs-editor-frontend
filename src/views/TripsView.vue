@@ -19,6 +19,7 @@ import EditableTable from "@/components/vuetable/EditableTable.vue";
 import tripsAPI from '@/api/trips.api';
 import routesAPI from '@/api/routes.api';
 import shapesAPI from '@/api/shapes.api';
+import servicesAPI from '@/api/services.api';
 import TableHeader from "@/components/vuetable/TableHeader";
 import Enums from "@/utils/enums";
 
@@ -75,7 +76,7 @@ export default {
           foreignKey: true,
           id_field: 'service_id',
           ajax_params: {
-            url: 'http://127.0.0.1:8000/api/projects/1/services/',
+            url: servicesAPI.servicesAPI.getFullBaseURL(this.$route.params.projectid),
           },
           type: Enums.InputType.FK_SELECT
         },
