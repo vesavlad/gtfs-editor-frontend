@@ -438,6 +438,8 @@ input[type="file"]:disabled ~ .btn:before {display: none;}
 .report-header > div {display: grid; padding: 5px 10px; grid-auto-flow: column; align-items: center; justify-content: flex-start; grid-gap: 15px;}
 .report-header h3 {font-weight: bold; text-transform: none; font-size: 18px; color: var(--gris-osc);}
 .report-header .icon {width: 48px; height: 48px; color: var(--gris-osc);}
+.report-collapse.collapsed .report-header .icon i {transform: rotate(0deg); transition: transform .3s ease;}
+.report-collapse .report-header .icon i {transform: rotate(180deg);}
 .report-content {padding:10px;}
 .report-body {overflow: hidden;}
 .report-box {border-left: 4px solid var(--gris-claro2); padding: 10px 20px; display: grid;}
