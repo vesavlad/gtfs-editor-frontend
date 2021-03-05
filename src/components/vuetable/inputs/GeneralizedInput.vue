@@ -1,16 +1,19 @@
 <template>
-  <FKSelect v-if="field.type===inputType.FK_SELECT" :field="field" :data="data" v-model="val" @input="onInput"
-            :hasErrors="has_errors">
+  <FKSelect v-if="field.type===inputType.FK_SELECT"
+            v-model="val" :field="field" :data="data" :hasErrors="hasErrors" v-on="$listeners">
   </FKSelect>
-  <SimpleSelect v-else-if="field.type===inputType.SIMPLE_SELECT" :field="field" v-model="val" @input="onInput"
-                :hasErrors="has_errors">
+  <SimpleSelect v-else-if="field.type===inputType.SIMPLE_SELECT"
+                v-model="val" :field="field" :hasErrors="hasErrors" v-on="$listeners">
   </SimpleSelect>
-  <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX" :field="field" v-model="val"
-                  @input="onInput"></SimpleCheckbox>
-  <ColorInput v-else-if="field.type===inputType.COLOR" v-model="val" @input="onInput"
-              :hasErrors="has_errors" :errors="field_errors"></ColorInput>
+  <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX"
+                  v-model="val" :field="field" v-on="$listeners">
+  </SimpleCheckbox>
+  <ColorInput v-else-if="field.type===inputType.COLOR"
+              v-model="val" :hasErrors="hasErrors" :errors="fieldErrors" v-on="$listeners">
+  </ColorInput>
   <!-- Default -->
-  <SimpleInput v-else :field="field" v-model="val" @input="onInput" :hasErrors="has_errors" :errors="field_errors">
+  <SimpleInput v-else
+               v-model="val" :field="field" :hasErrors="hasErrors" :errors="fieldErrors" v-on="$listeners">
   </SimpleInput>
 </template>
 
@@ -33,7 +36,7 @@ export default {
     ColorInput
   },
   mixins: [
-    fieldMixin,
+    fieldMixin
   ],
   props: {
     field: {
@@ -58,8 +61,13 @@ export default {
       inputType: Enums.InputType
     }
   },
+  watch: {
+    data() {
+      this.val = this.data[this.getFieldID(this.field)]
+    }
+  },
   computed: {
-    has_errors() {
+    hasErrors() {
       if (this.name in this.errors) {
         let errors = this.errors[this.name];
         if (errors instanceof Array) {
@@ -69,17 +77,12 @@ export default {
       }
       return false;
     },
-    field_errors() {
+    fieldErrors() {
       if (this.name in this.errors) {
         return this.errors[this.name];
       }
       return [];
     },
-  },
-  methods: {
-    onInput(event) {
-      this.$emit('input', event);
-    }
   },
 }
 </script>
