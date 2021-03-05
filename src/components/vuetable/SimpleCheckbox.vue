@@ -26,7 +26,7 @@ export default {
       if (this.field.inputConfig?.transformLabel) {
         return this.field.inputConfig.transformLabel(this.field.title);
       }
-      return this.field.title
+      return this.field.title;
     }
   }
 }

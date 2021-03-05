@@ -1,7 +1,7 @@
 <template>
   <input ref="input" :type="field.type" v-model="val" :placeholder="`Enter ${field.title.toLowerCase()}`"
          @input="$emit('input', $event.target.value)" :class="{error: hasErrors}"
-         v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: errors.length }"
+         v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: Boolean(errors.length) }"
          v-autowidth="{minWidth: 'calc(100% - 20px)'}"/>
 </template>
 

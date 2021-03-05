@@ -1,5 +1,5 @@
 <template>
-  <div class="input-color" :class="{error: hasErrors}" v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: errors.length }">
+  <div class="input-color" :class="{error: hasErrors}" v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: Boolean(errors.length) }">
     <input type="text" v-model="val" maxlength="6" @input="$emit('input', getValue($event.target))"/>
     <input type="color" v-model="val" @input="$emit('input', getValue($event.target))"/>
   </div>

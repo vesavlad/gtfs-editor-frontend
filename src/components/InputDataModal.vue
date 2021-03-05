@@ -14,9 +14,8 @@
             <span>{{ field.title }}{{ field.required ? '*' : '' }}</span>
           </div>
           <div class="input-row-content single">
-            <GeneralizedInput v-model="localData[field.name]" :field="field" :data="localData"
-                              @focus="$emit('removeError', field.name)"
-                              v-tooltip="{ theme: 'error-tooltip', content: errors[field.name]?errors[field.name][0]:'', shown: errors[field.name]!==undefined }"></GeneralizedInput>
+            <GeneralizedInput v-model="localData[field.name]" :field="field" :data="localData" :errors="errors"
+                              @focus="$emit('removeError', field.name)"></GeneralizedInput>
           </div>
         </li>
       </ul>
