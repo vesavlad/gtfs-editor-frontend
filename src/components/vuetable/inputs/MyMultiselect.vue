@@ -6,7 +6,8 @@ export default {
   extends: Multiselect,
   methods: {
     repositionDropDown() {
-      const {top, height, left} = this.$el.getBoundingClientRect();
+      const {top, width, height, left} = this.$el.getBoundingClientRect();
+      document.documentElement.style.setProperty('--multiselect-width', width + 'px');
       const listEl = this.$refs.list;
       listEl.style.position = 'fixed';
       listEl.style.bottom = 'auto';
