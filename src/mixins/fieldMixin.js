@@ -1,7 +1,7 @@
 let fieldMixin = {
   methods: {
     getFieldID(field) {
-      if (field instanceof Object && field.id_field) {
+      if (field.id_field) {
         return field.id_field;
       }
       return field.name;

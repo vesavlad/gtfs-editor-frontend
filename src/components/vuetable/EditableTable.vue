@@ -39,7 +39,7 @@
                   v-bind:rowIndex="props.rowIndex"></slot>
           </div>
           <!-- This is where the fields are converted into inputs to make the table editable -->
-          <GeneralizedInput :key="index" v-for="(field, index) in getProperFields(fields)" :slot="field.name"
+          <GeneralizedInput :key="index" v-for="(field, index) in cleanFields" :slot="field.name"
                             slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
                             v-model="properties.rowData[getFieldID(properties.rowField)]"
                             v-on:input="changeHandler(properties)"
