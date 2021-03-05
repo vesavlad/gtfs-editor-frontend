@@ -28,6 +28,7 @@ html,body {background-color:var(--gris-claro); -webkit-font-smoothing: antialias
     --typo:'Roboto', sans-serif;
     --aspect-ratio:1/1;
     --border:1px solid var(--gris-claro);
+    --multiselect-width:100px;
 }
 
 
@@ -498,12 +499,16 @@ table th {
 .multiselect__input, .multiselect__single {background-color: transparent;}
 td .multiselect input[type="text"] {min-width: inherit; box-shadow: none;}
 .multiselect__input, .multiselect__single {white-space: nowrap;}
-.multiselect__content-wrapper {width: fit-content;}
+.multiselect__content-wrapper {min-width: var(--multiselect-width); max-width: fit-content;}
 .multiselect__input:focus {border:0; box-shadow: none;}
 .multiselect__tags {border: 0; background-color: transparent;}
+.multiselect.error {border:1px solid var(--error);}
 
 tr.changed>td {
     background-color: var(--bg-warning);
+}
+tr.error>td {
+    background-color: rgba(185, 77, 60, 0.1);
 }
 .table-th {display: grid; grid-template-columns: 1fr auto; align-items: center; text-align: left;}
 .table-th .material-icons {font-size: 18px;}
