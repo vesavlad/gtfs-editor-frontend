@@ -334,9 +334,6 @@ export default {
         if (data[field.name] === '') {
           data[field.name] = null;
         }
-        if (field.type === Enums.InputType.COLOR && data[field.name].charAt(0) === '#') {
-          data[field.name] = data[field.name].slice(1, 7);
-        }
       });
       this.createMethod(data).then(response => {
         console.log(response);
@@ -366,9 +363,6 @@ export default {
         console.log(error.response);
         this.uploadModal.error = error.response.data;
       });
-    },
-    log() {
-      console.log(...arguments);
     },
     getSortParam(sortOrder) {
       let query = sortOrder.map(function (sort) {
