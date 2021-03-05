@@ -14,8 +14,8 @@
             <span>{{ field.title }}{{ field.required ? '*' : '' }}</span>
           </div>
           <div class="input-row-content single">
-            <GeneralizedInput v-model="localData[field.name]" :field="field" :data="localData" :errors="errors"
-                              @focus="$emit('removeError', field.name)"></GeneralizedInput>
+            <GeneralizedInput v-model="localData[getFieldID(field)]" :field="field" :data="localData"
+                              :errors="errors" @focus="$emit('removeError', field.name)"></GeneralizedInput>
           </div>
         </li>
       </ul>
@@ -36,9 +36,13 @@
 import BaseModal from '@/components/BaseModal.vue';
 import Enums from "@/utils/enums";
 import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput";
+import fieldMixin from "@/mixins/fieldMixin";
 
 export default {
   name: 'InputDataModal',
+  mixins: [
+    fieldMixin,
+  ],
   components: {
     BaseModal,
     GeneralizedInput
@@ -105,7 +109,7 @@ export default {
   mounted() {
     this.fields.forEach(field => {
       if (!Object.prototype.hasOwnProperty.call(this.localData, field.name)) {
-        this.localData[field.name] = null;
+        this.localData[this.getFieldID(field)] = null;
       }
     });
   }
