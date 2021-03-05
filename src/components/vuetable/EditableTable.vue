@@ -381,9 +381,9 @@ export default {
       return this.$refs.vuetable.$data.tableData.reduce((changed, row) => row.changed || changed, false);
     },
     getRowClass(data) {
-      if (data.error) return "error";
-      if (data.changed) return "changed";
-      return "";
+      if (data.error) return 'error';
+      if (data.changed) return 'changed';
+      return '';
     },
     onChangePage(page) {
       if (page === this.current_page) {
@@ -423,10 +423,7 @@ export default {
         per_page: perPage,
         search: this.quickSearch,
       }
-    },
-    onActionClicked(action, data) {
-      console.log("slot actions: on-click", data);
-    },
+    }
   },
   created() {
     this.doSearch = debounce(this.reloadTable, 300);
