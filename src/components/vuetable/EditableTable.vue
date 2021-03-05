@@ -218,7 +218,7 @@ export default {
   },
   methods: {
     updateTotalDataLabel(response) {
-      this.totalDataInTable = response.data.pagination.total;
+      this.totalDataInTable = response.data.pagination.total.toLocaleString();
     },
     getFieldsWithVisibility() {
       return this.fields.map(field => {
@@ -248,14 +248,6 @@ export default {
       this.hasChanged = true;
       props.rowData.changed = true;
       props.rowData.error = false;
-    },
-    getOption(value, options) {
-      for (const [k, v] of Object.entries(options)) {
-        if (v === value) {
-          return k;
-        }
-      }
-      return undefined;
     },
     async saveChanges() {
       let data = this.$refs.vuetable.tableData;
@@ -307,11 +299,6 @@ export default {
         }
       })
       return data;
-    },
-    getInputvalue(input, field) {
-      if (field.type === Enums.InputType.CHECKBOX)
-        return input.checked;
-      return input.value;
     },
     beginDeleteRow(data) {
       this.deleteModal.visible = true;
