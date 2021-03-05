@@ -52,9 +52,8 @@ export default {
     },
   },
   data() {
-    let name = this.getFieldName(this.field);
     return {
-      name,
+      name: this.field.name,
       val: this.data[this.getFieldID(this.field)],
       inputType: Enums.InputType
     }

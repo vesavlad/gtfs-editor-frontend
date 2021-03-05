@@ -21,7 +21,7 @@
         <label for="enable-drag">Enable drag</label>
       </div>
       <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times" v-show="!drag_enabled">
-        <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="getFieldName(field)"
+        <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
              slot-scope="properties"
              v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
           <GeneralizedInput :data="properties.rowData" :field="properties.rowField"

@@ -1,19 +1,13 @@
 let fieldMixin = {
   methods: {
-    getFieldName(field) {
-      if (field instanceof Object) {
-        return field.name;
-      }
-      return field;
-    },
     getFieldID(field) {
       if (field instanceof Object && field.id_field) {
         return field.id_field;
       }
-      return this.getFieldName(field);
+      return field.name;
     },
     getFKText(field, data) {
-      return data[this.getFieldName(field)];
+      return data[field.name];
     },
     getProperFields(fields, params) {
       if (!params) {
@@ -22,7 +16,7 @@ let fieldMixin = {
       if (!params.exclusions) {
         params.exclusions = ['actions']
       }
-      let properFields = fields.filter(field => !params.exclusions.includes(this.getFieldName(field)));
+      let properFields = fields.filter(field => !params.exclusions.includes(field.name));
       return properFields;
     }
   }
