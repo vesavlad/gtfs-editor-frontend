@@ -213,6 +213,7 @@ export default {
   },
   computed: {
     cleanFields() {
+      /* ignore all fields which type value is null, it is used to removed action column */
       return this.fields.filter(field => field.type !== null);
     }
   },
