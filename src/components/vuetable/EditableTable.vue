@@ -83,7 +83,7 @@
       </template>
       <template slot="close-button-name">Upload</template>
     </Modal>
-    <InputDataModal v-if="createModal.visible" :title="$t('vuetable.newEntity')" :initialData="createModal.data"
+    <InputDataModal v-if="createModal.visible" :title="$t('vuetable.newEntityTitle')" :initialData="createModal.data"
                     :errors="createModal.errors" :fields="cleanFields" @save="createEntry"
                     @close="createModal.visible=false" @cancel="createModal.visible=false">
     </InputDataModal>

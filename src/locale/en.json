@@ -85,6 +85,7 @@
     "save": "Save",
     "addRow": "Add row",
     "actions": "Actions",
-    "settings": "Settings"
+    "settings": "Settings",
+    "newEntityTitle": "New entity"
   }
 }
