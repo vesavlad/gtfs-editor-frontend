@@ -35,7 +35,7 @@
 <script>
 import BaseModal from '@/components/BaseModal.vue';
 import Enums from "@/utils/enums";
-import GeneralizedInput from "@/components/vuetable/GeneralizedInput";
+import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput";
 
 export default {
   name: 'InputDataModal',

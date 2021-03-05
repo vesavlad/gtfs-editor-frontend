@@ -13,7 +13,7 @@
 
 <script>
 import fieldMixin from "@/mixins/fieldMixin.js";
-import GeneralizedInput from "@/components/vuetable/GeneralizedInput.vue";
+import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput.vue";
 
 export default {
   components: {

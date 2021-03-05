@@ -51,7 +51,7 @@ import stopsAPI from '@/api/stops.api';
 import shapesAPI from '@/api/shapes.api';
 import shapeMapMixin from "@/mixins/shapeMapMixin"
 import PopupContent from '@/components/PopupContent.vue';
-import FKSelect from '@/components/vuetable/FKSelect.vue';
+import FKSelect from '@/components/vuetable/inputs/FKSelect.vue';
 import Modal from "@/components/Modal.vue";
 import envelopeMixin from "@/mixins/envelopeMixin"
 import config from "@/config.js"

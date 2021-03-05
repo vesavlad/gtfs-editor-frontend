@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import MyMultiselect from "@/components/vuetable/MyMultiselect";
+import MyMultiselect from "@/components/vuetable/inputs/MyMultiselect";
 
 export default {
   name: 'SimpleSelect',
@@ -57,4 +57,4 @@ export default {
 }
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style src="../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css"></style>

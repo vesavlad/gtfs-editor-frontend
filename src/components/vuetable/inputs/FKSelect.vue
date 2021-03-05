@@ -7,7 +7,7 @@
 <script>
 import fieldMixin from "@/mixins/fieldMixin.js";
 import httpClient from "@/api/httpClient";
-import MyMultiselect from "@/components/vuetable/MyMultiselect";
+import MyMultiselect from "@/components/vuetable/inputs/MyMultiselect";
 
 export default {
   name: 'FKSelect',
