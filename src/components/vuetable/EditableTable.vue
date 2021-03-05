@@ -97,7 +97,7 @@
       </template>
       <template slot="close-button-name">Delete</template>
     </Modal>
-    <FieldVisibilityModal :show="settings.show" @close="settings.show=false" :fields="fields"></FieldVisibilityModal>
+    <VuetableSettingsModal :show="settings.show" @close="settings.show=false" :fields="fields"></VuetableSettingsModal>
   </div>
 </template>
 
@@ -112,7 +112,7 @@ import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
 import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput.vue";
 import VuetableRowHeader from "@/components/vuetable/VuetableRowHeader.vue";
 import VuetablePaginationDropDown from "@/components/vuetable/VuetablePaginationDropDown.vue";
-import FieldVisibilityModal from '@/components/vuetable/FieldVisibilityModal.vue';
+import VuetableSettingsModal from '@/components/vuetable/VuetableSettingsModal.vue';
 import InputDataModal from "@/components/InputDataModal.vue";
 
 import {debounce} from "debounce";
@@ -129,7 +129,7 @@ export default {
     FileReader,
     GeneralizedInput,
     VuetableRowHeader,
-    FieldVisibilityModal,
+    VuetableSettingsModal,
     InputDataModal
   },
   mixins: [

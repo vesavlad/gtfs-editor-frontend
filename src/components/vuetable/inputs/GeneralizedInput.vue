@@ -34,7 +34,6 @@ export default {
   },
   mixins: [
     fieldMixin,
-    SimpleInput,
   ],
   props: {
     field: {
