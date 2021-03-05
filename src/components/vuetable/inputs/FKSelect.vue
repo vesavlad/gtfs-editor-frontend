@@ -1,7 +1,7 @@
 <template>
   <MyMultiselect v-model="val" :options="options" :loading="isLoading" :searchable="true" :internal-search="false"
                  track-by="value" label="name" :showLabels="false" @open="onOpen" @input="onChange"
-                 @search-change="asyncFind" :class="{error: hasErrors}"
+                 @search-change="asyncFind" :class="{error: hasErrors}" :placeholder="$t('general.select')"
                  v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: Boolean(errors.length) }">
   </MyMultiselect>
 </template>
