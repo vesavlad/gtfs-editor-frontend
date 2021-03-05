@@ -65,8 +65,10 @@ export default {
           value: this.data[this.field.id_field]
         };
         this.selectedOption = option;
-        this.options.push(option);
-        this.val = option;
+        if (!this.options.find(opt => opt.value===option.value)) {
+          this.options.push(option);
+          this.val = option;
+        }
       }
     },
     onChange(option) {
