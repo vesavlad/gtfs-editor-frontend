@@ -38,9 +38,11 @@
             <slot name="additional-actions" v-bind:rowData="props.rowData" v-bind:rowField="props.rowField"
                   v-bind:rowIndex="props.rowIndex"></slot>
           </div>
-          <!-- This is where the fields are converted into inputs to make the table editable -->
+          <!-- This is where the fields are converted into inputs to make the table editable.
+               We build slots for every field and inside change html with input and logic -->
           <GeneralizedInput :key="index" v-for="(field, index) in cleanFields" :slot="field.name"
-                            slot-scope="properties" :data="properties.rowData" :field="properties.rowField"
+                            slot-scope="properties"
+                            :data="properties.rowData" :field="properties.rowField"
                             v-model="properties.rowData[getFieldID(properties.rowField)]"
                             v-on:input="changeHandler(properties)"
                             :errors="$refs.vuetable.tableData[properties.rowIndex].errors">
