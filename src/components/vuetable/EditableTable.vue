@@ -32,7 +32,7 @@
             <VuetableRowHeader></VuetableRowHeader>
           </template>
           <div slot="actions" slot-scope="props" class="grid min center">
-            <button class="btn icon flat error" @click="beginDeleteRow(props.rowData)" alt="Delete entry.">
+            <button class="btn icon flat error" @click="beginDeleteRow(props.rowData)">
               <span class="material-icons">delete</span>
             </button>
             <slot name="additional-actions" v-bind:rowData="props.rowData" v-bind:rowField="props.rowField"
@@ -55,7 +55,7 @@
                                       @vuetable-pagination:change-page="onChangePage">
           </VuetablePaginationDropDown>
         </div>
-        <div class="table-errors">aquí poner error global </div>
+        <div class="table-errors">aquí poner error global</div>
         <div class="table-footer-buttons">
           <button class="btn green" @click="saveChanges"><span>{{ $t('vuetable.save') }}</span></button>
           <slot name="additional-buttons"></slot>
@@ -115,8 +115,6 @@ import VuetablePaginationDropDown from "@/components/vuetable/VuetablePagination
 import FieldVisibilityModal from '@/components/vuetable/FieldVisibilityModal.vue';
 import InputDataModal from "@/components/InputDataModal.vue";
 
-import $ from 'jquery';
-import 'select2';
 import {debounce} from "debounce";
 
 let Vuetable = require('vuetable-2')
@@ -310,62 +308,6 @@ export default {
       })
       return data;
     },
-    createModalCreated() {
-      /*
-      * Al momento de crearse el modal se ejecutaba este código para haibilitar todos los select2 para que funcione
-      * el autocompletado con paginamiento. Si cambiamos por
-      * */
-      this.fields.filter((f) => f.foreignKey).forEach((field) => {
-        $(`.create-select.data.${this.getFieldName(field)}`).select2({
-          ajax: {
-            url: field.ajax_params.url,
-            data: function (params) {
-              let query = {
-                search: params.term,
-                per_page: 50,
-                page: params.page,
-              }
-              return query
-            },
-            processResults(data) {
-              let name_field = field.name;
-              if (field.fk_name) {
-                name_field = field.fk_name
-              }
-              console.log(name_field)
-              let reply = {
-                results: data.results.map(result => {
-                  let res = {
-                    id: result.id,
-                    text: result[name_field]
-                  };
-                  return res;
-                }),
-                pagination: {
-                  more: data.pagination.current_page !== data.pagination.last_page,
-                },
-              }
-              if (field.nullable && data.pagination.current_page === 1) {
-                reply.results.unshift({
-                  id: "",
-                  text: "Unselected"
-                })
-              }
-              return reply;
-            },
-          }
-        }).on('change', (evt) => {
-          console.log(this.getFieldName(field), evt.target.value);
-          this.createModal.data[field.id_field] = evt.target.value;
-        });
-      });
-      this.fields.filter((f) => f.options).forEach((field) => {
-        $(`.create-select.options.${this.getFieldName(field)}`).select2().on('change', (evt) => {
-          console.log(this.getFieldName(field), evt.target.value);
-          this.createModal.data[field.name] = evt.target.value;
-        });
-      })
-    },
     getInputvalue(input, field) {
       if (field.type === Enums.InputType.CHECKBOX)
         return input.checked;
@@ -444,7 +386,7 @@ export default {
       return "";
     },
     onChangePage(page) {
-      if (page == this.current_page) {
+      if (page === this.current_page) {
         return;
       }
       if (this.hasUnsavedChanges()) {
@@ -465,9 +407,6 @@ export default {
         this.last_page = paginationData.last_page;
         this.$refs.pagination.setPaginationData(paginationData);
         this.$refs.paginationDropDown.setPaginationData(paginationData);
-        this.$nextTick(() => {
-          $(".vuetable-pagination-dropdown").val(this.current_page).trigger('change');
-        });
       }
     },
     reloadTable() {
