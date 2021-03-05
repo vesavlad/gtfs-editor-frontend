@@ -16,10 +16,10 @@
 
 <script>
 import fieldMixin from "@/mixins/fieldMixin.js";
-import SimpleInput from './SimpleInput.vue';
+import SimpleInput from '@/components/vuetable/inputs/SimpleInput.vue';
 import ColorInput from "@/components/vuetable/inputs/ColorInput";
-import SimpleSelect from './SimpleSelect.vue';
-import FKSelect from './FKSelect.vue';
+import SimpleSelect from '@/components/vuetable/inputs/SimpleSelect.vue';
+import FKSelect from '@/components/vuetable/inputs/FKSelect.vue';
 import SimpleCheckbox from "@/components/vuetable/inputs/SimpleCheckbox";
 import Enums from "@/utils/enums";
 
