@@ -499,7 +499,7 @@ table th {
 .multiselect__input, .multiselect__single {background-color: transparent;}
 td .multiselect input[type="text"] {min-width: inherit; box-shadow: none;}
 .multiselect__input, .multiselect__single {white-space: nowrap;}
-.multiselect__content-wrapper {min-width: var(--multiselect-width); max-width: fit-content;}
+.multiselect__content-wrapper {min-width: var(--multiselect-width); max-width: calc(fit-content + 50px);}
 .multiselect__input:focus {border:0; box-shadow: none;}
 .multiselect__tags {border: 0; background-color: transparent;}
 .multiselect.error {border:1px solid var(--error);}
