@@ -1,9 +1,9 @@
 <template>
   <FKSelect v-if="field.type===inputType.FK_SELECT"
-            v-model="val" :field="field" :data="data" :hasErrors="hasErrors" v-on="$listeners">
+            v-model="val" :field="field" :data="data" :hasErrors="hasErrors" :errors="fieldErrors" v-on="$listeners">
   </FKSelect>
   <SimpleSelect v-else-if="field.type===inputType.SIMPLE_SELECT"
-                v-model="val" :field="field" :hasErrors="hasErrors" v-on="$listeners">
+                v-model="val" :field="field" :hasErrors="hasErrors" :errors="fieldErrors" v-on="$listeners">
   </SimpleSelect>
   <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX"
                   v-model="val" :field="field" v-on="$listeners">

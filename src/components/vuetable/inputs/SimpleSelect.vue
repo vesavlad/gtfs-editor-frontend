@@ -1,6 +1,8 @@
 <template>
   <MyMultiselect ref="multiselect" v-model="val" :options="field.options" :showLabels="false" track-by="value"
-                 label="name" @input="onChange"></MyMultiselect>
+                 label="name" @input="onChange" :class="{error: hasErrors}"
+                 v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: Boolean(errors.length) }">
+  </MyMultiselect>
 </template>
 
 <script>
@@ -23,6 +25,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    errors: {
+      type: Array,
+      required: true
+    }
   },
   data() {
     return {
