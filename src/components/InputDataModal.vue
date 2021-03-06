@@ -15,7 +15,7 @@
           </div>
           <div class="input-row-content single">
             <GeneralizedInput v-model="localData[getFieldID(field)]" :field="field" :data="localData"
-                              :errors="errors" @focus="$emit('removeError', field.name)"></GeneralizedInput>
+                              :errors="errors"></GeneralizedInput>
           </div>
         </li>
       </ul>
