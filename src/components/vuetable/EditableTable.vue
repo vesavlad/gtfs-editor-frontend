@@ -255,36 +255,30 @@ export default {
     async saveChanges() {
       let data = this.$refs.vuetable.tableData;
 
-      data.filter(row => row.changed).map(
-          (row) => {
-            for (let i = 0; i < this.fields.length; i++) {
-              let field = this.fields[i];
-              let fieldName = field.name;
+      data.filter(row => row.changed).map(row => {
+        for (let i = 0; i < this.fields.length; i++) {
+          let field = this.fields[i];
+          let fieldName = field.name;
 
-              if (row[fieldName] === '') {
-                row[fieldName] = null;
-              }
-              if (field.type === Enums.InputType.COLOR) {
-                if (row[fieldName].charAt(0) === '#') {
-                  row[fieldName] = row[fieldName].slice(0, 1)
-                }
-              }
-            }
-            console.log("Updating Row")
-            console.log(row);
-            this.updateMethod(row).then(response => {
-              row.changed = false;
-              row.error = false;
-              row.errors = {};
-              this.$emit('update', response.data);
-              this.reRender();
-            }).catch(error => {
-              let response = error.response;
-              row.error = true;
-              row.errors = response.data;
-              this.reRender();
-            });
+          if (row[fieldName] === '') {
+            row[fieldName] = null;
           }
+        }
+        console.log("Updating Row")
+        console.log(row);
+        this.updateMethod(row).then(response => {
+          row.changed = false;
+          row.error = false;
+          row.errors = {};
+          this.$emit('update', response.data);
+          this.reRender();
+        }).catch(error => {
+          let response = error.response;
+          row.error = true;
+          row.errors = response.data;
+          this.reRender();
+        });
+      }
       );
     },
     reRender() {
