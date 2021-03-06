@@ -1,5 +1,5 @@
 <template>
-  <MessageModal v-if="showDeletionModal" @close="closeModal" @cancel="closeModal" @ok="deleteProject"
+  <MessageModal :show="showDeletionModal" @close="closeModal" @cancel="closeModal" @ok="deleteProject"
                 :okButtonLabel="$t('general.delete')" :type="ModalType.WARNING">
     <template v-slot:m-title>{{ $t('projectMenu.deleteModalTitle') }}</template>
     <template v-slot:m-content>{{ $t('projectMenu.deleteModalMessage') }}</template>
