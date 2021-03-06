@@ -1,9 +1,9 @@
 <template>
   <FKSelect v-if="field.type===inputType.FK_SELECT"
-            v-model="val" :field="field" :data="data" :hasErrors="hasErrors" :errors="fieldErrors" v-on="$listeners">
+            v-model="val" :field="field" :data="data" :errors="fieldErrors" v-on="$listeners">
   </FKSelect>
   <SimpleSelect v-else-if="field.type===inputType.SIMPLE_SELECT"
-                v-model="val" :field="field" :hasErrors="hasErrors" :errors="fieldErrors" v-on="$listeners">
+                v-model="val" :field="field" :errors="fieldErrors" v-on="$listeners">
   </SimpleSelect>
   <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX"
                   v-model="val" :field="field" v-on="$listeners">
@@ -13,7 +13,7 @@
   </ColorInput>
   <!-- Default -->
   <SimpleInput v-else
-               v-model="val" :field="field" :hasErrors="hasErrors" :errors="fieldErrors" v-on="$listeners">
+               v-model="val" :field="field" :errors="fieldErrors" v-on="$listeners">
   </SimpleInput>
 </template>
 
@@ -56,7 +56,6 @@ export default {
   },
   data() {
     return {
-      name: this.getFieldID(this.field),
       val: this.data[this.getFieldID(this.field)],
       inputType: Enums.InputType
     }
@@ -67,22 +66,13 @@ export default {
     }
   },
   computed: {
-    hasErrors() {
-      if (this.name in this.errors) {
-        let errors = this.errors[this.name];
-        if (errors instanceof Array) {
-          if (this.data.error)
-            return errors.length > 0;
-        }
-      }
-      return false;
-    },
     fieldErrors() {
-      if (this.name in this.errors) {
-        return this.errors[this.name];
+      let name = this.getFieldID(this.field);
+      if (name in this.errors) {
+        return this.errors[name];
       }
       return [];
-    },
-  },
+    }
+  }
 }
 </script>
