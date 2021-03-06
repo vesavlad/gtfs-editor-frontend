@@ -6,6 +6,9 @@
         <span class="material-icons">info</span>
       </button>
     </div>
+    <div>
+      <slot name="right-section"></slot>
+    </div>
   </div>
 </template>
 
