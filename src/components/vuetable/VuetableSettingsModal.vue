@@ -1,5 +1,5 @@
 <template>
-  <InputDataModal v-if="show" :initialData="initialData" :fields="checkboxFields" @cancel="$emit('close')"
+  <InputDataModal :show="show" :initialData="initialData" :fields="checkboxFields" @cancel="$emit('close')"
                   @close="$emit('close')" @save="setVisibilityColumn" :title="$t('vuetable.settings')"
                   :errors="{}"></InputDataModal>
 </template>

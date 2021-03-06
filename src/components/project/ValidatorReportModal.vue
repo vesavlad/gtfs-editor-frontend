@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-on="$listeners">
+  <BaseModal v-if="show" v-on="$listeners">
     <template slot="m-content">
       <div class="m-header">
         <h2>{{ $t('projectDashboard.gtfsBuilder.validationReport.title') }}</h2>
@@ -71,6 +71,10 @@ export default {
     PillBase
   },
   props: {
+    show: {
+      type: Boolean,
+      default: false
+    },
     message: {
       required: true,
       type: String

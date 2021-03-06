@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-    <InputDataModal v-if="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo"
+    <InputDataModal :show="feedInfo.edit" @close="feedInfo.edit=false" @cancel="feedInfo.edit=false" @save="saveFeedInfo"
                     @removeError="removeMessageError"
                     :title="feedInfo.config.title" :link="feedInfo.config.link" :fields="feedInfo.config.fields"
                     :initialData="project.feedinfo?project.feedinfo:{}" :errors="feedInfo.config.errors">

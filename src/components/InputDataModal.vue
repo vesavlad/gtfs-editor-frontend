@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :classes="ownClasses" @close="$emit('close')">
+  <BaseModal v-if="show" :classes="ownClasses" @close="$emit('close')">
     <template v-slot:m-content>
       <div class="m-header">
         <h2>{{ title }}</h2>
@@ -48,6 +48,10 @@ export default {
     GeneralizedInput
   },
   props: {
+    show: {
+      type: Boolean,
+      default: false
+    },
     classes: {
       type: Array,
       default: () => []

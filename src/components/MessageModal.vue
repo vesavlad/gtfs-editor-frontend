@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :classes="ownClasses" v-on="$listeners">
+  <BaseModal v-if="show" :classes="ownClasses" v-on="$listeners">
     <template v-slot:m-content>
       <div class="m-header">
         <div class="message-title">
@@ -37,6 +37,10 @@ export default {
     BaseModal
   },
   props: {
+    show: {
+      type: Boolean,
+      default: false
+    },
     classes: {
       type: Array,
       default: () => []
