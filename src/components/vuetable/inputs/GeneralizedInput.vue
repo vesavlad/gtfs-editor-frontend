@@ -9,7 +9,7 @@
                   v-model="val" :field="field" v-on="$listeners">
   </SimpleCheckbox>
   <ColorInput v-else-if="field.type===inputType.COLOR"
-              v-model="val" :hasErrors="hasErrors" :errors="fieldErrors" v-on="$listeners">
+              v-model="val" :errors="fieldErrors" v-on="$listeners">
   </ColorInput>
   <!-- Default -->
   <SimpleInput v-else

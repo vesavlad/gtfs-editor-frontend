@@ -1,7 +1,10 @@
 <template>
-  <div class="input-color" :class="{error: hasErrors}" v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: Boolean(errors.length) }">
-    <input type="text" v-model="val" maxlength="6" @input="$emit('input', getValue($event.target))"/>
-    <input type="color" v-model="val" @input="$emit('input', getValue($event.target))"/>
+  <div class="input-color" :class="{error: hasErrors}"
+       v-tooltip="{ theme: 'error-tooltip', content: localErrors.length?localErrors[0]:'', shown: hasErrors }">
+    <input type="text" v-model="val" maxlength="6" @input="$emit('input', getValue($event.target))"
+           @focus="localErrors=[]"/>
+    <input type="color" v-model="val" @input="$emit('input', getValue($event.target))"
+           @focus="localErrors=[]"/>
   </div>
 </template>
 
@@ -12,23 +15,29 @@ export default {
     value: {
       required: true,
     },
-    hasErrors: {
-      type: Boolean,
-      default: false,
-    },
     errors: {
       type: Array,
+      required: true
     }
   },
   data() {
     return {
       val: this.preProcessValue(this.value),
+      localErrors: []
     };
   },
   watch: {
     value() {
       this.val = this.preProcessValue(this.value);
     },
+    errors() {
+      this.localErrors = [...this.errors];
+    }
+  },
+  computed: {
+    hasErrors() {
+      return Boolean(this.localErrors.length);
+    }
   },
   methods: {
     preProcessValue(value) {
