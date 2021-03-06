@@ -1,7 +1,8 @@
 <template>
   <MyMultiselect ref="multiselect" v-model="val" :options="field.options" :showLabels="false" track-by="value"
-                 label="name" @input="onChange" :class="{error: hasErrors}" :placeholder="$t('general.select')"
-                 v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: Boolean(errors.length) }">
+                 label="name" @input="onChange" @open="localErrors=[]" :class="{error: hasErrors}"
+                 :placeholder="$t('general.select')"
+                 v-tooltip="{ theme: 'error-tooltip', content: hasErrors?localErrors[0]:'', shown: hasErrors }">
   </MyMultiselect>
 </template>
 
@@ -21,10 +22,6 @@ export default {
     value: {
       required: true
     },
-    hasErrors: {
-      type: Boolean,
-      default: false,
-    },
     errors: {
       type: Array,
       required: true
@@ -32,13 +29,22 @@ export default {
   },
   data() {
     return {
-      val: null
+      val: null,
+      localErrors: []
     }
   },
   watch: {
     value(newValue) {
       let option = this.translateValueToOption(newValue);
       this.val = this.value === "" ? null : option;
+    },
+    errors() {
+      this.localErrors = [...this.errors];
+    }
+  },
+  computed: {
+    hasErrors() {
+      return Boolean(this.localErrors.length);
     }
   },
   methods: {

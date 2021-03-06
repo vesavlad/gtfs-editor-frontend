@@ -2,7 +2,7 @@
   <MyMultiselect v-model="val" :options="options" :loading="isLoading" :searchable="true" :internal-search="false"
                  track-by="value" label="name" :showLabels="false" @open="onOpen" @input="onChange"
                  @search-change="asyncFind" :class="{error: hasErrors}" :placeholder="$t('general.select')"
-                 v-tooltip="{ theme: 'error-tooltip', content: errors.length?errors[0]:'', shown: Boolean(errors.length) }">
+                 v-tooltip="{ theme: 'error-tooltip', content: hasErrors?localErrors[0]:'', shown: hasErrors }">
   </MyMultiselect>
 </template>
 
@@ -31,10 +31,6 @@ export default {
     value: {
       required: true
     },
-    hasErrors: {
-      type: Boolean,
-      default: false,
-    },
     errors: {
       type: Array,
       required: true
@@ -46,16 +42,25 @@ export default {
       options: [],
       selectedOption: null,
       isLoading: false,
-      page: 1
+      page: 1,
+      localErrors: []
     }
   },
   watch: {
     value() {
       this.setOption();
+    },
+    errors() {
+      this.localErrors = [...this.errors];
     }
   },
   mounted() {
     this.setOption();
+  },
+  computed: {
+    hasErrors() {
+      return Boolean(this.localErrors.length);
+    }
   },
   methods: {
     setOption() {
@@ -65,7 +70,7 @@ export default {
           value: this.data[this.field.id_field]
         };
         this.selectedOption = option;
-        if (!this.options.find(opt => opt.value===option.value)) {
+        if (!this.options.find(opt => opt.value === option.value)) {
           this.options.push(option);
           this.val = option;
         }
@@ -78,6 +83,7 @@ export default {
       if (this.options.length < 2) {
         this.asyncFind('');
       }
+      this.localErrors = [];
     },
     asyncFind(query) {
       this.isLoading = true;
@@ -107,4 +113,3 @@ export default {
   },
 }
 </script>
-

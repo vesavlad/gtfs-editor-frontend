@@ -1,6 +1,6 @@
 <template>
   <div class="input-color" :class="{error: hasErrors}"
-       v-tooltip="{ theme: 'error-tooltip', content: localErrors.length?localErrors[0]:'', shown: hasErrors }">
+       v-tooltip="{ theme: 'error-tooltip', content: hasErrors?localErrors[0]:'', shown: hasErrors }">
     <input type="text" v-model="val" maxlength="6" @input="$emit('input', getValue($event.target))"
            @focus="localErrors=[]"/>
     <input type="color" v-model="val" @input="$emit('input', getValue($event.target))"
