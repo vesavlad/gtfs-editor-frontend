@@ -34,11 +34,9 @@
   </div>
 </template>
 
-
 <script>
-import $ from 'jquery';
-import 'select2';
 import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
+import VuetablePaginationDropDown from "@/components/vuetable/VuetablePaginationDropDown";
 import shapesAPI from "@/api/shapes.api";
 import {debounce} from "debounce";
 
@@ -49,7 +47,7 @@ export default {
   components: {
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
-    VuetablePaginationDropDown: Vuetable.VuetablePaginationDropDown,
+    VuetablePaginationDropDown
   },
   data: function () {
     return {
@@ -85,9 +83,6 @@ export default {
         this.last_page = paginationData.last_page;
         this.$refs.pagination.setPaginationData(paginationData);
         this.$refs.paginationDropDown.setPaginationData(paginationData);
-        this.$nextTick(() => {
-          $(".vuetable-pagination-dropdown").val(this.current_page).trigger('change');
-        });
       }
     },
     onChangePage(page) {
@@ -114,16 +109,6 @@ export default {
   },
   mounted() {
     this.doSearch = debounce(this.refresh, 300);
-    this.$nextTick(() => {
-      $("select.vuetable-pagination-dropdown").select2({
-        matcher(query, option) {
-          if (query.term) {
-            return String(option.id).startsWith(query.term) ? option : null;
-          }
-          return option;
-        }
-      }).on('change', (evt) => this.$refs.pagination.loadPage(evt.target.value));
-    });
   },
 };
 </script>

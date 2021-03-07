@@ -73,6 +73,7 @@
     data() {
       return {
         tableTitle: 'Shapes',
+        infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
         editing: false,
         shape: false,
         range: false,
