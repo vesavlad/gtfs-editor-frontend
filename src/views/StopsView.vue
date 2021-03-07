@@ -1,20 +1,27 @@
 <template>
   <div class="section stops">
     <div class="grid container">
-      <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
-      <div class="tab">
-        <button class="tablinks" @click="switchTab('table')"><span>Table view</span><i class="material-icons">view_headline</i></button>
-        <button class="tablinks" @click="switchTab('map')"><span>Map view</span><i class="material-icons">map</i></button>
-      </div>
+      <TableHeader :title="tableTitle" :infoURL="infoURL">
+        <template v-slot:right-section>
+          <div class="tab">
+            <button class="tablinks" :class="{active: activeTab===tabType.TABLE}" @click="switchTab(tabType.TABLE)">
+              <span>Table view</span><i class="material-icons">view_headline</i>
+            </button>
+            <button class="tablinks" :class="{active: activeTab===tabType.MAP}" @click="switchTab(tabType.MAP)">
+              <span>Map view</span><i class="material-icons">map</i>
+            </button>
+          </div>
+        </template>
+      </TableHeader>
     </div>
-    <div v-show="tab==='map'" class="map-container">
+    <div v-show="activeTab===tabType.MAP" class="map-container">
       <InteractiveMap ref="map" :project="$route.params.projectid" :stopFields="fields">
       </InteractiveMap>
     </div>
-    <div v-show="tab==='table'" class="table-container container">
+    <div v-show="activeTab===tabType.TABLE" class="table-container container">
       <EditableTable ref='table' :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
                      :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true"
-                     @update="onUpdate" :infoURL="infoURL">
+                     @update="onUpdate">
         <template slot="additional-actions" slot-scope="props">
           <button class="btn icon" @click="focusStop(props)" alt="Focus Stop on interactive map.">
             <span class="material-icons">map</span>
@@ -45,32 +52,36 @@ export default {
     return {
       tableTitle: 'Stops',
       infoURL: "https://developers.google.com/transit/gtfs/reference#stopstxt",
-      tab: "map",
       url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
       downloadURL: stopsAPI.stopsAPI.getDownloadURL(this.$route.params.projectid),
+      activeTab: 'map',
+      tabType: {
+        MAP: 'map',
+        TABLE: 'table'
+      }
     };
   },
   methods: {
-    log() {
-      console.log(...arguments);
-    },
-    switchTab(tab) {
-      if (tab === "map") {
+    switchTab(newTab) {
+      if (newTab === this.activeTab) {
+        return;
+      }
+      if (newTab === this.tabType.MAP) {
         if (this.$refs.table.hasUnsavedChanges()) {
           let answer = window.confirm("There are unsaved changes, are you sure you want to proceed?");
           if (!answer) {
             return;
           }
         }
-        this.tab = tab;
+        this.activeTab = newTab;
         this.$nextTick(this.$refs.map.resize);
-      } else if (tab === "table") {
-        this.tab = tab;
+      } else if (newTab === this.tabType.TABLE) {
+        this.activeTab = newTab;
         this.$refs.table.reloadTable();
       }
     },
     focusStop(props) {
-      this.switchTab("map");
+      this.switchTab(this.tabType.MAP);
       this.$refs.map.focusStop(props.rowData);
     },
     updateTrip(data) {

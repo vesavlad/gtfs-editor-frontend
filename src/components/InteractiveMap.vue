@@ -1,49 +1,50 @@
 <template>
-    <div class="dynamic-map-container">
-      <div class="top-map-bar">
-        <div class="right-content grid center">
-          <input type="search" placeholder="Search"/>
-          <FKSelect :field="shape_field" :data="{}" v-on:input="loadShape($event)"></FKSelect>
-          <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
-        </div>
+  <div class="dynamic-map-container">
+    <div class="top-map-bar">
+      <div class="right-content grid center">
+        <input type="search" placeholder="Search"/>
+        <FKSelect v-model="selectedShape" :field="shape_field" :data="{}" :errors="[]"
+                  v-on:input="loadShape($event)"></FKSelect>
+        <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
       </div>
-      <div id='map' class="map">
-        <button v-if="!creation.creating" class="btn floating" alt="Create Stop" @click="beginCreation">
-          <span class="material-icons">add</span>
+    </div>
+    <div id='map' class="map">
+      <button v-if="!creation.creating" class="btn floating" alt="Create Stop" @click="beginCreation">
+        <span class="material-icons">add</span>
+      </button>
+    </div>
+    <div class="map-sidebar">
+      <div ref="popup" v-show="popup.open">
+        <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
+        </popup-content>
+        <button class="btn icon" alt="Delete" @click="beginStopDeletion">
+          <span class="material-icons">delete</span>
         </button>
       </div>
-      <div class="map-sidebar">
-        <div ref="popup" v-show="popup.open">
-          <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
+      <div class="map-overlay-inner" v-if="map">
+        <div v-if="creation.creating">
+          <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
+                         v-model="creation.data">
           </popup-content>
-          <button class="btn icon" alt="Delete" @click="beginStopDeletion">
-            <span class="material-icons">delete</span>
+          <button class="btn icon" alt="Create" @click="create">
+            <span class="material-icons">add_location</span>
           </button>
         </div>
-        <div class="map-overlay-inner" v-if="map">
-          <div v-if="creation.creating">
-            <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
-                           v-model="creation.data">
-            </popup-content>
-            <button class="btn icon" alt="Create" @click="create">
-              <span class="material-icons">add_location</span>
-            </button>
-          </div>
-        </div>
       </div>
-      <Modal v-if="deleteModal.visible" @ok="deleteStop" @close="deleteModal.visible = false"
-             @cancel="deleteModal.visible = false" :showCancelButton="true">
-        <template slot="title">
-          <h2>Are you sure you want to delete this stop?</h2>
-        </template>
-        <template slot="content">
+    </div>
+    <Modal v-if="deleteModal.visible" @ok="deleteStop" @close="deleteModal.visible = false"
+           @cancel="deleteModal.visible = false" :showCancelButton="true">
+      <template slot="title">
+        <h2>Are you sure you want to delete this stop?</h2>
+      </template>
+      <template slot="content">
           <span>
             {{ deleteModal.message }}
           </span>
-        </template>
-        <template slot="close-button-name">Delete</template>
-      </Modal>
-    </div>
+      </template>
+      <template slot="close-button-name">Delete</template>
+    </Modal>
+  </div>
 </template>
 
 <script>
@@ -55,6 +56,7 @@ import FKSelect from '@/components/vuetable/inputs/FKSelect.vue';
 import Modal from "@/components/Modal.vue";
 import envelopeMixin from "@/mixins/envelopeMixin"
 import config from "@/config.js"
+import Enums from "@/utils/enums";
 
 const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
@@ -71,6 +73,7 @@ export default {
   ],
   data() {
     return {
+      selectedShape: null,
       active_stops: [],
       stops: [],
       deleteModal: {
@@ -93,7 +96,8 @@ export default {
         id_field: 'shape',
         ajax_params: {
           url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectid),
-        }
+        },
+        type: Enums.InputType.FK_SELECT
       },
       shape: {},
       map: false,
