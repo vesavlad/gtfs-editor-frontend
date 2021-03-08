@@ -42,18 +42,18 @@
         </div>
       </template>
     </BaseModal>
-    <Modal v-if="deleteModal.visible" @ok="deleteShape" @close="deleteModal.visible = false"
-           @cancel="deleteModal.visible = false" :showCancelButton="true">
-      <template slot="title">
+    <MessageModal :show="deleteModal.visible" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
+                  :type="Enums.MessageModalType.WARNING"
+                  @ok="deleteShape" @cancel="deleteModal.visible = false" @close="deleteModal.visible = false">
+      <template v-slot:m-title>
         <h2>Are you sure you want to delete shape {{ deleteModal.shape.shape_id }}?</h2>
       </template>
-      <template slot="content">
+      <template v-slot:m-content>
         <span>
           {{ deleteModal.message }}
         </span>
       </template>
-      <template slot="close-button-name">Delete</template>
-    </Modal>
+    </MessageModal>
   </div>
 </template>
 
@@ -61,18 +61,18 @@
 import ShapesTable from "@/components/ShapesTable.vue";
 import ShapesMap from "@/components/ShapesMap.vue";
 import ShapeEditor from "@/components/ShapeEditor.vue";
-import Modal from "@/components/Modal.vue";
 import shapesAPI from "@/api/shapes.api";
 import TableHeader from "@/components/vuetable/TableHeader";
 import BaseModal from "@/components/modal/BaseModal";
+import MessageModal from "@/components/modal/MessageModal";
 
 export default {
   components: {
+    MessageModal,
     BaseModal,
     ShapesTable,
     ShapesMap,
     ShapeEditor,
-    Modal,
     TableHeader
   },
   data() {
