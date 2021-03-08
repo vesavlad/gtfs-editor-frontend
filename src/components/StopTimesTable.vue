@@ -38,8 +38,6 @@
 
 
 <script>
-import $ from 'jquery';
-import 'select2';
 import VuetablePaginationDropDown from '@/components/vuetable/VuetablePaginationDropDown.vue';
 import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
 import tripsAPI from "@/api/trips.api";
@@ -59,7 +57,11 @@ export default {
       quickSearch: "",
       doSearch: false,
       fields: [
-        "actions",
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
+        },
         {
           name: "trip_id",
           title: "Trip ID",
@@ -97,13 +99,10 @@ export default {
         this.last_page = paginationData.last_page;
         this.$refs.pagination.setPaginationData(paginationData);
         this.$refs.paginationDropDown.setPaginationData(paginationData);
-        this.$nextTick(() => {
-          $(".vuetable-pagination-dropdown").val(this.current_page).trigger('change');
-        });
       }
     },
     onChangePage(page) {
-      if (page == this.current_page) {
+      if (page === this.current_page) {
         return;
       }
       this.$refs.vuetable.changePage(page);
@@ -136,19 +135,6 @@ export default {
   },
   mounted() {
     this.doSearch = debounce(this.refresh, 300);
-    this.$nextTick(() => {
-      $("select.vuetable-pagination-dropdown").select2({
-        matcher(query, option) {
-          if (query.term) {
-            return String(option.id).startsWith(query.term) ? option : null;
-          }
-          return option;
-        }
-      }).on('change', (evt) => this.$refs.pagination.loadPage(evt.target.value));
-    });
   },
 };
 </script>
-
-
-
