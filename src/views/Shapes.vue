@@ -18,36 +18,38 @@
       </div>
       <button class="btn floating" @click="beginCreation"><i class="material-icons">add</i></button>
     </div>
-    <ShapeEditor v-else :shape="shape" v-on:close="finishEditing" :project="$route.params.projectid" :range="range" :mode="mode">
+    <ShapeEditor v-else :shape="shape" v-on:close="finishEditing" :project="$route.params.projectid" :range="range"
+                 :mode="mode">
     </ShapeEditor>
-    <Modal v-if="editingModal.visible" @close="editingModal.visible = false" @cancel="editingModal.visible = false"
-      :showCancelButton="true" :showBase="false">
-      <template slot="title">
-        <h2>Select editing mode for shape {{shape.shape_id}}</h2>
+    <BaseModal :show="editingModal.visible" @close="editingModal.visible=false">
+      <template v-slot:m-content>
+        <div class="m-header">
+          <h2>Select editing mode for shape {{ shape.shape_id }}</h2>
+        </div>
+        <div class="m-content">
+          <button class="btn btn-outline-secondary" @click="beginEditing('all')">
+            Replace entire Shape
+          </button>
+          <button class="btn btn-outline-secondary" @click="beginEditing('simple')">
+            Edit Shape directly
+          </button>
+          <button class="btn btn-outline-secondary" @click="beginPointSelection">
+            Select point range on map
+          </button>
+          <button class="btn btn-outline-secondary" @click="beginEditing('duplicate')">
+            Duplicate Shape
+          </button>
+        </div>
       </template>
-      <template slot="content">
-        <button class="btn btn-outline-secondary" @click="beginEditing('all')">
-          Replace entire Shape
-        </button>
-        <button class="btn btn-outline-secondary" @click="beginEditing('simple')">
-          Edit Shape directly
-        </button>
-        <button class="btn btn-outline-secondary" @click="beginPointSelection">
-          Select point range on map
-        </button>
-        <button class="btn btn-outline-secondary" @click="beginEditing('duplicate')">
-          Duplicate Shape
-        </button>
-      </template>
-    </Modal>
+    </BaseModal>
     <Modal v-if="deleteModal.visible" @ok="deleteShape" @close="deleteModal.visible = false"
-      @cancel="deleteModal.visible = false" :showCancelButton="true">
+           @cancel="deleteModal.visible = false" :showCancelButton="true">
       <template slot="title">
-        <h2>Are you sure you want to delete shape {{deleteModal.shape.shape_id}}?</h2>
+        <h2>Are you sure you want to delete shape {{ deleteModal.shape.shape_id }}?</h2>
       </template>
       <template slot="content">
         <span>
-          {{deleteModal.message}}
+          {{ deleteModal.message }}
         </span>
       </template>
       <template slot="close-button-name">Delete</template>
@@ -56,91 +58,94 @@
 </template>
 
 <script>
-  import ShapesTable from "@/components/ShapesTable.vue";
-  import ShapesMap from "@/components/ShapesMap.vue";
-  import ShapeEditor from "@/components/ShapeEditor.vue";
-  import Modal from "@/components/Modal.vue";
-  import shapesAPI from "@/api/shapes.api";
-  import TableHeader from "@/components/vuetable/TableHeader";
-  export default {
-    components: {
-      ShapesTable,
-      ShapesMap,
-      ShapeEditor,
-      Modal,
-      TableHeader
-    },
-    data() {
-      return {
-        tableTitle: 'Shapes',
-        infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
-        editing: false,
-        shape: false,
-        range: false,
-        editingModal: {
-          visible: false,
-        },
-        deleteModal: {
+import ShapesTable from "@/components/ShapesTable.vue";
+import ShapesMap from "@/components/ShapesMap.vue";
+import ShapeEditor from "@/components/ShapeEditor.vue";
+import Modal from "@/components/Modal.vue";
+import shapesAPI from "@/api/shapes.api";
+import TableHeader from "@/components/vuetable/TableHeader";
+import BaseModal from "@/components/BaseModal";
+
+export default {
+  components: {
+    BaseModal,
+    ShapesTable,
+    ShapesMap,
+    ShapeEditor,
+    Modal,
+    TableHeader
+  },
+  data() {
+    return {
+      tableTitle: 'Shapes',
+      infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
+      editing: false,
+      shape: false,
+      range: false,
+      editingModal: {
+        visible: false,
+      },
+      deleteModal: {
+        shape: null,
+        visible: false,
+        message: "",
+      },
+      mode: "",
+    };
+  },
+  methods: {
+    deleteShape() {
+      shapesAPI.shapesAPI.remove(this.$route.params.projectid, this.deleteModal.shape).then(response => {
+        console.log(response);
+        this.deleteModal = {
           shape: null,
           visible: false,
           message: "",
-        },
-        mode: "",
-      };
+        }
+        this.$refs.table.refresh();
+      }).catch(err => {
+        console.log(err.response);
+        this.deleteModal.message = err.response.data.message;
+      })
     },
-    methods: {
-      deleteShape() {
-        shapesAPI.shapesAPI.remove(this.$route.params.projectid, this.deleteModal.shape).then(response => {
-          console.log(response);
-          this.deleteModal = {
-            shape: null,
-            visible: false,
-            message: "",
-          }
-          this.$refs.table.refresh();
-        }).catch(err => {
-          console.log(err.response);
-          this.deleteModal.message = err.response.data.message;
-        })
-      },
-      beginCreation() {
-        this.shape = false;
-        this.editing = true;
-      },
-      openEditingModal(shape) {
-        this.shape = {
-          id: shape.id,
-          shape_id: shape.shape_id,
-        }
-        this.editingModal.visible = true;
-      },
-      beginDeleteShape(shape) {
-        console.log(shape);
-        this.deleteModal.message = "";
-        this.deleteModal.visible = true;
-        this.deleteModal.shape = shape;
-      },
-      beginEditing(mode, range) {
-        this.mode = mode;
-        if (mode === "range") {
-          this.range = range;
-        }
-        this.editing = true;
-        this.editingModal.visible = false;
-      },
-      beginPointSelection() {
-        this.$refs.map.displayShape(this.shape);
-        this.$refs.map.beginPointSelection();
-        this.editingModal.visible = false;
-      },
-      finishEditing() {
-        this.editing = false;
-        this.shape = false;
-        this.range = false;
-      },
-      displayShape(shape) {
-        this.$refs.map.displayShape(shape);
+    beginCreation() {
+      this.shape = false;
+      this.editing = true;
+    },
+    openEditingModal(shape) {
+      this.shape = {
+        id: shape.id,
+        shape_id: shape.shape_id,
       }
+      this.editingModal.visible = true;
     },
-  };
+    beginDeleteShape(shape) {
+      console.log(shape);
+      this.deleteModal.message = "";
+      this.deleteModal.visible = true;
+      this.deleteModal.shape = shape;
+    },
+    beginEditing(mode, range) {
+      this.mode = mode;
+      if (mode === "range") {
+        this.range = range;
+      }
+      this.editing = true;
+      this.editingModal.visible = false;
+    },
+    beginPointSelection() {
+      this.$refs.map.displayShape(this.shape);
+      this.$refs.map.beginPointSelection();
+      this.editingModal.visible = false;
+    },
+    finishEditing() {
+      this.editing = false;
+      this.shape = false;
+      this.range = false;
+    },
+    displayShape(shape) {
+      this.$refs.map.displayShape(shape);
+    }
+  },
+};
 </script>
