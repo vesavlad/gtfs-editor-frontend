@@ -42,12 +42,12 @@
         Save changes and exit
       </button>
     </div>
-    <Modal v-if="orderModal.visible" @ok="automaticallyOrder" @close="orderModal.visible = false"
-           @cancel="orderModal.visible = false" :showCancelButton="true">
-      <template slot="title">
+    <MessageModal :show="orderModal.visible" @ok="automaticallyOrder" @cancel="orderModal.visible = false"
+                  @close="orderModal.visible = false" :showCancelButton="true" :type="Enums.MessageModalType.WARNING">
+      <template v-slot:m-title>
         <h2>Are you sure you want to automatically order the stops?</h2>
       </template>
-      <template slot="content">
+      <template v-slot:m-content>
         <span class="warning">
           The current Stop Sequence will be overwritten. The closest point of the Shape will be used to determine the
           position,
@@ -55,14 +55,13 @@
           passes twice next to the same Stop.
         </span>
       </template>
-      <template slot="close-button-name">Ok</template>
-    </Modal>
-    <Modal v-if="speedModal.visible" @ok="calculateTimes" @close="speedModal.visible = false"
-           @cancel="speedModal.visible = false" :showCancelButton="true">
-      <template slot="title">
+    </MessageModal>
+    <MessageModal :show="speedModal.visible" @ok="calculateTimes" @cancel="speedModal.visible = false"
+                  @close="speedModal.visible = false" :showCancelButton="true" :type="Enums.MessageModalType.WARNING">
+      <template v-slot:m-title>
         <h2>Are you sure you want to replace the current times?</h2>
       </template>
-      <template slot="content">
+      <template v-slot:m-content>
         <span class="warning">
           The current Arrival and Departure times will be replaced. The arrival time of the first stop will be used
           as a starting point and all other arrival/departure times will be recalculated based on that.
@@ -77,8 +76,7 @@
         <SimpleSelect :field="STSelectField" v-model="speedModal.to_stop">
         </SimpleSelect>
       </template>
-      <template slot="close-button-name">Ok</template>
-    </Modal>
+    </MessageModal>
   </div>
 </template>
 
@@ -92,9 +90,9 @@ import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput.vue"
 import SimpleSelect from "@/components/vuetable/inputs/SimpleSelect.vue";
 import DraggableTable from "@/components/DraggableTable.vue";
 import InfoButton from "@/components/InfoButton.vue";
-import Modal from "@/components/Modal.vue";
 import envelopeMixin from "@/mixins/envelopeMixin"
 import config from "@/config.js"
+import MessageModal from "@/components/modal/MessageModal";
 
 let Vuetable = require('vuetable-2')
 
@@ -140,17 +138,17 @@ let optional_fields = [{
 }, {
   title: "Timepoint",
   name: "timepoint",
-},]
+}]
 
 let full_fields = base_fields.concat(optional_fields);
 
 export default {
   name: "StopTimesEditor",
   components: {
+    MessageModal,
     Vuetable: Vuetable.Vuetable,
     GeneralizedInput,
     DraggableTable,
-    Modal,
     SimpleSelect,
     InfoButton,
   },

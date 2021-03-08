@@ -67,38 +67,34 @@
         </div>
       </div>
     </div>
-    <Modal v-if="uploadModal.visible" @close="uploadModal.visible = false" :showCancelButton="true">
-      <template slot="title">
-        <h2>Upload CSV</h2>
+    <BaseModal :show="uploadModal.visible" @close="uploadModal.visible = false">
+      <template v-slot:m-content>
+        <div class="m-header">
+          <h2>Upload CSV</h2>
+        </div>
+        <div class="m-content">
+          <span>Upload CSV file.</span><br/>
+          <span v-if="uploadModal.error" class="error">{{ uploadModal.error }}</span>
+          <FileReader @load="uploadCSVFile($event)"></FileReader>
+        </div>
       </template>
-      <template slot="content">
-        <span>
-          Upload CSV file.
-        </span>
-        <br>
-        <span v-if="uploadModal.error" class="error">{{ uploadModal.error }}</span>
-      </template>
-      <template slot="base">
-        <FileReader @load="uploadCSVFile($event)"></FileReader>
-      </template>
-      <template slot="close-button-name">Upload</template>
-    </Modal>
+    </BaseModal>
     <InputDataModal :show="createModal.visible" :title="$t('vuetable.newEntityTitle')" :initialData="createModal.data"
                     :errors="createModal.errors" :fields="cleanFields" @save="createEntry"
                     @close="createModal.visible=false" @cancel="createModal.visible=false">
     </InputDataModal>
-    <Modal v-if="deleteModal.visible" @ok="deleteRow" @close="deleteModal.visible = false"
-           @cancel="deleteModal.visible = false" :showCancelButton="true">
-      <template slot="title">
+    <MessageModal :show="deleteModal.visible" @ok="deleteRow" @cancel="deleteModal.visible = false"
+                  @close="deleteModal.visible = false" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
+                  :type="Enums.MessageModalType.WARNING">
+      <template v-slot:m-title>
         <h2>Are you sure you want to delete this row?</h2>
       </template>
-      <template slot="content">
+      <template v-slot:m-content>
         <span>
           {{ deleteModal.message }}
         </span>
       </template>
-      <template slot="close-button-name">Delete</template>
-    </Modal>
+    </MessageModal>
     <VuetableSettingsModal :show="settings.show" @close="settings.show=false" :fields="fields"></VuetableSettingsModal>
   </div>
 </template>
@@ -106,7 +102,6 @@
 
 <script>
 import Enums from "@/utils/enums";
-import Modal from "@/components/Modal.vue";
 import FileReader from "@/components/FileReader.vue";
 import errorMessageMixin from "@/mixins/errorMessageMixin.js";
 import fieldMixin from "@/mixins/fieldMixin.js";
@@ -118,16 +113,19 @@ import VuetableSettingsModal from '@/components/vuetable/VuetableSettingsModal.v
 import InputDataModal from "@/components/modal/InputDataModal.vue";
 
 import {debounce} from "debounce";
+import BaseModal from "@/components/modal/BaseModal";
+import MessageModal from "@/components/modal/MessageModal";
 
 let Vuetable = require('vuetable-2')
 
 export default {
   name: "EditableTable",
   components: {
+    MessageModal,
+    BaseModal,
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
     VuetablePaginationDropDown,
-    Modal,
     FileReader,
     GeneralizedInput,
     VuetableRowHeader,
@@ -256,29 +254,29 @@ export default {
       let data = this.$refs.vuetable.tableData;
 
       data.filter(row => row.changed).map(row => {
-        for (let i = 0; i < this.fields.length; i++) {
-          let field = this.fields[i];
-          let fieldName = field.name;
+            for (let i = 0; i < this.fields.length; i++) {
+              let field = this.fields[i];
+              let fieldName = field.name;
 
-          if (row[fieldName] === '') {
-            row[fieldName] = null;
+              if (row[fieldName] === '') {
+                row[fieldName] = null;
+              }
+            }
+            console.log("Updating Row")
+            console.log(row);
+            this.updateMethod(row).then(response => {
+              row.changed = false;
+              row.error = false;
+              row.errors = {};
+              this.$emit('update', response.data);
+              this.reRender();
+            }).catch(error => {
+              let response = error.response;
+              row.error = true;
+              row.errors = response.data;
+              this.reRender();
+            });
           }
-        }
-        console.log("Updating Row")
-        console.log(row);
-        this.updateMethod(row).then(response => {
-          row.changed = false;
-          row.error = false;
-          row.errors = {};
-          this.$emit('update', response.data);
-          this.reRender();
-        }).catch(error => {
-          let response = error.response;
-          row.error = true;
-          row.errors = response.data;
-          this.reRender();
-        });
-      }
       );
     },
     reRender() {

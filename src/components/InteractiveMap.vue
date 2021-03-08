@@ -32,18 +32,18 @@
         </div>
       </div>
     </div>
-    <Modal v-if="deleteModal.visible" @ok="deleteStop" @close="deleteModal.visible = false"
-           @cancel="deleteModal.visible = false" :showCancelButton="true">
-      <template slot="title">
+    <MessageModal :show="deleteModal.visible" @ok="deleteStop" @cancel="deleteModal.visible = false"
+                  @close="deleteModal.visible = false" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
+                  :type="Enums.MessageModalType.WARNING">
+      <template v-slot:m-title>
         <h2>Are you sure you want to delete this stop?</h2>
       </template>
-      <template slot="content">
+      <template v-slot:m-content>
           <span>
             {{ deleteModal.message }}
           </span>
       </template>
-      <template slot="close-button-name">Delete</template>
-    </Modal>
+    </MessageModal>
   </div>
 </template>
 
@@ -53,18 +53,18 @@ import shapesAPI from '@/api/shapes.api';
 import shapeMapMixin from "@/mixins/shapeMapMixin"
 import PopupContent from '@/components/PopupContent.vue';
 import FKSelect from '@/components/vuetable/inputs/FKSelect.vue';
-import Modal from "@/components/Modal.vue";
 import envelopeMixin from "@/mixins/envelopeMixin"
 import config from "@/config.js"
 import Enums from "@/utils/enums";
+import MessageModal from "@/components/modal/MessageModal";
 
 const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 export default {
   name: 'InteractiveMap',
   components: {
+    MessageModal,
     PopupContent,
-    Modal,
     FKSelect,
   },
   mixins: [
