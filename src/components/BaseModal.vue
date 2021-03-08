@@ -1,9 +1,9 @@
 <template>
   <transition name="fade">
-    <div class="modal-container" @click="$emit('close')">
-        <div class="modal modal-in" :class="classes" @click.stop>
-          <slot name="m-content"></slot>
-        </div>
+    <div v-if="show" class="modal-container" @click="$emit('close')">
+      <div class="modal modal-in" :class="classes" @click.stop>
+        <slot name="m-content"></slot>
+      </div>
     </div>
   </transition>
 </template>
@@ -15,6 +15,10 @@ export default {
     classes: {
       type: Array,
       default: () => []
+    },
+    show: {
+      type: Boolean,
+      required: true
     }
   }
 }

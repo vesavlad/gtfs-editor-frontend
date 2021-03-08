@@ -15,7 +15,7 @@
         <p>{{ $t('myProjects.addNewProject') }}</p>
       </div>
     </section>
-    <CreateProjectModal :isVisible="project.create" @close="project.create=false"
+    <CreateProjectModal :show="project.create" @close="project.create=false"
                         @project-created="updateProject"></CreateProjectModal>
     <DeletionModal></DeletionModal>
   </div>

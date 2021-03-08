@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-if="show" :classes="ownClasses" v-on="$listeners">
+  <BaseModal :show="show" :classes="ownClasses" v-on="$listeners">
     <template v-slot:m-content>
       <div class="m-header">
         <div class="message-title">

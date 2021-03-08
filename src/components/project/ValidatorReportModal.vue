@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-if="show" v-on="$listeners">
+  <BaseModal :show="show" v-on="$listeners">
     <template slot="m-content">
       <div class="m-header">
         <h2>{{ $t('projectDashboard.gtfsBuilder.validationReport.title') }}</h2>

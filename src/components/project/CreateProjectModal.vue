@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-if="isVisible" v-on="$listeners" :classes="['modal-new-project']" @close="setToDefaultValues">
+  <BaseModal :show="show" v-on="$listeners" :classes="['modal-new-project']" @close="setToDefaultValues">
     <template v-slot:m-content>
       <div class="modal-new-header">
         <h2>{{ $t('myProjects.createProject') }}</h2>
@@ -69,7 +69,7 @@ export default {
     BaseModal
   },
   props: {
-    isVisible: {
+    show: {
       type: Boolean,
       required: true
     }

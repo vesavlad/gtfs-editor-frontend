@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-if="show" :classes="ownClasses" @close="$emit('close')">
+  <BaseModal :show="show" :classes="ownClasses" @close="$emit('close')">
     <template v-slot:m-content>
       <div class="m-header">
         <h2>{{ title }}</h2>
