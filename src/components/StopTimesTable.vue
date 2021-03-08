@@ -40,6 +40,7 @@
 <script>
 import $ from 'jquery';
 import 'select2';
+import VuetablePaginationDropDown from '@/components/vuetable/VuetablePaginationDropDown.vue';
 import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
 import tripsAPI from "@/api/trips.api";
 import {debounce} from "debounce";
@@ -51,7 +52,7 @@ export default {
   components: {
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
-    VuetablePaginationDropDown: Vuetable.VuetablePaginationDropDown,
+    VuetablePaginationDropDown
   },
   data: function () {
     return {
