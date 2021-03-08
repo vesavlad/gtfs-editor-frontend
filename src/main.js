@@ -23,12 +23,12 @@ Vue.use(VTooltip, {
 })
 Vue.use(VueBreadcrumbs, {
   template:
-    '        <nav v-if="$breadcrumbs.length" aria-label="breadcrumb" class="breadcrumbs">\n' +
-                '<router-link :to="{name: \'myprojects\'}"><span class="step first"><span class="material-icons">home</span></span></router-link>' +
-'                <span v-for="(crumb, key) in $breadcrumbs" v-if="crumb.meta.breadcrumb" :key="key" class="step" aria-current="page">\n' +
-'                    <router-link :to="{ path: getPath(crumb) }">{{ getBreadcrumb(crumb.meta.breadcrumb) }}</router-link>' +
-'                </span>\n' +
-    '        </nav>'
+    `<nav v-if="$breadcrumbs.length" aria-label="breadcrumb" class="breadcrumbs">
+      <router-link :to="{name: 'myprojects'}"><span class="step first"><span class="material-icons">home</span></span></router-link>
+      <span v-for="(crumb, key) in $breadcrumbs" v-if="crumb.meta.breadcrumb" :key="key" class="step" aria-current="page">
+          <router-link :to="{ path: getPath(crumb) }">{{ getBreadcrumb(crumb.meta.breadcrumb) }}</router-link>
+      </span>
+    </nav>`
 });
 
 // enable Enums in all components
