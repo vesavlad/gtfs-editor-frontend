@@ -39,6 +39,7 @@ import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
 import VuetablePaginationDropDown from "@/components/vuetable/VuetablePaginationDropDown";
 import shapesAPI from "@/api/shapes.api";
 import {debounce} from "debounce";
+import Enums from "@/utils/enums";
 
 let Vuetable = require('vuetable-2')
 
@@ -55,14 +56,20 @@ export default {
       doSearch: false,
       infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
       fields: [
-        "actions",
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
+        },
         {
           name: "shape_id",
           title: "Shape ID",
+          type: Enums.InputType.INPUT
         },
         {
           name: "point_count",
           title: "Point Count",
+          type: Enums.InputType.INPUT
         },
       ],
       url: shapesAPI.shapesAPI.getFullBaseURL(this.project),
@@ -74,9 +81,6 @@ export default {
     }
   },
   methods: {
-    openInfo() {
-      window.open(this.infoURL);
-    },
     onPaginationData(paginationData) {
       if (paginationData.current_page !== this.current_page || paginationData.last_page !== this.last_page) {
         this.current_page = paginationData.current_page;
@@ -86,7 +90,7 @@ export default {
       }
     },
     onChangePage(page) {
-      if (page == this.current_page) {
+      if (page === this.current_page) {
         return;
       }
       this.$refs.vuetable.changePage(page);
