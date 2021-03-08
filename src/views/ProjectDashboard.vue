@@ -101,7 +101,7 @@ import {DateTime} from 'luxon';
 import projectsAPI from '@/api/projects.api';
 import tablesAPI from '@/api/tables.api';
 import feedInfoAPI from '@/api/feedinfo.api';
-import InputDataModal from '@/components/InputDataModal.vue';
+import InputDataModal from '@/components/modal/InputDataModal.vue';
 import EnvelopeMap from '@/components/EnvelopeMap.vue';
 import DataCard from "@/components/project/DataCard";
 import Enums from '@/utils/enums';

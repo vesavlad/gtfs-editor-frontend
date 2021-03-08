@@ -9,7 +9,7 @@
 <script>
 import {mapState} from 'vuex'
 import Enums from '@/utils/enums.js'
-import MessageModal from '@/components/MessageModal.vue'
+import MessageModal from '@/components/modal/MessageModal.vue'
 
 
 export default {

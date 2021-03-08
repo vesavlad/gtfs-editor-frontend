@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import InputDataModal from "@/components/InputDataModal.vue";
+import InputDataModal from "@/components/modal/InputDataModal.vue";
 import Enums from "@/utils/enums";
 
 export default {

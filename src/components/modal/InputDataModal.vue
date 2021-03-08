@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import BaseModal from '@/components/BaseModal.vue';
+import BaseModal from '@/components/modal/BaseModal.vue';
 import Enums from "@/utils/enums";
 import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput";
 import fieldMixin from "@/mixins/fieldMixin";

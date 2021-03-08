@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import BaseModal from "@/components/BaseModal";
+import BaseModal from "@/components/modal/BaseModal";
 import PillBase from "@/components/PillBase";
 import FileSaver from 'file-saver';
 

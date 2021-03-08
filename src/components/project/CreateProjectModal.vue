@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import BaseModal from "@/components/BaseModal";
+import BaseModal from "@/components/modal/BaseModal";
 import Enums from "@/utils/enums";
 import projectsAPI from "@/api/projects.api";
 

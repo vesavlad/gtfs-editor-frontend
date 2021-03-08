@@ -115,7 +115,7 @@ import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput.vue"
 import VuetableRowHeader from "@/components/vuetable/VuetableRowHeader.vue";
 import VuetablePaginationDropDown from "@/components/vuetable/VuetablePaginationDropDown.vue";
 import VuetableSettingsModal from '@/components/vuetable/VuetableSettingsModal.vue';
-import InputDataModal from "@/components/InputDataModal.vue";
+import InputDataModal from "@/components/modal/InputDataModal.vue";
 
 import {debounce} from "debounce";
 

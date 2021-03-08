@@ -64,7 +64,7 @@ import ShapeEditor from "@/components/ShapeEditor.vue";
 import Modal from "@/components/Modal.vue";
 import shapesAPI from "@/api/shapes.api";
 import TableHeader from "@/components/vuetable/TableHeader";
-import BaseModal from "@/components/BaseModal";
+import BaseModal from "@/components/modal/BaseModal";
 
 export default {
   components: {
