@@ -499,7 +499,7 @@ table th {
 .multiselect__input, .multiselect__single {background-color: transparent;}
 td .multiselect input[type="text"] {min-width: inherit; box-shadow: none;}
 .multiselect__input, .multiselect__single {white-space: nowrap;}
-.multiselect__content-wrapper {min-width: var(--multiselect-width); max-width: calc(fit-content + 50px);}
+.multiselect__content-wrapper {min-width: var(--multiselect-width); max-width: fit-content;}
 .multiselect__input:focus {border:0; box-shadow: none;}
 .multiselect__tags {border: 0; background-color: transparent;}
 .multiselect.error {border:1px solid var(--error);}
@@ -703,7 +703,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 
 
 .collapse-enter-active, .collapse-leave-active {
-    transition: all .5s;
+    transition: all .2s;
 }
 .collapse-enter, .collapse-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
