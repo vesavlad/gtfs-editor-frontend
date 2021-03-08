@@ -6,6 +6,7 @@ import VueBreadcrumbs from 'vue-2-breadcrumbs'
 import i18n from './i18n'
 import VTooltip from 'v-tooltip'
 import VueInputAutowidth from 'vue-input-autowidth'
+import Enums from "@/utils/enums";
 
 require('@/assets/css/base.css')
 require('@/assets/css/style.css')
@@ -29,6 +30,17 @@ Vue.use(VueBreadcrumbs, {
 '                </span>\n' +
     '        </nav>'
 });
+
+// enable Enums in all components
+Vue.mixin({
+  data: function () {
+    return {
+      get Enums() {
+        return Enums
+      }
+    }
+  }
+})
 
 Vue.config.productionTip = false
 
