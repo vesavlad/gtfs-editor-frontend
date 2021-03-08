@@ -19,8 +19,8 @@
       </InteractiveMap>
     </div>
     <div v-show="activeTab===tabType.TABLE" class="table-container container">
-      <EditableTable ref='table' :fields="fields" :url="url" :updateMethod="updateTrip" :deleteMethod="removeTrip"
-                     :createMethod="createTrip" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true"
+      <EditableTable ref='table' :fields="fields" :url="url" :updateMethod="updateStop" :deleteMethod="removeStop"
+                     :createMethod="createStop" :downloadURL="downloadURL" :uploadCSV="uploadCSV" :searchable="true"
                      @update="onUpdate">
         <template slot="additional-actions" slot-scope="props">
           <button class="btn icon" @click="focusStop(props)" alt="Focus Stop on interactive map.">
@@ -84,13 +84,13 @@ export default {
       this.switchTab(this.tabType.MAP);
       this.$refs.map.focusStop(props.rowData);
     },
-    updateTrip(data) {
+    updateStop(data) {
       return stopsAPI.stopsAPI.update(this.$route.params.projectid, data);
     },
-    createTrip(data) {
+    createStop(data) {
       return stopsAPI.stopsAPI.create(this.$route.params.projectid, data);
     },
-    removeTrip(data) {
+    removeStop(data) {
       return stopsAPI.stopsAPI.remove(this.$route.params.projectid, data);
     },
     uploadCSV(file) {
