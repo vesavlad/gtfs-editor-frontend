@@ -110,12 +110,15 @@ export default {
       window.open(this.link);
     }
   },
-  mounted() {
-    this.fields.forEach(field => {
-      if (!Object.prototype.hasOwnProperty.call(this.localData, field.name)) {
-        this.localData[this.getFieldID(field)] = null;
-      }
-    });
+  watch: {
+    initialData() {
+      this.localData = {...this.initialData};
+      this.fields.forEach(field => {
+        if (!Object.prototype.hasOwnProperty.call(this.localData, field.name)) {
+          this.localData[this.getFieldID(field)] = null;
+        }
+      });
+    }
   }
 }
 </script>
