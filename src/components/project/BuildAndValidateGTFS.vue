@@ -60,7 +60,7 @@
       <button class="btn min green" @click="downloadGTFS">
         <span>{{ $t('projectDashboard.gtfsBuilder.download') }}</span><i class="material-icons">save_alt</i></button>
     </div>
-    <ValidatorReportModal :show="showModal" @close="showModal=false"
+    <ValidatorReportModal v-if="project.gtfs_validation.message" :show="showModal" @close="showModal=false"
                           :message="project.gtfs_validation.message"></ValidatorReportModal>
   </div>
 </template>
