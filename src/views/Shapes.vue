@@ -58,9 +58,9 @@
 </template>
 
 <script>
-import ShapesTable from "@/components/ShapesTable.vue";
-import ShapesMap from "@/components/ShapesMap.vue";
-import ShapeEditor from "@/components/ShapeEditor.vue";
+import ShapesTable from "@/components/shape/ShapesTable.vue";
+import ShapesMap from "@/components/shape/ShapesMap.vue";
+import ShapeEditor from "@/components/shape/ShapeEditor.vue";
 import shapesAPI from "@/api/shapes.api";
 import TableHeader from "@/components/vuetable/TableHeader";
 import BaseModal from "@/components/modal/BaseModal";

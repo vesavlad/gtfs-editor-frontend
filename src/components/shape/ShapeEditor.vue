@@ -61,9 +61,9 @@ import * as turf from '@turf/turf';
 
 import errorMessageMixin from '@/mixins/shapeMapMixin';
 import shapeMapMixin from '@/mixins/errorMessageMixin';
-import envelopeMixin from "@/mixins/envelopeMixin"
+import envelopeMixin from "@/mixins/envelopeMixin";
 import InfoButton from "@/components/InfoButton.vue";
-import config from "@/config.js"
+import config from "@/config";
 import MessageModal from "@/components/modal/MessageModal";
 
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
@@ -331,7 +331,7 @@ export default {
         }
       });
       // Arrow for the shape
-      let img = require('../assets/img/arrow-small.png')
+      let img = require('../../assets/img/arrow-small.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
           console.log(err);

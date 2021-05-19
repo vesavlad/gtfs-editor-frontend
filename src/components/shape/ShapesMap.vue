@@ -10,10 +10,11 @@
 <script>
   import shapesAPI from "@/api/shapes.api";
   const mapboxgl = require('mapbox-gl');
-  import shapeMapMixin from "@/mixins/shapeMapMixin"
-  import envelopeMixin from "@/mixins/envelopeMixin"
+  import shapeMapMixin from "@/mixins/shapeMapMixin";
+  import envelopeMixin from "@/mixins/envelopeMixin";
+  import config from "@/config";
+
   mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
-  import config from "@/config.js"
 
   export default {
     name: "ShapesMap",
@@ -104,7 +105,7 @@
             "text-allow-overlap": true,
           }
         });
-        let img = require('../assets/img/arrow-small.png')
+        let img = require('../../assets/img/arrow-small.png')
         this.map.loadImage(img, (err, image) => {
           if (err) {
             console.log(err);
