@@ -1,6 +1,6 @@
 <template>
   <div class="section stops">
-    <div class="grid container">
+    <div class="container">
       <TableHeader :title="tableTitle" :infoURL="infoURL">
         <template v-slot:right-section>
           <div class="tab">

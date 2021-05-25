@@ -14,6 +14,23 @@
       </button>
     </div>
     <div class="map-sidebar">
+      <div class="side-panel empty">
+        <div class="side-header">
+          <div></div>
+          <div class="btn-list">
+            <button class="btn flat close"><i class="material-icons">close</i></button>
+          </div>
+        </div>
+        <div class="side-content">
+          <div class="empty img">
+            <i class="material-icons">add_location_alt</i>
+          </div>
+          <ol>
+            <li><span>Click the bottom right button to add a new stop</span></li>
+            <li><span>Click on the map to place it</span></li>
+          </ol>
+        </div>
+      </div>
       <div ref="popup" v-show="popup.open">
         <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
         </popup-content>
