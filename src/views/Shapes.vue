@@ -24,20 +24,20 @@
     <BaseModal :show="editingModal.visible" @close="editingModal.visible=false">
       <template v-slot:m-content>
         <div class="m-header">
-          <h2>{{ $t('shape.modal.title') }} "{{ shape.shape_id }}"</h2>
+          <h2>{{ $t('shape.editModal.title', {name: shape.shape_id}) }}</h2>
         </div>
         <div class="m-content">
           <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.ALL)">
-            {{ $t('shape.modal.replaceEntireShape') }}
+            {{ $t('shape.editModal.replaceEntireShape') }}
           </button>
           <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.SIMPLE)">
-            {{ $t('shape.modal.editShapeDirectly') }}
+            {{ $t('shape.editModal.editShapeDirectly') }}
           </button>
           <button class="btn btn-outline-secondary" @click="beginPointSelection">
-            {{ $t('shape.modal.selectPointRangeOnMap')}}
+            {{ $t('shape.editModal.selectPointRangeOnMap')}}
           </button>
           <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.DUPLICATE)">
-            {{ $t('shape.modal.duplicateShape') }}
+            {{ $t('shape.editModal.duplicateShape') }}
           </button>
         </div>
       </template>
@@ -46,7 +46,7 @@
                   :type="Enums.MessageModalType.WARNING"
                   @ok="deleteShape" @cancel="deleteModal.visible = false" @close="deleteModal.visible = false">
       <template v-slot:m-title>
-        <h2>Are you sure you want to delete shape {{ deleteModal.shape.shape_id }}?</h2>
+        <h2> {{ $t('shape.deleteModal.title', {name: deleteModal.shape.shape_id}) }}</h2>
       </template>
       <template v-slot:m-content>
         <span>
