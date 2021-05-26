@@ -42,12 +42,11 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      let map = new mapboxgl.Map({
+      this.map = new mapboxgl.Map({
         container: this.$refs.mapContainer,
         style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
       });
-      this.map = map;
-      map.on('load', () => {
+      this.map.on('load', () => {
         this.envelope(this.map, this.project);
         this.addLayers();
         this.$emit('load');
@@ -65,14 +64,14 @@ export default {
         'data': this.pointsGeojson,
       });
       this.map.addLayer({
-        'id': 'shape-layer',
-        'type': 'line',
-        'source': 'shape',
-        'layout': {
+        id: 'shape-layer',
+        type: 'line',
+        source: 'shape',
+        layout: {
           'line-join': 'round',
           'line-cap': 'round'
         },
-        'paint': {
+        paint: {
           'line-color': config.shape_line_color,
           'line-width': 2
         }
