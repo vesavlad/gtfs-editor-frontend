@@ -35,7 +35,6 @@
 @import "../node_modules/select2/dist/css/select2.min.css";
 @import url("https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css");
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Material+Icons+Outlined");
 </style>
 
 <script>
