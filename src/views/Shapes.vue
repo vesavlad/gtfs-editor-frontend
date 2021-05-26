@@ -7,7 +7,7 @@
       <div class="dynamic-map-container">
         <div class="top-map-bar">
           <div class="right-content">
-            <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+            <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
           </div>
         </div>
         <div class="map-sidebar">
