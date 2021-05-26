@@ -24,20 +24,20 @@
     <BaseModal :show="editingModal.visible" @close="editingModal.visible=false">
       <template v-slot:m-content>
         <div class="m-header">
-          <h2>Select editing mode for shape {{ shape.shape_id }}</h2>
+          <h2>{{ $t('shape.modal.title') }} "{{ shape.shape_id }}"</h2>
         </div>
         <div class="m-content">
-          <button class="btn btn-outline-secondary" @click="beginEditing('all')">
-            Replace entire Shape
+          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.ALL)">
+            {{ $t('shape.modal.replaceEntireShape') }}
           </button>
-          <button class="btn btn-outline-secondary" @click="beginEditing('simple')">
-            Edit Shape directly
+          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.SIMPLE)">
+            {{ $t('shape.modal.editShapeDirectly') }}
           </button>
           <button class="btn btn-outline-secondary" @click="beginPointSelection">
-            Select point range on map
+            {{ $t('shape.modal.selectPointRangeOnMap')}}
           </button>
-          <button class="btn btn-outline-secondary" @click="beginEditing('duplicate')">
-            Duplicate Shape
+          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.DUPLICATE)">
+            {{ $t('shape.modal.duplicateShape') }}
           </button>
         </div>
       </template>

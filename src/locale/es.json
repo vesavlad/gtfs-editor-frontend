@@ -89,5 +89,14 @@
     "actions": "Acciones",
     "settings": "Configuración",
     "newEntityTitle": "Nueva entidad"
+  },
+  "shape": {
+    "modal": {
+      "title": "Selecciona el modo de edición para el shape",
+      "replaceEntireShape": "Reemplazar toda la geometría",
+      "editShapeDirectly": "Editar geometría",
+      "selectPointRangeOnMap": "Editar tramo de la geometría",
+      "duplicateShape": "Duplicar geometría"
+    }
   }
 }
