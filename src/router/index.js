@@ -5,7 +5,6 @@ import VueRouter from 'vue-router'
 import NotFound from '../views/NotFound.vue'
 
 
-
 import MyProjects from '../views/MyProjects.vue'
 import ProjectDashboard from '../views/ProjectDashboard.vue'
 import CalendarView from '../views/CalendarView.vue'
@@ -22,11 +21,13 @@ import LevelsView from '../views/LevelsView.vue'
 import TransfersView from '../views/TransfersView.vue'
 import PathwaysView from '../views/PathwaysView.vue'
 import Shapes from '../views/Shapes.vue'
+import ShapeEditor from '../views/ShapeEditor.vue'
 
 
 Vue.use(VueRouter)
 
-const routes = [{
+const routes = [
+  {
     path: '',
     redirect: '/myprojects'
   },
@@ -44,7 +45,7 @@ const routes = [{
     path: '/project/:projectid',
     component: {render(c) { return c('router-view'); }},
     meta: {
-      breadcrumb(routeParams){
+      breadcrumb(routeParams) {
         return this.$i18n.t('general.project') + ' ' + routeParams.projectid;
       }
     },
@@ -160,13 +161,34 @@ const routes = [{
       },
       {
         path: '/project/:projectid/shapes',
-        name: 'Shapes',
-        component: Shapes,
-        meta: {
-          breadcrumb: 'Shapes'
-        },
+        component: {render(c) { return c('router-view'); }},
+        children: [
+          {
+            path: '',
+            name: 'Shapes',
+            component: Shapes,
+            meta: {
+              breadcrumb: 'Shapes'
+            }
+          },
+          {
+            path: '/project/:projectid/shapes/create',
+            name: 'createShape',
+            component: ShapeEditor,
+            meta: {
+              breadcrumb: 'Create shape'
+            }
+          },
+          {
+            path: '/project/:projectid/shapes/:shapeid',
+            name: 'editShape',
+            component: ShapeEditor,
+            meta: {
+              breadcrumb: 'Edit shape'
+            }
+          }
+        ]
       },
-
     ]
   },
   {
