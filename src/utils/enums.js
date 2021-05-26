@@ -46,6 +46,12 @@ const Enums = {
   ProjectCreationType: {
     EMPTY: 'empty',
     FROM_GTFS: 'from_gtfs'
+  },
+  ShapeEditorMode: {
+    ALL: 'all',
+    DUPLICATE: 'duplicate',
+    RANGE: 'range',
+    SIMPLE: 'simple'
   }
 }
 

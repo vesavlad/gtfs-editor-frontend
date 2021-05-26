@@ -200,7 +200,7 @@ export default {
         'data': this.connectingLineGeojson,
       });
 
-      if (!this.creating && this.mode !== "all") {
+      if (!this.creating && this.mode !== this.Enums.ShapeEditorMode.ALL) {
         shapesAPI.shapesAPI.detail(this.project, this.shape.id).then(response => {
           let points = response.data.points.map(point => {
             return {
@@ -623,7 +623,7 @@ export default {
         points: this.points.map(generatePointJson)
       };
       console.log(this.mode);
-      if (this.creating || this.mode === "duplicate") {
+      if (this.creating || this.mode === this.Enums.ShapeEditorMode.DUPLICATE) {
         shapesAPI.shapesAPI.create(this.project, data).then(response => {
           console.log(response);
           this.$emit('close');
