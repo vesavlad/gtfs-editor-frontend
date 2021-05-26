@@ -162,7 +162,7 @@ export default {
         this.stops = response.data;
         let map = new mapboxgl.Map({
           container: 'map',
-          style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+          style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
           center: [this.stops[0].stop_lon, this.stops[0].stop_lat], // starting position [lng, lat]
           zoom: 16 // starting zoom
         });

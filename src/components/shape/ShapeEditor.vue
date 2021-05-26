@@ -157,7 +157,7 @@ export default {
   mounted() {
     let map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+      style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
     });
     this.map = map;
     map.on('load', () => {

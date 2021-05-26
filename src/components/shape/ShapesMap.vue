@@ -44,7 +44,7 @@ export default {
     this.$nextTick(() => {
       this.map = new mapboxgl.Map({
         container: this.$refs.mapContainer,
-        style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+        style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
       });
       this.map.on('load', () => {
         this.envelope(this.map, this.project);
