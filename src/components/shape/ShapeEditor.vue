@@ -9,12 +9,10 @@
             </label>
             <span>Map Matching</span>
           </div>
-          <button v-if="mapMatching" class="btn" @click="replacePoints">
-            Replace points
-          </button>
+          <button v-if="mapMatching" class="btn" @click="replacePoints">{{ $t('shape.editor.replacePoints') }}</button>
         </div>
       <div class="right-content grid center">
-        <button class="btn" @click="invertPoints"><span>Invert Shape</span><span class="material-icons">cached</span></button>
+        <button class="btn" @click="invertPoints"><span>{{ $t('shape.editor.invertShape') }}</span><span class="material-icons">cached</span></button>
         <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
       </div>
     </div>
@@ -26,7 +24,7 @@
       <div class="side-panel edit-shape">
         <div class="side-header">
           <div>
-            <h4>Add new shape</h4>
+            <h4>{{ $t('shape.editor.addNewShape') }}</h4>
           </div>
           <div class="btn-list">
             <button class="btn flat" @click="saveAndExit"><span class="material-icons">check</span></button>
@@ -36,7 +34,7 @@
         <div class="side-content">
           <div class="field-name"><span>Shape ID</span></div>
           <div class="field"><input v-model="shape_id"></div>
-          <div class="field-name"><span>Length</span></div>
+          <div class="field-name"><span>{{ $t('shape.editor.length') }}</span></div>
           <div class="field"> {{ shapeLength }}</div>
           <div v-if="error" class="errors error">
             {{ error.code }}
@@ -53,7 +51,7 @@
     <MessageModal :show="exitModal.visible" :showCancelButton="true" @cancel="exitModal.visible=false"
                   @close="exitModal.visible=false" @ok="exit" :type="Enums.MessageModalType.WARNING">
       <template v-slot:m-title>
-        <h2>Are you sure you want to exit and discard your changes?</h2>
+        <h2>{{ $t('shape.editor.discardChangesMessage') }}</h2>
       </template>
     </MessageModal>
   </div>
@@ -109,7 +107,7 @@ export default {
   },
   data() {
     return {
-      map: false,
+      map: null,
       pointGeojson: {
         type: 'FeatureCollection',
         features: [],
@@ -168,12 +166,11 @@ export default {
     }
   },
   mounted() {
-    let map = new mapboxgl.Map({
+    this.map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
     });
-    this.map = map;
-    map.on('load', () => {
+    this.map.on('load', () => {
       this.addSources();
       this.addLayers();
       this.addListeners();
