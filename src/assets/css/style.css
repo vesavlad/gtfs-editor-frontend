@@ -621,11 +621,12 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 /* ============  DYNAMIC MAPS  ============== */
 
 .side-panel {min-height: 100%; display: grid; grid-template-rows: auto 1fr auto;}
+.side-panel.empty {align-items: flex-start;}
 .side-header {display: grid; grid-gap: 10px; grid-template-columns: 1fr auto; padding: 10px; background-color: var(--secundario-claro); color: white; align-items: center;}
 .side-header .btn.flat {padding: 10px;}
 .empty .side-header {background-color: transparent; color: var(--gris-medio);}
 .empty .side-header .btn.flat {color: var(--gris-medio);}
-.side-content {padding: 10px; max-width: 350px;}
+.side-content {padding: 10px; max-width: 350px; align-content: flex-start;}
 .side-content li {margin-bottom: 10px;}
 .empty .side-content {display: grid; grid-gap: 20px; justify-items: flex-start; color: var(--gris-medio2); font-weight: 500;}
 .empty.img {display:flex; cursor: default; user-select: none; color: var(--gris-medio2); padding: 20px; background-color: var(--gris-claro); border-radius: 50%;}
@@ -642,7 +643,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 
     /* LOADER */
 
-.rotating {-webkit-animation: load3 1.4s infinite linear; animation: load3 1.4s infinite linear;}
+.rotating {-webkit-animation: load3 1.4s infini te linear; animation: load3 1.4s infinite linear;}
 .loader {
   font-size: 10px;
   text-indent: -9999em;

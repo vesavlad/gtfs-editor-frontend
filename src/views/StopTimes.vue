@@ -1,6 +1,6 @@
 <template>
   <div class="section stop-times">
-    <div class="grid container">
+    <div class="container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
     <div class="map-container" v-if="!editing">
