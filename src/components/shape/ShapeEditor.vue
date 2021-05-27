@@ -15,7 +15,7 @@
         </div>
       <div class="right-content grid center">
         <button class="btn" @click="invertPoints"><span>Invert Shape</span><span class="material-icons">cached</span></button>
-        <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+        <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
       </div>
     </div>
     <div id='map-container'>
