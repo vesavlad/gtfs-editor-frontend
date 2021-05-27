@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="side-panel">
     <div class="side-table-header">
       <form class="search" @submit.stop.prevent="doSearch">
         <div class="input-group">

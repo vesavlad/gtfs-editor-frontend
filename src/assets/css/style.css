@@ -620,6 +620,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 
 /* ============  DYNAMIC MAPS  ============== */
 
+.side-panel {min-height: 100%; display: grid; grid-template-rows: auto 1fr auto;}
 .side-header {display: grid; grid-gap: 10px; grid-template-columns: 1fr auto; padding: 10px; background-color: var(--secundario-claro); color: white; align-items: center;}
 .side-header .btn.flat {padding: 10px;}
 .empty .side-header {background-color: transparent; color: var(--gris-medio);}
