@@ -1,56 +1,61 @@
 <template>
-  <div class="flex">
-    <div class="map-info">
-      <InfoButton :info="info"></InfoButton>
-    </div>
-    <div id='map-container'>
-      <div id='map' ref='map'>
-      </div>
-      <div class="map-overlay top">
-        <div class="map-overlay-inner" v-if="map">
-          <div>Largo de shape: {{ shapeLength }} mts.</div>
-          <div>
-            shape ID
-            <input v-model="shape_id">
-          </div>
-          <div>
-            <p>Map Matching</p>
+  <div class="dynamic-map-container">
+    <div class="top-map-bar">
+      <div class="left-content" v-if="map">
+          <div class="grid center">
             <label class="switch">
               <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
               <span class="slider round"></span>
             </label>
+            <span>Map Matching</span>
           </div>
-          <div v-if="error" class="error">
+          <button v-if="mapMatching" class="btn" @click="replacePoints">
+            Replace points
+          </button>
+        </div>
+      <div class="right-content grid center">
+        <button class="btn" @click="invertPoints"><span>Invert Shape</span><span class="material-icons">cached</span></button>
+        <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
+      </div>
+    </div>
+    <div id='map-container'>
+      <div id='map' ref='map'>
+      </div>
+    </div>
+    <div class="map-sidebar">
+      <div class="side-panel edit-shape">
+        <div class="side-header">
+          <div>
+            <h4>Add new shape</h4>
+          </div>
+          <div class="btn-list">
+            <button class="btn flat" @click="saveAndExit"><span class="material-icons">check</span></button>
+            <button class="btn flat" @click="exitModal.visible = true"><span class="material-icons">close</span></button>
+          </div>
+        </div>
+        <div class="side-content">
+          <div class="field-name"><span>Shape ID</span></div>
+          <div class="field"><input v-model="shape_id"></div>
+          <div class="field-name"><span>Length</span></div>
+          <div class="field"> {{ shapeLength }}</div>
+          <div v-if="error" class="errors error">
             {{ error.code }}
-            <br>
             <div v-for="(text, index) in error.message.split('\n')" :key="index">
               {{ text }}
             </div>
           </div>
-          <div v-if="warning" class="warning">
+          <div v-if="warning" class="errors warning">
             {{ warning }}
           </div>
-          <button class="btn btn-outline-secondary" @click="invertPoints">
-            Invert Shape
-          </button>
-          <button v-if="mapMatching" class="btn btn-outline-secondary" @click="replacePoints">
-            Replace points
-          </button>
-          <button class="btn btn-outline-secondary" @click="saveAndExit">
-            Save and exit
-          </button>
-          <button class="btn btn-outline-secondary" @click="exitModal.visible = true">
-            Exit
-          </button>
         </div>
       </div>
-      <MessageModal :show="exitModal.visible" :showCancelButton="true" @cancel="exitModal.visible=false"
-                    @close="exitModal.visible=false" @ok="exit" :type="Enums.MessageModalType.WARNING">
-        <template v-slot:m-title>
-          <h2>Are you sure you want to exit and discard your changes?</h2>
-        </template>
-      </MessageModal>
     </div>
+    <MessageModal :show="exitModal.visible" :showCancelButton="true" @cancel="exitModal.visible=false"
+                  @close="exitModal.visible=false" @ok="exit" :type="Enums.MessageModalType.WARNING">
+      <template v-slot:m-title>
+        <h2>Are you sure you want to exit and discard your changes?</h2>
+      </template>
+    </MessageModal>
   </div>
 </template>
 
@@ -64,7 +69,6 @@ import Enums from '@/utils/enums.js'
 import errorMessageMixin from '@/mixins/shapeMapMixin';
 import shapeMapMixin from '@/mixins/errorMessageMixin';
 import envelopeMixin from "@/mixins/envelopeMixin";
-import InfoButton from "@/components/InfoButton.vue";
 import config from "@/config";
 import MessageModal from "@/components/modal/MessageModal";
 
@@ -74,7 +78,6 @@ export default {
   name: 'ShapeEditor',
   components: {
     MessageModal,
-    InfoButton,
   },
   mixins: [
     errorMessageMixin,
