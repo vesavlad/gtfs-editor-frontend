@@ -341,7 +341,7 @@ export default {
         }
       });
       // Arrow for the shape
-      let img = require('../../assets/img/arrow-small.png')
+      let img = require('../../assets/img/double-arrow.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
           console.log(err);
@@ -358,8 +358,13 @@ export default {
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
             'icon-image': 'arrow',
-            'icon-size': 1,
+            'icon-size': 0.5,
             'visibility': 'visible'
+          },
+          paint: {
+            'icon-color': 'white',
+            'icon-halo-color': "#343332",
+            'icon-halo-width': 2,
           }
         });
         this.map.addLayer({

@@ -105,7 +105,7 @@
             'line-width': 2
           }
         });
-        let img = require('../assets/img/arrow-small.png')
+        let img = require('../assets/img/double-arrow.png')
         this.map.loadImage(img, (err, image) => {
           if (err) {
             console.log(err);
