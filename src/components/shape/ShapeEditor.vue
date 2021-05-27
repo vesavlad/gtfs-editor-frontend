@@ -8,17 +8,18 @@
       </div>
       <div class="map-overlay top">
         <div class="map-overlay-inner" v-if="map">
-          <div>Largo de shape: {{ shapeLength }}</div>
+          <div>Largo de shape: {{ shapeLength }} mts.</div>
           <div>
             shape ID
             <input v-model="shape_id">
           </div>
-          Map Matching
-          <br>
-          <label class="switch">
-            <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
-            <span class="slider round"></span>
-          </label>
+          <div>
+            <p>Map Matching</p>
+            <label class="switch">
+              <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
+              <span class="slider round"></span>
+            </label>
+          </div>
           <div v-if="error" class="error">
             {{ error.code }}
             <br>
@@ -59,6 +60,7 @@ import mapMatching from '@/api/mapMatching.api';
 import * as mapboxgl from 'mapbox-gl';
 import * as turf from '@turf/turf';
 
+import Enums from '@/utils/enums.js'
 import errorMessageMixin from '@/mixins/shapeMapMixin';
 import shapeMapMixin from '@/mixins/errorMessageMixin';
 import envelopeMixin from "@/mixins/envelopeMixin";
@@ -79,6 +81,29 @@ export default {
     shapeMapMixin,
     envelopeMixin,
   ],
+  props: {
+    projectId: {
+      type: [String, Number],
+      required: true,
+    },
+    shape: {
+      type: Object
+    },
+    range: {
+      default: false,
+    },
+    editMode: {
+      type: String,
+      default: Enums.ShapeEditorEditionMode.SIMPLE,
+      validator: function (value) {
+        if (Object.values(Enums.ShapeEditorEditionMode).indexOf(value) === -1) {
+          console.error(`edit mode "${value}" is not valid`)
+          return false;
+        }
+        return true;
+      }
+    }
+  },
   data() {
     return {
       map: false,
@@ -124,24 +149,9 @@ export default {
       ],
     }
   },
-  props: {
-    project: {
-      required: true,
-    },
-    shape: {
-      required: true,
-    },
-    range: {
-      default: false,
-    },
-    mode: {
-      type: String,
-      default: "simple"
-    }
-  },
   computed: {
-    creating() {
-      return this.shape ? false : true;
+    mode() {
+      return this.shape ? this.Enums.ShapeEditorMode.EDIT : this.Enums.ShapeEditorMode.CREATE;
     },
     shapeLength() {
       let result = 0;
@@ -200,8 +210,8 @@ export default {
         'data': this.connectingLineGeojson,
       });
 
-      if (!this.creating && this.mode !== this.Enums.ShapeEditorMode.ALL) {
-        shapesAPI.shapesAPI.detail(this.project, this.shape.id).then(response => {
+      if (this.mode === this.Enums.ShapeEditorMode.EDIT && this.editMode !== this.Enums.ShapeEditorEditionMode.ALL) {
+        shapesAPI.shapesAPI.detail(this.projectId, this.shape.id).then(response => {
           let points = response.data.points.map(point => {
             return {
               id: this.id++,
@@ -248,7 +258,7 @@ export default {
           this.reGeneratePoints();
         });
       } else {
-        this.envelope(this.map, this.project);
+        this.envelope(this.map, this.projectId);
       }
     },
     exit() {
@@ -622,9 +632,9 @@ export default {
         shape_id: this.shape_id,
         points: this.points.map(generatePointJson)
       };
-      console.log(this.mode);
-      if (this.creating || this.mode === this.Enums.ShapeEditorMode.DUPLICATE) {
-        shapesAPI.shapesAPI.create(this.project, data).then(response => {
+      console.log(this.editMode);
+      if (this.mode === this.Enums.ShapeEditorMode.CREATE || this.editMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
+        shapesAPI.shapesAPI.create(this.projectId, data).then(response => {
           console.log(response);
           this.$emit('close');
         }).catch(err => {
@@ -635,7 +645,7 @@ export default {
         data.id = this.shape.id;
         data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(
             generatePointJson);
-        shapesAPI.shapesAPI.put(this.project, data).then(response => {
+        shapesAPI.shapesAPI.put(this.projectId, data).then(response => {
           console.log(response);
           this.$emit('close');
         }).catch(err => {

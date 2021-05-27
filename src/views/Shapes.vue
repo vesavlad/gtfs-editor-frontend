@@ -3,7 +3,7 @@
     <div class="grid container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
-    <div class="map-container" v-if="!editing">
+    <div class="map-container">
       <div class="dynamic-map-container">
         <div class="top-map-bar">
           <div class="right-content">
@@ -16,27 +16,26 @@
         </div>
         <ShapesMap ref="map" :project="$route.params.projectid" @range="beginEditing('range', $event)"></ShapesMap>
       </div>
-      <button class="btn floating" @click="beginCreation"><i class="material-icons">add</i></button>
+      <router-link :to="{name: 'createShape', params: {projectid: $route.params.projectid}}" class="btn floating">
+        <i class="material-icons">add</i>
+      </router-link>
     </div>
-    <ShapeEditor v-else :shape="shape" v-on:close="finishEditing" :project="$route.params.projectid" :range="range"
-                 :mode="mode">
-    </ShapeEditor>
     <BaseModal :show="editingModal.visible" @close="editingModal.visible=false">
       <template v-slot:m-content>
         <div class="m-header">
           <h2>{{ $t('shape.editModal.title', {name: shape.shape_id}) }}</h2>
         </div>
         <div class="m-content">
-          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.ALL)">
+          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorEditionMode.ALL)">
             {{ $t('shape.editModal.replaceEntireShape') }}
           </button>
-          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.SIMPLE)">
+          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorEditionMode.SIMPLE)">
             {{ $t('shape.editModal.editShapeDirectly') }}
           </button>
           <button class="btn btn-outline-secondary" @click="beginPointSelection">
             {{ $t('shape.editModal.selectPointRangeOnMap')}}
           </button>
-          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorMode.DUPLICATE)">
+          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorEditionMode.DUPLICATE)">
             {{ $t('shape.editModal.duplicateShape') }}
           </button>
         </div>
@@ -60,7 +59,6 @@
 <script>
 import ShapesTable from "@/components/shape/ShapesTable.vue";
 import ShapesMap from "@/components/shape/ShapesMap.vue";
-import ShapeEditor from "@/components/shape/ShapeEditor.vue";
 import shapesAPI from "@/api/shapes.api";
 import TableHeader from "@/components/vuetable/TableHeader";
 import BaseModal from "@/components/modal/BaseModal";
@@ -72,14 +70,12 @@ export default {
     BaseModal,
     ShapesTable,
     ShapesMap,
-    ShapeEditor,
     TableHeader
   },
   data() {
     return {
       tableTitle: 'Shapes',
       infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
-      editing: false,
       shape: false,
       range: false,
       editingModal: {
@@ -108,10 +104,6 @@ export default {
         this.deleteModal.message = err.response.data.message;
       })
     },
-    beginCreation() {
-      this.shape = false;
-      this.editing = true;
-    },
     openEditingModal(shape) {
       this.shape = {
         id: shape.id,
@@ -137,11 +129,6 @@ export default {
       this.$refs.map.displayShape(this.shape);
       this.$refs.map.beginPointSelection();
       this.editingModal.visible = false;
-    },
-    finishEditing() {
-      this.editing = false;
-      this.shape = false;
-      this.range = false;
     },
     displayShape(shape) {
       this.$refs.map.displayShape(shape);

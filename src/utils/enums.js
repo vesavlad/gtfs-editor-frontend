@@ -48,6 +48,10 @@ const Enums = {
     FROM_GTFS: 'from_gtfs'
   },
   ShapeEditorMode: {
+    CREATE: 'create',
+    EDIT: 'edit',
+  },
+  ShapeEditorEditionMode: {
     ALL: 'all',
     DUPLICATE: 'duplicate',
     RANGE: 'range',
