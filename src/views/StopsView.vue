@@ -15,7 +15,7 @@
       </TableHeader>
     </div>
     <div v-show="activeTab===tabType.MAP" class="map-container">
-      <InteractiveMap ref="map" :project="$route.params.projectid" :stopFields="fields">
+      <InteractiveMap ref="map" :project="$route.params.projectId" :stopFields="fields">
       </InteractiveMap>
     </div>
     <div v-show="activeTab===tabType.TABLE" class="table-container container">
@@ -52,8 +52,8 @@ export default {
     return {
       tableTitle: 'Stops',
       infoURL: "https://developers.google.com/transit/gtfs/reference#stopstxt",
-      url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
-      downloadURL: stopsAPI.stopsAPI.getDownloadURL(this.$route.params.projectid),
+      url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectId),
+      downloadURL: stopsAPI.stopsAPI.getDownloadURL(this.$route.params.projectId),
       activeTab: 'map',
       tabType: {
         MAP: 'map',
@@ -85,16 +85,16 @@ export default {
       this.$refs.map.focusStop(props.rowData);
     },
     updateStop(data) {
-      return stopsAPI.stopsAPI.update(this.$route.params.projectid, data);
+      return stopsAPI.stopsAPI.update(this.$route.params.projectId, data);
     },
     createStop(data) {
-      return stopsAPI.stopsAPI.create(this.$route.params.projectid, data);
+      return stopsAPI.stopsAPI.create(this.$route.params.projectId, data);
     },
     removeStop(data) {
-      return stopsAPI.stopsAPI.remove(this.$route.params.projectid, data);
+      return stopsAPI.stopsAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return stopsAPI.stopsAPI.uploadCSV(this.$route.params.projectid, file);
+      return stopsAPI.stopsAPI.uploadCSV(this.$route.params.projectId, file);
     },
     onUpdate(stop) {
       this.$refs.map.updateStopData(stop);

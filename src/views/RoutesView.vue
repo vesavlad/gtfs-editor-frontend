@@ -30,8 +30,8 @@ export default {
     return {
       tableTitle: 'Routes',
       infoURL: "https://developers.google.com/transit/gtfs/reference#routestxt",
-      url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
-      downloadURL: routesAPI.routesAPI.getDownloadURL(this.$route.params.projectid),
+      url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectId),
+      downloadURL: routesAPI.routesAPI.getDownloadURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -53,7 +53,7 @@ export default {
           id_field: 'agency',
           required: true,
           ajax_params: {
-            url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectid),
+            url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -126,16 +126,16 @@ export default {
       })
     },
     update(data) {
-      return routesAPI.routesAPI.update(this.$route.params.projectid, data);
+      return routesAPI.routesAPI.update(this.$route.params.projectId, data);
     },
     create(data) {
-      return routesAPI.routesAPI.create(this.$route.params.projectid, data);
+      return routesAPI.routesAPI.create(this.$route.params.projectId, data);
     },
     remove(data) {
-      return routesAPI.routesAPI.remove(this.$route.params.projectid, data);
+      return routesAPI.routesAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return routesAPI.routesAPI.uploadCSV(this.$route.params.projectid, file);
+      return routesAPI.routesAPI.uploadCSV(this.$route.params.projectId, file);
     }
   },
 };

@@ -25,8 +25,8 @@ export default {
     return {
       tableTitle: 'Frequencies',
       infoURL: "https://developers.google.com/transit/gtfs/reference#frequenciestxt",
-      downloadURL: frequenciesAPI.frequenciesAPI.getDownloadURL(this.$route.params.projectid),
-      url: frequenciesAPI.frequenciesAPI.getFullBaseURL(this.$route.params.projectid),
+      downloadURL: frequenciesAPI.frequenciesAPI.getDownloadURL(this.$route.params.projectId),
+      url: frequenciesAPI.frequenciesAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -41,7 +41,7 @@ export default {
           foreignKey: true,
           id_field: 'trip',
           ajax_params: {
-            url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectid),
+            url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -80,16 +80,16 @@ export default {
   },
   methods: {
     update(data) {
-      return frequenciesAPI.frequenciesAPI.update(this.$route.params.projectid, data);
+      return frequenciesAPI.frequenciesAPI.update(this.$route.params.projectId, data);
     },
     create(data) {
-      return frequenciesAPI.frequenciesAPI.create(this.$route.params.projectid, data);
+      return frequenciesAPI.frequenciesAPI.create(this.$route.params.projectId, data);
     },
     remove(data) {
-      return frequenciesAPI.frequenciesAPI.remove(this.$route.params.projectid, data);
+      return frequenciesAPI.frequenciesAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return frequenciesAPI.frequenciesAPI.uploadCSV(this.$route.params.projectid, file);
+      return frequenciesAPI.frequenciesAPI.uploadCSV(this.$route.params.projectId, file);
     },
     log(out) {
       console.log(out);

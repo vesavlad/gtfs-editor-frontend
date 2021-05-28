@@ -71,7 +71,7 @@
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsRequiredData') }}</h2>
         <div class="grid-data required">
-          <DataCard v-for="file in data.slice(0, 9)" v-bind:key="file.id" :projectId="$route.params.projectid"
+          <DataCard v-for="file in data.slice(0, 9)" v-bind:key="file.id" :projectId="$route.params.projectId"
                     :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state"
                     :errorNumber="file.error_number" :warningNumber="file.warning_number"
                     :message="$t(file.message)"></DataCard>
@@ -80,7 +80,7 @@
       <div class="box-data">
         <h2>{{ $t('projectDashboard.gtfsOptionalData') }}</h2>
         <div class="grid-data optional">
-          <DataCard v-for="file in data.slice(9)" v-bind:key="file.id" :projectId="$route.params.projectid"
+          <DataCard v-for="file in data.slice(9)" v-bind:key="file.id" :projectId="$route.params.projectId"
                     :viewName="file.viewName" :filename="file.name" :quantity="file.entries" :state="file.state"
                     :errorNumber="file.error_number" :warningNumber="file.warning_number"
                     :message="$t(file.message)"></DataCard>
@@ -260,13 +260,13 @@ export default {
   },
   methods: {
     initData() {
-      projectsAPI.getProjectDetail(this.$route.params.projectid).then(response => {
+      projectsAPI.getProjectDetail(this.$route.params.projectId).then(response => {
         this.project = response.data;
       });
       this.retrieveCardData();
     },
     retrieveCardData() {
-      tablesAPI.list_tables(this.$route.params.projectid).then(response => {
+      tablesAPI.list_tables(this.$route.params.projectId).then(response => {
         let data = response.data;
         this.data = this.data.map(datum => {
           let entry = data[datum.id];
@@ -309,7 +309,7 @@ export default {
     },
     saveFeedInfo(feedInfoData) {
       let method = this.project.feedinfo && this.project.feedinfo.id ? feedInfoAPI.update : feedInfoAPI.create;
-      method(this.$route.params.projectid, feedInfoData).then((response) => {
+      method(this.$route.params.projectId, feedInfoData).then((response) => {
         this.project.feedinfo = response.data;
         this.feedInfo.edit = false;
         this.feedInfo.config.errors = {};

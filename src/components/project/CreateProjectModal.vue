@@ -109,7 +109,7 @@ export default {
     createProjectAndRedirect() {
       projectsAPI.createProject(this.projectName).then(response => {
         this.errors = {};
-        this.$router.push({name: "projectoverview", params: {projectid: response.data.project_id}});
+        this.$router.push({name: "projectoverview", params: {projectId: response.data.project_id}});
       }).catch((error) => {
         this.errors = error.response.data;
       });

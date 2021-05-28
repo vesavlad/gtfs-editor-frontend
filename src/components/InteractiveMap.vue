@@ -112,7 +112,7 @@ export default {
         nullable: true,
         id_field: 'shape',
         ajax_params: {
-          url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectid),
+          url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectId),
         },
         type: Enums.InputType.FK_SELECT
       },

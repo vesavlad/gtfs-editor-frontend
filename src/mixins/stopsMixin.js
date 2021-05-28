@@ -72,7 +72,7 @@ let stopsMixin = {
           fk_name: 'stop_id',
           nullable: true,
           ajax_params: {
-            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
+            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -104,7 +104,7 @@ let stopsMixin = {
           id_field: 'level',
           nullable: true,
           ajax_params: {
-            url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectid),
+            url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },

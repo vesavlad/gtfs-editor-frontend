@@ -42,11 +42,11 @@ const routes = [
     }
   },
   {
-    path: '/project/:projectid',
+    path: '/project/:projectId',
     component: {render(c) { return c('router-view'); }},
     meta: {
       breadcrumb(routeParams) {
-        return this.$i18n.t('general.project') + ' ' + routeParams.projectid;
+        return this.$i18n.t('general.project') + ' ' + routeParams.projectId;
       }
     },
     children: [
@@ -56,7 +56,7 @@ const routes = [
         component: ProjectDashboard,
       },
       {
-        path: '/project/:projectid/agencies',
+        path: '/project/:projectId/agencies',
         name: 'Agencies',
         component: AgencyView,
         meta: {
@@ -64,7 +64,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/calendars',
+        path: '/project/:projectId/calendars',
         name: 'Calendars',
         component: CalendarView,
         meta: {
@@ -72,7 +72,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/calendardates',
+        path: '/project/:projectId/calendardates',
         name: 'CalendarDates',
         component: CalendarDateView,
         meta: {
@@ -80,7 +80,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/trips',
+        path: '/project/:projectId/trips',
         name: 'Trips',
         component: TripsView,
         meta: {
@@ -88,7 +88,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/stoptimes',
+        path: '/project/:projectId/stoptimes',
         name: 'StopTimes',
         component: StopTimes,
         meta: {
@@ -96,7 +96,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/stops',
+        path: '/project/:projectId/stops',
         name: 'Stops',
         component: StopsView,
         meta: {
@@ -104,7 +104,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/routes',
+        path: '/project/:projectId/routes',
         name: 'Routes',
         component: RoutesView,
         meta: {
@@ -112,7 +112,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/frequencies',
+        path: '/project/:projectId/frequencies',
         name: 'Frequencies',
         component: FrequencyView,
         meta: {
@@ -120,7 +120,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/fareattributes',
+        path: '/project/:projectId/fareattributes',
         name: 'FareAttributes',
         component: FareAttributesView,
         meta: {
@@ -128,7 +128,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/farerules',
+        path: '/project/:projectId/farerules',
         name: 'FareRules',
         component: FareRulesView,
         meta: {
@@ -136,7 +136,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/transfers',
+        path: '/project/:projectId/transfers',
         name: 'Transfers',
         component: TransfersView,
         meta: {
@@ -144,7 +144,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/pathways',
+        path: '/project/:projectId/pathways',
         name: 'Pathways',
         component: PathwaysView,
         meta: {
@@ -152,7 +152,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/levels',
+        path: '/project/:projectId/levels',
         name: 'Levels',
         component: LevelsView,
         meta: {
@@ -160,7 +160,7 @@ const routes = [
         },
       },
       {
-        path: '/project/:projectid/shapes',
+        path: '/project/:projectId/shapes',
         component: {render(c) { return c('router-view'); }},
         meta: {
           breadcrumb: 'Shapes'
@@ -172,7 +172,7 @@ const routes = [
             component: Shapes,
           },
           {
-            path: '/project/:projectid/shapes/create',
+            path: '/project/:projectId/shapes/create',
             name: 'createShape',
             component: ShapeEditorView,
             meta: {
@@ -180,7 +180,7 @@ const routes = [
             }
           },
           {
-            path: '/project/:projectid/shapes/:shapeid',
+            path: '/project/:projectId/shapes/:shapeid',
             name: 'editShape',
             component: ShapeEditorView,
             props: true,

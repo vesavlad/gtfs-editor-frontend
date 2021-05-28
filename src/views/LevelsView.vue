@@ -24,8 +24,8 @@ export default {
     return {
       tableTitle: 'Levels',
       infoURL: "https://developers.google.com/transit/gtfs/reference#levelstxt",
-      downloadURL: levelsAPI.levelsAPI.getDownloadURL(this.$route.params.projectid),
-      url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectid),
+      downloadURL: levelsAPI.levelsAPI.getDownloadURL(this.$route.params.projectId),
+      url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -58,16 +58,16 @@ export default {
   },
   methods: {
     update(data) {
-      return levelsAPI.levelsAPI.update(this.$route.params.projectid, data);
+      return levelsAPI.levelsAPI.update(this.$route.params.projectId, data);
     },
     create(data) {
-      return levelsAPI.levelsAPI.create(this.$route.params.projectid, data);
+      return levelsAPI.levelsAPI.create(this.$route.params.projectId, data);
     },
     remove(data) {
-      return levelsAPI.levelsAPI.remove(this.$route.params.projectid, data);
+      return levelsAPI.levelsAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return levelsAPI.levelsAPI.uploadCSV(this.$route.params.projectid, file);
+      return levelsAPI.levelsAPI.uploadCSV(this.$route.params.projectId, file);
     },
     log(out) {
       console.log(out);

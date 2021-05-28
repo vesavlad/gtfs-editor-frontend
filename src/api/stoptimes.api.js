@@ -4,16 +4,16 @@ const BASE_END_POINT = '/api'
 const END_POINT = `${BASE_END_POINT}/projects/`;
 const TABLE = '/stoptimes/'
 
-const getAllStopTimes = (projectid) => {
-    return httpClient.get(`${END_POINT}${projectid}${TABLE}`);
+const getAllStopTimes = (projectId) => {
+    return httpClient.get(`${END_POINT}${projectId}${TABLE}`);
 }
-const updateStopTime = (projectid, data) => {
-    let url=`${END_POINT}${projectid}${TABLE}${data.id}/`;
+const updateStopTime = (projectId, data) => {
+    let url=`${END_POINT}${projectId}${TABLE}${data.id}/`;
     console.log(url);
     return httpClient.patch(url, data);
 }
-const deleteStopTime = (projectid, data) => {
-    let url=`${END_POINT}${projectid}${TABLE}${data.id}/`;
+const deleteStopTime = (projectId, data) => {
+    let url=`${END_POINT}${projectId}${TABLE}${data.id}/`;
     console.log(url);
     return httpClient.delete(url);
 }

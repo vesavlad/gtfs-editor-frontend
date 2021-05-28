@@ -25,8 +25,8 @@ export default {
     return {
       tableTitle: 'Transfers',
       infoURL: "https://developers.google.com/transit/gtfs/reference#transferstxt",
-      url: transfersAPI.transfersAPI.getFullBaseURL(this.$route.params.projectid),
-      downloadURL: transfersAPI.transfersAPI.getDownloadURL(this.$route.params.projectid),
+      url: transfersAPI.transfersAPI.getFullBaseURL(this.$route.params.projectId),
+      downloadURL: transfersAPI.transfersAPI.getDownloadURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -54,7 +54,7 @@ export default {
           id_field: 'from_stop',
           required: true,
           ajax_params: {
-            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
+            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -67,7 +67,7 @@ export default {
           id_field: 'to_stop',
           required: true,
           ajax_params: {
-            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
+            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -81,16 +81,16 @@ export default {
   },
   methods: {
     update(data) {
-      return transfersAPI.transfersAPI.update(this.$route.params.projectid, data);
+      return transfersAPI.transfersAPI.update(this.$route.params.projectId, data);
     },
     create(data) {
-      return transfersAPI.transfersAPI.create(this.$route.params.projectid, data);
+      return transfersAPI.transfersAPI.create(this.$route.params.projectId, data);
     },
     remove(data) {
-      return transfersAPI.transfersAPI.remove(this.$route.params.projectid, data);
+      return transfersAPI.transfersAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return transfersAPI.transfersAPI.uploadCSV(this.$route.params.projectid, file);
+      return transfersAPI.transfersAPI.uploadCSV(this.$route.params.projectId, file);
     },
   },
 };

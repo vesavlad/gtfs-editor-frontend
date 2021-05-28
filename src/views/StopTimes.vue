@@ -10,13 +10,13 @@
             <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
           </div>
         </div>
-        <StopTimesTable ref="table" :project="$route.params.projectid" @focus-st="displayTrip"
+        <StopTimesTable ref="table" :project="$route.params.projectId" @focus-st="displayTrip"
                         @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>
-        <StopTimesMap ref="map" :project="$route.params.projectid"
+        <StopTimesMap ref="map" :project="$route.params.projectId"
                       @range="beginEditing('range', $event)"></StopTimesMap>
       </div>
     </div>
-    <StopTimesEditor v-else :trip="editingModal.trip" v-on:close="finishEditing" :project="$route.params.projectid"
+    <StopTimesEditor v-else :trip="editingModal.trip" v-on:close="finishEditing" :project="$route.params.projectId"
                      :mode="mode">
     </StopTimesEditor>
     <BaseModal :show="editingModal.visible" @close="editingModal.visible = false">
@@ -150,7 +150,7 @@ export default {
         delete st.id;
         return st;
       });
-      tripsAPI.tripsAPI.create(this.$route.params.projectid, trip).then(() => {
+      tripsAPI.tripsAPI.create(this.$route.params.projectId, trip).then(() => {
         this.editingModal.duplicating = false;
         this.$refs.table.refresh();
       }).catch(err => {
@@ -180,7 +180,7 @@ export default {
         id: this.deleteModal.trip.id,
         stop_times: [],
       }
-      tripsAPI.tripsAPI.update(this.$route.params.projectid, data).then(response => {
+      tripsAPI.tripsAPI.update(this.$route.params.projectId, data).then(response => {
         console.log(response);
         this.deleteModal = {
           trip: null,

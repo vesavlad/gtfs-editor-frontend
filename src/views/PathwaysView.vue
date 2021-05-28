@@ -25,8 +25,8 @@ export default {
     return {
       tableTitle: 'Pathways',
       infoURL: "https://developers.google.com/transit/gtfs/reference#pathwaystxt",
-      url: pathwaysAPI.pathwaysAPI.getFullBaseURL(this.$route.params.projectid),
-      downloadURL: pathwaysAPI.pathwaysAPI.getDownloadURL(this.$route.params.projectid),
+      url: pathwaysAPI.pathwaysAPI.getFullBaseURL(this.$route.params.projectId),
+      downloadURL: pathwaysAPI.pathwaysAPI.getDownloadURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -63,7 +63,7 @@ export default {
           id_field: 'from_stop',
           required: true,
           ajax_params: {
-            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
+            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -76,7 +76,7 @@ export default {
           id_field: 'to_stop',
           required: true,
           ajax_params: {
-            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectid),
+            url: stopsAPI.stopsAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -91,16 +91,16 @@ export default {
   },
   methods: {
     update(data) {
-      return pathwaysAPI.pathwaysAPI.update(this.$route.params.projectid, data);
+      return pathwaysAPI.pathwaysAPI.update(this.$route.params.projectId, data);
     },
     create(data) {
-      return pathwaysAPI.pathwaysAPI.create(this.$route.params.projectid, data);
+      return pathwaysAPI.pathwaysAPI.create(this.$route.params.projectId, data);
     },
     remove(data) {
-      return pathwaysAPI.pathwaysAPI.remove(this.$route.params.projectid, data);
+      return pathwaysAPI.pathwaysAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return pathwaysAPI.pathwaysAPI.uploadCSV(this.$route.params.projectid, file);
+      return pathwaysAPI.pathwaysAPI.uploadCSV(this.$route.params.projectId, file);
     },
   },
 };

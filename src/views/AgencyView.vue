@@ -25,8 +25,8 @@ export default {
     return {
       tableTitle: 'Agency',
       infoURL: "https://developers.google.com/transit/gtfs/reference#agencytxt",
-      downloadURL: agenciesAPI.agenciesAPI.getDownloadURL(this.$route.params.projectid),
-      url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectid),
+      downloadURL: agenciesAPI.agenciesAPI.getDownloadURL(this.$route.params.projectId),
+      url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -90,16 +90,16 @@ export default {
   },
   methods: {
     updateAgency(data) {
-      return agenciesAPI.agenciesAPI.update(this.$route.params.projectid, data);
+      return agenciesAPI.agenciesAPI.update(this.$route.params.projectId, data);
     },
     createAgency(data) {
-      return agenciesAPI.agenciesAPI.create(this.$route.params.projectid, data);
+      return agenciesAPI.agenciesAPI.create(this.$route.params.projectId, data);
     },
     removeAgency(data) {
-      return agenciesAPI.agenciesAPI.remove(this.$route.params.projectid, data);
+      return agenciesAPI.agenciesAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return agenciesAPI.agenciesAPI.uploadCSV(this.$route.params.projectid, file);
+      return agenciesAPI.agenciesAPI.uploadCSV(this.$route.params.projectId, file);
     },
     log(out) {
       console.log(out);

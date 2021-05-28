@@ -6,12 +6,12 @@ const ServicesAPI = class {
     this.end_point = `${this.base_end_point}/projects/`;
   }
 
-  getBaseURL(projectid) {
-    return `${this.end_point}${projectid}/services/`
+  getBaseURL(projectId) {
+    return `${this.end_point}${projectId}/services/`
   }
 
-  getFullBaseURL(projectid) {
-    return httpClient.getBaseURL() + this.getBaseURL(projectid);
+  getFullBaseURL(projectId) {
+    return httpClient.getBaseURL() + this.getBaseURL(projectId);
   }
 }
 

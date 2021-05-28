@@ -4,16 +4,16 @@ const BASE_END_POINT = '/api'
 const END_POINT = `${BASE_END_POINT}/projects/`;
 const TABLE = '/feedinfo/'
 
-const getFeedInfo = (projectid) => {
-    return httpClient.get(`${END_POINT}${projectid}${TABLE}`);
+const getFeedInfo = (projectId) => {
+    return httpClient.get(`${END_POINT}${projectId}${TABLE}`);
 }
 
-const update = (projectid, data) => {
-    return httpClient.patch(`${END_POINT}${projectid}${TABLE}${data.id}/`, data);
+const update = (projectId, data) => {
+    return httpClient.patch(`${END_POINT}${projectId}${TABLE}${data.id}/`, data);
 }
 
-const create = (projectid, data) => {
-    return httpClient.post(`${END_POINT}${projectid}${TABLE}`, data);
+const create = (projectId, data) => {
+    return httpClient.post(`${END_POINT}${projectId}${TABLE}`, data);
 }
 
 

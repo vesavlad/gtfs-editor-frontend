@@ -143,7 +143,7 @@ export default {
       this.deleteModal.shape = shape;
     },
     deleteShape() {
-      shapesAPI.shapesAPI.remove(this.$route.params.projectid, this.deleteModal.shape).then(response => {
+      shapesAPI.shapesAPI.remove(this.$route.params.projectId, this.deleteModal.shape).then(response => {
         console.log(response);
         this.deleteModal = {
           shape: null,
@@ -159,7 +159,7 @@ export default {
     editShape() {
       this.$router.push({name: 'editShape',
         params: {
-          projectid: this.$route.params.projectid,
+          projectId: this.$route.params.projectId,
           shapeid: this.activeShape.id,
           editionMode: this.Enums.ShapeEditorEditionMode.SIMPLE,
         }
@@ -168,7 +168,7 @@ export default {
     duplicateShape() {
       this.$router.push({name: 'createShape',
         params: {
-          projectid: this.$route.params.projectid,
+          projectId: this.$route.params.projectId,
           shape: this.activeShape,
           editionMode: this.Enums.ShapeEditorEditionMode.DUPLICATE,
         }

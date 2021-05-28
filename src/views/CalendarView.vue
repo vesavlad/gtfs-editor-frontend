@@ -27,8 +27,8 @@ export default {
     return {
       tableTitle: 'Calendar',
       infoURL: "https://developers.google.com/transit/gtfs/reference#calendartxt",
-      downloadURL: calendarAPI.calendarAPI.getDownloadURL(this.$route.params.projectid),
-      url: calendarAPI.calendarAPI.getFullBaseURL(this.$route.params.projectid),
+      downloadURL: calendarAPI.calendarAPI.getDownloadURL(this.$route.params.projectId),
+      url: calendarAPI.calendarAPI.getFullBaseURL(this.$route.params.projectId),
       days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
       fields: [
         {
@@ -127,16 +127,16 @@ export default {
   },
   methods: {
     updateCalendar(data) {
-      return calendarAPI.calendarAPI.update(this.$route.params.projectid, data);
+      return calendarAPI.calendarAPI.update(this.$route.params.projectId, data);
     },
     createCalendar(data) {
-      return calendarAPI.calendarAPI.create(this.$route.params.projectid, data);
+      return calendarAPI.calendarAPI.create(this.$route.params.projectId, data);
     },
     removeCalendar(data) {
-      return calendarAPI.calendarAPI.remove(this.$route.params.projectid, data);
+      return calendarAPI.calendarAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return calendarAPI.calendarAPI.uploadCSV(this.$route.params.projectid, file);
+      return calendarAPI.calendarAPI.uploadCSV(this.$route.params.projectId, file);
     },
     log(out) {
       console.log(out);

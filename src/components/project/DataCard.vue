@@ -1,6 +1,6 @@
 <template>
   <router-link class="card data-card" :class="[cardClass]" :event="state===DataCardEnum.BLOCKED?'':'click'"
-               :to="{name: viewName, params: { projectid: projectId }}">
+               :to="{name: viewName, params: { projectId: projectId }}">
     <div class="data-header header">
       <h4>{{ filename }}</h4>
       <div class="btn-list">

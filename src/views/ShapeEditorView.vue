@@ -3,7 +3,7 @@
     <div class="grid container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
-    <ShapeEditor :projectId="$route.params.projectid" :range="range" :shape="shape" :editionMode="editionMode" mode="">
+    <ShapeEditor :projectId="$route.params.projectId" :range="range" :shape="shape" :editionMode="editionMode" mode="">
     </ShapeEditor>
   </div>
 </template>
@@ -49,7 +49,7 @@ export default {
   methods: {
     initData() {
       if (this.$route.params.shapeid) {
-        shapesAPI.shapesAPI.detail(this.$route.params.projectid, this.$route.params.shapeid).then(response => {
+        shapesAPI.shapesAPI.detail(this.$route.params.projectId, this.$route.params.shapeid).then(response => {
           console.log(response.data);
           this.shape = response.data;
         });

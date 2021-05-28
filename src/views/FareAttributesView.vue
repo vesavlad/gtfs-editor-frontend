@@ -25,8 +25,8 @@ export default {
     return {
       tableTitle: 'Fare attributes',
       infoURL: "https://developers.google.com/transit/gtfs/reference#fare_attributestxt",
-      downloadURL: fareAttributesAPI.fareAttributesAPI.getDownloadURL(this.$route.params.projectid),
-      url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectid),
+      downloadURL: fareAttributesAPI.fareAttributesAPI.getDownloadURL(this.$route.params.projectId),
+      url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -83,7 +83,7 @@ export default {
           foreignKey: true,
           id_field: 'agency',
           ajax_params: {
-            url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectid),
+            url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT,
         },
@@ -98,16 +98,16 @@ export default {
   },
   methods: {
     update(data) {
-      return fareAttributesAPI.fareAttributesAPI.update(this.$route.params.projectid, data);
+      return fareAttributesAPI.fareAttributesAPI.update(this.$route.params.projectId, data);
     },
     create(data) {
-      return fareAttributesAPI.fareAttributesAPI.create(this.$route.params.projectid, data);
+      return fareAttributesAPI.fareAttributesAPI.create(this.$route.params.projectId, data);
     },
     remove(data) {
-      return fareAttributesAPI.fareAttributesAPI.remove(this.$route.params.projectid, data);
+      return fareAttributesAPI.fareAttributesAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return fareAttributesAPI.fareAttributesAPI.uploadCSV(this.$route.params.projectid, file);
+      return fareAttributesAPI.fareAttributesAPI.uploadCSV(this.$route.params.projectId, file);
     },
     log(out) {
       console.log(out);

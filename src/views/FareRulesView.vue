@@ -26,8 +26,8 @@ export default {
     return {
       tableTitle: 'Fare rules',
       infoURL: "https://developers.google.com/transit/gtfs/reference#fare_rulestxt",
-      downloadURL: fareRulesAPI.fareRulesAPI.getDownloadURL(this.$route.params.projectid),
-      url: fareRulesAPI.fareRulesAPI.getFullBaseURL(this.$route.params.projectid),
+      downloadURL: fareRulesAPI.fareRulesAPI.getDownloadURL(this.$route.params.projectId),
+      url: fareRulesAPI.fareRulesAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -42,7 +42,7 @@ export default {
           id_field: 'fare_attribute',
           required: true,
           ajax_params: {
-            url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectid),
+            url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT,
         },
@@ -54,7 +54,7 @@ export default {
           nullable: true,
           id_field: 'route',
           ajax_params: {
-            url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
+            url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT,
         },
@@ -78,16 +78,16 @@ export default {
   },
   methods: {
     update(data) {
-      return fareRulesAPI.fareRulesAPI.update(this.$route.params.projectid, data);
+      return fareRulesAPI.fareRulesAPI.update(this.$route.params.projectId, data);
     },
     create(data) {
-      return fareRulesAPI.fareRulesAPI.create(this.$route.params.projectid, data);
+      return fareRulesAPI.fareRulesAPI.create(this.$route.params.projectId, data);
     },
     remove(data) {
-      return fareRulesAPI.fareRulesAPI.remove(this.$route.params.projectid, data);
+      return fareRulesAPI.fareRulesAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return fareRulesAPI.fareRulesAPI.uploadCSV(this.$route.params.projectid, file);
+      return fareRulesAPI.fareRulesAPI.uploadCSV(this.$route.params.projectId, file);
     },
     log(out) {
       console.log(out);

@@ -12,13 +12,13 @@
           </div>
         </div>
         <div class="map-sidebar">
-          <ShapesTable ref="table" :project="$route.params.projectid" @focus-shape="displayShape"
+          <ShapesTable ref="table" :project="$route.params.projectId" @focus-shape="displayShape"
                        @select-range="beginRangeSelection"></ShapesTable>
         </div>
-        <ShapesMap ref="map" :project="$route.params.projectid"
+        <ShapesMap ref="map" :project="$route.params.projectId"
                    @selected-range="goToEditRange($event)"></ShapesMap>
       </div>
-      <router-link :to="{name: 'createShape', params: {projectid: $route.params.projectid}}" class="btn floating">
+      <router-link :to="{name: 'createShape', params: {projectId: $route.params.projectId}}" class="btn floating">
         <i class="material-icons">add</i>
       </router-link>
     </div>
@@ -47,7 +47,7 @@ export default {
     goToEditRange(range) {
       this.$router.push({
         name: 'editShape', params: {
-          projectid: this.$route.params.projectid,
+          projectId: this.$route.params.projectId,
           shapeid: this.activeShape.id,
           editionMode: this.Enums.ShapeEditorEditionMode.RANGE,
           range: range

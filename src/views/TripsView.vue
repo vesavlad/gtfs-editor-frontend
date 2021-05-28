@@ -32,8 +32,8 @@ export default {
     return {
       tableTitle: 'Trips',
       infoURL: "https://developers.google.com/transit/gtfs/reference#tripstxt",
-      url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectid),
-      downloadURL: tripsAPI.tripsAPI.getDownloadURL(this.$route.params.projectid),
+      url: tripsAPI.tripsAPI.getFullBaseURL(this.$route.params.projectId),
+      downloadURL: tripsAPI.tripsAPI.getDownloadURL(this.$route.params.projectId),
       fields: [
         {
           name: 'actions',
@@ -55,7 +55,7 @@ export default {
           id_field: 'route',
           required: true,
           ajax_params: {
-            url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectid),
+            url: routesAPI.routesAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -67,7 +67,7 @@ export default {
           nullable: true,
           id_field: 'shape',
           ajax_params: {
-            url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectid),
+            url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -77,7 +77,7 @@ export default {
           foreignKey: true,
           id_field: 'service_id',
           ajax_params: {
-            url: servicesAPI.servicesAPI.getFullBaseURL(this.$route.params.projectid),
+            url: servicesAPI.servicesAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
         },
@@ -131,16 +131,16 @@ export default {
   },
   methods: {
     updateTrip(data) {
-      return tripsAPI.tripsAPI.update(this.$route.params.projectid, data);
+      return tripsAPI.tripsAPI.update(this.$route.params.projectId, data);
     },
     createTrip(data) {
-      return tripsAPI.tripsAPI.create(this.$route.params.projectid, data);
+      return tripsAPI.tripsAPI.create(this.$route.params.projectId, data);
     },
     removeTrip(data) {
-      return tripsAPI.tripsAPI.remove(this.$route.params.projectid, data);
+      return tripsAPI.tripsAPI.remove(this.$route.params.projectId, data);
     },
     uploadCSV(file) {
-      return tripsAPI.tripsAPI.uploadCSV(this.$route.params.projectid, file);
+      return tripsAPI.tripsAPI.uploadCSV(this.$route.params.projectId, file);
     },
   },
 };
