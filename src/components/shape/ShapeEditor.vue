@@ -91,7 +91,7 @@ export default {
       type: Object
     },
     range: {
-      default: false,
+      default: null,
     },
     editMode: {
       type: String,
