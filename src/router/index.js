@@ -180,7 +180,7 @@ const routes = [
             }
           },
           {
-            path: '/project/:projectId/shapes/:shapeid',
+            path: '/project/:projectId/shapes/:shapeId',
             name: 'editShape',
             component: ShapeEditorView,
             props: true,

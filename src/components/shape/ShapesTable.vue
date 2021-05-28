@@ -160,7 +160,7 @@ export default {
       this.$router.push({name: 'editShape',
         params: {
           projectId: this.$route.params.projectId,
-          shapeid: this.activeShape.id,
+          shapeId: this.activeShape.id,
           editionMode: this.Enums.ShapeEditorEditionMode.SIMPLE,
         }
       });

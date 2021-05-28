@@ -48,8 +48,8 @@ export default {
   },
   methods: {
     initData() {
-      if (this.$route.params.shapeid) {
-        shapesAPI.shapesAPI.detail(this.$route.params.projectId, this.$route.params.shapeid).then(response => {
+      if (this.$route.params.shapeId) {
+        shapesAPI.shapesAPI.detail(this.$route.params.projectId, this.$route.params.shapeId).then(response => {
           console.log(response.data);
           this.shape = response.data;
         });
