@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import shapesAPI from "@/api/shapes.api";
 import ShapeEditor from "@/components/shape/ShapeEditor.vue";
 import TableHeader from "@/components/vuetable/TableHeader";
 import Enums from '@/utils/enums.js'
@@ -29,7 +30,7 @@ export default {
     },
     editMode: {
       type: String,
-      required: true,
+      default: Enums.ShapeEditorEditionMode.SIMPLE,
       validator: function (value) {
         if (Object.values(Enums.ShapeEditorEditionMode).indexOf(value) === -1) {
           console.error(`edit mode "${value}" is not valid`)
@@ -42,8 +43,21 @@ export default {
   data() {
     return {
       tableTitle: 'Shapes',
-      infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
+      infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt"
     };
-  }
+  },
+  methods: {
+    initData() {
+      if (this.$route.params.shapeid) {
+        shapesAPI.shapesAPI.detail(this.$route.params.projectid, this.$route.params.shapeid).then(response => {
+          console.log(response.data);
+          this.shape = response.data;
+        });
+      }
+    }
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => vm.initData());
+  },
 };
 </script>
