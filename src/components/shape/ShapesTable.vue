@@ -16,13 +16,13 @@
           </button>
           <div class="btn icon flat">
             <i class="material-icons"
-               @click="showMenu=!showMenu;activeShapeWithMenu=props.rowData.shape_id">more_vert</i>
-            <ShapeMenu v-if="showMenu && activeShapeWithMenu===props.rowData.shape_id"
+               @click="showMenu=!showMenu;activeShape=props.rowData">more_vert</i>
+            <ShapeMenu v-if="showMenu && activeShape.id===props.rowData.id"
                        :shapeId="props.rowData.shape_id"
-                       @edit="$emit('edit-shape', props.rowData)"
-                       @editRange="$emit('edit-shape', props.rowData)"
-                       @duplicate="$emit('edit-shape', props.rowData)"
-                       @delete="$emit('delete-shape', props.rowData)"
+                       @edit="editShape()"
+                       @editRange="editShape()"
+                       @duplicate="editShape()"
+                       @delete="beginDeleteShape(props.rowData)"
                        @close="showMenu=false"
             ></ShapeMenu>
           </div>
@@ -37,6 +37,16 @@
         </VuetablePaginationDropDown>
       </div>
     </div>
+    <MessageModal :show="deleteModal.visible" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
+                  :type="Enums.MessageModalType.WARNING"
+                  @ok="deleteShape" @cancel="deleteModal.visible=false" @close="deleteModal.visible=false">
+      <template v-slot:m-title>
+        <h2> {{ $t('shape.deleteModal.title', {name: deleteModal.shape.shape_id}) }}</h2>
+      </template>
+      <template v-slot:m-content>
+        <span>{{ deleteModal.message }}</span>
+      </template>
+    </MessageModal>
   </div>
 </template>
 
@@ -47,24 +57,31 @@ import shapesAPI from "@/api/shapes.api";
 import {debounce} from "debounce";
 import Enums from "@/utils/enums";
 import ShapeMenu from "@/components/shape/ShapeMenu";
+import MessageModal from "@/components/modal/MessageModal";
 
 let Vuetable = require('vuetable-2')
 
 export default {
   name: "ShapesTable",
   components: {
+    MessageModal,
     ShapeMenu,
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
     VuetablePaginationDropDown
   },
-  data: function () {
+  data() {
     return {
       quickSearch: "",
       doSearch: false,
       infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
       showMenu: false,
-      activeShapeWithMenu: null,
+      activeShape: null,
+      deleteModal: {
+        visible: false,
+        message: '',
+        shape: null
+      },
       fields: [
         {
           name: 'actions',
@@ -120,6 +137,34 @@ export default {
         search: this.quickSearch,
       }
     },
+    beginDeleteShape(shape) {
+      this.deleteModal.message = '';
+      this.deleteModal.visible = true;
+      this.deleteModal.shape = shape;
+    },
+    deleteShape() {
+      shapesAPI.shapesAPI.remove(this.$route.params.projectid, this.deleteModal.shape).then(response => {
+        console.log(response);
+        this.deleteModal = {
+          shape: null,
+          visible: false,
+          message: "",
+        }
+        this.$refs.table.refresh();
+      }).catch(err => {
+        console.log(err.response);
+        this.deleteModal.message = err.response.data.message;
+      })
+    },
+    editShape() {
+      this.$router.push({name: 'editShape',
+        params: {
+          projectid: this.$route.params.projectid,
+          shapeid: this.activeShape.id,
+          editMode: this.Enums.ShapeEditorEditionMode.SIMPLE,
+        }
+      });
+    }
   },
   mounted() {
     this.doSearch = debounce(this.refresh, 300);
