@@ -52,10 +52,9 @@ const Enums = {
     EDIT: 'edit',
   },
   ShapeEditorEditionMode: {
-    ALL: 'all',
-    DUPLICATE: 'duplicate',
+    SIMPLE: 'simple',
     RANGE: 'range',
-    SIMPLE: 'simple'
+    DUPLICATE: 'duplicate'
   }
 }
 
