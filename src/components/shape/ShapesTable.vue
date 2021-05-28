@@ -161,7 +161,7 @@ export default {
         params: {
           projectid: this.$route.params.projectid,
           shapeid: this.activeShape.id,
-          editMode: this.Enums.ShapeEditorEditionMode.SIMPLE,
+          editionMode: this.Enums.ShapeEditorEditionMode.SIMPLE,
         }
       });
     },
@@ -170,7 +170,7 @@ export default {
         params: {
           projectid: this.$route.params.projectid,
           shape: this.activeShape,
-          editMode: this.Enums.ShapeEditorEditionMode.DUPLICATE,
+          editionMode: this.Enums.ShapeEditorEditionMode.DUPLICATE,
         }
       });
     }

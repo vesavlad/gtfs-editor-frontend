@@ -88,12 +88,13 @@ export default {
       required: true,
     },
     shape: {
-      type: Object
+      type: Object,
+      default: () => ({id: null, shape_id: null, points: []})
     },
     range: {
       default: null,
     },
-    editMode: {
+    editionMode: {
       type: String,
       default: Enums.ShapeEditorEditionMode.SIMPLE,
       validator: function (value) {
@@ -107,6 +108,7 @@ export default {
   },
   data() {
     return {
+      localShape: this.shape,
       map: null,
       pointGeojson: {
         type: 'FeatureCollection',
@@ -135,8 +137,8 @@ export default {
       points: [],
       lineCoords: [],
       id: 0,
-      mapMatching: !this.shape || this.range,
-      shape_id: this.shape ? this.shape.shape_id : "",
+      mapMatching: !this.localShape || this.range,
+      shape_id: this.localShape ? this.localShape.shape_id : "",
       warning: false,
       error: false,
       exitModal: {
@@ -152,7 +154,7 @@ export default {
   },
   computed: {
     mode() {
-      return this.shape ? this.Enums.ShapeEditorMode.EDIT : this.Enums.ShapeEditorMode.CREATE;
+      return this.localShape ? this.Enums.ShapeEditorMode.EDIT : this.Enums.ShapeEditorMode.CREATE;
     },
     shapeLength() {
       let result = 0;
@@ -210,8 +212,8 @@ export default {
         'data': this.connectingLineGeojson,
       });
 
-      if (this.mode === this.Enums.ShapeEditorMode.EDIT && this.editMode !== this.Enums.ShapeEditorEditionMode.ALL) {
-        shapesAPI.shapesAPI.detail(this.projectId, this.shape.id).then(response => {
+      if (this.mode === this.Enums.ShapeEditorMode.EDIT && this.editionMode !== this.Enums.ShapeEditorEditionMode.ALL) {
+        shapesAPI.shapesAPI.detail(this.projectId, this.localShape.id).then(response => {
           let points = response.data.points.map(point => {
             return {
               id: this.id++,
@@ -637,8 +639,8 @@ export default {
         shape_id: this.shape_id,
         points: this.points.map(generatePointJson)
       };
-      console.log(this.editMode);
-      if (this.mode === this.Enums.ShapeEditorMode.CREATE || this.editMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
+      console.log(this.editionMode);
+      if (this.mode === this.Enums.ShapeEditorMode.CREATE || this.editionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
         shapesAPI.shapesAPI.create(this.projectId, data).then(response => {
           console.log(response);
           this.$emit('close');
@@ -647,7 +649,7 @@ export default {
           this.generateErrorMessage(err.response.data);
         });
       } else {
-        data.id = this.shape.id;
+        data.id = this.localShape.id;
         data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(
             generatePointJson);
         shapesAPI.shapesAPI.put(this.projectId, data).then(response => {

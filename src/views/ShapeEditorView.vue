@@ -3,7 +3,7 @@
     <div class="grid container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
-    <ShapeEditor :projectId="$route.params.projectid" :range="range" :shape="shape" :editMode="editMode">
+    <ShapeEditor :projectId="$route.params.projectid" :range="range" :shape="shape" :editionMode="editionMode" mode="">
     </ShapeEditor>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default {
     range: {
       type: Object,
     },
-    editMode: {
+    editionMode: {
       type: String,
       default: Enums.ShapeEditorEditionMode.SIMPLE,
       validator: function (value) {

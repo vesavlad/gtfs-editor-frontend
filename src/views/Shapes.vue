@@ -49,7 +49,7 @@ export default {
         name: 'editShape', params: {
           projectid: this.$route.params.projectid,
           shapeid: this.activeShape.id,
-          editMode: this.Enums.ShapeEditorEditionMode.RANGE,
+          editionMode: this.Enums.ShapeEditorEditionMode.RANGE,
           range: range
         }
       })
