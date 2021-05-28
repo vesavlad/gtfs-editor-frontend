@@ -21,7 +21,7 @@ import LevelsView from '../views/LevelsView.vue'
 import TransfersView from '../views/TransfersView.vue'
 import PathwaysView from '../views/PathwaysView.vue'
 import Shapes from '../views/Shapes.vue'
-import ShapeEditor from '../views/ShapeEditorView.vue'
+import ShapeEditorView from '../views/ShapeEditorView.vue'
 
 
 Vue.use(VueRouter)
@@ -174,7 +174,7 @@ const routes = [
           {
             path: '/project/:projectid/shapes/create',
             name: 'createShape',
-            component: ShapeEditor,
+            component: ShapeEditorView,
             meta: {
               breadcrumb: 'Create'
             }
@@ -182,7 +182,8 @@ const routes = [
           {
             path: '/project/:projectid/shapes/:shapeid',
             name: 'editShape',
-            component: ShapeEditor,
+            component: ShapeEditorView,
+            props: true,
             meta: {
               breadcrumb: 'Edit'
             }
