@@ -20,27 +20,6 @@
         <i class="material-icons">add</i>
       </router-link>
     </div>
-    <BaseModal :show="editingModal.visible" @close="editingModal.visible=false">
-      <template v-slot:m-content>
-        <div class="m-header">
-          <h2>{{ $t('shape.editModal.title', {name: shape.shape_id}) }}</h2>
-        </div>
-        <div class="m-content">
-          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorEditionMode.ALL)">
-            {{ $t('shape.editModal.replaceEntireShape') }}
-          </button>
-          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorEditionMode.SIMPLE)">
-            {{ $t('shape.editModal.editShapeDirectly') }}
-          </button>
-          <button class="btn btn-outline-secondary" @click="beginPointSelection">
-            {{ $t('shape.editModal.selectPointRangeOnMap')}}
-          </button>
-          <button class="btn btn-outline-secondary" @click="beginEditing(Enums.ShapeEditorEditionMode.DUPLICATE)">
-            {{ $t('shape.editModal.duplicateShape') }}
-          </button>
-        </div>
-      </template>
-    </BaseModal>
     <MessageModal :show="deleteModal.visible" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
                   :type="Enums.MessageModalType.WARNING"
                   @ok="deleteShape" @cancel="deleteModal.visible = false" @close="deleteModal.visible = false">
@@ -61,13 +40,11 @@ import ShapesTable from "@/components/shape/ShapesTable.vue";
 import ShapesMap from "@/components/shape/ShapesMap.vue";
 import shapesAPI from "@/api/shapes.api";
 import TableHeader from "@/components/vuetable/TableHeader";
-import BaseModal from "@/components/modal/BaseModal";
 import MessageModal from "@/components/modal/MessageModal";
 
 export default {
   components: {
     MessageModal,
-    BaseModal,
     ShapesTable,
     ShapesMap,
     TableHeader
@@ -78,9 +55,6 @@ export default {
       infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
       shape: false,
       range: false,
-      editingModal: {
-        visible: false,
-      },
       deleteModal: {
         shape: null,
         visible: false,
@@ -109,7 +83,6 @@ export default {
         id: shape.id,
         shape_id: shape.shape_id,
       }
-      this.editingModal.visible = true;
     },
     beginDeleteShape(shape) {
       console.log(shape);
@@ -123,12 +96,10 @@ export default {
         this.range = range;
       }
       this.editing = true;
-      this.editingModal.visible = false;
     },
     beginPointSelection() {
       this.$refs.map.displayShape(this.shape);
       this.$refs.map.beginPointSelection();
-      this.editingModal.visible = false;
     },
     displayShape(shape) {
       this.$refs.map.displayShape(shape);

@@ -91,11 +91,9 @@
     "newEntityTitle": "Nueva entidad"
   },
   "shape": {
-    "editModal": {
-      "title": "Selecciona el modo de edición para el shape \"{name}\"",
-      "replaceEntireShape": "Reemplazar toda la geometría",
+    "menu": {
       "editShapeDirectly": "Editar geometría",
-      "selectPointRangeOnMap": "Editar tramo de la geometría",
+      "editSectionOfShape": "Editar tramo de la geometría",
       "duplicateShape": "Duplicar geometría"
     },
     "deleteModal": {

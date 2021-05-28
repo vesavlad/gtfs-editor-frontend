@@ -91,12 +91,10 @@
     "newEntityTitle": "New entity"
   },
   "shape": {
-    "editModal": {
-      "title": "Select editing mode for shape \"{name}\"",
-      "replaceEntireShape": "Replace entire Shape",
-      "editShapeDirectly": "Edit Shape directly",
-      "selectPointRangeOnMap": "Select point range on map",
-      "duplicateShape": "Duplicate Shape"
+    "menu": {
+      "editShapeDirectly": "Edit shape directly",
+      "editSectionOfShape": "Edit section of shape",
+      "duplicateShape": "Duplicate shape"
     },
     "deleteModal": {
       "title": "Are you sure you want to delete shape \"{name}\"?"

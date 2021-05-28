@@ -11,15 +11,21 @@
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
         <div slot="actions" slot-scope="props" class="flex">
-          <button class="btn icon flat error" @click="$emit('delete-shape', props.rowData)" alt="Delete shape.">
-            <span class="material-icons">delete</span>
-          </button>
-          <button class="btn icon flat" @click="$emit('edit-shape', props.rowData)" alt="Edit shape.">
-            <span class="material-icons">edit</span>
-          </button>
           <button class="btn icon flat" @click="$emit('focus-shape', props.rowData)" alt="Display shape.">
             <span class="material-icons">remove_red_eye</span>
           </button>
+          <div class="btn icon flat">
+            <i class="material-icons"
+               @click="showMenu=!showMenu;activeShapeWithMenu=props.rowData.shape_id">more_vert</i>
+            <ShapeMenu v-if="showMenu && activeShapeWithMenu===props.rowData.shape_id"
+                       :shapeId="props.rowData.shape_id"
+                       @edit="$emit('edit-shape', props.rowData)"
+                       @editRange="$emit('edit-shape', props.rowData)"
+                       @duplicate="$emit('edit-shape', props.rowData)"
+                       @delete="$emit('delete-shape', props.rowData)"
+                       @close="showMenu=false"
+            ></ShapeMenu>
+          </div>
         </div>
       </Vuetable>
     </div>
@@ -40,12 +46,14 @@ import VuetablePaginationDropDown from "@/components/vuetable/VuetablePagination
 import shapesAPI from "@/api/shapes.api";
 import {debounce} from "debounce";
 import Enums from "@/utils/enums";
+import ShapeMenu from "@/components/shape/ShapeMenu";
 
 let Vuetable = require('vuetable-2')
 
 export default {
   name: "ShapesTable",
   components: {
+    ShapeMenu,
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
     VuetablePaginationDropDown
@@ -55,6 +63,8 @@ export default {
       quickSearch: "",
       doSearch: false,
       infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
+      showMenu: false,
+      activeShapeWithMenu: null,
       fields: [
         {
           name: 'actions',
