@@ -128,16 +128,13 @@ export default {
         if (this.selectingRange) {
           this.range.push(feature.properties.label);
           if (this.range.length === 2) {
-            this.$emit("range", {
-              start: this.range[0],
-              finish: this.range[1],
-            })
+            this.$emit("selected-range", {start: this.range[0], finish: this.range[1],})
             this.selectingRange = false;
           }
         }
       })
     },
-    beginPointSelection() {
+    beginRangeSelection() {
       this.selectingRange = true;
       this.range = [];
     },

@@ -20,7 +20,7 @@
             <ShapeMenu v-if="showMenu && activeShape.id===props.rowData.id"
                        :shapeId="props.rowData.shape_id"
                        @edit="editShape()"
-                       @editRange="editShape()"
+                       @editRange="$emit('select-range', props.rowData)"
                        @duplicate="editShape()"
                        @delete="beginDeleteShape(props.rowData)"
                        @close="showMenu=false"

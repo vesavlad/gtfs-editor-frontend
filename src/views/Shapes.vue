@@ -12,9 +12,11 @@
           </div>
         </div>
         <div class="map-sidebar">
-          <ShapesTable ref="table" :project="$route.params.projectid" @focus-shape="displayShape"></ShapesTable>
+          <ShapesTable ref="table" :project="$route.params.projectid" @focus-shape="displayShape"
+                       @select-range="beginRangeSelection"></ShapesTable>
         </div>
-        <ShapesMap ref="map" :project="$route.params.projectid" @range="beginEditing('range', $event)"></ShapesMap>
+        <ShapesMap ref="map" :project="$route.params.projectid"
+                   @selected-range="goToEditRange($event)"></ShapesMap>
       </div>
       <router-link :to="{name: 'createShape', params: {projectid: $route.params.projectid}}" class="btn floating">
         <i class="material-icons">add</i>
@@ -38,26 +40,28 @@ export default {
     return {
       tableTitle: 'Shapes',
       infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
-      shape: false,
-      range: false,
-      mode: "",
+      activeShape: null
     };
   },
   methods: {
-    beginEditing(mode, range) {
-      this.mode = mode;
-      if (mode === "range") {
-        this.range = range;
-      }
-      this.editing = true;
+    goToEditRange(range) {
+      this.$router.push({
+        name: 'editShape', params: {
+          projectid: this.$route.params.projectid,
+          shapeid: this.activeShape.id,
+          editMode: this.Enums.ShapeEditorEditionMode.RANGE,
+          range: range
+        }
+      })
     },
-    beginPointSelection() {
-      this.$refs.map.displayShape(this.shape);
-      this.$refs.map.beginPointSelection();
+    beginRangeSelection(shape) {
+      this.activeShape = shape;
+      this.$refs.map.displayShape(shape);
+      this.$refs.map.beginRangeSelection();
     },
     displayShape(shape) {
       this.$refs.map.displayShape(shape);
     }
-  },
+  }
 };
 </script>
