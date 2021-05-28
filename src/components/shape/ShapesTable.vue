@@ -21,7 +21,7 @@
                        :shapeId="props.rowData.shape_id"
                        @edit="editShape()"
                        @editRange="$emit('select-range', props.rowData)"
-                       @duplicate="editShape()"
+                       @duplicate="duplicateShape()"
                        @delete="beginDeleteShape(props.rowData)"
                        @close="showMenu=false"
             ></ShapeMenu>
@@ -162,6 +162,15 @@ export default {
           projectid: this.$route.params.projectid,
           shapeid: this.activeShape.id,
           editMode: this.Enums.ShapeEditorEditionMode.SIMPLE,
+        }
+      });
+    },
+    duplicateShape() {
+      this.$router.push({name: 'createShape',
+        params: {
+          projectid: this.$route.params.projectid,
+          shape: this.activeShape,
+          editMode: this.Enums.ShapeEditorEditionMode.DUPLICATE,
         }
       });
     }
