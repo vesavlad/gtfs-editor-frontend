@@ -1,46 +1,55 @@
 <template>
-  <div class="horizontal-display">
-    <div class="map-info">
-      <InfoButton :info="info"></InfoButton>
-    </div>
-    <div id="map" ref="mapContainer">
-    </div>
-    <div>
-      <div class="horizontal-display">
-        <input type="checkbox" id="optional-fields" v-model="show_optional_fields">
-        <label for="optional-fields">Show Optional Fields</label>
+  <div class="dynamic-map-container">
+    <div class="top-map-bar">
+      <div class="right-content grid center">
+        <button class="btn btn-outline-secondary" @click="orderModal.visible = true">
+          <span>Reorder using shape</span>
+          <span class="material-icons">low_priority</span>
+        </button>
+        <button class="btn btn-outline-secondary" @click="openSpeedModal">
+          <span>Calc times</span><span class="material-icons">restore</span>
+        </button>
       </div>
-      <button class="btn btn-outline-secondary" @click="orderModal.visible = true">
-        Automatically order using shape
-      </button>
-      <button class="btn btn-outline-secondary" @click="openSpeedModal">
-        Automatically calculate times
-      </button>
-      <div class="horizontal-display">
-        <input type="checkbox" id="enable-drag" v-model="drag_enabled">
-        <label for="enable-drag">Enable drag</label>
-      </div>
-      <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times" v-show="!drag_enabled">
-        <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
-             slot-scope="properties"
-             v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
-          <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
-                            v-model="properties.rowData[getFieldID(properties.rowField)]">
-          </GeneralizedInput>
-          <div v-if="errors.stop_times">
+    </div>
+    <div id="map" class="map" ref="mapContainer">
+    </div>
+    <div class="map-sidebar">
+      <div class="side-panel">
+        <div class="side-header">
+          <div class="grid center">
+            <h4>Trip ID:</h4>
+            <input v-model="trip.trip_id">
+          </div>
+          <div class="btn-list">
+            <button class="btn icon flat" @click="saveAndExit"><span class="material-icons">check</span></button>
+            <label>
+              <span>Drag</span>
+              <input type="checkbox" id="enable-drag" v-model="drag_enabled">
+            </label>
+            <label>
+              <span class="material-icons">settings</span>
+              <input type="checkbox" id="optional-fields" v-model="show_optional_fields">
+            </label>
+          </div>
+        </div>
+        <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times" v-show="!drag_enabled">
+            <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
+                 slot-scope="properties"
+                 v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
+              <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
+                                v-model="properties.rowData[getFieldID(properties.rowField)]">
+              </GeneralizedInput>
+              <div v-if="errors.stop_times">
             <span class="error" :key="error"
                   v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
               {{ error }}
             </span>
-          </div>
-        </div>
-      </vuetable>
-      <DraggableTable :fields="base_fields" :rows="stop_times" v-show="drag_enabled" v-model="stop_times"
-                      @input="$nextTick(calculateSeqs)"></DraggableTable>
-      Trip ID:<input v-model="trip.trip_id">
-      <button class="btn btn-outline-secondary" @click="saveAndExit">
-        Save changes and exit
-      </button>
+              </div>
+            </div>
+          </vuetable>
+        <DraggableTable :fields="base_fields" :rows="stop_times" v-show="drag_enabled" v-model="stop_times"
+                        @input="$nextTick(calculateSeqs)"></DraggableTable>
+      </div>
     </div>
     <MessageModal :show="orderModal.visible" @ok="automaticallyOrder" @cancel="orderModal.visible = false"
                   @close="orderModal.visible = false" :showCancelButton="true" :type="Enums.MessageModalType.WARNING">
@@ -89,7 +98,6 @@ import fieldMixin from "@/mixins/fieldMixin.js";
 import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput.vue";
 import SimpleSelect from "@/components/vuetable/inputs/SimpleSelect.vue";
 import DraggableTable from "@/components/DraggableTable.vue";
-import InfoButton from "@/components/InfoButton.vue";
 import envelopeMixin from "@/mixins/envelopeMixin"
 import config from "@/config.js"
 import MessageModal from "@/components/modal/MessageModal";
@@ -150,7 +158,6 @@ export default {
     GeneralizedInput,
     DraggableTable,
     SimpleSelect,
-    InfoButton,
   },
   mixins: [
     envelopeMixin,
