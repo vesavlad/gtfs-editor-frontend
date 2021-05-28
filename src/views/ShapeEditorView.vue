@@ -5,7 +5,7 @@
     </div>
     <ShapeEditor :projectId="$route.params.projectId"
                  :range="range"
-                 :shape="shape"
+                 :shape="localShape"
                  :editionMode="editionMode"
                  :mode="shapeEditorMode">
     </ShapeEditor>
@@ -48,14 +48,15 @@ export default {
     return {
       tableTitle: 'Shapes',
       infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
-      shapeEditorMode: null
+      shapeEditorMode: null,
+      localShape: this.shape
     };
   },
   methods: {
     initData() {
       if (this.$route.params.shapeId) {
         shapesAPI.shapesAPI.detail(this.$route.params.projectId, this.$route.params.shapeId).then(response => {
-          this.shape = response.data;
+          this.localShape = response.data;
         });
         this.shapeEditorMode = this.Enums.ShapeEditorMode.EDIT;
       } else {
