@@ -34,7 +34,7 @@
         </div>
         <div class="side-content">
           <div class="field-name"><span>Shape ID</span></div>
-          <div class="field"><input v-model="shape_id"></div>
+          <div class="field" v-if="localShape"><input v-model="localShape.shape_id"></div>
           <div class="field-name"><span>{{ $t('shape.editor.length') }}</span></div>
           <div class="field"> {{ shapeLength }}</div>
           <div v-if="error" class="errors error">
@@ -90,7 +90,7 @@ export default {
     },
     shape: {
       type: Object,
-      default: () => ({id: null, shape_id: null, points: []})
+      default: null
     },
     range: {
       default: null,
@@ -149,18 +149,11 @@ export default {
       lineCoords: [],
       id: 0,
       mapMatching: !this.localShape || this.range,
-      shape_id: this.localShape ? this.localShape.shape_id : "",
       warning: false,
       error: false,
       exitModal: {
         visible: false,
-      },
-      info: [
-        "Drag to move points in a Shape",
-        "Double click to add a point at the end of the Shape",
-        "Right click a point to remove it",
-        "Click on a line to add a point in that position",
-      ],
+      }
     }
   },
   computed: {
@@ -170,9 +163,9 @@ export default {
         let points = this.points.map(el => [el.lng, el.lat]);
         let turfShape = turf.lineString(points);
         let answer = turf.nearestPointOnLine(turfShape, turf.point(points[points.length - 1]));
-        result = answer.properties.location.toFixed(2) + " kms";
+        result = answer.properties.location.toFixed(2);
       }
-      return result;
+      return result + " kms";
     }
   },
   mounted() {
@@ -220,53 +213,51 @@ export default {
         'data': this.connectingLineGeojson,
       });
 
-      if (this.mode === this.Enums.ShapeEditorMode.EDIT && this.editionMode !== this.Enums.ShapeEditorEditionMode.ALL) {
-        shapesAPI.shapesAPI.detail(this.projectId, this.localShape.id).then(response => {
-          let points = response.data.points.map(point => {
-            return {
-              id: this.id++,
-              lat: point.shape_pt_lat,
-              lng: point.shape_pt_lon,
-            }
-          });
-          if (this.range) {
-            // Range uses the shape_pt_sequence so let's say you want to edit between 10-20, this would mean
-            // that you want to keep the values at array positions 0-9 (seq 1-10) and 19- (seq 20), so we have
-            // to adjust the indexes to use slice in order to split the array.
-            let start = this.range.start;
-            let finish = this.range.finish - 1;
-            let startingPoints = points.slice(0, start);
-            let finishingPoints = points.slice(finish);
-            this.fixedPoints = {
-              start: startingPoints,
-              finish: finishingPoints,
-            }
-            points = points.slice(start, finish);
-            if (points.length > 1) {
-              points = [points[0], points[points.length - 1]]
-            }
-            [startingPoints, finishingPoints].map(pointSeq => {
-              let feature = {
-                'type': 'Feature',
-                'properties': {},
-                'geometry': {
-                  'type': 'LineString',
-                  'coordinates': pointSeq.map(point => [point.lng, point.lat])
-                }
-              };
-              fixedPointsGeojson.features.push(feature);
-            })
-            this.map.getSource('fixedPoints').setData(fixedPointsGeojson);
+      if (this.mode === this.Enums.ShapeEditorMode.EDIT && this.localShape !== null) {
+        let points = this.localShape.points.map(point => {
+          return {
+            id: this.id++,
+            lat: point.shape_pt_lat,
+            lng: point.shape_pt_lon,
           }
-          this.points = points;
-          let bounds = this.getBounds(this.points);
-          let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 2 / 5;
-          this.map.fitBounds(bounds, {
-            padding,
-            animate: false,
-          });
-          this.reGeneratePoints();
         });
+        if (this.range) {
+          // Range uses the shape_pt_sequence so let's say you want to edit between 10-20, this would mean
+          // that you want to keep the values at array positions 0-9 (seq 1-10) and 19- (seq 20), so we have
+          // to adjust the indexes to use slice in order to split the array.
+          let start = this.range.start;
+          let finish = this.range.finish - 1;
+          let startingPoints = points.slice(0, start);
+          let finishingPoints = points.slice(finish);
+          this.fixedPoints = {
+            start: startingPoints,
+            finish: finishingPoints,
+          }
+          points = points.slice(start, finish);
+          if (points.length > 1) {
+            points = [points[0], points[points.length - 1]]
+          }
+          [startingPoints, finishingPoints].map(pointSeq => {
+            let feature = {
+              'type': 'Feature',
+              'properties': {},
+              'geometry': {
+                'type': 'LineString',
+                'coordinates': pointSeq.map(point => [point.lng, point.lat])
+              }
+            };
+            fixedPointsGeojson.features.push(feature);
+          });
+          this.map.getSource('fixedPoints').setData(fixedPointsGeojson);
+        }
+        this.points = points;
+        let bounds = this.getBounds(this.points);
+        let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 2 / 5;
+        this.map.fitBounds(bounds, {
+          padding,
+          animate: false,
+        });
+        this.reGeneratePoints();
       } else {
         this.envelope(this.map, this.projectId);
       }
@@ -644,7 +635,7 @@ export default {
         }
       }
       let data = {
-        shape_id: this.shape_id,
+        shape_id: this.localShape.shape_id,
         points: this.points.map(generatePointJson)
       };
       console.log(this.editionMode);
@@ -670,5 +661,10 @@ export default {
       }
     }
   },
+  watch: {
+    shape() {
+      this.localShape = this.shape;
+    }
+  }
 }
 </script>
