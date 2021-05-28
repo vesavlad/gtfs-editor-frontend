@@ -101,6 +101,7 @@
     },
     "editor": {
       "addNewShape": "Crear nueva geometría",
+      "editShape": "Editar geometría",
       "replacePoints": "Reemplazar puntos",
       "invertShape": "Invertir geometría",
       "length": "Largo",

@@ -24,7 +24,8 @@
       <div class="side-panel edit-shape">
         <div class="side-header">
           <div>
-            <h4>{{ $t('shape.editor.addNewShape') }}</h4>
+            <h4 v-if="mode===Enums.ShapeEditorMode.CREATE" >{{ $t('shape.editor.addNewShape') }}</h4>
+            <h4 v-else >{{ $t('shape.editor.editShape') }}</h4>
           </div>
           <div class="btn-list">
             <button class="btn flat" @click="saveAndExit"><span class="material-icons">check</span></button>
@@ -94,6 +95,16 @@ export default {
     range: {
       default: null,
     },
+    mode: {
+      type: String,
+      validator: function(value) {
+        if (Object.values(Enums.ShapeEditorMode).indexOf(value) === -1) {
+          console.error(`shape editor mode "${value}" is not valid`)
+          return false;
+        }
+        return true;
+      }
+    },
     editionMode: {
       type: String,
       default: Enums.ShapeEditorEditionMode.SIMPLE,
@@ -153,9 +164,6 @@ export default {
     }
   },
   computed: {
-    mode() {
-      return this.localShape ? this.Enums.ShapeEditorMode.EDIT : this.Enums.ShapeEditorMode.CREATE;
-    },
     shapeLength() {
       let result = 0;
       if (this.points.length > 1) {

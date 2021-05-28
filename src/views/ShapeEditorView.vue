@@ -3,7 +3,11 @@
     <div class="grid container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
-    <ShapeEditor :projectId="$route.params.projectId" :range="range" :shape="shape" :editionMode="editionMode" mode="">
+    <ShapeEditor :projectId="$route.params.projectId"
+                 :range="range"
+                 :shape="shape"
+                 :editionMode="editionMode"
+                 :mode="shapeEditorMode">
     </ShapeEditor>
   </div>
 </template>
@@ -43,16 +47,19 @@ export default {
   data() {
     return {
       tableTitle: 'Shapes',
-      infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt"
+      infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
+      shapeEditorMode: null
     };
   },
   methods: {
     initData() {
       if (this.$route.params.shapeId) {
         shapesAPI.shapesAPI.detail(this.$route.params.projectId, this.$route.params.shapeId).then(response => {
-          console.log(response.data);
           this.shape = response.data;
         });
+        this.shapeEditorMode = this.Enums.ShapeEditorMode.EDIT;
+      } else {
+        this.shapeEditorMode = this.Enums.ShapeEditorMode.CREATE;
       }
     }
   },

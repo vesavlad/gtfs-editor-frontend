@@ -101,6 +101,7 @@
     },
     "editor": {
       "addNewShape": "Add new shape",
+      "editShape": "Edit shape",
       "replacePoints": "Replace points",
       "invertShape": "invert Shape",
       "length": "Length",
