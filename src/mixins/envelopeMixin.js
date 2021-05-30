@@ -1,4 +1,5 @@
 import projectsAPI from "@/api/projects.api";
+
 const mapboxgl = require('mapbox-gl');
 
 let envelopeMixin = {
@@ -21,9 +22,8 @@ let envelopeMixin = {
           });
         }
       } else {
-        projectsAPI.getProjectDetail(project).then(p => {
-          let data = p.data;
-          this.project_data = data;
+        projectsAPI.getProjectDetail(project).then(response => {
+          this.project_data = response.data;
           this.envelope(map, project);
         })
       }
