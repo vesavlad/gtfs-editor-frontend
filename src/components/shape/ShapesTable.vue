@@ -143,14 +143,13 @@ export default {
       this.deleteModal.shape = shape;
     },
     deleteShape() {
-      shapesAPI.shapesAPI.remove(this.$route.params.projectId, this.deleteModal.shape).then(response => {
-        console.log(response);
+      shapesAPI.shapesAPI.remove(this.$route.params.projectId, this.deleteModal.shape).then(() => {
         this.deleteModal = {
           shape: null,
           visible: false,
           message: "",
         }
-        this.$refs.table.refresh();
+        this.$refs.vuetable.refresh();
       }).catch(err => {
         console.log(err.response);
         this.deleteModal.message = err.response.data.message;
