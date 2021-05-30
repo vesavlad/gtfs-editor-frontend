@@ -278,7 +278,7 @@ export default {
 
       this.points = points;
       if (this.mode === this.Enums.ShapeEditorMode.EDIT ||
-          (this.mode === this.Enums.ShapeEditorMode.CREATE && this.editionMode=== this.Enums.ShapeEditorEditionMode.DUPLICATE)) {
+          (this.mode === this.Enums.ShapeEditorMode.CREATE && this.editionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE)) {
         let bounds = this.getBounds(this.points);
         let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 0.1;
         this.map.fitBounds(bounds, {
@@ -359,11 +359,7 @@ export default {
         source: "points",
         filter: ["==", "$type", "Point"],
         paint: {
-          "circle-radius": [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-          ].concat(config.shape_point_zoom),
+          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
           "circle-color": config.shape_point_color,
         }
       });
