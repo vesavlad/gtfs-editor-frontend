@@ -101,6 +101,7 @@
     },
     "editor": {
       "duplicationPrefix": "copy of ",
+      "pointsNumber": "number of points",
       "addNewShape": "Add new shape",
       "editShape": "Edit shape",
       "replacePoints": "Replace points",

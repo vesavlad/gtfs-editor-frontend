@@ -101,6 +101,7 @@
     },
     "editor": {
       "duplicationPrefix": "copia de ",
+      "pointsNumber": "Número de puntos",
       "addNewShape": "Crear nueva geometría",
       "editShape": "Editar geometría",
       "replacePoints": "Reemplazar puntos",

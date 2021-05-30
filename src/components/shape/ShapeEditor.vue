@@ -40,6 +40,8 @@
           <div class="field" v-if="localShape"><input v-model="localShape.shape_id"></div>
           <div class="field-name"><span>{{ $t('shape.editor.length') }}</span></div>
           <div class="field"> {{ shapeLength }}</div>
+          <div class="field-name"><span>{{ $t('shape.editor.pointsNumber') }}</span></div>
+          <div class="field"> {{ points.length }}</div>
           <div v-if="error" class="errors error">
             {{ error.code }}
             <div v-for="(text, index) in error.message.split('\n')" :key="index">
