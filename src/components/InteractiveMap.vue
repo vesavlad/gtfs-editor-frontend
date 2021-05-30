@@ -22,30 +22,33 @@
           </div>
         </div>
         <div class="side-content">
-          <div class="empty img">
-            <i class="material-icons">add_location_alt</i>
+          <div>
+            <div class="empty img">
+              <i class="material-icons">add_location_alt</i>
+            </div>
+            <ol>
+              <li><span>Click the bottom right button to add a new stop</span></li>
+              <li><span>Click on the map to place it</span></li>
+            </ol>
           </div>
-          <ol>
-            <li><span>Click the bottom right button to add a new stop</span></li>
-            <li><span>Click on the map to place it</span></li>
-          </ol>
-        </div>
-      </div>
-      <div ref="popup" v-show="popup.open">
-        <popup-content ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
-        </popup-content>
-        <button class="btn icon" alt="Delete" @click="beginStopDeletion">
-          <span class="material-icons">delete</span>
-        </button>
-      </div>
-      <div class="map-overlay-inner" v-if="map">
-        <div v-if="creation.creating">
-          <popup-content v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
-                         v-model="creation.data">
-          </popup-content>
-          <button class="btn icon" alt="Create" @click="create">
-            <span class="material-icons">add_location</span>
-          </button>
+          <div ref="popup" v-show="popup.open">
+            <stop-form ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
+            </stop-form>
+            <button class="btn icon" alt="Delete" @click="saveStopData">
+              <span class="material-icons">save</span>
+            </button>
+            <button class="btn icon" alt="Delete" @click="beginStopDeletion">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+          <div v-if="creation.creating">
+            <stop-form v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
+                           v-model="creation.data">
+            </stop-form>
+            <button class="btn icon" alt="Create" @click="create">
+              <span class="material-icons">add_location</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -68,7 +71,7 @@
 import stopsAPI from '@/api/stops.api';
 import shapesAPI from '@/api/shapes.api';
 import shapeMapMixin from "@/mixins/shapeMapMixin"
-import PopupContent from '@/components/PopupContent.vue';
+import StopForm from '@/components/StopForm.vue';
 import FKSelect from '@/components/vuetable/inputs/FKSelect.vue';
 import envelopeMixin from "@/mixins/envelopeMixin"
 import config from "@/config.js"
@@ -82,7 +85,7 @@ export default {
   name: 'InteractiveMap',
   components: {
     MessageModal,
-    PopupContent,
+    StopForm,
     FKSelect,
   },
   mixins: [
@@ -157,7 +160,6 @@ export default {
     },
   },
   mounted() {
-
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.project).then((response) => {
         this.stops = response.data;
@@ -269,19 +271,36 @@ export default {
       });
       this.reGenerateStops();
     },
-    generatePopup(stop) {
-      this.popup.stop = stop;
-      this.popup.errors = {};
-      return this.$refs.popup;
-    },
-    createLabel(stop) {
-      return stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : "");
-    },
     addStop(data) {
       this.stops.push(data);
       this.reGenerateStops();
     },
+    saveStopData() {
+      if (this.popup.disableClose) return;
+      stopsAPI.stopsAPI.update(this.project, this.popup.stop).then(response => {
+        console.log(response);
+        this.active_stops.forEach(feature => {
+          this.map.setFeatureState({
+            source: 'stops',
+            id: feature.id,
+          }, {
+            active: false
+          });
+        });
+        this.stops = this.stops.map(stop => {
+          if (this.popup.stop.id === stop.id) {
+            return {
+              ...this.popup.stop
+            };
+          } else {
+            return stop;
+          }
+        });
+        this.reGenerateStops()
+      });
+    },
     generateStopGeoJson(stop) {
+      let label = stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : '');
       return {
         type: 'Feature',
         geometry: {
@@ -293,7 +312,7 @@ export default {
         },
         properties: {
           stop_id: stop.id,
-          label: this.createLabel(stop),
+          label: label,
         },
         id: stop.id,
       }
@@ -356,11 +375,7 @@ export default {
         type: "circle",
         source: "creating",
         paint: {
-          "circle-radius": [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-          ].concat(config.stop_creation_zoom),
+          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_creation_zoom),
           "circle-color": config.stop_creation_color,
         }
       });
@@ -435,9 +450,8 @@ export default {
       let canvas = map.getCanvas();
       let self = this;
       this.map.on('click', 'layer-stops-icon', (evt) => {
-        var coordinates = evt.features[0].geometry.coordinates.slice();
+        let coordinates = evt.features[0].geometry.coordinates.slice();
         let feature = evt.features[0];
-        var id = feature.properties.stop_id;
 
         // Ensure that if the map is zoomed out such that multiple
         // copies of the feature are visible, the popup appears
@@ -445,10 +459,7 @@ export default {
         while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
           coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
         }
-        let stop = this.findStop(id);
-        let popup = new mapboxgl.Popup()
-            .setLngLat(coordinates)
-            .setDOMContent(this.generatePopup(stop))
+
         map.setFeatureState({
           source: 'stops',
           id: feature.id,
@@ -456,32 +467,6 @@ export default {
           active: true
         });
         this.active_stops.push(feature);
-        popup.addTo(map)
-            .on('close', () => {
-              if (this.popup.disableClose) return;
-              stopsAPI.stopsAPI.update(this.project, this.popup.stop).then(response => {
-                console.log(response);
-                this.active_stops.forEach(feature => {
-                  map.setFeatureState({
-                    source: 'stops',
-                    id: feature.id,
-                  }, {
-                    active: false
-                  });
-                });
-                this.stops = this.stops.map(stop => {
-                  if (this.popup.stop.id === stop.id) {
-                    return {
-                      ...this.popup.stop
-                    };
-                  } else {
-                    return stop;
-                  }
-                });
-                this.reGenerateStops()
-              });
-            });
-        this.popup.popup = popup;
         this.popup.open = true;
       });
       let hovered_stops = [];
@@ -561,9 +546,6 @@ export default {
       let xdif = e1.x - e2.x;
       let ydif = e2.y - e2.y;
       return Math.sqrt(xdif * xdif + ydif * ydif)
-    },
-    log() {
-      console.log(...arguments);
     },
     updateStop(stop, coords) {
       this.stops = this.stops.map(s => {
