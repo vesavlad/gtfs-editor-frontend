@@ -291,7 +291,7 @@ export default {
       }
     },
     exit() {
-      this.$emit('close');
+      this.$router.push({name: "Shapes", params: {projectId: this.$route.params.projectId}});
     },
     addLayers() {
       // Line for the shape itself
@@ -661,11 +661,9 @@ export default {
         shape_id: this.localShape.shape_id,
         points: this.points.map(generatePointJson)
       };
-      console.log(this.editionMode);
       if (this.mode === this.Enums.ShapeEditorMode.CREATE || this.editionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
-        shapesAPI.shapesAPI.create(this.projectId, data).then(response => {
-          console.log(response);
-          this.$emit('close');
+        shapesAPI.shapesAPI.create(this.projectId, data).then(() => {
+          this.$router.push({name: "Shapes", params: {projectId: this.$route.params.projectId}});
         }).catch(err => {
           console.log(err.response);
           this.generateErrorMessage(err.response.data);
@@ -674,9 +672,8 @@ export default {
         data.id = this.localShape.id;
         data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(
             generatePointJson);
-        shapesAPI.shapesAPI.put(this.projectId, data).then(response => {
-          console.log(response);
-          this.$emit('close');
+        shapesAPI.shapesAPI.put(this.projectId, data).then(() => {
+          this.$router.push({name: "Shapes", params: {projectId: this.$route.params.projectId}});
         }).catch(err => {
           console.log(err.response);
           this.generateErrorMessage(err.response.data);
