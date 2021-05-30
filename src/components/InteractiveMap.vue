@@ -77,6 +77,7 @@ import MessageModal from "@/components/modal/MessageModal";
 
 const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
+
 export default {
   name: 'InteractiveMap',
   components: {
@@ -318,19 +319,18 @@ export default {
         type: "circle",
         source: "stops",
         paint: {
-          "circle-radius": [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-          ].concat(config.stop_zoom),
-          "circle-color": [
+          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
+          "circle-color": "white",
+          "circle-stroke-color": [
             'case',
             ['boolean', ['feature-state', 'active'], false],
             config.stop_selected_color,
             ['boolean', ['feature-state', 'hover'], false],
             config.stop_hover_color,
             config.stop_color,
-          ]
+          ],
+          "circle-stroke-opacity": 1,
+          "circle-stroke-width": 2
         }
       });
       this.map.addLayer({
@@ -387,7 +387,7 @@ export default {
           console.log(err);
           return;
         }
-        this.map.addImage('arrow', image);
+        this.map.addImage('double-arrow', image);
         this.map.addLayer({
           'id': 'arrowId',
           'type': 'symbol',
@@ -397,9 +397,14 @@ export default {
             'symbol-spacing': 100,
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
-            'icon-image': 'arrow',
-            'icon-size': 1,
+            'icon-image': 'double-arrow',
+            'icon-size': 0.4,
             'visibility': 'visible'
+          },
+          paint: {
+            'icon-color': 'red',
+            'icon-halo-color': "#343332",
+            'icon-halo-width': 2,
           }
         });
       });
