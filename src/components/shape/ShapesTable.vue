@@ -166,12 +166,15 @@ export default {
       });
     },
     duplicateShape() {
-      this.$router.push({name: 'createShape',
-        params: {
-          projectId: this.$route.params.projectId,
-          shape: this.activeShape,
-          editionMode: this.Enums.ShapeEditorEditionMode.DUPLICATE,
-        }
+      shapesAPI.shapesAPI.detail(this.$route.params.projectId, this.activeShape.id).then(response => {
+        let shape = response.data;
+        this.$router.push({name: 'createShape',
+          params: {
+            projectId: this.$route.params.projectId,
+            shape: shape,
+            editionMode: this.Enums.ShapeEditorEditionMode.DUPLICATE,
+          }
+        });
       });
     }
   },

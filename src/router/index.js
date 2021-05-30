@@ -175,6 +175,7 @@ const routes = [
             path: '/project/:projectId/shapes/create',
             name: 'createShape',
             component: ShapeEditorView,
+            props: true,
             meta: {
               breadcrumb: 'Create'
             }

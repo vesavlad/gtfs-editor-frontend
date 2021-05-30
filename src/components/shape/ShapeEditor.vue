@@ -2,18 +2,20 @@
   <div class="dynamic-map-container">
     <div class="top-map-bar">
       <div class="left-content" v-if="map">
-          <div class="grid center">
-            <label class="switch">
-              <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
-              <span class="slider round"></span>
-            </label>
-            <span>Map Matching</span>
-          </div>
-          <button v-if="mapMatching" class="btn" @click="replacePoints">{{ $t('shape.editor.replacePoints') }}</button>
+        <div class="grid center">
+          <label class="switch">
+            <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
+            <span class="slider round"></span>
+          </label>
+          <span>Map Matching</span>
         </div>
+        <button v-if="mapMatching" class="btn" @click="replacePoints">{{ $t('shape.editor.replacePoints') }}</button>
+      </div>
       <div class="right-content grid center">
-        <button class="btn" @click="invertPoints"><span>{{ $t('shape.editor.invertShape') }}</span><span class="material-icons">cached</span></button>
-        <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
+        <button class="btn" @click="invertPoints"><span>{{ $t('shape.editor.invertShape') }}</span><span
+            class="material-icons">cached</span></button>
+        <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i
+            class="material-icons">help_outline</i></button>
       </div>
     </div>
     <div id='map-container'>
@@ -24,12 +26,13 @@
       <div class="side-panel edit-shape">
         <div class="side-header">
           <div>
-            <h4 v-if="mode===Enums.ShapeEditorMode.CREATE" >{{ $t('shape.editor.addNewShape') }}</h4>
-            <h4 v-else >{{ $t('shape.editor.editShape') }}</h4>
+            <h4 v-if="mode===Enums.ShapeEditorMode.CREATE">{{ $t('shape.editor.addNewShape') }}</h4>
+            <h4 v-else>{{ $t('shape.editor.editShape') }}</h4>
           </div>
           <div class="btn-list">
             <button class="btn flat" @click="saveAndExit"><span class="material-icons">check</span></button>
-            <button class="btn flat" @click="exitModal.visible = true"><span class="material-icons">close</span></button>
+            <button class="btn flat" @click="exitModal.visible = true"><span class="material-icons">close</span>
+            </button>
           </div>
         </div>
         <div class="side-content">
@@ -97,7 +100,7 @@ export default {
     },
     mode: {
       type: String,
-      validator: function(value) {
+      validator: function (value) {
         if (Object.values(Enums.ShapeEditorMode).indexOf(value) === -1) {
           console.error(`shape editor mode "${value}" is not valid`)
           return false;
@@ -148,7 +151,7 @@ export default {
       points: [],
       lineCoords: [],
       id: 0,
-      mapMatching: !this.localShape || this.range,
+      mapMatching: false,
       warning: false,
       error: false,
       exitModal: {
@@ -175,6 +178,7 @@ export default {
     });
     this.map.on('load', () => {
       this.addSources();
+      this.setData();
       this.addLayers();
       this.addListeners();
       this.$emit('load');
@@ -199,29 +203,34 @@ export default {
         'data': this.lineGeojson,
       });
 
-      let fixedPointsGeojson = {
-        type: 'FeatureCollection',
-        features: [],
-      }
       this.map.addSource('fixedPoints', {
         'type': 'geojson',
-        'data': fixedPointsGeojson,
+        'data': {
+          type: 'FeatureCollection',
+          features: [],
+        },
       });
 
       this.map.addSource('connecting-line', {
         'type': 'geojson',
         'data': this.connectingLineGeojson,
       });
-
-      if (this.mode === this.Enums.ShapeEditorMode.EDIT && this.localShape !== null) {
-        let points = this.localShape.points.map(point => {
+    },
+    setData() {
+      let points = [];
+      if (this.localShape !== null) {
+        points = this.localShape.points.map(point => {
           return {
             id: this.id++,
             lat: point.shape_pt_lat,
             lng: point.shape_pt_lon,
           }
         });
-        if (this.range) {
+      }
+
+      if (this.mode === this.Enums.ShapeEditorMode.EDIT) {
+        this.mapMatching = false;
+        if (this.Enums.ShapeEditorEditionMode.RANGE && this.range !== null) {
           // Range uses the shape_pt_sequence so let's say you want to edit between 10-20, this would mean
           // that you want to keep the values at array positions 0-9 (seq 1-10) and 19- (seq 20), so we have
           // to adjust the indexes to use slice in order to split the array.
@@ -237,6 +246,12 @@ export default {
           if (points.length > 1) {
             points = [points[0], points[points.length - 1]]
           }
+
+          let fixedPointsGeojson = {
+            type: 'FeatureCollection',
+            features: [],
+          };
+
           [startingPoints, finishingPoints].map(pointSeq => {
             let feature = {
               'type': 'Feature',
@@ -250,16 +265,27 @@ export default {
           });
           this.map.getSource('fixedPoints').setData(fixedPointsGeojson);
         }
-        this.points = points;
+      } else {
+        if (this.editionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
+          this.localShape.id = null;
+          this.localShape.shape_id = this.$t('shape.editor.duplicationPrefix') + this.localShape.shape_id;
+        } else {
+          this.localShape = {id: null, shape_id: null, points: []};
+          this.mapMatching = true;
+          this.envelope(this.map, this.projectId);
+        }
+      }
+
+      this.points = points;
+      if (this.mode === this.Enums.ShapeEditorMode.EDIT ||
+          (this.mode === this.Enums.ShapeEditorMode.CREATE && this.editionMode=== this.Enums.ShapeEditorEditionMode.DUPLICATE)) {
         let bounds = this.getBounds(this.points);
-        let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 2 / 5;
+        let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 0.1;
         this.map.fitBounds(bounds, {
           padding,
           animate: false,
         });
         this.reGeneratePoints();
-      } else {
-        this.envelope(this.map, this.projectId);
       }
     },
     exit() {
@@ -500,7 +526,7 @@ export default {
             return
           }
           let matchings = response.data.matchings;
-          if (matchings.length == 0) {
+          if (matchings.length === 0) {
             this.lineGeojson.geometry.coordinates = [];
             console.log("No matchings")
           } else {

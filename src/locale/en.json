@@ -100,6 +100,7 @@
       "title": "Are you sure you want to delete shape \"{name}\"?"
     },
     "editor": {
+      "duplicationPrefix": "copy of ",
       "addNewShape": "Add new shape",
       "editShape": "Edit shape",
       "replacePoints": "Replace points",
