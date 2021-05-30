@@ -100,6 +100,7 @@
       "title": "Are you sure you want to delete shape \"{name}\"?"
     },
     "editor": {
+      "mapMatchingWarning": "Warning: Map matching is enabled, please disable map matching or replace your points with the Map Matching result.",
       "duplicationPrefix": "copy of ",
       "pointsNumber": "number of points",
       "addNewShape": "Add new shape",

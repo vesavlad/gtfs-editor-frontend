@@ -647,8 +647,7 @@ export default {
     },
     saveAndExit() {
       if (this.mapMatching) {
-        this.warning =
-            "Warning: Map matching is enabled, please disable map matching or replace your points with the Map Matching result";
+        this.warning = this.$t('shape.editor.mapMatchingWarning');
         return;
       }
       let generatePointJson = (point, index) => {
