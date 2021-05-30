@@ -305,7 +305,7 @@ export default {
         },
         'paint': {
           'line-color': config.shape_line_color,
-          'line-width': 7
+          'line-width': 5
         }
       });
 
@@ -362,7 +362,10 @@ export default {
         filter: ["==", "$type", "Point"],
         paint: {
           "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
-          "circle-color": config.shape_point_color,
+          "circle-color": "white",
+          "circle-stroke-color": config.shape_point_color,
+          "circle-stroke-opacity": 1,
+          "circle-stroke-width": 3
         }
       });
       // Arrow for the shape
@@ -372,7 +375,7 @@ export default {
           console.log(err);
           return;
         }
-        this.map.addImage('arrow', image);
+        this.map.addImage('double-arrow', image);
         this.map.addLayer({
           'id': 'point-arrow',
           'type': 'symbol',
@@ -382,12 +385,12 @@ export default {
             'symbol-spacing': 100,
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
-            'icon-image': 'arrow',
-            'icon-size': 0.5,
+            'icon-image': 'double-arrow',
+            'icon-size': 0.4,
             'visibility': 'visible'
           },
           paint: {
-            'icon-color': 'white',
+            'icon-color': config.shape_line_color,
             'icon-halo-color': "#343332",
             'icon-halo-width': 2,
           }
@@ -401,9 +404,14 @@ export default {
             'symbol-spacing': 100,
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
-            'icon-image': 'arrow',
-            'icon-size': 1,
+            'icon-image': 'double-arrow',
+            'icon-size': 0.4,
             'visibility': 'visible'
+          },
+          paint: {
+            'icon-color': config.map_matching_color,
+            'icon-halo-color': "#343332",
+            'icon-halo-width': 2,
           }
         });
       });
