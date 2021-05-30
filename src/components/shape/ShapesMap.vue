@@ -81,12 +81,11 @@ export default {
         type: "circle",
         source: "shape-pts",
         paint: {
-          "circle-radius": [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-          ].concat(config.shape_point_zoom),
-          "circle-color": config.shape_point_color,
+          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
+          "circle-color": "white",
+          "circle-stroke-color": config.shape_point_color,
+          "circle-stroke-opacity": 1,
+          "circle-stroke-width": 3
         }
       });
       this.map.addLayer({
@@ -97,7 +96,7 @@ export default {
         layout: {
           "text-field": "{label}",
           "text-anchor": "top",
-          "text-offset": [0, 0.5],
+          "text-offset": [0, 0.6],
           "text-allow-overlap": true,
         }
       });
@@ -107,7 +106,7 @@ export default {
           console.log(err);
           return;
         }
-        this.map.addImage('arrow', image);
+        this.map.addImage('double-arrow', image);
         this.map.addLayer({
           'id': 'arrowId',
           'type': 'symbol',
@@ -117,9 +116,14 @@ export default {
             'symbol-spacing': 100,
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
-            'icon-image': 'arrow',
-            'icon-size': 1,
+            'icon-image': 'double-arrow',
+            'icon-size': 0.4,
             'visibility': 'visible'
+          },
+          paint: {
+            'icon-color': config.shape_line_color,
+            'icon-halo-color': "#343332",
+            'icon-halo-width': 2
           }
         });
       });
