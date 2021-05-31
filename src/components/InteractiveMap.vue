@@ -184,14 +184,17 @@ export default {
     });
   },
   methods: {
-    loadShape(event) {
-      if (this.activeShape.id !== event) {
-        this.activeShape = {
-          id: event
-        }
-        shapesAPI.shapesAPI.detail(this.project, this.activeShape.id).then(response => {
+    loadShape(shapeId) {
+      if (shapeId === null) {
+        this.activeShape = {};
+        this.map.setLayoutProperty('shape-layer', 'visibility', 'none')
+        this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none')
+      } else if (this.activeShape.id !== shapeId) {
+        shapesAPI.shapesAPI.detail(this.project, shapeId).then(response => {
           this.activeShape = response.data;
           this.reGenerateShape();
+          this.map.setLayoutProperty('shape-layer', 'visibility', 'visible')
+          this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'visible')
         })
       }
     },
@@ -402,7 +405,7 @@ export default {
         }
         this.map.addImage('double-arrow', image);
         this.map.addLayer({
-          'id': 'arrowId',
+          'id': 'shape-arrow-layer',
           'type': 'symbol',
           'source': 'shape',
           'layout': {
