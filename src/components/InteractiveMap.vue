@@ -452,6 +452,7 @@ export default {
       this.map.on('click', 'layer-stops-icon', (evt) => {
         let coordinates = evt.features[0].geometry.coordinates.slice();
         let feature = evt.features[0];
+        let id = feature.properties.stop_id;
 
         // Ensure that if the map is zoomed out such that multiple
         // copies of the feature are visible, the popup appears
@@ -459,7 +460,7 @@ export default {
         while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
           coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
         }
-
+        this.popup.stop = this.findStop(id);
         map.setFeatureState({
           source: 'stops',
           id: feature.id,
