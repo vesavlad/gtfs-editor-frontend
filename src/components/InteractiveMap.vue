@@ -3,7 +3,7 @@
     <div class="top-map-bar">
       <div class="right-content grid center">
         <input type="search" placeholder="Search"/>
-        <FKSelect v-model="selectedShape" :field="shape_field" :data="{}" :errors="[]"
+        <FKSelect v-model="selectedShape" :field="shapeField" :data="{}" :errors="[]"
                   v-on:input="loadShape($event)"></FKSelect>
         <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
       </div>
@@ -108,7 +108,7 @@ export default {
         errors: {},
         disableClose: false,
       },
-      shape_field: {
+      shapeField: {
         name: 'shape_id',
         title: 'Shape',
         sortField: 'shape',
