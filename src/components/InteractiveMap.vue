@@ -31,7 +31,7 @@
               <li><span>Click on the map to place it</span></li>
             </ol>
           </div>
-          <div ref="popup" v-show="popup.open">
+          <div ref="popup" v-if="popup.stop" v-show="popup.open">
             <stop-form ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
             </stop-form>
             <button class="btn icon" alt="Delete" @click="saveStopData">
@@ -103,7 +103,7 @@ export default {
         message: "",
       },
       popup: {
-        stop: {},
+        stop: null,
         open: false,
         errors: {},
         disableClose: false,
@@ -461,13 +461,12 @@ export default {
         while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
           coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
         }
+        if (this.popup.stop) {
+          // deactivate previous stop selected
+          this.map.setFeatureState({source: 'stops', id: this.popup.stop.id,}, {active: false});
+        }
         this.popup.stop = this.findStop(id);
-        map.setFeatureState({
-          source: 'stops',
-          id: feature.id,
-        }, {
-          active: true
-        });
+        map.setFeatureState({source: 'stops', id: feature.id,}, {active: true});
         this.active_stops.push(feature);
         this.popup.open = true;
       });
