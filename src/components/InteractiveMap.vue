@@ -43,7 +43,7 @@
           </div>
           <div v-if="creation.creating">
             <stop-form v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
-                           v-model="creation.data">
+                       v-model="creation.data">
             </stop-form>
             <button class="btn icon" alt="Create" @click="create">
               <span class="material-icons">add_location</span>
@@ -120,7 +120,7 @@ export default {
         },
         type: Enums.InputType.FK_SELECT
       },
-      shape: {},
+      activeShape: {},
       map: false,
       dragging: false,
       geojson: {},
@@ -185,20 +185,18 @@ export default {
   },
   methods: {
     loadShape(event) {
-      if (this.shape.id !== event) {
-        this.shape = {
+      if (this.activeShape.id !== event) {
+        this.activeShape = {
           id: event
         }
-        shapesAPI.shapesAPI.detail(this.project, this.shape.id).then(response => {
-          this.shape = response.data;
+        shapesAPI.shapesAPI.detail(this.project, this.activeShape.id).then(response => {
+          this.activeShape = response.data;
           this.reGenerateShape();
         })
       }
     },
     reGenerateShape() {
-      this.shapeGeojson.geometry.coordinates = this.shape.points.map(point => [point.shape_pt_lon, point
-          .shape_pt_lat
-      ]);
+      this.shapeGeojson.geometry.coordinates = this.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
       this.map.getSource('shape').setData(this.shapeGeojson);
       this.map.fitBounds(this.getBounds(this.shapeGeojson.geometry.coordinates), {
         padding: 50
