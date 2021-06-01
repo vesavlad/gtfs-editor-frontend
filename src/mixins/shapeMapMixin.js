@@ -2,11 +2,11 @@ let shapeMapMixin = {
   methods: {
     getBounds(points) {
       points = points.map(point => {
-        if(point instanceof Array) {
+        if (point instanceof Array) {
           return point;
         }
-        if( point instanceof Object) {
-          return [point.lng,point.lat];
+        if (point instanceof Object) {
+          return [point.lng, point.lat];
         }
       })
       // We start with the entire world
