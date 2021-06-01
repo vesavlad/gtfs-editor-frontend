@@ -469,6 +469,7 @@ export default {
       let map = this.map;
       let canvas = map.getCanvas();
       let self = this;
+
       this.map.on('click', 'layer-stops-icon', (evt) => {
         let coordinates = evt.features[0].geometry.coordinates.slice();
         let feature = evt.features[0];
@@ -489,11 +490,13 @@ export default {
         this.stopData.activeStops.push(feature);
         this.edition.open = true;
       });
+
       let hovered_stops = [];
       this.map.on('mouseenter', 'layer-stops-icon', function () {
         if (this.dragging) return;
         canvas.style.cursor = 'pointer';
       });
+
       this.map.on('mousemove', 'layer-stops-icon', function (e) {
         if (this.dragging) return;
         hovered_stops.forEach(feature => {
@@ -506,6 +509,7 @@ export default {
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: true});
         });
       });
+
       this.map.on('mouseleave', 'layer-stops-icon', function () {
         hovered_stops.forEach(feature => {
           hovered_stops.push(feature.id);
@@ -515,7 +519,8 @@ export default {
         if (this.dragging) return;
         canvas.style.cursor = '';
       });
-      map.on('mousedown', 'layer-stops-icon', function (evt_down) {
+
+      this.map.on('mousedown', 'layer-stops-icon', function (evt_down) {
         // Prevent the default map drag behavior.
         evt_down.preventDefault();
         canvas.style.cursor = 'grab';
@@ -533,7 +538,7 @@ export default {
         });
       });
 
-      map.on('mousedown', 'layer-creating-icon', function (evt_down) {
+      this.map.on('mousedown', 'layer-creating-icon', function (evt_down) {
         // Prevent the default map drag behavior.
         evt_down.preventDefault();
         canvas.style.cursor = 'grab';
