@@ -213,15 +213,26 @@ export default {
     },
     filterStops() {
       let value = this.stopData.quickSearch;
+      if (value.length < 4) {
+        return;
+      }
       let normalize = value => value !== null ? value.trim().toLowerCase() : '';
+
+      value = normalize(value);
       let filtered = this.stopData.stops.filter(stop => {
         let stopCode = normalize(stop.stop_code);
         let stopId = normalize(stop.stop_id);
         let stopName = normalize(stop.stop_name);
 
         return stopCode.indexOf(value) > -1 || stopId.indexOf(value) > -1 || stopName.indexOf(value) > -1;
-      })
-      console.log(filtered);
+      });
+
+      if (filtered.length > 0) {
+        let points = filtered.map(stop => [stop.stop_lon, stop.stop_lat]);
+        this.map.fitBounds(this.getBounds(points), {
+          padding: 50
+        });
+      }
     },
     loadShape(shapeId) {
       if (shapeId === null) {
@@ -291,9 +302,9 @@ export default {
         this.stopData.creation.errors = err.response.data;
       });
     },
-    focusStop(stop_data) {
+    focusStop(stop) {
       this.map.flyTo({
-        center: [stop_data.stop_lon, stop_data.stop_lat],
+        center: [stop.stop_lon, stop.stop_lat],
         zoom: 16,
       });
     },
