@@ -303,7 +303,7 @@ export default {
         this.stop.creation.errors = err.response.data;
       });
     },
-    focusStop(stop) {
+    flyToStop(stop) {
       this.map.flyTo({
         center: [stop.stop_lon, stop.stop_lat],
         zoom: 16,
@@ -349,7 +349,7 @@ export default {
     reGenerateStops() {
       this.map.getSource('stop-source').setData(this.getStopGeojson());
     },
-    addStops() {
+    addSourceAndLayersForStops() {
       this.map.addSource('stop-source', {
         type: 'geojson',
         data: this.getStopGeojson(),
@@ -400,7 +400,8 @@ export default {
           "circle-color": config.stop_creation_color,
         }
       });
-
+    },
+    addSourceAndLayersForShape() {
       this.map.addSource('shape', {
         'type': 'geojson',
         'data': this.shape.geojson,
@@ -550,6 +551,27 @@ export default {
           canvas.style.cursor = '';
         });
       });
+    },
+    updateCreationCoords(coords) {
+      this.stop.creation.data.stop_lon = coords.lng;
+      this.stop.creation.data.stop_lat = coords.lat;
+      this.stop.creation.geojson.features = [{
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [coords.lng, coords.lat],
+        },
+      }];
+      this.map.getSource('creating').setData(this.stop.creation.geojson);
+    },
+    findStop(id) {
+      let s = null;
+      this.stop.stops.forEach(stop => {
+        if (stop.id === id) {
+          s = stop;
+        }
+      })
+      return s;
     },
     // Distance in pixels between events
     calcDistance(e1, e2) {

@@ -82,7 +82,7 @@ export default {
     },
     focusStop(props) {
       this.switchTab(this.tabType.MAP);
-      this.$refs.map.focusStop(props.rowData);
+      this.$refs.map.flyToStop(props.rowData);
     },
     updateStop(data) {
       return stopsAPI.stopsAPI.update(this.$route.params.projectId, data);
