@@ -2,14 +2,14 @@
   <div class="dynamic-map-container">
     <div class="top-map-bar">
       <div class="right-content grid center">
-        <input type="search" placeholder="Search" v-model="stopData.quickSearch" @input="filterStops"/>
+        <input type="search" placeholder="Search" v-model="stop.quickSearch" @input="filterStops"/>
         <FKSelect v-model="shape.selectedShape" :field="shape.shapeField" :data="{}" :errors="[]"
                   v-on:input="loadShape($event)"></FKSelect>
         <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
       </div>
     </div>
     <div id='map' class="map">
-      <button v-if="!stopData.creation.creating" class="btn floating" alt="Create Stop" @click="beginCreation">
+      <button v-if="!stop.creation.creating" class="btn floating" alt="Create Stop" @click="beginCreation">
         <span class="material-icons">add</span>
       </button>
     </div>
@@ -31,30 +31,30 @@
               <li><span>Click on the map to place it</span></li>
             </ol>
           </div>
-          <div v-if="stopData.edition.stop" v-show="stopData.edition.open">
-            <button class="btn icon" alt="Delete" @click="saveStopData">
+          <div v-if="stop.edition.stop" v-show="stop.edition.open">
+            <button class="btn icon" alt="Delete" @click="savestop">
               <span class="material-icons">save</span>
             </button>
             <button class="btn icon" alt="Delete" @click="beginStopDeletion">
               <span class="material-icons">delete</span>
             </button>
-            <stop-form :fields="stopFields" v-model="stopData.edition.stop" :errors="stopData.edition.errors">
+            <stop-form :fields="stopFields" v-model="stop.edition.stop" :errors="stop.edition.errors">
             </stop-form>
           </div>
-          <div v-if="stopData.creation.creating">
+          <div v-if="stop.creation.creating">
             <button class="btn icon" alt="Create" @click="create">
               <span class="material-icons">add_location</span>
             </button>
-            <stop-form v-if="stopData.creation.creating" ref="createForm" :fields="stopFields"
-                       :errors="stopData.creation.errors"
-                       v-model="stopData.creation.data">
+            <stop-form v-if="stop.creation.creating" ref="createForm" :fields="stopFields"
+                       :errors="stop.creation.errors"
+                       v-model="stop.creation.data">
             </stop-form>
           </div>
         </div>
       </div>
     </div>
-    <MessageModal :show="stopData.deleteModal.visible" @ok="deleteStop" @cancel="stopData.deleteModal.visible = false"
-                  @close="stopData.deleteModal.visible = false" :showCancelButton="true"
+    <MessageModal :show="stop.deleteModal.visible" @ok="deleteStop" @cancel="stop.deleteModal.visible = false"
+                  @close="stop.deleteModal.visible = false" :showCancelButton="true"
                   :okButtonLabel="$t('general.delete')"
                   :type="Enums.MessageModalType.WARNING">
       <template v-slot:m-title>
@@ -62,7 +62,7 @@
       </template>
       <template v-slot:m-content>
           <span>
-            {{ stopData.deleteModal.message }}
+            {{ stop.deleteModal.message }}
           </span>
       </template>
     </MessageModal>
@@ -122,7 +122,7 @@ export default {
           }
         },
       },
-      stopData: {
+      stop: {
         quickSearch: null,
         activeStops: [],
         stops: [],
@@ -166,7 +166,7 @@ export default {
     this.filterStops = debounce(this.filterStops, 300);
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then(response => {
-        this.stopData.stops = response.data;
+        this.stop.stops = response.data;
         this.map = new mapboxgl.Map({
           container: 'map',
           style: 'mapbox://styles/mapbox/light-v10',
@@ -208,19 +208,19 @@ export default {
         features: [] // We use feature collection to allow either 0 or 1
       };
 
-      geojson.features = this.stopData.stops.map(generateStopGeoJson);
+      geojson.features = this.stop.stops.map(generateStopGeoJson);
 
       return geojson;
     },
     filterStops() {
-      let value = this.stopData.quickSearch;
+      let value = this.stop.quickSearch;
       if (value.length < 4) {
         return;
       }
       let normalize = value => value !== null ? value.trim().toLowerCase() : '';
 
       value = normalize(value);
-      let filtered = this.stopData.stops.filter(stop => {
+      let filtered = this.stop.stops.filter(stop => {
         let stopCode = normalize(stop.stop_code);
         let stopId = normalize(stop.stop_id);
         let stopName = normalize(stop.stop_name);
@@ -257,49 +257,49 @@ export default {
       });
     },
     beginStopDeletion() {
-      let stop = this.stopData.edition.stop;
-      this.stopData.deleteModal.visible = true;
-      this.stopData.deleteModal.stop = stop;
-      this.stopData.deleteModal.message = "";
+      let stop = this.stop.edition.stop;
+      this.stop.deleteModal.visible = true;
+      this.stop.deleteModal.stop = stop;
+      this.stop.deleteModal.message = "";
     },
     deleteStop() {
-      let stop = this.stopData.deleteModal.stop;
+      let stop = this.stop.deleteModal.stop;
       stopsAPI.stopsAPI.remove(this.projectId, stop).then(() => {
-        this.stopData.deleteModal.visible = false;
-        this.stopData.deleteModal.stop = {};
-        this.stopData.deleteModal.message = "";
-        this.stopData.edition.disableClose = true;
-        this.stopData.edition.disableClose = false;
-        this.stopData.stops = this.stopData.stops.filter(s => s.id !== stop.id);
+        this.stop.deleteModal.visible = false;
+        this.stop.deleteModal.stop = {};
+        this.stop.deleteModal.message = "";
+        this.stop.edition.disableClose = true;
+        this.stop.edition.disableClose = false;
+        this.stop.stops = this.stop.stops.filter(s => s.id !== stop.id);
         this.reGenerateStops();
         console.log("removed");
       }).catch((err) => {
         let data = err.response.data;
-        this.stopData.deleteModal.message = data.message;
+        this.stop.deleteModal.message = data.message;
       });
     },
     beginCreation() {
       let self = this;
       this.map.once("click", e => {
-        self.stopData.creation.creating = true;
+        self.stop.creation.creating = true;
         self.updateCreationCoords(e.lngLat);
       });
     },
     create() {
-      let data = this.stopData.creation.data;
+      let data = this.stop.creation.data;
       stopsAPI.stopsAPI.create(this.projectId, data).then(() => {
         this.addStop(data);
-        this.stopData.creation.errors = {};
-        this.stopData.creation.creating = false;
-        this.stopData.creation.data = {
+        this.stop.creation.errors = {};
+        this.stop.creation.creating = false;
+        this.stop.creation.data = {
           stop_lat: null,
           stop_lon: null,
         };
-        this.stopData.creation.geojson.features = [];
-        this.map.getSource('creating').setData(this.stopData.creation.geojson);
+        this.stop.creation.geojson.features = [];
+        this.map.getSource('creating').setData(this.stop.creation.geojson);
       }).catch((err) => {
         console.log(err.response);
-        this.stopData.creation.errors = err.response.data;
+        this.stop.creation.errors = err.response.data;
       });
     },
     focusStop(stop) {
@@ -311,8 +311,8 @@ export default {
     resize() {
       this.map.resize();
     },
-    updateStopData(stop) {
-      this.stopData.stops = this.stopData.stops.map(s => {
+    updatestop(stop) {
+      this.stop.stops = this.stop.stops.map(s => {
         if (s.id === stop.id) {
           return {
             ...stop
@@ -323,20 +323,20 @@ export default {
       this.reGenerateStops();
     },
     addStop(data) {
-      this.stopData.stops.push(data);
+      this.stop.stops.push(data);
       this.reGenerateStops();
     },
-    saveStopData() {
-      if (this.stopData.edition.disableClose) return;
-      stopsAPI.stopsAPI.update(this.projectId, this.stopData.edition.stop).then(response => {
+    savestop() {
+      if (this.stop.edition.disableClose) return;
+      stopsAPI.stopsAPI.update(this.projectId, this.stop.edition.stop).then(response => {
         console.log(response);
-        this.stopData.activeStops.forEach(feature => {
+        this.stop.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
         });
-        this.stopData.stops = this.stopData.stops.map(stop => {
-          if (this.stopData.edition.stop.id === stop.id) {
+        this.stop.stops = this.stop.stops.map(stop => {
+          if (this.stop.edition.stop.id === stop.id) {
             return {
-              ...this.stopData.edition.stop
+              ...this.stop.edition.stop
             };
           } else {
             return stop;
@@ -388,7 +388,7 @@ export default {
       // Icon for new stop
       this.map.addSource('creating', {
         type: 'geojson',
-        data: this.stopData.creation.geojson,
+        data: this.stop.creation.geojson,
       })
       this.map.addLayer({
         id: "layer-creating-icon",
@@ -446,20 +446,20 @@ export default {
       });
     },
     updateCreationCoords(coords) {
-      this.stopData.creation.data.stop_lon = coords.lng;
-      this.stopData.creation.data.stop_lat = coords.lat;
-      this.stopData.creation.geojson.features = [{
+      this.stop.creation.data.stop_lon = coords.lng;
+      this.stop.creation.data.stop_lat = coords.lat;
+      this.stop.creation.geojson.features = [{
         type: 'Feature',
         geometry: {
           type: 'Point',
           coordinates: [coords.lng, coords.lat],
         },
       }];
-      this.map.getSource('creating').setData(this.stopData.creation.geojson);
+      this.map.getSource('creating').setData(this.stop.creation.geojson);
     },
     findStop(id) {
       let s = null;
-      this.stopData.stops.forEach(stop => {
+      this.stop.stops.forEach(stop => {
         if (stop.id === id) {
           s = stop;
         }
@@ -482,14 +482,14 @@ export default {
         while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
           coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
         }
-        if (this.stopData.edition.stop) {
+        if (this.stop.edition.stop) {
           // deactivate previous stop selected
-          this.map.setFeatureState({source: 'stop-source', id: this.stopData.edition.stop.id,}, {active: false});
+          this.map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id,}, {active: false});
         }
-        this.stopData.edition.stop = this.findStop(id);
+        this.stop.edition.stop = this.findStop(id);
         map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: true});
-        this.stopData.activeStops.push(feature);
-        this.stopData.edition.open = true;
+        this.stop.activeStops.push(feature);
+        this.stop.edition.open = true;
       });
 
       let hovered_stops = [];
@@ -559,7 +559,7 @@ export default {
       return Math.sqrt(xdif * xdif + ydif * ydif)
     },
     updateStop(stop, coords) {
-      this.stopData.stops = this.stopData.stops.map(s => {
+      this.stop.stops = this.stop.stops.map(s => {
         if (s.id !== stop.properties.stop_id) {
           return s;
         }
