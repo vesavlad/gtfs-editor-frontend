@@ -52,6 +52,36 @@
           </div>
         </div>
       </div>
+      <div class="side-panel ">
+        <div class="side-header">
+          <div></div>
+          <div class="btn-list">
+
+          </div>
+        </div>
+        <div class="side-content">
+        </div>
+      </div>
+      <div class="side-panel ">
+        <div class="side-header">
+          <div></div>
+          <div class="btn-list">
+
+          </div>
+        </div>
+        <div class="side-content">
+        </div>
+      </div>
+      <div class="side-panel ">
+        <div class="side-header">
+          <div></div>
+          <div class="btn-list">
+
+          </div>
+        </div>
+        <div class="side-content">
+        </div>
+      </div>
     </div>
     <MessageModal :show="stop.deleteModal.visible" @ok="deleteStop" @cancel="stop.deleteModal.visible = false"
                   @close="stop.deleteModal.visible = false" :showCancelButton="true"
@@ -281,15 +311,31 @@ export default {
     beginCreation() {
       this.stop.creation.creating = true;
       this.status = this.Enums.InteractiveMapStatus.ADDING_NEW_POINT;
-      this.map.getCanvas().style.cursor = 'grab';
+      this.map.getCanvas().style.cursor = 'grabbing';
       let self = this;
+      // move feature to cursor position in realtime
+      let mousemove = function (e) {
+        let coords = e.lngLat;
+        self.updateCreationCoords(coords);
+      }
+      // when user decides position he makes click on map
       this.map.once("click", e => {
+        self.map.off('mousemove', mousemove);
         self.updateCreationCoords(e.lngLat);
         self.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
+        self.map.getCanvas().style.cursor = '';
       });
-      this.map.on('mousemove', function () {
-
-      });
+      this.map.on('mousemove', mousemove);
+      document.addEventListener('keydown', this.escapeKeyPressed);
+    },
+    escapeKeyPressed() {
+      return;/*
+      console.log(this.status);
+      if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
+          this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
+        this.status = this.Enums.InteractiveMapStatus.READER;
+        this.map.getCanvas().style.cursor = '';
+      }*/
     },
     create() {
       let data = this.stop.creation.data;
@@ -485,12 +531,12 @@ export default {
 
       let hovered_stops = [];
       this.map.on('mouseenter', 'layer-stops-icon', function () {
-        if (this.dragging) return;
+        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         canvas.style.cursor = 'pointer';
       });
 
       this.map.on('mousemove', 'layer-stops-icon', function (e) {
-        if (this.dragging) return;
+        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         hovered_stops.forEach(feature => {
           hovered_stops.push(feature.id);
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
@@ -508,7 +554,7 @@ export default {
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
         });
         hovered_stops = [];
-        if (this.dragging) return;
+        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         canvas.style.cursor = '';
       });
 
