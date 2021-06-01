@@ -312,7 +312,7 @@ export default {
     resize() {
       this.map.resize();
     },
-    updatestop(stop) {
+    updateStopData(stop) {
       this.stop.stops = this.stop.stops.map(s => {
         if (s.id === stop.id) {
           return {
@@ -446,27 +446,6 @@ export default {
           }
         });
       });
-    },
-    updateCreationCoords(coords) {
-      this.stop.creation.data.stop_lon = coords.lng;
-      this.stop.creation.data.stop_lat = coords.lat;
-      this.stop.creation.geojson.features = [{
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [coords.lng, coords.lat],
-        },
-      }];
-      this.map.getSource('creating').setData(this.stop.creation.geojson);
-    },
-    findStop(id) {
-      let s = null;
-      this.stop.stops.forEach(stop => {
-        if (stop.id === id) {
-          s = stop;
-        }
-      })
-      return s;
     },
     addListeners() {
       let map = this.map;
