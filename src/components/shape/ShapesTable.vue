@@ -12,7 +12,7 @@
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
         <div slot="actions" slot-scope="props" class="flex">
           <button class="btn icon flat" @click="$emit('focus-shape', props.rowData)" alt="Display shape.">
-            <span class="material-icons">remove_red_eye</span>
+            <span class="material-icons">my_location</span>
           </button>
           <div class="btn icon flat">
             <i class="material-icons"
