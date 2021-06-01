@@ -15,44 +15,38 @@
       </button>
     </div>
     <div class="map-sidebar">
-      <div class="side-panel empty">
+      <div class="side-panel empty" v-if="status===Enums.InteractiveMapStatus.READER">
         <div class="side-header">
           <div></div>
           <div class="btn-list">
+          </div>
+        </div>
+        <div class="side-content">
+          <div class="empty img">
+            <i class="material-icons">add_location_alt</i>
+          </div>
+          <ol>
+            <li><span>Click the bottom right button to add a new stop</span></li>
+            <li><span>Click on the map to place it</span></li>
+          </ol>
+        </div>
+      </div>
+      <div class="side-panel edit-data-point" v-if="status===Enums.InteractiveMapStatus.EDIT_DATA_POINT">
+        <div class="side-header">
+          <div></div>
+          <div class="btn-list">
+            <button class="btn icon" alt="Delete" @click="saveStop"><span class="material-icons">save</span></button>
+            <button class="btn icon" alt="Delete" @click="beginStopDeletion"><span class="material-icons">delete</span>
+            </button>
             <button class="btn flat close"><i class="material-icons">close</i></button>
           </div>
         </div>
         <div class="side-content">
-          <div v-if="status===Enums.InteractiveMapStatus.READER">
-            <div class="empty img">
-              <i class="material-icons">add_location_alt</i>
-            </div>
-            <ol>
-              <li><span>Click the bottom right button to add a new stop</span></li>
-              <li><span>Click on the map to place it</span></li>
-            </ol>
-          </div>
-          <div v-if="status===Enums.InteractiveMapStatus.EDIT_DATA_POINT">
-            <button class="btn icon" alt="Delete" @click="saveStop">
-              <span class="material-icons">save</span>
-            </button>
-            <button class="btn icon" alt="Delete" @click="beginStopDeletion">
-              <span class="material-icons">delete</span>
-            </button>
-            <stop-form :fields="stopFields" v-model="stop.edition.stop" :errors="stop.edition.errors">
-            </stop-form>
-          </div>
-          <div v-if="status===Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT">
-            <button class="btn icon" alt="Create" @click="create">
-              <span class="material-icons">add_location</span>
-            </button>
-            <stop-form v-if="stop.creation.creating" ref="createForm" :fields="stopFields"
-                       :errors="stop.creation.errors" v-model="stop.creation.data">
-            </stop-form>
-          </div>
+          <stop-form :fields="stopFields" v-model="stop.edition.stop" :errors="stop.edition.errors">
+          </stop-form>
         </div>
       </div>
-      <div class="side-panel ">
+      <div class="side-panel adding-new-point"  v-if="status===Enums.InteractiveMapStatus.ADDING_NEW_POINT">
         <div class="side-header">
           <div></div>
           <div class="btn-list">
@@ -60,26 +54,21 @@
           </div>
         </div>
         <div class="side-content">
+          <h1>hello</h1>
         </div>
       </div>
-      <div class="side-panel ">
+      <div class="side-panel fill-new-data-point" v-if="status===Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT">
         <div class="side-header">
           <div></div>
           <div class="btn-list">
-
+            <button class="btn icon" alt="Create" @click="create"><span class="material-icons">add_location</span>
+            </button>
           </div>
         </div>
         <div class="side-content">
-        </div>
-      </div>
-      <div class="side-panel ">
-        <div class="side-header">
-          <div></div>
-          <div class="btn-list">
-
-          </div>
-        </div>
-        <div class="side-content">
+          <stop-form v-if="stop.creation.creating" ref="createForm" :fields="stopFields" :errors="stop.creation.errors"
+                     v-model="stop.creation.data">
+          </stop-form>
         </div>
       </div>
     </div>
