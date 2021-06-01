@@ -2,14 +2,14 @@
   <div class="dynamic-map-container">
     <div class="top-map-bar">
       <div class="right-content grid center">
-        <input type="search" placeholder="Search"/>
-        <FKSelect v-model="selectedShape" :field="shapeField" :data="{}" :errors="[]"
+        <input type="search" placeholder="Search" v-model="stopData.quickSearch" @input="filterStops"/>
+        <FKSelect v-model="shape.selectedShape" :field="shape.shapeField" :data="{}" :errors="[]"
                   v-on:input="loadShape($event)"></FKSelect>
         <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
       </div>
     </div>
     <div id='map' class="map">
-      <button v-if="!creation.creating" class="btn floating" alt="Create Stop" @click="beginCreation">
+      <button v-if="!stopData.creation.creating" class="btn floating" alt="Create Stop" @click="beginCreation">
         <span class="material-icons">add</span>
       </button>
     </div>
@@ -41,9 +41,10 @@
               <span class="material-icons">delete</span>
             </button>
           </div>
-          <div v-if="creation.creating">
-            <stop-form v-if="creation.creating" ref="createForm" :fields="stopFields" :errors="creation.errors"
-                       v-model="creation.data">
+          <div v-if="stopData.creation.creating">
+            <stop-form v-if="stopData.creation.creating" ref="createForm" :fields="stopFields"
+                       :errors="stopData.creation.errors"
+                       v-model="stopData.creation.data">
             </stop-form>
             <button class="btn icon" alt="Create" @click="create">
               <span class="material-icons">add_location</span>
@@ -77,6 +78,8 @@ import envelopeMixin from "@/mixins/envelopeMixin"
 import config from "@/config.js"
 import Enums from "@/utils/enums";
 import MessageModal from "@/components/modal/MessageModal";
+import {debounce} from "debounce";
+
 
 const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
@@ -94,9 +97,47 @@ export default {
   ],
   data() {
     return {
-      selectedShape: null,
-      active_stops: [],
-      stops: [],
+      shape: {
+        selectedShape: null,
+        activeShape: {},
+        shapeField: {
+          name: 'shape_id',
+          title: 'Shape',
+          sortField: 'shape',
+          foreignKey: true,
+          nullable: true,
+          id_field: 'shape',
+          ajax_params: {
+            url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectId),
+          },
+          type: Enums.InputType.FK_SELECT
+        },
+        shapeGeojson: {
+          'type': 'Feature',
+          'properties': {},
+          'geometry': {
+            'type': 'LineString',
+            'coordinates': []
+          }
+        },
+      },
+      stopData: {
+        quickSearch: null,
+        activeStops: [],
+        stops: [],
+        creation: {
+          creating: false,
+          data: {
+            stop_lat: null,
+            stop_lon: null,
+          },
+          errors: {},
+          geojson: {
+            type: 'FeatureCollection',
+            features: [] // We use feature collection to allow either 0 or 1
+          }
+        }
+      },
       deleteModal: {
         visible: false,
         stop: {},
@@ -108,47 +149,8 @@ export default {
         errors: {},
         disableClose: false,
       },
-      shapeField: {
-        name: 'shape_id',
-        title: 'Shape',
-        sortField: 'shape',
-        foreignKey: true,
-        nullable: true,
-        id_field: 'shape',
-        ajax_params: {
-          url: shapesAPI.shapesAPI.getFullBaseURL(this.$route.params.projectId),
-        },
-        type: Enums.InputType.FK_SELECT
-      },
-      activeShape: {},
-      map: false,
+      map: null,
       dragging: false,
-      geojson: {},
-      creation: {
-        creating: false,
-        data: {
-          stop_lat: null,
-          stop_lon: null,
-        },
-        errors: {},
-        geojson: {
-          type: 'FeatureCollection',
-          features: [] // We use feature collection to allow either 0 or 1
-        }
-      },
-      shapeGeojson: {
-        'type': 'Feature',
-        'properties': {},
-        'geometry': {
-          'type': 'LineString',
-          'coordinates': []
-        }
-      },
-      info: [
-        "Drag a Stop to update its coordinates",
-        "Click on a Stop to edit its data",
-        "Click outside the popup to open it",
-      ],
     }
   },
   props: {
@@ -160,18 +162,17 @@ export default {
     },
   },
   mounted() {
+    this.filterStops = debounce(this.filterStops, 300);
     this.$nextTick(() => {
-      stopsAPI.stopsAPI.getAll(this.project).then((response) => {
-        this.stops = response.data;
-        let map = new mapboxgl.Map({
+      stopsAPI.stopsAPI.getAll(this.project).then(response => {
+        this.stopData.stops = response.data;
+        this.map = new mapboxgl.Map({
           container: 'map',
-          style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
-          center: [this.stops[0].stop_lon, this.stops[0].stop_lat], // starting position [lng, lat]
-          zoom: 16 // starting zoom
+          style: 'mapbox://styles/mapbox/light-v10',
+          zoom: 16
         });
-        this.map = map;
-        map.on('load', () => {
-          this.envelope(map, this.project);
+        this.map.on('load', () => {
+          this.envelope(this.map, this.project);
           this.addStops();
           this.addListeners();
           this.$emit('load');
@@ -180,18 +181,56 @@ export default {
         alert("Unable to fetch stops");
         console.log(err);
       });
-
     });
   },
   methods: {
+    getGeojsonStop() {
+      console.log('generating stop points...');
+      let generateStopGeoJson = stop => {
+        let label = stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : '');
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [stop.stop_lon, stop.stop_lat]
+          },
+          properties: {
+            stop_id: stop.id,
+            label: label,
+          },
+          id: stop.id,
+        }
+      };
+
+      let geojson = {
+        type: 'FeatureCollection',
+        features: [] // We use feature collection to allow either 0 or 1
+      };
+
+      geojson.features = this.stopData.stops.map(generateStopGeoJson);
+
+      return geojson;
+    },
+    filterStops() {
+      let value = this.stopData.quickSearch;
+      let normalize = value => value !== null ? value.trim().toLowerCase() : '';
+      let filtered = this.stopData.stops.filter(stop => {
+        let stopCode = normalize(stop.stop_code);
+        let stopId = normalize(stop.stop_id);
+        let stopName = normalize(stop.stop_name);
+
+        return stopCode.indexOf(value) > -1 || stopId.indexOf(value) > -1 || stopName.indexOf(value) > -1;
+      })
+      console.log(filtered);
+    },
     loadShape(shapeId) {
       if (shapeId === null) {
-        this.activeShape = {};
+        this.shape.activeShape = {};
         this.map.setLayoutProperty('shape-layer', 'visibility', 'none')
         this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none')
-      } else if (this.activeShape.id !== shapeId) {
+      } else if (this.shape.activeShape.id !== shapeId) {
         shapesAPI.shapesAPI.detail(this.project, shapeId).then(response => {
-          this.activeShape = response.data;
+          this.shape.activeShape = response.data;
           this.reGenerateShape();
           this.map.setLayoutProperty('shape-layer', 'visibility', 'visible')
           this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'visible')
@@ -199,9 +238,9 @@ export default {
       }
     },
     reGenerateShape() {
-      this.shapeGeojson.geometry.coordinates = this.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-      this.map.getSource('shape').setData(this.shapeGeojson);
-      this.map.fitBounds(this.getBounds(this.shapeGeojson.geometry.coordinates), {
+      this.shape.shapeGeojson.geometry.coordinates = this.shape.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+      this.map.getSource('shape').setData(this.shape.shapeGeojson);
+      this.map.fitBounds(this.getBounds(this.shape.shapeGeojson.geometry.coordinates), {
         padding: 50
       });
     },
@@ -220,7 +259,7 @@ export default {
         this.popup.disableClose = true;
         this.popup.popup.remove();
         this.popup.disableClose = false;
-        this.stops = this.stops.filter(s => s.id !== stop.id);
+        this.stopData.stops = this.stopData.stops.filter(s => s.id !== stop.id);
         this.reGenerateStops();
         console.log("removed");
       }).catch((err) => {
@@ -231,25 +270,25 @@ export default {
     beginCreation() {
       let self = this;
       this.map.once("click", e => {
-        self.creation.creating = true;
+        self.stopData.creation.creating = true;
         self.updateCreationCoords(e.lngLat);
       });
     },
     create() {
-      let data = this.creation.data;
+      let data = this.stopData.creation.data;
       stopsAPI.stopsAPI.create(this.project, data).then(() => {
         this.addStop(data);
-        this.creation.errors = {};
-        this.creation.creating = false;
-        this.creation.data = {
+        this.stopData.creation.errors = {};
+        this.stopData.creation.creating = false;
+        this.stopData.creation.data = {
           stop_lat: null,
           stop_lon: null,
         };
-        this.creation.geojson.features = [];
-        this.map.getSource('creating').setData(this.creation.geojson);
+        this.stopData.creation.geojson.features = [];
+        this.map.getSource('creating').setData(this.stopData.creation.geojson);
       }).catch((err) => {
         console.log(err.response);
-        this.creation.errors = err.response.data;
+        this.stopData.creation.errors = err.response.data;
       });
     },
     focusStop(stop_data) {
@@ -262,7 +301,7 @@ export default {
       this.map.resize();
     },
     updateStopData(stop) {
-      this.stops = this.stops.map(s => {
+      this.stopData.stops = this.stopData.stops.map(s => {
         if (s.id === stop.id) {
           return {
             ...stop
@@ -273,22 +312,17 @@ export default {
       this.reGenerateStops();
     },
     addStop(data) {
-      this.stops.push(data);
+      this.stopData.stops.push(data);
       this.reGenerateStops();
     },
     saveStopData() {
       if (this.popup.disableClose) return;
       stopsAPI.stopsAPI.update(this.project, this.popup.stop).then(response => {
         console.log(response);
-        this.active_stops.forEach(feature => {
-          this.map.setFeatureState({
-            source: 'stops',
-            id: feature.id,
-          }, {
-            active: false
-          });
+        this.stopData.activeStops.forEach(feature => {
+          this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
         });
-        this.stops = this.stops.map(stop => {
+        this.stopData.stops = this.stopData.stops.map(stop => {
           if (this.popup.stop.id === stop.id) {
             return {
               ...this.popup.stop
@@ -300,53 +334,28 @@ export default {
         this.reGenerateStops()
       });
     },
-    generateStopGeoJson(stop) {
-      let label = stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : '');
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [
-            stop.stop_lon,
-            stop.stop_lat,
-          ]
-        },
-        properties: {
-          stop_id: stop.id,
-          label: label,
-        },
-        id: stop.id,
-      }
-    },
     reGenerateStops() {
-      this.geojson.features = this.stops.map(this.generateStopGeoJson);
-      this.map.getSource('stops').setData(this.geojson);
+      this.map.getSource('stop-source').setData(this.getGeojsonStop());
     },
     addStops() {
-      // We create the geojson and add it to the map
-      this.geojson = {
-        type: 'FeatureCollection',
-        features: this.stops.map(this.generateStopGeoJson),
-      };
-      this.map.addSource('stops', {
+      this.map.addSource('stop-source', {
         type: 'geojson',
-        data: this.geojson,
+        data: this.getGeojsonStop(),
       });
 
       // We add an icon and text to the geojson
+      console.log(this.geojsonStop);
       this.map.addLayer({
         id: "layer-stops-icon",
         type: "circle",
-        source: "stops",
+        source: "stop-source",
         paint: {
           "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
           "circle-color": "white",
           "circle-stroke-color": [
             'case',
-            ['boolean', ['feature-state', 'active'], false],
-            config.stop_selected_color,
-            ['boolean', ['feature-state', 'hover'], false],
-            config.stop_hover_color,
+            ['boolean', ['feature-state', 'active'], false], config.stop_selected_color,
+            ['boolean', ['feature-state', 'hover'], false], config.stop_hover_color,
             config.stop_color,
           ],
           "circle-stroke-opacity": 1,
@@ -356,8 +365,8 @@ export default {
       this.map.addLayer({
         id: "layer-stops-label",
         type: "symbol",
-        source: "stops",
-        minzoom: 16,
+        source: "stop-source",
+        minzoom: 14,
         layout: {
           "text-field": "{label}",
           "text-anchor": "top",
@@ -369,7 +378,7 @@ export default {
       // Icon for new stop
       this.map.addSource('creating', {
         type: 'geojson',
-        data: this.creation.geojson,
+        data: this.stopData.creation.geojson,
       })
       this.map.addLayer({
         id: "layer-creating-icon",
@@ -380,9 +389,10 @@ export default {
           "circle-color": config.stop_creation_color,
         }
       });
+
       this.map.addSource('shape', {
         'type': 'geojson',
-        'data': this.shapeGeojson,
+        'data': this.shape.shapeGeojson,
       });
       this.map.addLayer({
         'id': 'shape-layer',
@@ -426,20 +436,20 @@ export default {
       });
     },
     updateCreationCoords(coords) {
-      this.creation.data.stop_lon = coords.lng;
-      this.creation.data.stop_lat = coords.lat;
-      this.creation.geojson.features = [{
+      this.stopData.creation.data.stop_lon = coords.lng;
+      this.stopData.creation.data.stop_lat = coords.lat;
+      this.stopData.creation.geojson.features = [{
         type: 'Feature',
         geometry: {
           type: 'Point',
           coordinates: [coords.lng, coords.lat],
         },
       }];
-      this.map.getSource('creating').setData(this.creation.geojson);
+      this.map.getSource('creating').setData(this.stopData.creation.geojson);
     },
     findStop(id) {
       let s = null;
-      this.stops.forEach(stop => {
+      this.stopData.stops.forEach(stop => {
         if (stop.id === id) {
           s = stop;
         }
@@ -463,11 +473,11 @@ export default {
         }
         if (this.popup.stop) {
           // deactivate previous stop selected
-          this.map.setFeatureState({source: 'stops', id: this.popup.stop.id,}, {active: false});
+          this.map.setFeatureState({source: 'stop-source', id: this.popup.stop.id,}, {active: false});
         }
         this.popup.stop = this.findStop(id);
-        map.setFeatureState({source: 'stops', id: feature.id,}, {active: true});
-        this.active_stops.push(feature);
+        map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: true});
+        this.stopData.activeStops.push(feature);
         this.popup.open = true;
       });
       let hovered_stops = [];
@@ -479,33 +489,18 @@ export default {
         if (this.dragging) return;
         hovered_stops.forEach(feature => {
           hovered_stops.push(feature.id);
-          map.setFeatureState({
-            source: 'stops',
-            id: feature.id,
-          }, {
-            hover: false
-          });
+          map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
         });
         hovered_stops = [];
         [e.features[0]].forEach(feature => {
           hovered_stops.push(feature);
-          map.setFeatureState({
-            source: 'stops',
-            id: feature.id,
-          }, {
-            hover: true
-          });
+          map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: true});
         });
       });
       this.map.on('mouseleave', 'layer-stops-icon', function () {
         hovered_stops.forEach(feature => {
           hovered_stops.push(feature.id);
-          map.setFeatureState({
-            source: 'stops',
-            id: feature.id,
-          }, {
-            hover: false
-          });
+          map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
         });
         hovered_stops = [];
         if (this.dragging) return;
@@ -549,7 +544,7 @@ export default {
       return Math.sqrt(xdif * xdif + ydif * ydif)
     },
     updateStop(stop, coords) {
-      this.stops = this.stops.map(s => {
+      this.stopData.stops = this.stopData.stops.map(s => {
         if (s.id !== stop.properties.stop_id) {
           return s;
         }
