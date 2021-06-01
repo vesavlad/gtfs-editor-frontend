@@ -31,24 +31,24 @@
               <li><span>Click on the map to place it</span></li>
             </ol>
           </div>
-          <div ref="popup" v-if="popup.stop" v-show="popup.open">
-            <stop-form ref="popupContent" :fields="stopFields" v-model="popup.stop" :errors="popup.errors">
-            </stop-form>
+          <div v-if="edition.stop" v-show="edition.open">
             <button class="btn icon" alt="Delete" @click="saveStopData">
               <span class="material-icons">save</span>
             </button>
             <button class="btn icon" alt="Delete" @click="beginStopDeletion">
               <span class="material-icons">delete</span>
             </button>
+            <stop-form :fields="stopFields" v-model="edition.stop" :errors="edition.errors">
+            </stop-form>
           </div>
           <div v-if="stopData.creation.creating">
+            <button class="btn icon" alt="Create" @click="create">
+              <span class="material-icons">add_location</span>
+            </button>
             <stop-form v-if="stopData.creation.creating" ref="createForm" :fields="stopFields"
                        :errors="stopData.creation.errors"
                        v-model="stopData.creation.data">
             </stop-form>
-            <button class="btn icon" alt="Create" @click="create">
-              <span class="material-icons">add_location</span>
-            </button>
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@ export default {
         stop: {},
         message: "",
       },
-      popup: {
+      edition: {
         stop: null,
         open: false,
         errors: {},
@@ -256,7 +256,7 @@ export default {
       });
     },
     beginStopDeletion() {
-      let stop = this.popup.stop;
+      let stop = this.edition.stop;
       this.deleteModal.visible = true;
       this.deleteModal.stop = stop;
       this.deleteModal.message = "";
@@ -267,9 +267,8 @@ export default {
         this.deleteModal.visible = false;
         this.deleteModal.stop = {};
         this.deleteModal.message = "";
-        this.popup.disableClose = true;
-        this.popup.popup.remove();
-        this.popup.disableClose = false;
+        this.edition.disableClose = true;
+        this.edition.disableClose = false;
         this.stopData.stops = this.stopData.stops.filter(s => s.id !== stop.id);
         this.reGenerateStops();
         console.log("removed");
@@ -327,16 +326,16 @@ export default {
       this.reGenerateStops();
     },
     saveStopData() {
-      if (this.popup.disableClose) return;
-      stopsAPI.stopsAPI.update(this.projectId, this.popup.stop).then(response => {
+      if (this.edition.disableClose) return;
+      stopsAPI.stopsAPI.update(this.projectId, this.edition.stop).then(response => {
         console.log(response);
         this.stopData.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
         });
         this.stopData.stops = this.stopData.stops.map(stop => {
-          if (this.popup.stop.id === stop.id) {
+          if (this.edition.stop.id === stop.id) {
             return {
-              ...this.popup.stop
+              ...this.edition.stop
             };
           } else {
             return stop;
@@ -355,7 +354,6 @@ export default {
       });
 
       // We add an icon and text to the geojson
-      console.log(this.geojsonStop);
       this.map.addLayer({
         id: "layer-stops-icon",
         type: "circle",
@@ -482,14 +480,14 @@ export default {
         while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
           coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
         }
-        if (this.popup.stop) {
+        if (this.edition.stop) {
           // deactivate previous stop selected
-          this.map.setFeatureState({source: 'stop-source', id: this.popup.stop.id,}, {active: false});
+          this.map.setFeatureState({source: 'stop-source', id: this.edition.stop.id,}, {active: false});
         }
-        this.popup.stop = this.findStop(id);
+        this.edition.stop = this.findStop(id);
         map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: true});
         this.stopData.activeStops.push(feature);
-        this.popup.open = true;
+        this.edition.open = true;
       });
       let hovered_stops = [];
       this.map.on('mouseenter', 'layer-stops-icon', function () {
