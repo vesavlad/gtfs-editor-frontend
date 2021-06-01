@@ -184,7 +184,7 @@ export default {
     });
   },
   methods: {
-    getGeojsonStop() {
+    getStopGeojson() {
       console.log('generating stop points...');
       let generateStopGeoJson = stop => {
         let label = stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : '');
@@ -346,12 +346,12 @@ export default {
       });
     },
     reGenerateStops() {
-      this.map.getSource('stop-source').setData(this.getGeojsonStop());
+      this.map.getSource('stop-source').setData(this.getStopGeojson());
     },
     addStops() {
       this.map.addSource('stop-source', {
         type: 'geojson',
-        data: this.getGeojsonStop(),
+        data: this.getStopGeojson(),
       });
 
       // We add an icon and text to the geojson
