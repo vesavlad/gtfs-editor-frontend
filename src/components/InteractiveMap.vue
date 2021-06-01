@@ -174,7 +174,8 @@ export default {
         });
         this.map.on('load', () => {
           this.envelope(this.map, this.projectId);
-          this.addStops();
+          this.addSourceAndLayersForStops();
+          this.addSourceAndLayersForShape();
           this.addListeners();
           this.$emit('load');
         })
