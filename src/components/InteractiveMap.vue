@@ -154,7 +154,7 @@ export default {
     }
   },
   props: {
-    project: {
+    projectId: {
       required: true,
     },
     stopFields: {
@@ -164,7 +164,7 @@ export default {
   mounted() {
     this.filterStops = debounce(this.filterStops, 300);
     this.$nextTick(() => {
-      stopsAPI.stopsAPI.getAll(this.project).then(response => {
+      stopsAPI.stopsAPI.getAll(this.projectId).then(response => {
         this.stopData.stops = response.data;
         this.map = new mapboxgl.Map({
           container: 'map',
@@ -172,7 +172,7 @@ export default {
           zoom: 16
         });
         this.map.on('load', () => {
-          this.envelope(this.map, this.project);
+          this.envelope(this.map, this.projectId);
           this.addStops();
           this.addListeners();
           this.$emit('load');
@@ -240,7 +240,7 @@ export default {
         this.map.setLayoutProperty('shape-layer', 'visibility', 'none')
         this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none')
       } else if (this.shape.activeShape === null || this.shape.activeShape.id !== shapeId) {
-        shapesAPI.shapesAPI.detail(this.project, shapeId).then(response => {
+        shapesAPI.shapesAPI.detail(this.projectId, shapeId).then(response => {
           this.shape.activeShape = response.data;
           this.reGenerateShape();
           this.map.setLayoutProperty('shape-layer', 'visibility', 'visible')
@@ -263,7 +263,7 @@ export default {
     },
     deleteStop() {
       let stop = this.deleteModal.stop;
-      stopsAPI.stopsAPI.remove(this.project, stop).then(() => {
+      stopsAPI.stopsAPI.remove(this.projectId, stop).then(() => {
         this.deleteModal.visible = false;
         this.deleteModal.stop = {};
         this.deleteModal.message = "";
@@ -287,7 +287,7 @@ export default {
     },
     create() {
       let data = this.stopData.creation.data;
-      stopsAPI.stopsAPI.create(this.project, data).then(() => {
+      stopsAPI.stopsAPI.create(this.projectId, data).then(() => {
         this.addStop(data);
         this.stopData.creation.errors = {};
         this.stopData.creation.creating = false;
@@ -328,7 +328,7 @@ export default {
     },
     saveStopData() {
       if (this.popup.disableClose) return;
-      stopsAPI.stopsAPI.update(this.project, this.popup.stop).then(response => {
+      stopsAPI.stopsAPI.update(this.projectId, this.popup.stop).then(response => {
         console.log(response);
         this.stopData.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});

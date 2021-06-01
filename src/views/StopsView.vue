@@ -15,7 +15,7 @@
       </TableHeader>
     </div>
     <div v-show="activeTab===tabType.MAP" class="map-container">
-      <InteractiveMap ref="map" :project="$route.params.projectId" :stopFields="fields">
+      <InteractiveMap ref="map" :projectId="$route.params.projectId" :stopFields="fields">
       </InteractiveMap>
     </div>
     <div v-show="activeTab===tabType.TABLE" class="table-container container">
