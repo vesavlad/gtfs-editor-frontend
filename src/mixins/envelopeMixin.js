@@ -9,11 +9,11 @@ let envelopeMixin = {
     }
   },
   methods: {
-    envelope(map, project) {
+    envelope(map, projectId) {
       if (this.project_data) {
         let coordinates = this.project_data.envelope.geometry.coordinates[0];
         if (coordinates.length > 0) {
-          var bounds = coordinates.reduce(function (bounds, coord) {
+          let bounds = coordinates.reduce(function (bounds, coord) {
             return bounds.extend(coord);
           }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
           this.map.fitBounds(bounds, {
@@ -22,9 +22,9 @@ let envelopeMixin = {
           });
         }
       } else {
-        projectsAPI.getProjectDetail(project).then(response => {
+        projectsAPI.getProjectDetail(projectId).then(response => {
           this.project_data = response.data;
-          this.envelope(map, project);
+          this.envelope(map, projectId);
         })
       }
     }
