@@ -31,14 +31,14 @@
               <li><span>Click on the map to place it</span></li>
             </ol>
           </div>
-          <div v-if="edition.stop" v-show="edition.open">
+          <div v-if="stopData.edition.stop" v-show="stopData.edition.open">
             <button class="btn icon" alt="Delete" @click="saveStopData">
               <span class="material-icons">save</span>
             </button>
             <button class="btn icon" alt="Delete" @click="beginStopDeletion">
               <span class="material-icons">delete</span>
             </button>
-            <stop-form :fields="stopFields" v-model="edition.stop" :errors="edition.errors">
+            <stop-form :fields="stopFields" v-model="stopData.edition.stop" :errors="stopData.edition.errors">
             </stop-form>
           </div>
           <div v-if="stopData.creation.creating">
@@ -53,15 +53,16 @@
         </div>
       </div>
     </div>
-    <MessageModal :show="deleteModal.visible" @ok="deleteStop" @cancel="deleteModal.visible = false"
-                  @close="deleteModal.visible = false" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
+    <MessageModal :show="stopData.deleteModal.visible" @ok="deleteStop" @cancel="stopData.deleteModal.visible = false"
+                  @close="stopData.deleteModal.visible = false" :showCancelButton="true"
+                  :okButtonLabel="$t('general.delete')"
                   :type="Enums.MessageModalType.WARNING">
       <template v-slot:m-title>
         <h2>Are you sure you want to delete this stop?</h2>
       </template>
       <template v-slot:m-content>
           <span>
-            {{ deleteModal.message }}
+            {{ stopData.deleteModal.message }}
           </span>
       </template>
     </MessageModal>
@@ -136,18 +137,18 @@ export default {
             type: 'FeatureCollection',
             features: [] // We use feature collection to allow either 0 or 1
           }
-        }
-      },
-      deleteModal: {
-        visible: false,
-        stop: {},
-        message: "",
-      },
-      edition: {
-        stop: null,
-        open: false,
-        errors: {},
-        disableClose: false,
+        },
+        deleteModal: {
+          visible: false,
+          stop: {},
+          message: "",
+        },
+        edition: {
+          stop: null,
+          open: false,
+          errors: {},
+          disableClose: false,
+        },
       },
       map: null,
       dragging: false,
@@ -256,25 +257,25 @@ export default {
       });
     },
     beginStopDeletion() {
-      let stop = this.edition.stop;
-      this.deleteModal.visible = true;
-      this.deleteModal.stop = stop;
-      this.deleteModal.message = "";
+      let stop = this.stopData.edition.stop;
+      this.stopData.deleteModal.visible = true;
+      this.stopData.deleteModal.stop = stop;
+      this.stopData.deleteModal.message = "";
     },
     deleteStop() {
-      let stop = this.deleteModal.stop;
+      let stop = this.stopData.deleteModal.stop;
       stopsAPI.stopsAPI.remove(this.projectId, stop).then(() => {
-        this.deleteModal.visible = false;
-        this.deleteModal.stop = {};
-        this.deleteModal.message = "";
-        this.edition.disableClose = true;
-        this.edition.disableClose = false;
+        this.stopData.deleteModal.visible = false;
+        this.stopData.deleteModal.stop = {};
+        this.stopData.deleteModal.message = "";
+        this.stopData.edition.disableClose = true;
+        this.stopData.edition.disableClose = false;
         this.stopData.stops = this.stopData.stops.filter(s => s.id !== stop.id);
         this.reGenerateStops();
         console.log("removed");
       }).catch((err) => {
         let data = err.response.data;
-        this.deleteModal.message = data.message;
+        this.stopData.deleteModal.message = data.message;
       });
     },
     beginCreation() {
@@ -326,16 +327,16 @@ export default {
       this.reGenerateStops();
     },
     saveStopData() {
-      if (this.edition.disableClose) return;
-      stopsAPI.stopsAPI.update(this.projectId, this.edition.stop).then(response => {
+      if (this.stopData.edition.disableClose) return;
+      stopsAPI.stopsAPI.update(this.projectId, this.stopData.edition.stop).then(response => {
         console.log(response);
         this.stopData.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
         });
         this.stopData.stops = this.stopData.stops.map(stop => {
-          if (this.edition.stop.id === stop.id) {
+          if (this.stopData.edition.stop.id === stop.id) {
             return {
-              ...this.edition.stop
+              ...this.stopData.edition.stop
             };
           } else {
             return stop;
@@ -481,14 +482,14 @@ export default {
         while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
           coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
         }
-        if (this.edition.stop) {
+        if (this.stopData.edition.stop) {
           // deactivate previous stop selected
-          this.map.setFeatureState({source: 'stop-source', id: this.edition.stop.id,}, {active: false});
+          this.map.setFeatureState({source: 'stop-source', id: this.stopData.edition.stop.id,}, {active: false});
         }
-        this.edition.stop = this.findStop(id);
+        this.stopData.edition.stop = this.findStop(id);
         map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: true});
         this.stopData.activeStops.push(feature);
-        this.edition.open = true;
+        this.stopData.edition.open = true;
       });
 
       let hovered_stops = [];
