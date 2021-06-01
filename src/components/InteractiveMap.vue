@@ -46,7 +46,7 @@
           </stop-form>
         </div>
       </div>
-      <div class="side-panel adding-new-point"  v-if="status===Enums.InteractiveMapStatus.ADDING_NEW_POINT">
+      <div class="side-panel adding-new-point" v-if="status===Enums.InteractiveMapStatus.ADDING_NEW_POINT">
         <div class="side-header">
           <div></div>
           <div class="btn-list">
@@ -182,6 +182,7 @@ export default {
     },
   },
   mounted() {
+    document.addEventListener('keydown', this.escapeKeyPressed);
     this.filterStops = debounce(this.filterStops, 300);
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then(response => {
@@ -203,6 +204,9 @@ export default {
         console.log(err);
       });
     });
+  },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.escapeKeyPressed);
   },
   methods: {
     getStopGeojson() {
@@ -302,29 +306,39 @@ export default {
       this.status = this.Enums.InteractiveMapStatus.ADDING_NEW_POINT;
       this.map.getCanvas().style.cursor = 'grabbing';
       let self = this;
-      // move feature to cursor position in realtime
-      let mousemove = function (e) {
-        let coords = e.lngLat;
-        self.updateCreationCoords(coords);
-      }
+
       // when user decides position he makes click on map
       this.map.once("click", e => {
-        self.map.off('mousemove', mousemove);
+        self.map.off('mousemove', this.mousemove);
         self.updateCreationCoords(e.lngLat);
         self.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
         self.map.getCanvas().style.cursor = '';
       });
-      this.map.on('mousemove', mousemove);
-      document.addEventListener('keydown', this.escapeKeyPressed);
+      this.map.on('mousemove', this.mousemove);
     },
-    escapeKeyPressed() {
-      return;/*
-      console.log(this.status);
-      if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
-          this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
-        this.status = this.Enums.InteractiveMapStatus.READER;
-        this.map.getCanvas().style.cursor = '';
-      }*/
+    mousemove(e) {
+      // move feature to cursor position in realtime
+      let coords = e.lngLat;
+      this.updateCreationCoords(coords);
+    },
+    escapeKeyPressed(e) {
+      if (e.keyCode === 27) {
+        if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
+            this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
+          this.status = this.Enums.InteractiveMapStatus.READER;
+          this.map.getCanvas().style.cursor = '';
+          this.map.off('mousemove', this.mousemove);
+          this.stop.activeStops.forEach(feature => {
+            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+          });
+          this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
+        } else if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
+          this.status = this.Enums.InteractiveMapStatus.READER;
+          this.stop.activeStops.forEach(feature => {
+            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+          });
+        }
+      }
     },
     create() {
       let data = this.stop.creation.data;
@@ -336,8 +350,7 @@ export default {
           stop_lat: null,
           stop_lon: null,
         };
-        this.stop.creation.geojson.features = [];
-        this.map.getSource('creating').setData(this.stop.creation.geojson);
+        this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
       }).catch((err) => {
         console.log(err.response);
         this.stop.creation.errors = err.response.data;
@@ -587,6 +600,7 @@ export default {
         },
       }];
       this.map.getSource('creating').setData(this.stop.creation.geojson);
+      this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'visible')
     },
     // Distance in pixels between events
     calcDistance(e1, e2) {
