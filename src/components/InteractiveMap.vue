@@ -99,7 +99,7 @@ export default {
     return {
       shape: {
         selectedShape: null,
-        activeShape: {},
+        activeShape: null,
         shapeField: {
           name: 'shape_id',
           title: 'Shape',
@@ -236,10 +236,10 @@ export default {
     },
     loadShape(shapeId) {
       if (shapeId === null) {
-        this.shape.activeShape = {};
+        this.shape.activeShape = null;
         this.map.setLayoutProperty('shape-layer', 'visibility', 'none')
         this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none')
-      } else if (this.shape.activeShape.id !== shapeId) {
+      } else if (this.shape.activeShape === null || this.shape.activeShape.id !== shapeId) {
         shapesAPI.shapesAPI.detail(this.project, shapeId).then(response => {
           this.shape.activeShape = response.data;
           this.reGenerateShape();
