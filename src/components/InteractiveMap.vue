@@ -205,7 +205,7 @@ export default {
 
       let geojson = {
         type: 'FeatureCollection',
-        features: [] // We use feature collection to allow either 0 or 1
+        features: []
       };
 
       geojson.features = this.stop.stops.map(generateStopGeoJson);
