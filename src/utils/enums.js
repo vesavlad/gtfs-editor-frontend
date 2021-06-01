@@ -55,6 +55,12 @@ const Enums = {
     SIMPLE: 'simple',
     RANGE: 'range',
     DUPLICATE: 'duplicate'
+  },
+  InteractiveMapStatus: {
+    READER: 'reader',
+    ADDING_NEW_POINT: 'addingNewPoint',
+    FILL_NEW_DATA_POINT: 'addDataPoint',
+    EDIT_DATA_POINT: 'editDataPoint'
   }
 }
 

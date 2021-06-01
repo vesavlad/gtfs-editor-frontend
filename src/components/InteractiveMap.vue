@@ -9,7 +9,8 @@
       </div>
     </div>
     <div id='map' class="map">
-      <button v-if="!stop.creation.creating" class="btn floating" alt="Create Stop" @click="beginCreation">
+      <button v-if="status===Enums.InteractiveMapStatus.READER" class="btn floating" alt="Create Stop"
+              @click="beginCreation">
         <span class="material-icons">add</span>
       </button>
     </div>
@@ -22,7 +23,7 @@
           </div>
         </div>
         <div class="side-content">
-          <div>
+          <div v-if="status===Enums.InteractiveMapStatus.READER">
             <div class="empty img">
               <i class="material-icons">add_location_alt</i>
             </div>
@@ -31,8 +32,8 @@
               <li><span>Click on the map to place it</span></li>
             </ol>
           </div>
-          <div v-if="stop.edition.stop" v-show="stop.edition.open">
-            <button class="btn icon" alt="Delete" @click="savestop">
+          <div v-if="status===Enums.InteractiveMapStatus.EDIT_DATA_POINT">
+            <button class="btn icon" alt="Delete" @click="saveStop">
               <span class="material-icons">save</span>
             </button>
             <button class="btn icon" alt="Delete" @click="beginStopDeletion">
@@ -41,13 +42,12 @@
             <stop-form :fields="stopFields" v-model="stop.edition.stop" :errors="stop.edition.errors">
             </stop-form>
           </div>
-          <div v-if="stop.creation.creating">
+          <div v-if="status===Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT">
             <button class="btn icon" alt="Create" @click="create">
               <span class="material-icons">add_location</span>
             </button>
             <stop-form v-if="stop.creation.creating" ref="createForm" :fields="stopFields"
-                       :errors="stop.creation.errors"
-                       v-model="stop.creation.data">
+                       :errors="stop.creation.errors" v-model="stop.creation.data">
             </stop-form>
           </div>
         </div>
@@ -145,11 +145,11 @@ export default {
         },
         edition: {
           stop: null,
-          open: false,
           errors: {},
           disableClose: false,
         },
       },
+      status: Enums.InteractiveMapStatus.READER,
       map: null,
       dragging: false,
     }
@@ -261,29 +261,34 @@ export default {
       let stop = this.stop.edition.stop;
       this.stop.deleteModal.visible = true;
       this.stop.deleteModal.stop = stop;
-      this.stop.deleteModal.message = "";
+      this.stop.deleteModal.message = '';
     },
     deleteStop() {
       let stop = this.stop.deleteModal.stop;
       stopsAPI.stopsAPI.remove(this.projectId, stop).then(() => {
         this.stop.deleteModal.visible = false;
-        this.stop.deleteModal.stop = {};
-        this.stop.deleteModal.message = "";
-        this.stop.edition.disableClose = true;
+        this.stop.deleteModal.stop = null;
+        this.stop.deleteModal.message = '';
         this.stop.edition.disableClose = false;
         this.stop.stops = this.stop.stops.filter(s => s.id !== stop.id);
         this.reGenerateStops();
-        console.log("removed");
+        console.log(`stop ${stop.stop_id} removed`);
       }).catch((err) => {
         let data = err.response.data;
         this.stop.deleteModal.message = data.message;
       });
     },
     beginCreation() {
+      this.stop.creation.creating = true;
+      this.status = this.Enums.InteractiveMapStatus.ADDING_NEW_POINT;
+      this.map.getCanvas().style.cursor = 'grab';
       let self = this;
       this.map.once("click", e => {
-        self.stop.creation.creating = true;
         self.updateCreationCoords(e.lngLat);
+        self.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
+      });
+      this.map.on('mousemove', function () {
+
       });
     },
     create() {
@@ -327,23 +332,20 @@ export default {
       this.stop.stops.push(data);
       this.reGenerateStops();
     },
-    savestop() {
+    saveStop() {
       if (this.stop.edition.disableClose) return;
       stopsAPI.stopsAPI.update(this.projectId, this.stop.edition.stop).then(response => {
-        console.log(response);
         this.stop.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
         });
         this.stop.stops = this.stop.stops.map(stop => {
-          if (this.stop.edition.stop.id === stop.id) {
-            return {
-              ...this.stop.edition.stop
-            };
-          } else {
-            return stop;
+          if (stop.id === response.data.id) {
+            return response.data;
           }
+          return stop;
         });
         this.reGenerateStops()
+        this.status = this.Enums.InteractiveMapStatus.READER;
       });
     },
     reGenerateStops() {
@@ -452,6 +454,14 @@ export default {
       let canvas = map.getCanvas();
       let self = this;
 
+      this.map.on('click', () => {
+        // deactivate stop if user clicks on map
+        if (this.stop.edition.stop) {
+          this.status = this.Enums.InteractiveMapStatus.READER;
+          map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id}, {active: false});
+        }
+      });
+
       this.map.on('click', 'layer-stops-icon', (evt) => {
         let coordinates = evt.features[0].geometry.coordinates.slice();
         let feature = evt.features[0];
@@ -467,10 +477,10 @@ export default {
           // deactivate previous stop selected
           this.map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id,}, {active: false});
         }
-        this.stop.edition.stop = this.findStop(id);
+        this.stop.edition.stop = this.stop.stops.find(stop => stop.id === id);
         map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: true});
         this.stop.activeStops.push(feature);
-        this.stop.edition.open = true;
+        this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
       });
 
       let hovered_stops = [];
@@ -542,15 +552,6 @@ export default {
         },
       }];
       this.map.getSource('creating').setData(this.stop.creation.geojson);
-    },
-    findStop(id) {
-      let s = null;
-      this.stop.stops.forEach(stop => {
-        if (stop.id === id) {
-          s = stop;
-        }
-      })
-      return s;
     },
     // Distance in pixels between events
     calcDistance(e1, e2) {
