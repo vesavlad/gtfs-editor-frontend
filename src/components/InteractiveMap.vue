@@ -112,7 +112,7 @@ export default {
           },
           type: Enums.InputType.FK_SELECT
         },
-        shapeGeojson: {
+        geojson: {
           'type': 'Feature',
           'properties': {},
           'geometry': {
@@ -249,9 +249,9 @@ export default {
       }
     },
     reGenerateShape() {
-      this.shape.shapeGeojson.geometry.coordinates = this.shape.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-      this.map.getSource('shape').setData(this.shape.shapeGeojson);
-      this.map.fitBounds(this.getBounds(this.shape.shapeGeojson.geometry.coordinates), {
+      this.shape.geojson.geometry.coordinates = this.shape.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+      this.map.getSource('shape').setData(this.shape.geojson);
+      this.map.fitBounds(this.getBounds(this.shape.geojson.geometry.coordinates), {
         padding: 50
       });
     },
@@ -401,7 +401,7 @@ export default {
 
       this.map.addSource('shape', {
         'type': 'geojson',
-        'data': this.shape.shapeGeojson,
+        'data': this.shape.geojson,
       });
       this.map.addLayer({
         'id': 'shape-layer',
