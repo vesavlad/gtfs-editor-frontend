@@ -67,7 +67,7 @@
           </div>
         </div>
         <div class="side-content">
-          <stop-form v-if="stop.creation.creating" ref="createForm" :fields="stopFields" :errors="stop.creation.errors"
+          <stop-form ref="createForm" :fields="stopFields" :errors="stop.creation.errors"
                      v-model="stop.creation.data">
           </stop-form>
         </div>
@@ -147,7 +147,6 @@ export default {
         activeStops: [],
         stops: [],
         creation: {
-          creating: false,
           data: {
             stop_lat: null,
             stop_lon: null,
@@ -303,7 +302,6 @@ export default {
       });
     },
     beginCreation() {
-      this.stop.creation.creating = true;
       this.status = this.Enums.InteractiveMapStatus.ADDING_NEW_POINT;
       this.map.getCanvas().style.cursor = 'grabbing';
       let self = this;
@@ -346,7 +344,6 @@ export default {
       stopsAPI.stopsAPI.create(this.projectId, data).then(() => {
         this.addStop(data);
         this.stop.creation.errors = {};
-        this.stop.creation.creating = false;
         this.stop.creation.data = {
           stop_lat: null,
           stop_lon: null,
@@ -532,14 +529,19 @@ export default {
         this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
       });
 
-      let hovered_stops = [];
-      this.map.on('mouseenter', 'layer-stops-icon', function () {
-        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
-        canvas.style.cursor = 'pointer';
+      this.map.on('mouseenter', 'layer-stops-icon', function (e) {
+        if (self.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.status === self.Enums.InteractiveMapStatus.EDIT_DATA_POINT &&
+            self.stop.edition.stop.id === e.features[0].id) {
+          canvas.style.cursor = 'move';
+        } else {
+          canvas.style.cursor = 'pointer';
+        }
       });
 
+      let hovered_stops = [];
       this.map.on('mousemove', 'layer-stops-icon', function (e) {
-        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         hovered_stops.forEach(feature => {
           hovered_stops.push(feature.id);
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
@@ -557,26 +559,35 @@ export default {
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
         });
         hovered_stops = [];
-        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         canvas.style.cursor = '';
       });
 
-      this.map.on('mousedown', 'layer-stops-icon', function (evt_down) {
-        // Prevent the default map drag behavior.
-        evt_down.preventDefault();
-        canvas.style.cursor = 'grab';
-        let activeStop = evt_down.features[0]
-        this.dragging = true;
-        map.once('mouseup', evt_up => {
-          this.dragging = false;
-          let coords = evt_up.lngLat;
-          let distance = self.calcDistance(evt_down, evt_up);
-          if (!distance) {
-            return;
-          }
-          self.updateStop(activeStop, coords);
-          canvas.style.cursor = '';
-        });
+      this.map.on('mousedown', 'layer-stops-icon', function (e) {
+        let activeStop = e.features[0]
+        if (self.status === self.Enums.InteractiveMapStatus.EDIT_DATA_POINT &&
+            self.stop.edition.stop.id === activeStop.id) {
+          // Prevent the default map drag behavior.
+          e.preventDefault();
+          canvas.style.cursor = 'grab';
+          this.dragging = true;
+          map.once('mouseup', evt_up => {
+            this.dragging = false;
+            let coords = evt_up.lngLat;
+            let distance = self.calcDistance(e, evt_up);
+            if (!distance) return;
+            self.updateStop(activeStop, coords);
+            canvas.style.cursor = '';
+          });
+        }
+      });
+
+      this.map.on('mouseenter', 'layer-creating-icon', () => {
+        canvas.style.cursor = 'move';
+      });
+
+      this.map.on('mouseleave', 'layer-creating-icon', () => {
+        canvas.style.cursor = '';
       });
 
       this.map.on('mousedown', 'layer-creating-icon', function (evt_down) {
