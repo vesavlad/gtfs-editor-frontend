@@ -5,10 +5,10 @@
         <template v-slot:right-section>
           <div class="tab">
             <button class="tablinks" :class="{active: activeTab===tabType.TABLE}" @click="switchTab(tabType.TABLE)">
-              <span>Table view</span><i class="material-icons">view_headline</i>
+              <span>{{ $t('stop.tabs.tableView') }}</span><i class="material-icons">view_headline</i>
             </button>
             <button class="tablinks" :class="{active: activeTab===tabType.MAP}" @click="switchTab(tabType.MAP)">
-              <span>Map view</span><i class="material-icons">map</i>
+              <span>{{ $t('stop.tabs.mapView') }}</span><i class="material-icons">map</i>
             </button>
           </div>
         </template>
