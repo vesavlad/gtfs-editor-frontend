@@ -302,39 +302,20 @@ export default {
     beginCreation() {
       this.status = this.Enums.InteractiveMapStatus.ADDING_NEW_POINT;
       this.map.getCanvas().style.cursor = 'grabbing';
-      let self = this;
 
       // when user decides position he makes click on map
-      this.map.once('click', () => {
-        self.map.off('mousemove', this.creationMouseMove);
-        self.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
-        self.map.getCanvas().style.cursor = '';
-      });
+      this.map.once('click', this.creationPutPointOnMap);
       this.map.on('mousemove', this.creationMouseMove);
+    },
+    creationPutPointOnMap() {
+      this.map.off('mousemove', this.creationMouseMove);
+      this.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
+      this.map.getCanvas().style.cursor = '';
     },
     creationMouseMove(e) {
       // move feature to cursor position in realtime
       let coords = e.lngLat;
       this.updateCreationCoords(coords);
-    },
-    escapeKeyPressed(e) {
-      if (e.keyCode === 27) {
-        if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
-            this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
-          this.status = this.Enums.InteractiveMapStatus.READER;
-          this.map.getCanvas().style.cursor = '';
-          this.map.off('mousemove', this.creationMouseMove);
-          this.stop.activeStops.forEach(feature => {
-            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
-          });
-          this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
-        } else if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
-          this.status = this.Enums.InteractiveMapStatus.READER;
-          this.stop.activeStops.forEach(feature => {
-            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
-          });
-        }
-      }
     },
     create() {
       let data = this.stop.creation.data;
@@ -351,7 +332,28 @@ export default {
         this.stop.creation.errors = err.response.data;
       });
     },
+    escapeKeyPressed(e) {
+      if (e.keyCode === 27) {
+        if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
+            this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
+          this.status = this.Enums.InteractiveMapStatus.READER;
+          this.map.getCanvas().style.cursor = '';
+          this.map.off('click', this.creationPutPointOnMap);
+          this.map.off('mousemove', this.creationMouseMove);
+          this.stop.activeStops.forEach(feature => {
+            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+          });
+          this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
+        } else if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
+          this.status = this.Enums.InteractiveMapStatus.READER;
+          this.stop.activeStops.forEach(feature => {
+            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+          });
+        }
+      }
+    },
     flyToStop(stop) {
+      /* it is used by external components to interact with map (put focus on one stop point) */
       this.map.flyTo({
         center: [stop.stop_lon, stop.stop_lat],
         zoom: 16,
