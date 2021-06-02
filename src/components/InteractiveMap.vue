@@ -261,6 +261,7 @@ export default {
     },
     loadShape(shapeId) {
       if (shapeId === null) {
+        // select is empty
         this.shape.activeShape = null;
         this.map.setLayoutProperty('shape-layer', 'visibility', 'none');
         this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none');
@@ -274,7 +275,7 @@ export default {
           });
           this.map.setLayoutProperty('shape-layer', 'visibility', 'visible');
           this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'visible');
-        })
+        });
       }
     },
     beginStopDeletion() {
