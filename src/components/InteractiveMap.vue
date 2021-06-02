@@ -68,8 +68,7 @@
           </div>
         </div>
         <div class="side-content">
-          <stop-form ref="createForm" :fields="stopFields" :errors="stop.creation.errors"
-                     v-model="stop.creation.data">
+          <stop-form :fields="stopFields" :errors="stop.creation.errors" v-model="stop.creation.data">
           </stop-form>
         </div>
       </div>
