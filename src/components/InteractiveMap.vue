@@ -510,16 +510,12 @@ export default {
       });
 
       this.map.on('click', 'layer-stops-icon', (evt) => {
-        let coordinates = evt.features[0].geometry.coordinates.slice();
         let feature = evt.features[0];
         let id = feature.properties.stop_id;
 
-        // Ensure that if the map is zoomed out such that multiple
-        // copies of the feature are visible, the popup appears
-        // over the copy being pointed to.
-        while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
+        if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
+            this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) return;
+
         if (this.stop.edition.stop) {
           // deactivate previous stop selected
           this.map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id,}, {active: false});
