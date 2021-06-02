@@ -33,7 +33,8 @@
           </ol>
         </div>
       </div>
-      <div class="side-panel edit-data-point" v-if="status===Enums.InteractiveMapStatus.EDIT_DATA_POINT">
+      <div class="side-panel edit-data-point"
+           v-if="status===Enums.InteractiveMapStatus.EDIT_DATA_POINT || status===Enums.InteractiveMapStatus.MOVING_POINT">
         <div class="side-header">
           <div></div>
           <div class="btn-list">
@@ -167,9 +168,12 @@ export default {
           errors: {}
         },
       },
+      tmp: {
+        previousEvent: null,
+        previousFeature: null
+      },
       status: Enums.InteractiveMapStatus.READER,
       map: null,
-      dragging: false,
     }
   },
   props: {
@@ -339,8 +343,10 @@ export default {
           this.map.off('click', this.putNewPointOnMap);
           this.map.off('mousemove', this.creationMouseMove);
           this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
-        } else if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
+        } else if (this.status === this.Enums.InteractiveMapStatus.MOVING_POINT ||
+            this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
           this.status = this.Enums.InteractiveMapStatus.READER;
+          this.map.off('mouseup', this.editingStopMouseUp);
         }
         this.stop.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
@@ -525,7 +531,8 @@ export default {
       });
 
       this.map.on('mouseenter', 'layer-stops-icon', function (e) {
-        if (self.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
+            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         if (self.status === self.Enums.InteractiveMapStatus.EDIT_DATA_POINT &&
             self.stop.edition.stop.id === e.features[0].id) {
           canvas.style.cursor = 'move';
@@ -536,7 +543,8 @@ export default {
 
       let hovered_stops = [];
       this.map.on('mousemove', 'layer-stops-icon', function (e) {
-        if (self.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
+            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         hovered_stops.forEach(feature => {
           hovered_stops.push(feature.id);
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
@@ -554,26 +562,22 @@ export default {
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
         });
         hovered_stops = [];
-        if (self.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
+            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         canvas.style.cursor = '';
       });
 
-      this.map.on('mousedown', 'layer-stops-icon', function (e) {
-        let activeStop = e.features[0]
+      this.map.on('mousedown', 'layer-stops-icon', function (evtMouseDown) {
+        let activeStop = evtMouseDown.features[0];
+        self.tmp.previousEvent = evtMouseDown;
+        self.tmp.previousFeature = activeStop;
         if (self.status === self.Enums.InteractiveMapStatus.EDIT_DATA_POINT &&
             self.stop.edition.stop.id === activeStop.id) {
           // Prevent the default map drag behavior.
-          e.preventDefault();
+          evtMouseDown.preventDefault();
           canvas.style.cursor = 'grab';
-          this.dragging = true;
-          map.once('mouseup', evt_up => {
-            this.dragging = false;
-            let coords = evt_up.lngLat;
-            let distance = self.calcDistance(e, evt_up);
-            if (!distance) return;
-            self.updateStop(activeStop, coords);
-            canvas.style.cursor = '';
-          });
+          self.status = self.Enums.InteractiveMapStatus.MOVING_POINT;
+          map.once('mouseup', self.editingStopMouseUp);
         }
       });
 
@@ -599,6 +603,15 @@ export default {
         });
         map.on('mousemove', self.creationMouseMove);
       });
+    },
+    editingStopMouseUp(evtUp) {
+      /* executed when user finishes to move editing point */
+      this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
+      let coords = evtUp.lngLat;
+      let distance = this.calcDistance(this.tmp.previousEvent, evtUp);
+      if (!distance) return;
+      this.updateStop(this.tmp.previousFeature, coords);
+      this.map.getCanvas().style.cursor = '';
     },
     updateCreationCoords(coords) {
       this.stop.creation.data.stop_lon = coords.lng;
