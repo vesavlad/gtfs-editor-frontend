@@ -262,23 +262,20 @@ export default {
     loadShape(shapeId) {
       if (shapeId === null) {
         this.shape.activeShape = null;
-        this.map.setLayoutProperty('shape-layer', 'visibility', 'none')
-        this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none')
+        this.map.setLayoutProperty('shape-layer', 'visibility', 'none');
+        this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none');
       } else if (this.shape.activeShape === null || this.shape.activeShape.id !== shapeId) {
         shapesAPI.shapesAPI.detail(this.projectId, shapeId).then(response => {
           this.shape.activeShape = response.data;
-          this.reGenerateShape();
-          this.map.setLayoutProperty('shape-layer', 'visibility', 'visible')
-          this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'visible')
+          this.shape.geojson.geometry.coordinates = this.shape.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+          this.map.getSource('shape').setData(this.shape.geojson);
+          this.map.fitBounds(this.getBounds(this.shape.geojson.geometry.coordinates), {
+            padding: 50
+          });
+          this.map.setLayoutProperty('shape-layer', 'visibility', 'visible');
+          this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'visible');
         })
       }
-    },
-    reGenerateShape() {
-      this.shape.geojson.geometry.coordinates = this.shape.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-      this.map.getSource('shape').setData(this.shape.geojson);
-      this.map.fitBounds(this.getBounds(this.shape.geojson.geometry.coordinates), {
-        padding: 50
-      });
     },
     beginStopDeletion() {
       let stop = this.stop.edition.stop;
