@@ -62,7 +62,7 @@
         <div class="side-header">
           <div></div>
           <div class="btn-list">
-            <button class="btn icon" alt="Create" @click="create"><span class="material-icons">add_location</span>
+            <button class="btn icon" alt="Create" @click="createStop"><span class="material-icons">add_location</span>
             </button>
           </div>
         </div>
@@ -317,7 +317,7 @@ export default {
       let coords = e.lngLat;
       this.updateCreationCoords(coords);
     },
-    create() {
+    createStop() {
       let data = this.stop.creation.data;
       stopsAPI.stopsAPI.create(this.projectId, data).then(() => {
         this.addStop(data);
