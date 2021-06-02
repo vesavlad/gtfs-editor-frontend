@@ -116,6 +116,7 @@
     "tabs": {
       "mapView": "Mapa",
       "tableView": "Tabla"
-    }
+    },
+    "deleteModalTitle": "¿Estás segur@ que deseas eliminar la parada?"
   }
 }

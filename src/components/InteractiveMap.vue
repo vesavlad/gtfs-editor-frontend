@@ -79,7 +79,7 @@
                   :okButtonLabel="$t('general.delete')"
                   :type="Enums.MessageModalType.WARNING">
       <template v-slot:m-title>
-        <h2>Are you sure you want to delete this stop?</h2>
+        <h2>{{ $t('stop.deleteModalTitle') }}</h2>
       </template>
       <template v-slot:m-content>
           <span>
