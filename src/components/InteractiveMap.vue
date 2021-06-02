@@ -495,9 +495,11 @@ export default {
 
       this.map.on('click', () => {
         // deactivate stop if user clicks on map
-        if (this.stop.edition.stop) {
+        if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
           this.status = this.Enums.InteractiveMapStatus.READER;
-          map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id}, {active: false});
+          this.stop.activeStops.forEach(feature => {
+            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+          });
         }
       });
 
