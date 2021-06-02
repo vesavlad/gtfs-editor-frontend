@@ -209,6 +209,29 @@ export default {
     document.removeEventListener('keydown', this.escapeKeyPressed);
   },
   methods: {
+    filterStops() {
+      let value = this.stop.quickSearch;
+      if (value.length < 4) {
+        return;
+      }
+      let normalize = value => value !== null ? value.trim().toLowerCase() : '';
+
+      value = normalize(value);
+      let filtered = this.stop.stops.filter(stop => {
+        let stopCode = normalize(stop.stop_code);
+        let stopId = normalize(stop.stop_id);
+        let stopName = normalize(stop.stop_name);
+
+        return stopCode.indexOf(value) > -1 || stopId.indexOf(value) > -1 || stopName.indexOf(value) > -1;
+      });
+
+      if (filtered.length > 0) {
+        let points = filtered.map(stop => [stop.stop_lon, stop.stop_lat]);
+        this.map.fitBounds(this.getBounds(points), {
+          padding: 50
+        });
+      }
+    },
     getStopGeojson() {
       console.log('generating stop points...');
       let generateStopGeoJson = stop => {
@@ -235,29 +258,6 @@ export default {
       geojson.features = this.stop.stops.map(generateStopGeoJson);
 
       return geojson;
-    },
-    filterStops() {
-      let value = this.stop.quickSearch;
-      if (value.length < 4) {
-        return;
-      }
-      let normalize = value => value !== null ? value.trim().toLowerCase() : '';
-
-      value = normalize(value);
-      let filtered = this.stop.stops.filter(stop => {
-        let stopCode = normalize(stop.stop_code);
-        let stopId = normalize(stop.stop_id);
-        let stopName = normalize(stop.stop_name);
-
-        return stopCode.indexOf(value) > -1 || stopId.indexOf(value) > -1 || stopName.indexOf(value) > -1;
-      });
-
-      if (filtered.length > 0) {
-        let points = filtered.map(stop => [stop.stop_lon, stop.stop_lat]);
-        this.map.fitBounds(this.getBounds(points), {
-          padding: 50
-        });
-      }
     },
     loadShape(shapeId) {
       if (shapeId === null) {
