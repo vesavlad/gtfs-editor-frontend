@@ -279,9 +279,8 @@ export default {
       }
     },
     beginStopDeletion() {
-      let stop = this.stop.edition.stop;
       this.stop.deleteModal.visible = true;
-      this.stop.deleteModal.stop = stop;
+      this.stop.deleteModal.stop = this.stop.edition.stop;
       this.stop.deleteModal.message = '';
     },
     deleteStop() {
@@ -297,6 +296,7 @@ export default {
       }).catch((err) => {
         let data = err.response.data;
         this.stop.deleteModal.message = data.message;
+        this.stop.deleteModal.visible = true;
       });
     },
     beginCreation() {
