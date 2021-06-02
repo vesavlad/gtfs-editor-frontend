@@ -5,7 +5,8 @@
         <input type="search" placeholder="Search" v-model="stop.quickSearch" @input="filterStops"/>
         <FKSelect v-model="shape.selectedShape" :field="shape.shapeField" :data="{}" :errors="[]"
                   v-on:input="loadShape($event)"></FKSelect>
-        <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
+        <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i
+            class="material-icons">help_outline</i></button>
       </div>
     </div>
     <div id='map' class="map">
