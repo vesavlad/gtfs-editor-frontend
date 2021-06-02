@@ -11,7 +11,7 @@
       </div>
     </div>
     <div id='map' class="map">
-      <button v-if="status===Enums.InteractiveMapStatus.READER" class="btn floating" alt="Create Stop"
+      <button :disabled="status!==Enums.InteractiveMapStatus.READER" class="btn floating" alt="Create Stop"
               @click="beginCreation">
         <span class="material-icons">add</span>
       </button>
@@ -34,9 +34,12 @@
         <div class="side-header">
           <div><h4>Stop details</h4></div>
           <div class="btn-list">
-            <button class="btn icon save" alt="Save" @click="saveStop"><span class="material-icons">check</span></button>
-            <button class="btn icon" alt="Delete" @click="beginStopDeletion"><span class="material-icons">delete</span></button>
-            <button class="btn icon" alt="Cancel" @click="cancelStopEdition"><i class="material-icons">close</i></button>
+            <button class="btn icon save" alt="Save" @click="saveStop"><span class="material-icons">check</span>
+            </button>
+            <button class="btn icon" alt="Delete" @click="beginStopDeletion"><span class="material-icons">delete</span>
+            </button>
+            <button class="btn icon" alt="Cancel" @click="cancelStopEdition"><i class="material-icons">close</i>
+            </button>
           </div>
         </div>
         <div class="side-content">
@@ -143,7 +146,7 @@ export default {
       stop: {
         quickSearch: null,
         activeStops: [],
-        stops: [],
+        stops: {},
         creation: {
           data: {
             stop_lat: null,
@@ -186,7 +189,9 @@ export default {
     this.filterStops = debounce(this.filterStops, 300);
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then(response => {
-        this.stop.stops = response.data;
+        response.data.forEach(el => {
+          this.stop.stops[el.id] = el;
+        });
         this.map = new mapboxgl.Map({
           container: 'map',
           style: 'mapbox://styles/mapbox/light-v10',
@@ -217,7 +222,7 @@ export default {
       let normalize = value => value !== null ? value.trim().toLowerCase() : '';
 
       value = normalize(value);
-      let filtered = this.stop.stops.filter(stop => {
+      let filtered = Object.values(this.stop.stops).filter(stop => {
         let stopCode = normalize(stop.stop_code);
         let stopId = normalize(stop.stop_id);
         let stopName = normalize(stop.stop_name);
@@ -255,7 +260,7 @@ export default {
         features: []
       };
 
-      geojson.features = this.stop.stops.map(generateStopGeoJson);
+      geojson.features = Object.values(this.stop.stops).map(generateStopGeoJson);
 
       return geojson;
     },
@@ -289,7 +294,7 @@ export default {
         this.stop.deleteModal.visible = false;
         this.stop.deleteModal.stop = null;
         this.stop.deleteModal.message = '';
-        this.stop.stops = this.stop.stops.filter(s => s.id !== stop.id);
+        delete this.stop.stops[stop.id];
         this.reGenerateStops();
         console.log(`stop ${stop.stop_id} removed`);
       }).catch((err) => {
@@ -334,7 +339,7 @@ export default {
     cancelNewStop() {
       this.moveToReaderStatus();
     },
-    cancelStopEdition(){
+    cancelStopEdition() {
       this.moveToReaderStatus();
     },
     moveToReaderStatus() {
@@ -370,18 +375,11 @@ export default {
       this.map.resize();
     },
     updateStopData(stop) {
-      this.stop.stops = this.stop.stops.map(s => {
-        if (s.id === stop.id) {
-          return {
-            ...stop
-          };
-        }
-        return s;
-      });
+      this.stop.stops[stop.id] = stop;
       this.reGenerateStops();
     },
     addStop(data) {
-      this.stop.stops.push(data);
+      this.stop.stops[data.id] = data;
       this.reGenerateStops();
     },
     saveStop() {
@@ -389,12 +387,7 @@ export default {
         this.stop.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
         });
-        this.stop.stops = this.stop.stops.map(stop => {
-          if (stop.id === response.data.id) {
-            return response.data;
-          }
-          return stop;
-        });
+        this.stop.stops[response.data.id] = response.data;
         this.reGenerateStops()
         this.status = this.Enums.InteractiveMapStatus.READER;
       });
@@ -442,9 +435,9 @@ export default {
           "text-offset": [0, 0.5]
         },
         paint: {
-          "text-halo-width":3,
-          "text-halo-color":"#000",
-          "text-color":"#fff",
+          "text-halo-width": 3,
+          "text-halo-color": "#000",
+          "text-color": "#fff",
         }
       });
 
@@ -535,7 +528,7 @@ export default {
           // deactivate previous stop selected
           this.map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id,}, {active: false});
         }
-        this.stop.edition.stop = this.stop.stops.find(stop => stop.id === id);
+        this.stop.edition.stop = this.stop.stops[id];
         map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: true});
         this.stop.activeStops.push(feature);
         this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
@@ -646,14 +639,8 @@ export default {
       return Math.sqrt(xdif * xdif + ydif * ydif)
     },
     updateStop(stop, coords) {
-      this.stop.stops = this.stop.stops.map(s => {
-        if (s.id !== stop.properties.stop_id) {
-          return s;
-        }
-        s.stop_lon = coords.lng;
-        s.stop_lat = coords.lat;
-        return s;
-      });
+      this.stop.stops[stop.properties.stop_id].stop_lon = coords.lng;
+      this.stop.stops[stop.properties.stop_id].stop_lat = coords.lat;
       this.reGenerateStops();
     },
   },
