@@ -305,15 +305,14 @@ export default {
       let self = this;
 
       // when user decides position he makes click on map
-      this.map.once('click', e => {
-        self.map.off('mousemove', this.mousemove);
-        self.updateCreationCoords(e.lngLat);
+      this.map.once('click', () => {
+        self.map.off('mousemove', this.creationMouseMove);
         self.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
         self.map.getCanvas().style.cursor = '';
       });
-      this.map.on('mousemove', this.mousemove);
+      this.map.on('mousemove', this.creationMouseMove);
     },
-    mousemove(e) {
+    creationMouseMove(e) {
       // move feature to cursor position in realtime
       let coords = e.lngLat;
       this.updateCreationCoords(coords);
@@ -324,7 +323,7 @@ export default {
             this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
           this.status = this.Enums.InteractiveMapStatus.READER;
           this.map.getCanvas().style.cursor = '';
-          this.map.off('mousemove', this.mousemove);
+          this.map.off('mousemove', this.creationMouseMove);
           this.stop.activeStops.forEach(feature => {
             this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
           });
@@ -581,22 +580,26 @@ export default {
       });
 
       this.map.on('mouseenter', 'layer-creating-icon', () => {
-        canvas.style.cursor = 'move';
+        if (self.status === self.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
+          canvas.style.cursor = 'move';
+        }
       });
 
       this.map.on('mouseleave', 'layer-creating-icon', () => {
-        canvas.style.cursor = '';
+        if (self.status === self.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
+          canvas.style.cursor = '';
+        }
       });
 
       this.map.on('mousedown', 'layer-creating-icon', function (evt_down) {
         // Prevent the default map drag behavior.
         evt_down.preventDefault();
         canvas.style.cursor = 'grab';
-        map.once('mouseup', evt_up => {
-          let coords = evt_up.lngLat;
-          self.updateCreationCoords(coords);
+        map.once('mouseup', () => {
+          map.off('mousemove', self.creationMouseMove);
           canvas.style.cursor = '';
         });
+        map.on('mousemove', self.creationMouseMove);
       });
     },
     updateCreationCoords(coords) {
