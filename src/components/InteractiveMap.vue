@@ -164,8 +164,7 @@ export default {
         },
         edition: {
           stop: null,
-          errors: {},
-          disableClose: false,
+          errors: {}
         },
       },
       status: Enums.InteractiveMapStatus.READER,
@@ -289,7 +288,6 @@ export default {
         this.stop.deleteModal.visible = false;
         this.stop.deleteModal.stop = null;
         this.stop.deleteModal.message = '';
-        this.stop.edition.disableClose = false;
         this.stop.stops = this.stop.stops.filter(s => s.id !== stop.id);
         this.reGenerateStops();
         console.log(`stop ${stop.stop_id} removed`);
@@ -378,7 +376,6 @@ export default {
       this.reGenerateStops();
     },
     saveStop() {
-      if (this.stop.edition.disableClose) return;
       stopsAPI.stopsAPI.update(this.projectId, this.stop.edition.stop).then(response => {
         this.stop.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
