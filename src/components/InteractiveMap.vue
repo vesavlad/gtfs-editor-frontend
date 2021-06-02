@@ -38,10 +38,11 @@
         <div class="side-header">
           <div></div>
           <div class="btn-list">
-            <button class="btn icon" alt="Delete" @click="saveStop"><span class="material-icons">save</span></button>
-            <button class="btn icon" alt="Delete" @click="beginStopDeletion"><span class="material-icons">delete</span>
+            <button class="btn flat" alt="Save" @click="saveStop"><span class="material-icons">save</span></button>
+            <button class="btn flat" alt="Delete" @click="beginStopDeletion"><span class="material-icons">delete</span>
             </button>
-            <button class="btn flat close"><i class="material-icons">close</i></button>
+            <button class="btn flat" alt="Cancel" @click="cancelStopEdition"><span class="material-icons">cancel</span>
+            </button>
           </div>
         </div>
         <div class="side-content">
@@ -64,7 +65,9 @@
         <div class="side-header">
           <div></div>
           <div class="btn-list">
-            <button class="btn icon" alt="Create" @click="createStop"><span class="material-icons">add_location</span>
+            <button class="btn flat" alt="Create" @click="createStop"><span class="material-icons">add_location</span>
+            </button>
+            <button class="btn flat" alt="Create" @click="cancelNewStop"><span class="material-icons">cancel</span>
             </button>
           </div>
         </div>
@@ -334,23 +337,32 @@ export default {
         this.stop.creation.errors = err.response.data;
       });
     },
+    cancelNewStop() {
+      this.moveToReaderStatus();
+    },
+    cancelStopEdition(){
+      this.moveToReaderStatus();
+    },
+    moveToReaderStatus() {
+      if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
+          this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
+        this.status = this.Enums.InteractiveMapStatus.READER;
+        this.map.getCanvas().style.cursor = '';
+        this.map.off('click', this.putNewPointOnMap);
+        this.map.off('mousemove', this.creationMouseMove);
+        this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
+      } else if (this.status === this.Enums.InteractiveMapStatus.MOVING_POINT ||
+          this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
+        this.status = this.Enums.InteractiveMapStatus.READER;
+        this.map.off('mouseup', this.editingStopMouseUp);
+      }
+      this.stop.activeStops.forEach(feature => {
+        this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+      });
+    },
     escapeKeyPressed(e) {
       if (e.keyCode === 27) {
-        if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
-            this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
-          this.status = this.Enums.InteractiveMapStatus.READER;
-          this.map.getCanvas().style.cursor = '';
-          this.map.off('click', this.putNewPointOnMap);
-          this.map.off('mousemove', this.creationMouseMove);
-          this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
-        } else if (this.status === this.Enums.InteractiveMapStatus.MOVING_POINT ||
-            this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
-          this.status = this.Enums.InteractiveMapStatus.READER;
-          this.map.off('mouseup', this.editingStopMouseUp);
-        }
-        this.stop.activeStops.forEach(feature => {
-          this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
-        });
+        this.moveToReaderStatus();
       }
     },
     flyToStop(stop) {
