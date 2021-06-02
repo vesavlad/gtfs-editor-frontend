@@ -92,14 +92,14 @@
 <script>
 import stopsAPI from '@/api/stops.api';
 import shapesAPI from '@/api/shapes.api';
-import shapeMapMixin from "@/mixins/shapeMapMixin"
+import shapeMapMixin from '@/mixins/shapeMapMixin'
 import StopForm from '@/components/StopForm.vue';
 import FKSelect from '@/components/vuetable/inputs/FKSelect.vue';
-import envelopeMixin from "@/mixins/envelopeMixin"
-import config from "@/config.js"
-import Enums from "@/utils/enums";
-import MessageModal from "@/components/modal/MessageModal";
-import {debounce} from "debounce";
+import envelopeMixin from '@/mixins/envelopeMixin'
+import config from '@/config.js'
+import Enums from '@/utils/enums';
+import MessageModal from '@/components/modal/MessageModal';
+import {debounce} from 'debounce';
 
 
 const mapboxgl = require('mapbox-gl');
@@ -160,7 +160,7 @@ export default {
         deleteModal: {
           visible: false,
           stop: {},
-          message: "",
+          message: '',
         },
         edition: {
           stop: null,
@@ -200,7 +200,7 @@ export default {
           this.$emit('load');
         })
       }).catch((err) => {
-        alert("Unable to fetch stops");
+        alert('Unable to fetch stops');
         console.log(err);
       });
     });
@@ -307,7 +307,7 @@ export default {
       let self = this;
 
       // when user decides position he makes click on map
-      this.map.once("click", e => {
+      this.map.once('click', e => {
         self.map.off('mousemove', this.mousemove);
         self.updateCreationCoords(e.lngLat);
         self.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
@@ -405,32 +405,32 @@ export default {
 
       // We add an icon and text to the geojson
       this.map.addLayer({
-        id: "layer-stops-icon",
-        type: "circle",
-        source: "stop-source",
+        id: 'layer-stops-icon',
+        type: 'circle',
+        source: 'stop-source',
         paint: {
-          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
-          "circle-color": "white",
-          "circle-stroke-color": [
+          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
+          'circle-color': 'white',
+          'circle-stroke-color': [
             'case',
             ['boolean', ['feature-state', 'active'], false], config.stop_selected_color,
             ['boolean', ['feature-state', 'hover'], false], config.stop_hover_color,
             config.stop_color,
           ],
-          "circle-stroke-opacity": 1,
-          "circle-stroke-width": 2
+          'circle-stroke-opacity': 1,
+          'circle-stroke-width': 2
         }
       });
       this.map.addLayer({
-        id: "layer-stops-label",
-        type: "symbol",
-        source: "stop-source",
+        id: 'layer-stops-label',
+        type: 'symbol',
+        source: 'stop-source',
         minzoom: 14,
         layout: {
-          "text-field": "{label}",
-          "text-anchor": "top",
-          "text-offset": [0, 0.5],
-          "text-allow-overlap": true,
+          'text-field': '{label}',
+          'text-anchor': 'top',
+          'text-offset': [0, 0.5],
+          'text-allow-overlap': true,
         }
       });
 
@@ -440,12 +440,12 @@ export default {
         data: this.stop.creation.geojson,
       })
       this.map.addLayer({
-        id: "layer-creating-icon",
-        type: "circle",
-        source: "creating",
+        id: 'layer-creating-icon',
+        type: 'circle',
+        source: 'creating',
         paint: {
-          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_creation_zoom),
-          "circle-color": config.stop_creation_color,
+          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stop_creation_zoom),
+          'circle-color': config.stop_creation_color,
         }
       });
     },
@@ -489,7 +489,7 @@ export default {
           },
           paint: {
             'icon-color': 'red',
-            'icon-halo-color': "#343332",
+            'icon-halo-color': '#343332',
             'icon-halo-width': 2,
           }
         });
