@@ -88,7 +88,9 @@ export default {
       return stopsAPI.stopsAPI.update(this.$route.params.projectId, data);
     },
     createStop(data) {
-      return stopsAPI.stopsAPI.create(this.$route.params.projectId, data);
+      let response = stopsAPI.stopsAPI.create(this.$route.params.projectId, data);
+      this.$refs.map.addStop(response.data);
+      return response;
     },
     removeStop(data) {
       return stopsAPI.stopsAPI.remove(this.$route.params.projectId, data);
