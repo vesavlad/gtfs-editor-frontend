@@ -2,7 +2,8 @@
   <div class="dynamic-map-container">
     <div class="top-map-bar">
       <div class="right-content grid center">
-        <input type="search" :placeholder="$t('shape.editor.searchPlaceholder')" v-model="stop.quickSearch" @input="filterStops"/>
+        <input type="search" :placeholder="$t('shape.editor.searchPlaceholder')" v-model="stop.quickSearch"
+               @input="filterStops"/>
         <FKSelect v-model="shape.selectedShape" :field="shape.shapeField" :data="{}" :errors="[]"
                   v-on:input="loadShape($event)"></FKSelect>
         <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i
