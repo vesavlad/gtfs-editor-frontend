@@ -5,10 +5,10 @@
         <template v-slot:right-section>
           <div class="tab">
             <button class="tablinks" :class="{active: activeTab===tabType.TABLE}" @click="switchTab(tabType.TABLE)">
-              <span>Table view</span><i class="material-icons">view_headline</i>
+              <span>{{ $t('stop.tabs.tableView') }}</span><i class="material-icons">view_headline</i>
             </button>
             <button class="tablinks" :class="{active: activeTab===tabType.MAP}" @click="switchTab(tabType.MAP)">
-              <span>Map view</span><i class="material-icons">map</i>
+              <span>{{ $t('stop.tabs.mapView') }}</span><i class="material-icons">map</i>
             </button>
           </div>
         </template>
@@ -88,7 +88,9 @@ export default {
       return stopsAPI.stopsAPI.update(this.$route.params.projectId, data);
     },
     createStop(data) {
-      return stopsAPI.stopsAPI.create(this.$route.params.projectId, data);
+      let response = stopsAPI.stopsAPI.create(this.$route.params.projectId, data);
+      this.$refs.map.addStop(response.data);
+      return response;
     },
     removeStop(data) {
       return stopsAPI.stopsAPI.remove(this.$route.params.projectId, data);

@@ -100,6 +100,7 @@
       "title": "Are you sure you want to delete shape \"{name}\"?"
     },
     "editor": {
+      "searchPlaceholder": "search",
       "mapMatchingWarning": "Warning: Map matching is enabled, please disable map matching or replace your points with the Map Matching result.",
       "duplicationPrefix": "copy of ",
       "pointsNumber": "number of points",
@@ -110,5 +111,12 @@
       "length": "Length",
       "discardChangesMessage": "Are you sure you want to exit and discard your changes?"
     }
+  },
+  "stop": {
+    "tabs": {
+      "mapView": "Map view",
+      "tableView": "Table view"
+    },
+    "deleteModalTitle": "Are you sure you want to delete this stop?"
   }
 }

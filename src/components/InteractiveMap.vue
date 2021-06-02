@@ -2,10 +2,12 @@
   <div class="dynamic-map-container">
     <div class="top-map-bar">
       <div class="right-content grid center">
-        <input type="search" placeholder="Search" v-model="stop.quickSearch" @input="filterStops"/>
+        <input type="search" :placeholder="$t('shape.editor.searchPlaceholder')" v-model="stop.quickSearch"
+               @input="filterStops"/>
         <FKSelect v-model="shape.selectedShape" :field="shape.shapeField" :data="{}" :errors="[]"
                   v-on:input="loadShape($event)"></FKSelect>
-        <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
+        <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i
+            class="material-icons">help_outline</i></button>
       </div>
     </div>
     <div id='map' class="map">
@@ -27,13 +29,14 @@
           </ol>
         </div>
       </div>
-      <div class="side-panel edit-data-point" v-if="status===Enums.InteractiveMapStatus.EDIT_DATA_POINT">
+      <div class="side-panel edit-data-point"
+           v-if="status===Enums.InteractiveMapStatus.EDIT_DATA_POINT || status===Enums.InteractiveMapStatus.MOVING_POINT">
         <div class="side-header">
           <div><h4>Stop details</h4></div>
           <div class="btn-list">
             <button class="btn icon save" alt="Save" @click="saveStop"><span class="material-icons">check</span></button>
             <button class="btn icon" alt="Delete" @click="beginStopDeletion"><span class="material-icons">delete</span></button>
-            <button class="btn icon" alt="Close"><i class="material-icons">close</i></button>
+            <button class="btn icon" alt="Cancel" @click="cancelStopEdition"><i class="material-icons">close</i></button>
           </div>
         </div>
         <div class="side-content">
@@ -56,13 +59,14 @@
         <div class="side-header">
           <div></div>
           <div class="btn-list">
-            <button class="btn icon" alt="Create" @click="create"><span class="material-icons">add_location</span>
+            <button class="btn flat" alt="Create" @click="createStop"><span class="material-icons">add_location</span>
+            </button>
+            <button class="btn flat" alt="Create" @click="cancelNewStop"><span class="material-icons">cancel</span>
             </button>
           </div>
         </div>
         <div class="side-content">
-          <stop-form v-if="stop.creation.creating" ref="createForm" :fields="stopFields" :errors="stop.creation.errors"
-                     v-model="stop.creation.data">
+          <stop-form :fields="stopFields" :errors="stop.creation.errors" v-model="stop.creation.data">
           </stop-form>
         </div>
       </div>
@@ -72,7 +76,7 @@
                   :okButtonLabel="$t('general.delete')"
                   :type="Enums.MessageModalType.WARNING">
       <template v-slot:m-title>
-        <h2>Are you sure you want to delete this stop?</h2>
+        <h2>{{ $t('stop.deleteModalTitle') }}</h2>
       </template>
       <template v-slot:m-content>
           <span>
@@ -86,14 +90,14 @@
 <script>
 import stopsAPI from '@/api/stops.api';
 import shapesAPI from '@/api/shapes.api';
-import shapeMapMixin from "@/mixins/shapeMapMixin"
+import shapeMapMixin from '@/mixins/shapeMapMixin'
 import StopForm from '@/components/StopForm.vue';
 import FKSelect from '@/components/vuetable/inputs/FKSelect.vue';
-import envelopeMixin from "@/mixins/envelopeMixin"
-import config from "@/config.js"
-import Enums from "@/utils/enums";
-import MessageModal from "@/components/modal/MessageModal";
-import {debounce} from "debounce";
+import envelopeMixin from '@/mixins/envelopeMixin'
+import config from '@/config.js'
+import Enums from '@/utils/enums';
+import MessageModal from '@/components/modal/MessageModal';
+import {debounce} from 'debounce';
 
 
 const mapboxgl = require('mapbox-gl');
@@ -141,7 +145,6 @@ export default {
         activeStops: [],
         stops: [],
         creation: {
-          creating: false,
           data: {
             stop_lat: null,
             stop_lon: null,
@@ -155,17 +158,19 @@ export default {
         deleteModal: {
           visible: false,
           stop: {},
-          message: "",
+          message: '',
         },
         edition: {
           stop: null,
-          errors: {},
-          disableClose: false,
+          errors: {}
         },
+      },
+      tmp: {
+        previousEvent: null,
+        previousFeature: null
       },
       status: Enums.InteractiveMapStatus.READER,
       map: null,
-      dragging: false,
     }
   },
   props: {
@@ -195,7 +200,7 @@ export default {
           this.$emit('load');
         })
       }).catch((err) => {
-        alert("Unable to fetch stops");
+        alert('Unable to fetch stops');
         console.log(err);
       });
     });
@@ -204,6 +209,29 @@ export default {
     document.removeEventListener('keydown', this.escapeKeyPressed);
   },
   methods: {
+    filterStops() {
+      let value = this.stop.quickSearch;
+      if (value.length < 4) {
+        return;
+      }
+      let normalize = value => value !== null ? value.trim().toLowerCase() : '';
+
+      value = normalize(value);
+      let filtered = this.stop.stops.filter(stop => {
+        let stopCode = normalize(stop.stop_code);
+        let stopId = normalize(stop.stop_id);
+        let stopName = normalize(stop.stop_name);
+
+        return stopCode.indexOf(value) > -1 || stopId.indexOf(value) > -1 || stopName.indexOf(value) > -1;
+      });
+
+      if (filtered.length > 0) {
+        let points = filtered.map(stop => [stop.stop_lon, stop.stop_lat]);
+        this.map.fitBounds(this.getBounds(points), {
+          padding: 50
+        });
+      }
+    },
     getStopGeojson() {
       console.log('generating stop points...');
       let generateStopGeoJson = stop => {
@@ -231,54 +259,28 @@ export default {
 
       return geojson;
     },
-    filterStops() {
-      let value = this.stop.quickSearch;
-      if (value.length < 4) {
-        return;
-      }
-      let normalize = value => value !== null ? value.trim().toLowerCase() : '';
-
-      value = normalize(value);
-      let filtered = this.stop.stops.filter(stop => {
-        let stopCode = normalize(stop.stop_code);
-        let stopId = normalize(stop.stop_id);
-        let stopName = normalize(stop.stop_name);
-
-        return stopCode.indexOf(value) > -1 || stopId.indexOf(value) > -1 || stopName.indexOf(value) > -1;
-      });
-
-      if (filtered.length > 0) {
-        let points = filtered.map(stop => [stop.stop_lon, stop.stop_lat]);
-        this.map.fitBounds(this.getBounds(points), {
-          padding: 50
-        });
-      }
-    },
     loadShape(shapeId) {
       if (shapeId === null) {
+        // select is empty
         this.shape.activeShape = null;
-        this.map.setLayoutProperty('shape-layer', 'visibility', 'none')
-        this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none')
+        this.map.setLayoutProperty('shape-layer', 'visibility', 'none');
+        this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'none');
       } else if (this.shape.activeShape === null || this.shape.activeShape.id !== shapeId) {
         shapesAPI.shapesAPI.detail(this.projectId, shapeId).then(response => {
           this.shape.activeShape = response.data;
-          this.reGenerateShape();
-          this.map.setLayoutProperty('shape-layer', 'visibility', 'visible')
-          this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'visible')
-        })
+          this.shape.geojson.geometry.coordinates = this.shape.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+          this.map.getSource('shape').setData(this.shape.geojson);
+          this.map.fitBounds(this.getBounds(this.shape.geojson.geometry.coordinates), {
+            padding: 50
+          });
+          this.map.setLayoutProperty('shape-layer', 'visibility', 'visible');
+          this.map.setLayoutProperty('shape-arrow-layer', 'visibility', 'visible');
+        });
       }
     },
-    reGenerateShape() {
-      this.shape.geojson.geometry.coordinates = this.shape.activeShape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-      this.map.getSource('shape').setData(this.shape.geojson);
-      this.map.fitBounds(this.getBounds(this.shape.geojson.geometry.coordinates), {
-        padding: 50
-      });
-    },
     beginStopDeletion() {
-      let stop = this.stop.edition.stop;
       this.stop.deleteModal.visible = true;
-      this.stop.deleteModal.stop = stop;
+      this.stop.deleteModal.stop = this.stop.edition.stop;
       this.stop.deleteModal.message = '';
     },
     deleteStop() {
@@ -287,60 +289,38 @@ export default {
         this.stop.deleteModal.visible = false;
         this.stop.deleteModal.stop = null;
         this.stop.deleteModal.message = '';
-        this.stop.edition.disableClose = false;
         this.stop.stops = this.stop.stops.filter(s => s.id !== stop.id);
         this.reGenerateStops();
         console.log(`stop ${stop.stop_id} removed`);
       }).catch((err) => {
         let data = err.response.data;
         this.stop.deleteModal.message = data.message;
+        this.stop.deleteModal.visible = true;
       });
     },
     beginCreation() {
-      this.stop.creation.creating = true;
       this.status = this.Enums.InteractiveMapStatus.ADDING_NEW_POINT;
       this.map.getCanvas().style.cursor = 'grabbing';
-      let self = this;
 
       // when user decides position he makes click on map
-      this.map.once("click", e => {
-        self.map.off('mousemove', this.mousemove);
-        self.updateCreationCoords(e.lngLat);
-        self.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
-        self.map.getCanvas().style.cursor = '';
-      });
-      this.map.on('mousemove', this.mousemove);
+      this.map.once('click', this.putNewPointOnMap);
+      this.map.on('mousemove', this.creationMouseMove);
     },
-    mousemove(e) {
+    putNewPointOnMap() {
+      this.map.off('mousemove', this.creationMouseMove);
+      this.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
+      this.map.getCanvas().style.cursor = '';
+    },
+    creationMouseMove(e) {
       // move feature to cursor position in realtime
       let coords = e.lngLat;
       this.updateCreationCoords(coords);
     },
-    escapeKeyPressed(e) {
-      if (e.keyCode === 27) {
-        if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
-            this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
-          this.status = this.Enums.InteractiveMapStatus.READER;
-          this.map.getCanvas().style.cursor = '';
-          this.map.off('mousemove', this.mousemove);
-          this.stop.activeStops.forEach(feature => {
-            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
-          });
-          this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
-        } else if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
-          this.status = this.Enums.InteractiveMapStatus.READER;
-          this.stop.activeStops.forEach(feature => {
-            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
-          });
-        }
-      }
-    },
-    create() {
+    createStop() {
       let data = this.stop.creation.data;
       stopsAPI.stopsAPI.create(this.projectId, data).then(() => {
         this.addStop(data);
         this.stop.creation.errors = {};
-        this.stop.creation.creating = false;
         this.stop.creation.data = {
           stop_lat: null,
           stop_lon: null,
@@ -351,7 +331,36 @@ export default {
         this.stop.creation.errors = err.response.data;
       });
     },
+    cancelNewStop() {
+      this.moveToReaderStatus();
+    },
+    cancelStopEdition(){
+      this.moveToReaderStatus();
+    },
+    moveToReaderStatus() {
+      if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
+          this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
+        this.status = this.Enums.InteractiveMapStatus.READER;
+        this.map.getCanvas().style.cursor = '';
+        this.map.off('click', this.putNewPointOnMap);
+        this.map.off('mousemove', this.creationMouseMove);
+        this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
+      } else if (this.status === this.Enums.InteractiveMapStatus.MOVING_POINT ||
+          this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
+        this.status = this.Enums.InteractiveMapStatus.READER;
+        this.map.off('mouseup', this.editingStopMouseUp);
+      }
+      this.stop.activeStops.forEach(feature => {
+        this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+      });
+    },
+    escapeKeyPressed(e) {
+      if (e.keyCode === 27) {
+        this.moveToReaderStatus();
+      }
+    },
     flyToStop(stop) {
+      /* it is used by external components to interact with map (put focus on one stop point) */
       this.map.flyTo({
         center: [stop.stop_lon, stop.stop_lat],
         zoom: 16,
@@ -376,7 +385,6 @@ export default {
       this.reGenerateStops();
     },
     saveStop() {
-      if (this.stop.edition.disableClose) return;
       stopsAPI.stopsAPI.update(this.projectId, this.stop.edition.stop).then(response => {
         this.stop.activeStops.forEach(feature => {
           this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
@@ -402,9 +410,9 @@ export default {
 
       // We add an icon and text to the geojson
       this.map.addLayer({
-        id: "layer-stops-icon",
-        type: "circle",
-        source: "stop-source",
+        id: 'layer-stops-icon',
+        type: 'circle',
+        source: 'stop-source',
         paint: {
           "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
           "circle-color": [
@@ -424,9 +432,9 @@ export default {
         }
       });
       this.map.addLayer({
-        id: "layer-stops-label",
-        type: "symbol",
-        source: "stop-source",
+        id: 'layer-stops-label',
+        type: 'symbol',
+        source: 'stop-source',
         minzoom: 14,
         layout: {
           "text-field": "{label}",
@@ -446,12 +454,12 @@ export default {
         data: this.stop.creation.geojson,
       })
       this.map.addLayer({
-        id: "layer-creating-icon",
-        type: "circle",
-        source: "creating",
+        id: 'layer-creating-icon',
+        type: 'circle',
+        source: 'creating',
         paint: {
-          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_creation_zoom),
-          "circle-color": config.stop_creation_color,
+          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stop_creation_zoom),
+          'circle-color': config.stop_creation_color,
         }
       });
     },
@@ -495,7 +503,7 @@ export default {
           },
           paint: {
             'icon-color': 'red',
-            'icon-halo-color': "#343332",
+            'icon-halo-color': '#343332',
             'icon-halo-width': 2,
           }
         });
@@ -508,23 +516,21 @@ export default {
 
       this.map.on('click', () => {
         // deactivate stop if user clicks on map
-        if (this.stop.edition.stop) {
+        if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
           this.status = this.Enums.InteractiveMapStatus.READER;
-          map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id}, {active: false});
+          this.stop.activeStops.forEach(feature => {
+            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+          });
         }
       });
 
       this.map.on('click', 'layer-stops-icon', (evt) => {
-        let coordinates = evt.features[0].geometry.coordinates.slice();
         let feature = evt.features[0];
         let id = feature.properties.stop_id;
 
-        // Ensure that if the map is zoomed out such that multiple
-        // copies of the feature are visible, the popup appears
-        // over the copy being pointed to.
-        while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
+        if (this.status === this.Enums.InteractiveMapStatus.ADDING_NEW_POINT ||
+            this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) return;
+
         if (this.stop.edition.stop) {
           // deactivate previous stop selected
           this.map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id,}, {active: false});
@@ -535,14 +541,21 @@ export default {
         this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
       });
 
-      let hovered_stops = [];
-      this.map.on('mouseenter', 'layer-stops-icon', function () {
-        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
-        canvas.style.cursor = 'pointer';
+      this.map.on('mouseenter', 'layer-stops-icon', function (e) {
+        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
+            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.status === self.Enums.InteractiveMapStatus.EDIT_DATA_POINT &&
+            self.stop.edition.stop.id === e.features[0].id) {
+          canvas.style.cursor = 'move';
+        } else {
+          canvas.style.cursor = 'pointer';
+        }
       });
 
+      let hovered_stops = [];
       this.map.on('mousemove', 'layer-stops-icon', function (e) {
-        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
+            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         hovered_stops.forEach(feature => {
           hovered_stops.push(feature.id);
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
@@ -560,38 +573,56 @@ export default {
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
         });
         hovered_stops = [];
-        if (this.dragging || self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
+        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
+            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         canvas.style.cursor = '';
       });
 
-      this.map.on('mousedown', 'layer-stops-icon', function (evt_down) {
-        // Prevent the default map drag behavior.
-        evt_down.preventDefault();
-        canvas.style.cursor = 'grab';
-        let activeStop = evt_down.features[0]
-        this.dragging = true;
-        map.once('mouseup', evt_up => {
-          this.dragging = false;
-          let coords = evt_up.lngLat;
-          let distance = self.calcDistance(evt_down, evt_up);
-          if (!distance) {
-            return;
-          }
-          self.updateStop(activeStop, coords);
+      this.map.on('mousedown', 'layer-stops-icon', function (evtMouseDown) {
+        let activeStop = evtMouseDown.features[0];
+        self.tmp.previousEvent = evtMouseDown;
+        self.tmp.previousFeature = activeStop;
+        if (self.status === self.Enums.InteractiveMapStatus.EDIT_DATA_POINT &&
+            self.stop.edition.stop.id === activeStop.id) {
+          // Prevent the default map drag behavior.
+          evtMouseDown.preventDefault();
+          canvas.style.cursor = 'grab';
+          self.status = self.Enums.InteractiveMapStatus.MOVING_POINT;
+          map.once('mouseup', self.editingStopMouseUp);
+        }
+      });
+
+      this.map.on('mouseenter', 'layer-creating-icon', () => {
+        if (self.status === self.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
+          canvas.style.cursor = 'move';
+        }
+      });
+
+      this.map.on('mouseleave', 'layer-creating-icon', () => {
+        if (self.status === self.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
           canvas.style.cursor = '';
-        });
+        }
       });
 
       this.map.on('mousedown', 'layer-creating-icon', function (evt_down) {
         // Prevent the default map drag behavior.
         evt_down.preventDefault();
         canvas.style.cursor = 'grab';
-        map.once('mouseup', evt_up => {
-          let coords = evt_up.lngLat;
-          self.updateCreationCoords(coords);
+        map.once('mouseup', () => {
+          map.off('mousemove', self.creationMouseMove);
           canvas.style.cursor = '';
         });
+        map.on('mousemove', self.creationMouseMove);
       });
+    },
+    editingStopMouseUp(evtUp) {
+      /* executed when user finishes to move editing point */
+      this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
+      let coords = evtUp.lngLat;
+      let distance = this.calcDistance(this.tmp.previousEvent, evtUp);
+      if (!distance) return;
+      this.updateStop(this.tmp.previousFeature, coords);
+      this.map.getCanvas().style.cursor = '';
     },
     updateCreationCoords(coords) {
       this.stop.creation.data.stop_lon = coords.lng;

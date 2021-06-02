@@ -100,6 +100,7 @@
       "title": "¿Está segur@ que quiere eliminar el shape \"{name}\"?"
     },
     "editor": {
+      "searchPlaceholder": "buscar",
       "mapMatchingWarning": "Advertencia: Map matching está habilitado, por favor deshabilita el map matching o reemplaza los puntos con el resultado del map matching.",
       "duplicationPrefix": "copia de ",
       "pointsNumber": "Número de puntos",
@@ -110,5 +111,12 @@
       "length": "Largo",
       "discardChangesMessage": "¿Está segur@ de salir y descargar los cambios no guardados?"
     }
+  },
+  "stop": {
+    "tabs": {
+      "mapView": "Mapa",
+      "tableView": "Tabla"
+    },
+    "deleteModalTitle": "¿Estás segur@ que deseas eliminar la parada?"
   }
 }
