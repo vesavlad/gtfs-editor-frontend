@@ -338,16 +338,13 @@ export default {
           this.map.getCanvas().style.cursor = '';
           this.map.off('click', this.putNewPointOnMap);
           this.map.off('mousemove', this.creationMouseMove);
-          this.stop.activeStops.forEach(feature => {
-            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
-          });
           this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
         } else if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
           this.status = this.Enums.InteractiveMapStatus.READER;
-          this.stop.activeStops.forEach(feature => {
-            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
-          });
         }
+        this.stop.activeStops.forEach(feature => {
+          this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+        });
       }
     },
     flyToStop(stop) {
