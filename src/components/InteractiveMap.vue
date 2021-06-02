@@ -304,10 +304,10 @@ export default {
       this.map.getCanvas().style.cursor = 'grabbing';
 
       // when user decides position he makes click on map
-      this.map.once('click', this.creationPutPointOnMap);
+      this.map.once('click', this.putNewPointOnMap);
       this.map.on('mousemove', this.creationMouseMove);
     },
-    creationPutPointOnMap() {
+    putNewPointOnMap() {
       this.map.off('mousemove', this.creationMouseMove);
       this.status = this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT;
       this.map.getCanvas().style.cursor = '';
@@ -338,7 +338,7 @@ export default {
             this.status === this.Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT) {
           this.status = this.Enums.InteractiveMapStatus.READER;
           this.map.getCanvas().style.cursor = '';
-          this.map.off('click', this.creationPutPointOnMap);
+          this.map.off('click', this.putNewPointOnMap);
           this.map.off('mousemove', this.creationMouseMove);
           this.stop.activeStops.forEach(feature => {
             this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
