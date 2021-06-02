@@ -1,12 +1,12 @@
 <template>
   <div class="stop-input-details">
-    <div :key="`popup-${field.name}`" v-for="field in getProperFields(fields)">
-      <label>{{ field.name }}</label>
+    <label class="stop-input-row-detail" :key="`popup-${field.name}`" v-for="field in getProperFields(fields)">
+      <span>{{ field.name }}</span>
       <div class="error-message" v-for="error in errors[field.name]" v-bind:key="error">{{ error }}</div>
       <GeneralizedInput :data="newData" :field="field" :value="newData[field.name]"
                         v-model="newData[getFieldID(field)]" v-on:input="$emit('input',newData)">
       </GeneralizedInput>
-    </div>
+    </label>
   </div>
 </template>
 

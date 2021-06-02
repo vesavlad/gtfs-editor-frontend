@@ -16,11 +16,7 @@
     </div>
     <div class="map-sidebar">
       <div class="side-panel empty" v-if="status===Enums.InteractiveMapStatus.READER">
-        <div class="side-header">
-          <div></div>
-          <div class="btn-list">
-          </div>
-        </div>
+        <div class="side-header"></div>
         <div class="side-content">
           <div class="empty img">
             <i class="material-icons">add_location_alt</i>
@@ -33,12 +29,11 @@
       </div>
       <div class="side-panel edit-data-point" v-if="status===Enums.InteractiveMapStatus.EDIT_DATA_POINT">
         <div class="side-header">
-          <div></div>
+          <div><h4>Stop details</h4></div>
           <div class="btn-list">
-            <button class="btn icon" alt="Delete" @click="saveStop"><span class="material-icons">save</span></button>
-            <button class="btn icon" alt="Delete" @click="beginStopDeletion"><span class="material-icons">delete</span>
-            </button>
-            <button class="btn flat close"><i class="material-icons">close</i></button>
+            <button class="btn icon save" alt="Save" @click="saveStop"><span class="material-icons">check</span></button>
+            <button class="btn icon" alt="Delete" @click="beginStopDeletion"><span class="material-icons">delete</span></button>
+            <button class="btn icon" alt="Close"><i class="material-icons">close</i></button>
           </div>
         </div>
         <div class="side-content">
@@ -412,15 +407,20 @@ export default {
         source: "stop-source",
         paint: {
           "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
-          "circle-color": "white",
+          "circle-color": [
+            'case',
+            ['boolean', ['feature-state', 'active'], false], "#21B0CF",
+            ['boolean', ['feature-state', 'hover'], false], "#19849C",
+            "#4E5F68",
+          ],
           "circle-stroke-color": [
             'case',
-            ['boolean', ['feature-state', 'active'], false], config.stop_selected_color,
-            ['boolean', ['feature-state', 'hover'], false], config.stop_hover_color,
-            config.stop_color,
+            ['boolean', ['feature-state', 'active'], false], "white",
+            ['boolean', ['feature-state', 'hover'], false], "#4E5F68",
+            "#4E5F68",
           ],
           "circle-stroke-opacity": 1,
-          "circle-stroke-width": 2
+          "circle-stroke-width": 4,
         }
       });
       this.map.addLayer({
@@ -431,8 +431,12 @@ export default {
         layout: {
           "text-field": "{label}",
           "text-anchor": "top",
-          "text-offset": [0, 0.5],
-          "text-allow-overlap": true,
+          "text-offset": [0, 0.5]
+        },
+        paint: {
+          "text-halo-width":3,
+          "text-halo-color":"#000",
+          "text-color":"#fff",
         }
       });
 
