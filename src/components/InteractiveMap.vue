@@ -411,6 +411,11 @@ export default {
         data: this.getStopGeojson(),
       });
 
+      this.map.addSource('highlighted-stop-source', {
+        type: 'geojson',
+        data: this.stop.highlightedFeatureGeojson,
+      });
+
       let img = require('../assets/img/bg-stop-name.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
@@ -442,6 +447,29 @@ export default {
               ['boolean', ['feature-state', 'active'], false], config.stop_label_background_hover_color,
               config.stop_label_background_color,
             ],
+            'text-color': config.stop_label_color,
+          }
+        });
+        this.map.addLayer({
+          id: 'layer-highlighted-stop-label',
+          type: 'symbol',
+          source: 'highlighted-stop-source',
+          layout: {
+            'text-field': '{label}',
+            'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
+            'icon-image': 'bg-stop-name',
+            'icon-anchor': 'top',
+            'text-anchor': 'top',
+            'text-offset': [0, 1.2],
+            'text-size': 14,
+            'icon-text-fit': 'both',
+            'icon-text-fit-padding': [4, 6, 0, 6],
+            'icon-allow-overlap': true,
+            'text-allow-overlap': true,
+            'visibility': 'none'
+          },
+          paint: {
+            'icon-color': config.stop_label_background_hover_color,
             'text-color': config.stop_label_color,
           }
         });
@@ -583,6 +611,9 @@ export default {
           canvas.style.cursor = 'pointer';
           let feature = e.features[0];
           hovered_stops.push(feature);
+          self.stop.highlightedFeatureGeojson.features = [feature];
+          map.getSource('highlighted-stop-source').setData(self.stop.highlightedFeatureGeojson);
+          map.setLayoutProperty('layer-highlighted-stop-label', 'visibility', 'visible');
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: true});
         }
       });
@@ -592,6 +623,7 @@ export default {
             self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         hovered_stops.forEach(feature => {
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
+          map.setLayoutProperty('layer-highlighted-stop-label', 'visibility', 'none');
         });
         hovered_stops = [];
         canvas.style.cursor = '';
