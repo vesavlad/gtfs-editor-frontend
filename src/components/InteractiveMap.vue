@@ -166,7 +166,7 @@ export default {
         },
         deleteModal: {
           visible: false,
-          stop: {},
+          stop: null,
           message: '',
         },
         edition: {
