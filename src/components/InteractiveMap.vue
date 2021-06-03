@@ -568,6 +568,7 @@ export default {
         this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
       });
 
+      let hovered_stops = [];
       this.map.on('mouseenter', 'layer-stops-icon', function (e) {
         if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
             self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
@@ -576,32 +577,19 @@ export default {
           canvas.style.cursor = 'move';
         } else {
           canvas.style.cursor = 'pointer';
+          let feature = e.features[0];
+          hovered_stops.push(feature);
+          map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: true});
         }
       });
 
-      let hovered_stops = [];
-      this.map.on('mousemove', 'layer-stops-icon', function (e) {
-        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
-            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
-        hovered_stops.forEach(feature => {
-          hovered_stops.push(feature.id);
-          map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
-        });
-        hovered_stops = [];
-        [e.features[0]].forEach(feature => {
-          hovered_stops.push(feature);
-          map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: true});
-        });
-      });
-
       this.map.on('mouseleave', 'layer-stops-icon', function () {
+        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
+            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         hovered_stops.forEach(feature => {
-          hovered_stops.push(feature.id);
           map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
         });
         hovered_stops = [];
-        if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
-            self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
         canvas.style.cursor = '';
       });
 
