@@ -1,8 +1,14 @@
 let config = {
-  stop_color: '#2222DD',
-  stop_hover_color: '#22DD22',
-  stop_creation_color: "#DD9911",
-  stop_selected_color: '#DD2222',
+  stop_color: '#4E5F68',
+  stop_hover_color: '#21B0CF',
+  stop_creation_color: "#21B0CF",
+  stop_selected_color: '#FFFFFF',
+  stop_stroke_color: '#FFFFFF',
+  stop_stroke_hover_color: '#21B0CF',
+  stop_stroke_selected_color: '#21B0CF',
+  stop_label_background_color: '#1F2B32',
+  stop_label_background_hover_color: '#21B0CF',
+  stop_label_color: '#FFFFFF',
   stop_zoom: [
     // Pairs of zoom level - radius of ball (in pixels). Gets interpolated
     12, 1.5,
