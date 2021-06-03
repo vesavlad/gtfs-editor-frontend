@@ -173,6 +173,10 @@ export default {
           stop: null,
           errors: {}
         },
+        highlightedFeatureGeojson: {
+          type: 'FeatureCollection',
+          features: []
+        }
       },
       tmp: {
         previousEvent: null,
