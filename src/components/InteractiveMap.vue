@@ -445,8 +445,8 @@ export default {
             'text-size': 14,
             'icon-text-fit': 'both',
             'icon-text-fit-padding': [4, 6, 0, 6],
-            'icon-allow-overlap': true,
-            'text-allow-overlap': true,
+            'icon-allow-overlap': false,
+            'text-allow-overlap': false,
           },
           paint: {
             'icon-color': [
