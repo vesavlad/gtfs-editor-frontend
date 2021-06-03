@@ -329,8 +329,8 @@ export default {
     },
     createStop() {
       let data = this.stop.creation.data;
-      stopsAPI.stopsAPI.create(this.projectId, data).then(() => {
-        this.addStop(data);
+      stopsAPI.stopsAPI.create(this.projectId, data).then(response => {
+        this.addStop(response.data);
         this.stop.creation.errors = {};
         this.stop.creation.data = {
           stop_lat: null,
