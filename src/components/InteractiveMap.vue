@@ -151,7 +151,7 @@ export default {
       },
       stop: {
         quickSearch: null,
-        activeStops: [],
+        activeStops: {},
         stops: {},
         creation: {
           data: {
@@ -365,9 +365,11 @@ export default {
         this.status = this.Enums.InteractiveMapStatus.READER;
         this.map.off('mouseup', this.editingStopMouseUp);
       }
-      this.stop.activeStops.forEach(feature => {
-        this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+      Object.keys(this.stop.activeStops).forEach(featureId => {
+        this.map.setFeatureState({source: 'stop-source', id: featureId}, {active: false});
       });
+      this.stop.activeStops = {};
+      this.map.setLayoutProperty('layer-highlighted-stop-label', 'visibility', 'none');
     },
     escapeKeyPressed(e) {
       if (e.keyCode === 27) {
@@ -394,9 +396,10 @@ export default {
     },
     saveStop() {
       stopsAPI.stopsAPI.update(this.projectId, this.stop.edition.stop).then(response => {
-        this.stop.activeStops.forEach(feature => {
-          this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+        Object.keys(this.stop.activeStops).forEach(featureId => {
+          this.map.setFeatureState({source: 'stop-source', id: featureId}, {active: false});
         });
+        this.stop.activeStops = {};
         this.stop.stops[response.data.id] = response.data;
         this.reGenerateStops()
         this.status = this.Enums.InteractiveMapStatus.READER;
@@ -585,9 +588,10 @@ export default {
         // deactivate stop if user clicks on map
         if (this.status === this.Enums.InteractiveMapStatus.EDIT_DATA_POINT) {
           this.status = this.Enums.InteractiveMapStatus.READER;
-          this.stop.activeStops.forEach(feature => {
-            this.map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: false});
+          Object.keys(this.stop.activeStops).forEach(featureId => {
+            this.map.setFeatureState({source: 'stop-source', id: featureId}, {active: false});
           });
+          this.stop.activeStops = {};
         }
       });
 
@@ -600,15 +604,16 @@ export default {
 
         if (this.stop.edition.stop) {
           // deactivate previous stop selected
-          this.map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id,}, {active: false});
+          this.map.setFeatureState({source: 'stop-source', id: this.stop.edition.stop.id}, {active: false});
+          delete this.stop.activeStops[this.stop.edition.stop.id];
         }
         this.stop.edition.stop = this.stop.stops[id];
         map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: true});
-        this.stop.activeStops.push(feature);
+        this.stop.activeStops[feature.id] = feature;
         this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
       });
 
-      let hovered_stops = [];
+      let hoveredStops = {};
       this.map.on('mouseenter', 'layer-stops-icon', function (e) {
         if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
             self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
@@ -618,7 +623,7 @@ export default {
         } else {
           canvas.style.cursor = 'pointer';
           let feature = e.features[0];
-          hovered_stops.push(feature);
+          hoveredStops[feature.id] = feature;
           self.stop.highlightedFeatureGeojson.features = [feature];
           map.getSource('highlighted-stop-source').setData(self.stop.highlightedFeatureGeojson);
           map.setLayoutProperty('layer-highlighted-stop-label', 'visibility', 'visible');
@@ -629,11 +634,11 @@ export default {
       this.map.on('mouseleave', 'layer-stops-icon', function () {
         if (self.status === self.Enums.InteractiveMapStatus.MOVING_POINT ||
             self.status === self.Enums.InteractiveMapStatus.ADDING_NEW_POINT) return;
-        hovered_stops.forEach(feature => {
-          map.setFeatureState({source: 'stop-source', id: feature.id,}, {hover: false});
-          map.setLayoutProperty('layer-highlighted-stop-label', 'visibility', 'none');
+        Object.keys(hoveredStops).forEach(featureId => {
+          map.setFeatureState({source: 'stop-source', id: featureId}, {hover: false});
         });
-        hovered_stops = [];
+        hoveredStops = {};
+        map.setLayoutProperty('layer-highlighted-stop-label', 'visibility', 'none');
         canvas.style.cursor = '';
       });
 
