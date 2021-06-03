@@ -13,7 +13,7 @@
     <div id='map' class="map">
       <button :disabled="status!==Enums.InteractiveMapStatus.READER" class="btn floating" alt="Create Stop"
               @click="beginCreation">
-        <span class="material-icons">add</span>
+        <span class="material-icons">add_location_alt</span>
       </button>
     </div>
     <div class="map-sidebar">
@@ -25,7 +25,6 @@
           </div>
           <ol>
             <li><span>Click the bottom right button to add a new stop</span></li>
-            <li><span>Click on the map to place it</span></li>
           </ol>
         </div>
       </div>
@@ -49,22 +48,27 @@
       </div>
       <div class="side-panel adding-new-point" v-if="status===Enums.InteractiveMapStatus.ADDING_NEW_POINT">
         <div class="side-header">
-          <div></div>
+          <div><h4>Adding a new stop</h4></div>
           <div class="btn-list">
-
+            <button class="btn icon" alt="Cancel" @click="cancelStopEdition"><i class="material-icons">close</i>
+            </button>
           </div>
         </div>
         <div class="side-content">
-          <h1>hello</h1>
+          <div class="empty img">
+            <i class="material-icons">pin_drop</i>
+          </div>
+          <ol>
+            <li><span>Click on the map to place it</span></li>
+          </ol>
         </div>
       </div>
       <div class="side-panel fill-new-data-point" v-if="status===Enums.InteractiveMapStatus.FILL_NEW_DATA_POINT">
         <div class="side-header">
-          <div></div>
+          <div><h4>New stop</h4></div>
           <div class="btn-list">
-            <button class="btn flat" alt="Create" @click="createStop"><span class="material-icons">add_location</span>
-            </button>
-            <button class="btn flat" alt="Create" @click="cancelNewStop"><span class="material-icons">cancel</span>
+            <button class="btn icon save" alt="Create" @click="createStop"><span class="material-icons">check</span></button>
+            <button class="btn icon" alt="Create" @click="cancelNewStop"><span class="material-icons">close</span>
             </button>
           </div>
         </div>
@@ -400,30 +404,15 @@ export default {
         type: 'geojson',
         data: this.getStopGeojson(),
       });
-
-      // We add an icon and text to the geojson
-      this.map.addLayer({
-        id: 'layer-stops-icon',
-        type: 'circle',
-        source: 'stop-source',
-        paint: {
-          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
-          "circle-color": [
-            'case',
-            ['boolean', ['feature-state', 'active'], false], "#21B0CF",
-            ['boolean', ['feature-state', 'hover'], false], "#19849C",
-            "#4E5F68",
-          ],
-          "circle-stroke-color": [
-            'case',
-            ['boolean', ['feature-state', 'active'], false], "white",
-            ['boolean', ['feature-state', 'hover'], false], "#4E5F68",
-            "#4E5F68",
-          ],
-          "circle-stroke-opacity": 1,
-          "circle-stroke-width": 4,
+      let img = require('../assets/img/bg-stop-name.png')
+      this.map.loadImage(img, (err, image) => {
+        if (err) {
+          console.log(err);
+          return;
         }
+        this.map.addImage('bg-stop-name', image, {sdf:true});
       });
+      // Added Stop name box
       this.map.addLayer({
         id: 'layer-stops-label',
         type: 'symbol',
@@ -431,13 +420,56 @@ export default {
         minzoom: 14,
         layout: {
           "text-field": "{label}",
+          "text-font": ["Roboto Medium","Arial Unicode MS Regular"],
+          "icon-image":"bg-stop-name",
+          "icon-anchor":"top",
           "text-anchor": "top",
-          "text-offset": [0, 0.5]
+          "text-offset": [0, 1.2],
+          "text-size":14,
+          "icon-text-fit": "both",
+          "icon-text-fit-padding":[4,6,0,6],
+          "icon-allow-overlap": true,
+          "text-allow-overlap": true,
         },
         paint: {
-          "text-halo-width": 3,
-          "text-halo-color": "#000",
-          "text-color": "#fff",
+          //"text-halo-width":1,
+          "icon-color": [
+            'case',
+            ['boolean', ['feature-state', 'active'], false], "#21B0CF",
+            "#1F2B32",
+          ],
+          "text-color":"#fff",
+        }
+      });
+      // We add an icon and text to the geojson
+      this.map.addLayer({
+        id: 'layer-stops-icon',
+        type: 'circle',
+        source: 'stop-source',
+        layout: {
+          visibility: 'visible',
+        },
+        paint: {
+          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
+          "circle-color": [
+            'case',
+            ['boolean', ['feature-state', 'active'], false], "white",
+            ['boolean', ['feature-state', 'hover'], false], "#21B0CF",
+            "#4E5F68",
+          ],
+          "circle-stroke-color": [
+            'case',
+            ['boolean', ['feature-state', 'active'], false], "#21B0CF",
+            ['boolean', ['feature-state', 'hover'], false], "#21B0CF",
+            "#fff",
+          ],
+          "circle-stroke-opacity": 1,
+          "circle-stroke-width": [
+            'case',
+            ['boolean', ['feature-state', 'active'], false], 5,
+            ['boolean', ['feature-state', 'hover'], false], 5,
+            2,
+          ],
         }
       });
 
@@ -451,8 +483,8 @@ export default {
         type: 'circle',
         source: 'creating',
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stop_creation_zoom),
-          'circle-color': config.stop_creation_color,
+          'circle-radius':10,
+          'circle-color': "#21B0CF",
         }
       });
     },
