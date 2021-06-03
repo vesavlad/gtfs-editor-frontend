@@ -12,7 +12,7 @@
     </div>
     <div id='map' class="map">
       <button :disabled="status!==Enums.InteractiveMapStatus.READER" class="btn floating" alt="Create Stop"
-              @click="beginCreation">
+              @click="beginCreation" v-tooltip="{ placement: 'left', content: $t('stop.helpMessageAddNewStop'), shown: status===Enums.InteractiveMapStatus.READER}">
         <span class="material-icons">add_location_alt</span>
       </button>
     </div>
