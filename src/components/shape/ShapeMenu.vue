@@ -54,9 +54,6 @@ export default {
         }
       ]
     }
-  },
-  mounted() {
-    this.$store.commit('setCurrentProject', this.project);
   }
 }
 </script>

@@ -74,7 +74,6 @@ export default {
     return {
       quickSearch: "",
       doSearch: false,
-      infoURL: "https://developers.google.com/transit/gtfs/reference#shapestxt",
       showMenu: false,
       activeShape: null,
       deleteModal: {
