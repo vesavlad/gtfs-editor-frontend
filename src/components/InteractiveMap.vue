@@ -46,6 +46,10 @@
           <stop-form :fields="stopFields" v-model="stop.edition.stop" :errors="stop.edition.errors">
           </stop-form>
         </div>
+        <div class="side-footer">
+          <h4>Errores</h4>
+          <p>Footer</p>
+        </div>
       </div>
       <div class="side-panel adding-new-point" v-if="status===Enums.InteractiveMapStatus.ADDING_NEW_POINT">
         <div class="side-header">
@@ -77,6 +81,10 @@
         <div class="side-content">
           <stop-form :fields="stopFields" :errors="stop.creation.errors" v-model="stop.creation.data">
           </stop-form>
+        </div>
+        <div class="side-footer">
+          <h4>Errores</h4>
+          <p>Footer</p>
         </div>
       </div>
     </div>
