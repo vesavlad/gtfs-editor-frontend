@@ -101,15 +101,6 @@ const routes = [
             component: StopTimesView,
           },
           {
-            path: '/project/:projectId/stoptimes/create',
-            name: 'createStopTimes',
-            component: StopTimesEditorView,
-            props: true,
-            meta: {
-              breadcrumb: 'Create'
-            }
-          },
-          {
             path: '/project/:projectId/stoptimes/:stoptimeId',
             name: 'editStopTimes',
             component: StopTimesEditorView,
