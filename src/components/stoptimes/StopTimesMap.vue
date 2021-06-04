@@ -35,7 +35,7 @@ export default {
     };
   },
   props: {
-    project: {
+    projectId: {
       required: true,
     }
   },
@@ -49,8 +49,8 @@ export default {
       map.on('load', () => {
         this.addLayers();
         this.$emit('load');
-        this.envelope(this.map, this.project);
-        stopsAPI.stopsAPI.getAll(this.project).then((response) => {
+        this.envelope(this.map, this.projectId);
+        stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
           let stops = response.data;
           stops.forEach(stop => {
             this.stops[stop.id] = stop;
@@ -161,7 +161,7 @@ export default {
       });
     },
     displayTrip(trip) {
-      tripsAPI.tripsAPI.detail(this.project, trip.id).then(response => {
+      tripsAPI.tripsAPI.detail(this.projectId, trip.id).then(response => {
         console.log(response);
         let data = response.data;
         if (data.shape) {
@@ -189,7 +189,7 @@ export default {
       });
     },
     displayShape(shape) {
-      shapesAPI.shapesAPI.detail(this.project, shape).then(response => {
+      shapesAPI.shapesAPI.detail(this.projectId, shape).then(response => {
         let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
         this.geojson.geometry.coordinates = points;
         this.map.getSource('shape').setData(this.geojson);

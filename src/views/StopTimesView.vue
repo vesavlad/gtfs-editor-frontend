@@ -12,7 +12,7 @@
         </div>
         <StopTimesTable ref="table" :project="$route.params.projectId" @focus-st="displayTrip"
                         @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>
-        <StopTimesMap ref="map" :project="$route.params.projectId"
+        <StopTimesMap ref="map" :projectId="$route.params.projectId"
                       @range="beginEditing('range', $event)"></StopTimesMap>
       </div>
     </div>
