@@ -10,8 +10,10 @@
             <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
           </div>
         </div>
-        <StopTimesTable ref="table" :project="$route.params.projectId" @focus-st="displayTrip"
-                        @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>
+        <StopTimesTable ref="table"
+                        :projectId="$route.params.projectId"
+                        @focus-st="displayTrip"
+                        @edit-st="openEditingModal"></StopTimesTable>
         <StopTimesMap ref="map" :projectId="$route.params.projectId"
                       @range="beginEditing('range', $event)"></StopTimesMap>
       </div>
@@ -46,18 +48,6 @@
         <input v-model="editingModal.trip_id">
         <span>
           {{ editingModal.error }}
-        </span>
-      </template>
-    </MessageModal>
-    <MessageModal :show="deleteModal.visible" @ok="deleteST" @cancel="deleteModal.visible = false"
-                  @close="deleteModal.visible = false" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
-                  :type="Enums.MessageModalType.WARNING">
-      <template v-slot:m-title>
-        <h2>Are you sure you want to delete the stop-times for trip "{{ deleteModal.trip.trip_id }}"?</h2>
-      </template>
-      <template v-slot:m-content>
-        <span>
-          {{ deleteModal.message }}
         </span>
       </template>
     </MessageModal>
@@ -157,35 +147,10 @@ export default {
       this.editingModal.visible = true;
       this.editingModal.error = "";
     },
-    beginDeleteST(trip) {
-      console.log(trip);
-      this.deleteModal.message = "";
-      this.deleteModal.visible = true;
-      this.deleteModal.trip = trip;
-    },
     duplicateWithHeadway() {
       this.editingModal.visible = false;
       this.editingModal.duplicating = true;
       this.editingModal.trip_id = this.editingModal.trip.trip_id;
-    },
-    deleteST() {
-      console.log(this.deleteModal.trip)
-      let data = {
-        id: this.deleteModal.trip.id,
-        stop_times: [],
-      }
-      tripsAPI.tripsAPI.update(this.$route.params.projectId, data).then(response => {
-        console.log(response);
-        this.deleteModal = {
-          trip: null,
-          visible: false,
-          message: "",
-        }
-        this.$refs.table.refresh();
-      }).catch(err => {
-        console.log(err.response);
-        this.deleteModal.message = err.response.data.message;
-      })
     },
     beginEditing(mode, range) {
       this.mode = mode;

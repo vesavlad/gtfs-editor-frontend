@@ -21,12 +21,12 @@
             <i class="material-icons"
                @click="showMenu=!showMenu;activeTrip=props.rowData">more_vert</i>
             <StopTimesMenu v-if="showMenu && activeTrip.id===props.rowData.id"
-                       :tripId="props.rowData.trip_id"
-                       @edit="editShape()"
-                       @duplicate-expedition="editShape()"
-                       @duplicate-expedition-using-headway="editShape()"
-                       @delete="$emit('delete-st', props.rowData)"
-                       @close="showMenu=false">
+                           :tripId="props.rowData.trip_id"
+                           @edit="editShape()"
+                           @duplicate-expedition="editShape()"
+                           @duplicate-expedition-using-headway="editShape()"
+                           @delete="beginDeleteST(props.rowData)"
+                           @close="showMenu=false">
             </StopTimesMenu>
           </div>
         </div>
@@ -38,6 +38,16 @@
       <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
       </VuetablePaginationDropDown>
     </div>
+    <MessageModal :show="deleteModal.visible" @ok="deleteST" @cancel="deleteModal.visible = false"
+                  @close="deleteModal.visible = false" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
+                  :type="Enums.MessageModalType.WARNING">
+      <template v-slot:m-title>
+        <h2>{{ $t('stopTimes.deleteModalTitle', {tripId: deleteModal.trip.trip_id}) }}</h2>
+      </template>
+      <template v-slot:m-content>
+        <span>{{ deleteModal.message }}</span>
+      </template>
+    </MessageModal>
   </div>
 </template>
 
@@ -48,6 +58,7 @@ import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
 import tripsAPI from "@/api/trips.api";
 import {debounce} from "debounce";
 import StopTimesMenu from "@/components/stoptimes/StopTimesMenu";
+import MessageModal from "@/components/modal/MessageModal";
 
 let Vuetable = require('vuetable-2')
 
@@ -57,7 +68,13 @@ export default {
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
     VuetablePaginationDropDown,
-    StopTimesMenu
+    StopTimesMenu,
+    MessageModal
+  },
+  props: {
+    projectId: {
+      required: true,
+    }
   },
   data: function () {
     return {
@@ -65,6 +82,11 @@ export default {
       doSearch: false,
       showMenu: false,
       activeTrip: null,
+      deleteModal: {
+        visible: false,
+        trip: null,
+        message: ''
+      },
       fields: [
         {
           name: 'actions',
@@ -93,13 +115,8 @@ export default {
           formatter: shape => shape ? '<span class="material-icons">check</span>' : '<span class="material-icons">close</span>',
         },
       ],
-      url: tripsAPI.tripsAPI.getFullBaseURL(this.project),
+      url: tripsAPI.tripsAPI.getFullBaseURL(this.projectId),
     };
-  },
-  props: {
-    project: {
-      required: true,
-    }
   },
   methods: {
     onPaginationData(paginationData) {
@@ -115,9 +132,6 @@ export default {
         return;
       }
       this.$refs.vuetable.changePage(page);
-    },
-    refresh() {
-      this.$refs.vuetable.refresh();
     },
     makeQueryParams(sortOrder, currentPage, perPage) {
       let sorting = ""
@@ -140,10 +154,31 @@ export default {
         }
       })
       return data;
-    }
+    },
+    beginDeleteST(trip) {
+      this.deleteModal.message = "";
+      this.deleteModal.visible = true;
+      this.deleteModal.trip = trip;
+    },
+    deleteST() {
+      let data = {
+        id: this.deleteModal.trip.id,
+        stop_times: [],
+      }
+      tripsAPI.tripsAPI.update(this.$route.params.projectId, data).then(() => {
+        this.deleteModal.trip = null;
+        this.deleteModal.visible = false;
+        this.deleteModal.message = '';
+        this.$refs.vuetable.refresh();
+      }).catch(err => {
+        console.log(err.response);
+        this.deleteModal.message = err.response.data.message;
+        this.deleteModal.visible = true;
+      })
+    },
   },
   mounted() {
     this.doSearch = debounce(this.refresh, 300);
-  },
+  }
 };
 </script>

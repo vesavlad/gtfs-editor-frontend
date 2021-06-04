@@ -125,6 +125,7 @@
       "edit": "Edit",
       "duplicateExpedition": "Duplicate expedition",
       "duplicateExpeditionUsingHeadway": "Duplicate expedition using headway"
-    }
+    },
+    "deleteModalTitle": "Are you sure you want to delete the stop-times for trip \"{tripId}\"?"
   }
 }

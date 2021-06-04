@@ -125,6 +125,7 @@
       "edit": "Editar",
       "duplicateExpedition": "Duplicar expedición",
       "duplicateExpeditionUsingHeadway": "Duplicar expedición usando intervalos"
-    }
+    },
+    "deleteModalTitle": "¿Estás segur@ que deseas eliminar los stop-times del trip \"{tripId}\"?"
   }
 }
