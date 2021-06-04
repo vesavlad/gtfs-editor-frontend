@@ -47,7 +47,8 @@ export default {
       });
       this.map.on('load', () => {
         this.envelope(this.map, this.projectId);
-        this.addLayers();
+        this.addShapeLayers();
+        this.addStopLayers();
         this.loadStops();
         this.$emit('load');
       });
@@ -81,16 +82,11 @@ export default {
         }
       }
     },
-    addLayers() {
+    addShapeLayers() {
       this.map.addSource('shape-source', {
         'type': 'geojson',
         'data': this.shapeGeojson,
       });
-      this.map.addSource('stops-source', {
-        'type': 'geojson',
-        'data': this.stopsGeojson,
-      });
-
       this.map.addLayer({
         'id': 'shape-layer',
         'type': 'line',
@@ -131,24 +127,31 @@ export default {
           }
         });
       });
+    },
+    addStopLayers() {
+      this.map.addSource('stops-source', {
+        'type': 'geojson',
+        'data': this.stopsGeojson,
+      });
+
       this.map.addLayer({
         id: "layer-stops-icon",
         type: "circle",
         source: "stops-source",
-        filter: ["==", "selected", "selected"],
+        filter: ["==", "selected", true],
         paint: {
           "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
-          "circle-color": config.stop_selected_color
+          "circle-color": config.stop_color
         }
       });
       this.map.addLayer({
         id: "layer-stops-seq",
         type: "symbol",
         source: "stops-source",
-        filter: ["==", "selected", "selected"],
+        filter: ["==", "selected", true],
         minzoom: 14,
         layout: {
-          "text-field": "Seq: {sequence}",
+          "text-field": "seq:{sequence}",
           "text-anchor": "top",
           "text-offset": [0, -0.5],
           "text-allow-overlap": true,
@@ -158,7 +161,7 @@ export default {
         id: "layer-stops-label",
         type: "symbol",
         source: "stops-source",
-        filter: ["==", "selected", "selected"],
+        filter: ["==", "selected", true],
         minzoom: 16,
         layout: {
           "text-field": "{label}",
@@ -170,14 +173,13 @@ export default {
     },
     displayTrip(trip) {
       tripsAPI.tripsAPI.detail(this.projectId, trip.id).then(response => {
-        console.log(response);
         let data = response.data;
         if (data.shape) {
           this.displayShape(data.shape);
         }
         let stop_ids = response.data.stop_times.map(st => st.stop);
         this.stopsGeojson.features = this.stopsGeojson.features.map(feature => {
-          feature.properties.selected = stop_ids.includes(feature.properties.id) ? 'selected' : false;
+          feature.properties.selected = stop_ids.includes(feature.properties.id);
           return feature;
         });
         this.map.getSource('stops-source').setData(this.stopsGeojson);
