@@ -195,13 +195,11 @@ export default {
             padding: 20,
           });
         }
-
       });
     },
     displayShape(shape) {
       shapesAPI.shapesAPI.detail(this.projectId, shape).then(response => {
-        let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-        this.shapeGeojson.geometry.coordinates = points;
+        this.shapeGeojson.geometry.coordinates = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
         this.map.getSource('shape-source').setData(this.shapeGeojson);
       }).catch(err => console.log(err));
     },
