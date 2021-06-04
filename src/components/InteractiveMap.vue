@@ -325,6 +325,8 @@ export default {
     beginCreation() {
       this.status = this.Enums.InteractiveMapStatus.ADDING_NEW_POINT;
       this.map.getCanvas().style.cursor = 'grabbing';
+      // clean error messages
+      this.stop.creation.errors = {};
 
       // when user decides position he makes click on map
       this.map.once('click', this.putNewPointOnMap);
