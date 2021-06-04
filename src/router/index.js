@@ -9,7 +9,8 @@ import MyProjects from '../views/MyProjects.vue'
 import ProjectDashboard from '../views/ProjectDashboard.vue'
 import CalendarView from '../views/CalendarView.vue'
 import TripsView from '../views/TripsView.vue'
-import StopTimes from '../views/StopTimes.vue'
+import StopTimesView from '../views/StopTimesView.vue'
+import StopTimesEditorView from '../views/StopTimesEditorView.vue'
 import AgencyView from '../views/AgencyView.vue'
 import StopsView from '../views/StopsView.vue'
 import RoutesView from '../views/RoutesView.vue'
@@ -89,11 +90,35 @@ const routes = [
       },
       {
         path: '/project/:projectId/stoptimes',
-        name: 'StopTimes',
-        component: StopTimes,
+        component: {render(c) { return c('router-view'); }},
         meta: {
           breadcrumb: 'StopTimes'
         },
+        children: [
+          {
+            path: '',
+            name: 'StopTimes',
+            component: StopTimesView,
+          },
+          {
+            path: '/project/:projectId/stoptimes/create',
+            name: 'createShape',
+            component: StopTimesEditorView,
+            props: true,
+            meta: {
+              breadcrumb: 'Create'
+            }
+          },
+          {
+            path: '/project/:projectId/stoptimes/:stoptimeId',
+            name: 'editStopTime',
+            component: StopTimesEditorView,
+            props: true,
+            meta: {
+              breadcrumb: 'Edit'
+            }
+          }
+        ]
       },
       {
         path: '/project/:projectId/stops',

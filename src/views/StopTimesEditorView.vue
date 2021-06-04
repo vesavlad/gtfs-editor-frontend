@@ -68,9 +68,9 @@
 </template>
 
 <script>
-import StopTimesTable from "@/components/StopTimesTable.vue";
-import StopTimesMap from "@/components/StopTimesMap.vue";
-import StopTimesEditor from "@/components/StopTimesEditor.vue";
+import StopTimesTable from "@/components/stoptimes/StopTimesTable.vue";
+import StopTimesMap from "@/components/stoptimes/StopTimesMap.vue";
+import StopTimesEditor from "@/components/stoptimes/StopTimesEditor.vue";
 import tripsAPI from "@/api/trips.api";
 import TableHeader from "@/components/vuetable/TableHeader";
 import BaseModal from "@/components/modal/BaseModal";

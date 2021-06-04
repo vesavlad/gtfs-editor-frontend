@@ -33,20 +33,20 @@
           </div>
         </div>
         <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times" v-show="!drag_enabled">
-            <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
-                 slot-scope="properties"
-                 v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
-              <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
-                                v-model="properties.rowData[getFieldID(properties.rowField)]">
-              </GeneralizedInput>
-              <div v-if="errors.stop_times">
+          <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
+               slot-scope="properties"
+               v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
+            <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
+                              v-model="properties.rowData[getFieldID(properties.rowField)]">
+            </GeneralizedInput>
+            <div v-if="errors.stop_times">
             <span class="error" :key="error"
                   v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
               {{ error }}
             </span>
-              </div>
             </div>
-          </vuetable>
+          </div>
+        </vuetable>
         <DraggableTable :fields="base_fields" :rows="stop_times" v-show="drag_enabled" v-model="stop_times"
                         @input="$nextTick(calculateSeqs)"></DraggableTable>
       </div>
@@ -98,8 +98,8 @@ import fieldMixin from "@/mixins/fieldMixin.js";
 import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput.vue";
 import SimpleSelect from "@/components/vuetable/inputs/SimpleSelect.vue";
 import DraggableTable from "@/components/DraggableTable.vue";
-import envelopeMixin from "@/mixins/envelopeMixin"
-import config from "@/config.js"
+import envelopeMixin from "@/mixins/envelopeMixin";
+import config from "@/config";
 import MessageModal from "@/components/modal/MessageModal";
 
 let Vuetable = require('vuetable-2')
@@ -482,7 +482,7 @@ export default {
           'line-width': 3
         }
       });
-      let img = require('../assets/img/double-arrow.png')
+      let img = require('../../assets/img/double-arrow.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
           console.log(err);
