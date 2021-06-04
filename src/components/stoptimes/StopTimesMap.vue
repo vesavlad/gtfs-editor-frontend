@@ -1,5 +1,5 @@
 <template>
-  <div id="map" class="map" ref="mapContainer"></div>
+  <div id="map" class="map"></div>
 </template>
 
 <script>
@@ -19,7 +19,7 @@ export default {
   ],
   data: function () {
     return {
-      geojson: {
+      shapeGeojson: {
         'type': 'Feature',
         'properties': {},
         'geometry': {
@@ -41,27 +41,29 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      let map = new mapboxgl.Map({
-        container: this.$refs.mapContainer,
-        style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
+      this.map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
       });
-      this.map = map;
-      map.on('load', () => {
-        this.addLayers();
-        this.$emit('load');
+      this.map.on('load', () => {
         this.envelope(this.map, this.projectId);
-        stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
-          let stops = response.data;
-          stops.forEach(stop => {
-            this.stops[stop.id] = stop;
-          });
-          this.stopsGeojson.features = stops.map(this.generateStopGeoJson);
-          this.map.getSource('stops').setData(this.stopsGeojson);
-        });
+        this.addLayers();
+        this.loadStops();
+        this.$emit('load');
       });
     });
   },
   methods: {
+    loadStops() {
+      stopsAPI.stopsAPI.getAll(this.projectId).then(response => {
+        let stops = response.data;
+        stops.forEach(stop => {
+          this.stops[stop.id] = stop;
+        });
+        this.stopsGeojson.features = stops.map(this.generateStopGeoJson);
+        this.map.getSource('stops-source').setData(this.stopsGeojson);
+      });
+    },
     generateStopGeoJson(stop) {
       return {
         type: 'Feature',
@@ -80,18 +82,19 @@ export default {
       }
     },
     addLayers() {
-      this.map.addSource('shape', {
+      this.map.addSource('shape-source', {
         'type': 'geojson',
-        'data': this.geojson,
+        'data': this.shapeGeojson,
       });
-      this.map.addSource('stops', {
+      this.map.addSource('stops-source', {
         'type': 'geojson',
         'data': this.stopsGeojson,
       });
+
       this.map.addLayer({
         'id': 'shape-layer',
         'type': 'line',
-        'source': 'shape',
+        'source': 'shape-source',
         'layout': {
           'line-join': 'round',
           'line-cap': 'round'
@@ -109,9 +112,9 @@ export default {
         }
         this.map.addImage('double-arrow', image);
         this.map.addLayer({
-          'id': 'arrowId',
+          'id': 'shape-arrow-layer',
           'type': 'symbol',
-          'source': 'shape',
+          'source': 'shape-source',
           'layout': {
             'symbol-placement': 'line',
             'symbol-spacing': 100,
@@ -120,13 +123,18 @@ export default {
             'icon-image': 'double-arrow',
             'icon-size': 0.4,
             'visibility': 'visible'
+          },
+          paint: {
+            'icon-color': 'red',
+            'icon-halo-color': '#343332',
+            'icon-halo-width': 2,
           }
         });
       });
       this.map.addLayer({
         id: "layer-stops-icon",
         type: "circle",
-        source: "stops",
+        source: "stops-source",
         filter: ["==", "selected", "selected"],
         paint: {
           "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
@@ -136,7 +144,7 @@ export default {
       this.map.addLayer({
         id: "layer-stops-seq",
         type: "symbol",
-        source: "stops",
+        source: "stops-source",
         filter: ["==", "selected", "selected"],
         minzoom: 14,
         layout: {
@@ -149,7 +157,7 @@ export default {
       this.map.addLayer({
         id: "layer-stops-label",
         type: "symbol",
-        source: "stops",
+        source: "stops-source",
         filter: ["==", "selected", "selected"],
         minzoom: 16,
         layout: {
@@ -172,7 +180,7 @@ export default {
           feature.properties.selected = stop_ids.includes(feature.properties.id) ? 'selected' : false;
           return feature;
         });
-        this.map.getSource('stops').setData(this.stopsGeojson);
+        this.map.getSource('stops-source').setData(this.stopsGeojson);
         let coordinates = response.data.stop_times.map(st => st.stop).map(id => {
           let stop = this.stops[id];
           return [stop.stop_lon, stop.stop_lat];
@@ -191,8 +199,8 @@ export default {
     displayShape(shape) {
       shapesAPI.shapesAPI.detail(this.projectId, shape).then(response => {
         let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-        this.geojson.geometry.coordinates = points;
-        this.map.getSource('shape').setData(this.geojson);
+        this.shapeGeojson.geometry.coordinates = points;
+        this.map.getSource('shape-source').setData(this.shapeGeojson);
       }).catch(err => console.log(err));
     },
   },
