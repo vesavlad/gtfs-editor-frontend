@@ -3,7 +3,7 @@
     <div class="side-table-header">
       <form class="form-inline d-flex mx-1 justify-content-end search" @submit.stop.prevent="doSearch">
         <div class="input-group">
-          <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
+          <input v-model="quickSearch" type="search" :placeholder="$t('vuetable.quickSearch')" v-on:input="doSearch">
         </div>
       </form>
       <div class="icon-link">
@@ -33,7 +33,6 @@
       </VuetablePaginationDropDown>
     </div>
   </div>
-
 </template>
 
 

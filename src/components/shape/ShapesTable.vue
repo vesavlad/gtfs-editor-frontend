@@ -3,7 +3,7 @@
     <div class="side-table-header">
       <form class="search" @submit.stop.prevent="doSearch">
         <div class="input-group">
-          <input v-model="quickSearch" type="search" placeholder="Quick search" v-on:input="doSearch">
+          <input v-model="quickSearch" type="search" :placeholder="$t('vuetable.quickSearch')" v-on:input="doSearch">
         </div>
       </form>
     </div>
@@ -156,7 +156,8 @@ export default {
       })
     },
     editShape() {
-      this.$router.push({name: 'editShape',
+      this.$router.push({
+        name: 'editShape',
         params: {
           projectId: this.$route.params.projectId,
           shapeId: this.activeShape.id,
@@ -167,7 +168,8 @@ export default {
     duplicateShape() {
       shapesAPI.shapesAPI.detail(this.$route.params.projectId, this.activeShape.id).then(response => {
         let shape = response.data;
-        this.$router.push({name: 'createShape',
+        this.$router.push({
+          name: 'createShape',
           params: {
             projectId: this.$route.params.projectId,
             shape: shape,
