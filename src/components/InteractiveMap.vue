@@ -314,6 +314,7 @@ export default {
         this.stop.deleteModal.message = '';
         delete this.stop.stops[stop.id];
         this.reGenerateStops();
+        this.moveToReaderStatus();
         console.log(`stop ${stop.stop_id} removed`);
       }).catch((err) => {
         let data = err.response.data;
@@ -349,6 +350,7 @@ export default {
           stop_lon: null,
         };
         this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
+        this.moveToReaderStatus();
       }).catch((err) => {
         console.log(err.response);
         this.stop.creation.errors = err.response.data;
@@ -453,8 +455,8 @@ export default {
             'text-size': 14,
             'icon-text-fit': 'both',
             'icon-text-fit-padding': [4, 6, 0, 6],
-            'icon-allow-overlap': true,
-            'text-allow-overlap': true,
+            'icon-allow-overlap': false,
+            'text-allow-overlap': false,
           },
           paint: {
             'icon-color': [
