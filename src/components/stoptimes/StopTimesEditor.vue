@@ -488,7 +488,7 @@ export default {
           console.log(err);
           return;
         }
-        this.map.addImage('arrow', image);
+        this.map.addImage('double-arrow', image, {sdf: true});
         this.map.addLayer({
           'id': 'arrowId',
           'type': 'symbol',
@@ -498,7 +498,7 @@ export default {
             'symbol-spacing': 100,
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
-            'icon-image': 'arrow',
+            'icon-image': 'double-arrow',
             'icon-size': 1,
             'visibility': 'visible'
           }

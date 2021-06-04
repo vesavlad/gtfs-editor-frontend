@@ -375,7 +375,7 @@ export default {
           console.log(err);
           return;
         }
-        this.map.addImage('double-arrow', image);
+        this.map.addImage('double-arrow', image, {sdf: true});
         this.map.addLayer({
           'id': 'point-arrow',
           'type': 'symbol',
@@ -391,7 +391,7 @@ export default {
           },
           paint: {
             'icon-color': config.shape_line_color,
-            'icon-halo-color': "#343332",
+            'icon-halo-color': "#fff",
             'icon-halo-width': 2,
           }
         });
@@ -410,7 +410,7 @@ export default {
           },
           paint: {
             'icon-color': config.map_matching_color,
-            'icon-halo-color': "#343332",
+            'icon-halo-color': "#fff",
             'icon-halo-width': 2,
           }
         });

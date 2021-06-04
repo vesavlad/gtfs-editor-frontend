@@ -110,7 +110,7 @@ export default {
           console.log(err);
           return;
         }
-        this.map.addImage('double-arrow', image);
+        this.map.addImage('double-arrow', image, {sdf: true});
         this.map.addLayer({
           'id': 'shape-arrow-layer',
           'type': 'symbol',
@@ -125,8 +125,8 @@ export default {
             'visibility': 'visible'
           },
           paint: {
-            'icon-color': 'red',
-            'icon-halo-color': '#343332',
+            'icon-color': config.shape_line_color,
+            'icon-halo-color': '#fff',
             'icon-halo-width': 2,
           }
         });
