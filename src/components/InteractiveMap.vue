@@ -306,6 +306,7 @@ export default {
         this.stop.deleteModal.message = '';
         delete this.stop.stops[stop.id];
         this.reGenerateStops();
+        this.moveToReaderStatus();
         console.log(`stop ${stop.stop_id} removed`);
       }).catch((err) => {
         let data = err.response.data;
@@ -341,6 +342,7 @@ export default {
           stop_lon: null,
         };
         this.map.setLayoutProperty('layer-creating-icon', 'visibility', 'none')
+        this.moveToReaderStatus();
       }).catch((err) => {
         console.log(err.response);
         this.stop.creation.errors = err.response.data;
