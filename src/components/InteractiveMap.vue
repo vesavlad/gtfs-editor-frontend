@@ -415,6 +415,8 @@ export default {
         this.stop.stops[response.data.id] = response.data;
         this.reGenerateStops()
         this.status = this.Enums.InteractiveMapStatus.READER;
+      }).catch((err) => {
+        this.stop.edition.errors = err.response.data;
       });
     },
     reGenerateStops() {
@@ -622,6 +624,8 @@ export default {
         this.stop.edition.stop = this.stop.stops[id];
         map.setFeatureState({source: 'stop-source', id: feature.id,}, {active: true});
         this.stop.activeStops[feature.id] = feature;
+        // clean previous error messages
+        this.stop.edition.errors = {};
         this.status = this.Enums.InteractiveMapStatus.EDIT_DATA_POINT;
       });
 
