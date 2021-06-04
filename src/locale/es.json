@@ -119,5 +119,12 @@
     },
     "deleteModalTitle": "¿Estás segur@ que deseas eliminar la parada?",
     "helpMessageAddNewStop": "Agrega una nueva parada"
+  },
+  "stopTimes": {
+    "menu": {
+      "edit": "Editar",
+      "duplicateExpedition": "Duplicar expedición",
+      "duplicateExpeditionUsingHeadway": "Duplicar expedición usando intervalos"
+    }
   }
 }

@@ -14,15 +14,21 @@
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :transform="transformData">
         <div slot="actions" slot-scope="props" class="flex">
-          <button class="btn flat icon error" @click="$emit('delete-st', props.rowData)" alt="Delete stop-times.">
-            <span class="material-icons">delete</span>
-          </button>
-          <button class="btn flat icon" @click="$emit('edit-st', props.rowData)" alt="Edit stop-times.">
-            <span class="material-icons">edit</span>
-          </button>
           <button class="btn flat icon" @click="$emit('focus-st', props.rowData)" alt="Display stop_times.">
             <span class="material-icons">remove_red_eye</span>
           </button>
+          <div class="btn icon flat">
+            <i class="material-icons"
+               @click="showMenu=!showMenu;activeTrip=props.rowData">more_vert</i>
+            <StopTimesMenu v-if="showMenu && activeTrip.id===props.rowData.id"
+                       :tripId="props.rowData.trip_id"
+                       @edit="editShape()"
+                       @duplicate-expedition="editShape()"
+                       @duplicate-expedition-using-headway="editShape()"
+                       @delete="$emit('delete-st', props.rowData)"
+                       @close="showMenu=false">
+            </StopTimesMenu>
+          </div>
         </div>
       </Vuetable>
     </div>
@@ -41,6 +47,7 @@ import VuetablePaginationDropDown from '@/components/vuetable/VuetablePagination
 import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
 import tripsAPI from "@/api/trips.api";
 import {debounce} from "debounce";
+import StopTimesMenu from "@/components/stoptimes/StopTimesMenu";
 
 let Vuetable = require('vuetable-2')
 
@@ -49,12 +56,15 @@ export default {
   components: {
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
-    VuetablePaginationDropDown
+    VuetablePaginationDropDown,
+    StopTimesMenu
   },
   data: function () {
     return {
       quickSearch: "",
       doSearch: false,
+      showMenu: false,
+      activeTrip: null,
       fields: [
         {
           name: 'actions',
@@ -80,7 +90,7 @@ export default {
         {
           name: "shape",
           title: "Has Shape",
-          formatter: shape => shape ? "Yes" : "No",
+          formatter: shape => shape ? '<span class="material-icons">check</span>' : '<span class="material-icons">close</span>',
         },
       ],
       url: tripsAPI.tripsAPI.getFullBaseURL(this.project),
