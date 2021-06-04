@@ -102,7 +102,7 @@ const routes = [
           },
           {
             path: '/project/:projectId/stoptimes/create',
-            name: 'createShape',
+            name: 'createStopTimes',
             component: StopTimesEditorView,
             props: true,
             meta: {
@@ -111,7 +111,7 @@ const routes = [
           },
           {
             path: '/project/:projectId/stoptimes/:stoptimeId',
-            name: 'editStopTime',
+            name: 'editStopTimes',
             component: StopTimesEditorView,
             props: true,
             meta: {
