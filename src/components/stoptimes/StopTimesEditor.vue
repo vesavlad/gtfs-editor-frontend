@@ -91,17 +91,17 @@
 
 
 <script>
-import tripsAPI from "@/api/trips.api";
-import stopsAPI from "@/api/stops.api";
-import shapesAPI from "@/api/shapes.api";
-import fieldMixin from "@/mixins/fieldMixin.js";
-import GeneralizedInput from "@/components/vuetable/inputs/GeneralizedInput.vue";
-import SimpleSelect from "@/components/vuetable/inputs/SimpleSelect.vue";
-import DraggableTable from "@/components/DraggableTable.vue";
-import envelopeMixin from "@/mixins/envelopeMixin";
-import config from "@/config";
-import MessageModal from "@/components/modal/MessageModal";
-import Enums from "@/utils/enums";
+import tripsAPI from '@/api/trips.api';
+import stopsAPI from '@/api/stops.api';
+import shapesAPI from '@/api/shapes.api';
+import fieldMixin from '@/mixins/fieldMixin.js';
+import GeneralizedInput from '@/components/vuetable/inputs/GeneralizedInput.vue';
+import SimpleSelect from '@/components/vuetable/inputs/SimpleSelect.vue';
+import DraggableTable from '@/components/DraggableTable.vue';
+import envelopeMixin from '@/mixins/envelopeMixin';
+import config from '@/config';
+import MessageModal from '@/components/modal/MessageModal';
+import Enums from '@/utils/enums';
 
 let Vuetable = require('vuetable-2')
 
@@ -109,26 +109,26 @@ const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 let turf = require('@turf/turf');
 let base_fields = [
-  {title: "Seq", name: "stop_sequence",},
-  {title: "Stop ID", name: "stop_id"},
-  {title: "Arrival Time", name: "arrival_time"},
-  {title: "Departure Time", name: "departure_time"}
+  {title: 'Seq', name: 'stop_sequence',},
+  {title: 'Stop ID', name: 'stop_id'},
+  {title: 'Arrival Time', name: 'arrival_time'},
+  {title: 'Departure Time', name: 'departure_time'}
 ]
 
 let optional_fields = [
-  {title: "Stop Headsign", name: "stop_headsign",},
-  {title: "Pickup Type", name: "pickup_type"},
-  {title: "Drop-Off Type", name: "drop_off_type"},
-  {title: "Continuous Pickup", name: "continuous_pickup"},
-  {title: "Continuous Drop-Off", name: "continuous_dropoff"},
-  {title: "Shape Distance Traveled", name: "shape_dist_traveled"},
-  {title: "Timepoint", name: "timepoint",}
+  {title: 'Stop Headsign', name: 'stop_headsign',},
+  {title: 'Pickup Type', name: 'pickup_type'},
+  {title: 'Drop-Off Type', name: 'drop_off_type'},
+  {title: 'Continuous Pickup', name: 'continuous_pickup'},
+  {title: 'Continuous Drop-Off', name: 'continuous_dropoff'},
+  {title: 'Shape Distance Traveled', name: 'shape_dist_traveled'},
+  {title: 'Timepoint', name: 'timepoint',}
 ];
 
 let full_fields = base_fields.concat(optional_fields);
 
 export default {
-  name: "StopTimesEditor",
+  name: 'StopTimesEditor',
   components: {
     MessageModal,
     Vuetable: Vuetable.Vuetable,
@@ -163,9 +163,12 @@ export default {
   },
   data() {
     return {
+      stop: {
+        sourceName: 'stop-source'
+      },
       STSelectField: {
-        name: "stop",
-        type: "select-simple",
+        name: 'stop',
+        type: 'select-simple',
         options: {},
       },
       localTrip: this.trip,
@@ -220,21 +223,27 @@ export default {
   },
   methods: {
     addStopsLayers() {
+      let minZoom = 14;
       let geojson = {
         type: 'FeatureCollection',
         features: this.generateStopFeatures()
       };
-      this.map.addSource('stop-source', {
+
+      this.map.addSource(this.stop.sourceName, {
         'type': 'geojson',
         'data': geojson,
       });
+
       this.map.addLayer({
-        id: "layer-stops-icon",
-        type: "circle",
-        source: "stop-source",
+        id: 'layer-stops-icon',
+        type: 'circle',
+        source: this.stop.sourceName,
+        layout: {
+          'visibility': 'visible'
+        },
         paint: {
-          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
-          "circle-color": [
+          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
+          'circle-color': [
             'case',
             ['get', 'selected'], config.stop_selected_color,
             config.stop_color
@@ -242,41 +251,41 @@ export default {
         }
       });
       this.map.addLayer({
-        id: "layer-stops-label",
-        type: "symbol",
-        source: "stops",
-        minzoom: 14,
+        id: 'layer-stops-label',
+        type: 'symbol',
+        source: this.stop.sourceName,
+        minzoom: minZoom,
         layout: {
-          "text-field": "{label}",
-          "text-anchor": "top",
-          "text-offset": [0, 0.5],
-          "text-allow-overlap": true,
+          'text-field': '{label}',
+          'text-anchor': 'top',
+          'text-offset': [0, 0.5],
+          'text-allow-overlap': true,
         }
       });
       this.map.addLayer({
-        id: "layer-stops-seq",
-        type: "symbol",
-        source: "stops",
+        id: 'layer-stops-seq',
+        type: 'symbol',
+        source: this.stop.sourceName,
         filter: ['get', 'selected'],
-        minzoom: 14,
+        minzoom: minZoom,
         layout: {
-          "text-field": "Seq: {sequence}",
-          "text-anchor": "top",
-          "text-offset": [0, -0.5],
-          "text-allow-overlap": true,
+          'text-field': 'Seq: {sequence}',
+          'text-anchor': 'top',
+          'text-offset': [0, -0.5],
+          'text-allow-overlap': true,
         }
       });
       this.map.addLayer({
-        id: "layer-stops-time",
-        type: "symbol",
-        source: "stops",
+        id: 'layer-stops-time',
+        type: 'symbol',
+        source: this.stop.sourceName,
         filter: ['get', 'arrival_time'],
-        minzoom: 14,
+        minzoom: minZoom,
         layout: {
-          "text-field": "{arrival_time}",
-          "text-anchor": "top",
-          "text-offset": [0, 1.5],
-          "text-allow-overlap": true,
+          'text-field': '{arrival_time}',
+          'text-anchor': 'top',
+          'text-offset': [0, 1.5],
+          'text-allow-overlap': true,
         }
       });
       this.map.on('click', 'layer-stops-icon', evt => {
@@ -316,6 +325,17 @@ export default {
         let stop = this.stopMap.get(feature.properties.id);
         this.stop_times = this.stop_times.filter(st => st.stop !== stop.id);
         this.updateStops();
+      });
+
+      let canvas = this.map.getCanvas();
+      this.map.on('mouseenter', 'layer-stops-icon', function (e) {
+        let feature = e.features[0];
+        if (feature.properties.selected) {
+          canvas.style.cursor = 'pointer';
+        }
+      });
+      this.map.on('mouseleave', 'layer-stops-icon', function () {
+        canvas.style.cursor = '';
       });
     },
     addShapeLayers() {
@@ -376,7 +396,7 @@ export default {
           this.calculateSTPositions();
         }).catch(err => console.log(err));
       } else {
-        window.alert("Warning: editing a StopTimes without a shape is not supported");
+        window.alert('Warning: editing a StopTimes without a shape is not supported');
       }
     },
     openSpeedModal() {
@@ -390,7 +410,7 @@ export default {
       })
     },
     timeToSeconds(timeString) {
-      let times = timeString.split(":").map(t => parseInt(t));
+      let times = timeString.split(':').map(t => parseInt(t));
       let seconds = 0;
       for (let i = 0; i < times.length; i++) {
         seconds *= 60;
@@ -400,7 +420,7 @@ export default {
     },
     secondsToTime(seconds) {
       seconds = Math.floor(seconds);
-      let pad = (s) => s.length < 2 ? "0" + s : s;
+      let pad = (s) => s.length < 2 ? '0' + s : s;
       let hours = (seconds / 3600 | 0).toString()
       seconds = seconds % 3600
       let minutes = (seconds / 60 | 0).toString()
@@ -453,7 +473,7 @@ export default {
         type: 'FeatureCollection',
         features: this.generateStopFeatures(),
       };
-      this.map.getSource('stops').setData(geojson);
+      this.map.getSource(this.stop.sourceName).setData(geojson);
     },
     generateStopFeatures() {
       let st_map = new Map();
@@ -485,7 +505,7 @@ export default {
           },
           properties: {
             id: stop.id,
-            label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ""),
+            label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
             ...props,
           }
         }
