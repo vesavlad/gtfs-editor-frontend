@@ -181,8 +181,7 @@ export default {
         params: {
           projectId: this.$route.params.projectId,
           tripId: this.activeTrip.id,
-          mode: this.Enums.StopTimesEditorMode.EDIT,
-          trip: this.activeTrip
+          mode: this.Enums.StopTimesEditorMode.EDIT
         }
       });
     },
@@ -192,8 +191,7 @@ export default {
         params: {
           projectId: this.$route.params.projectId,
           tripId: this.activeTrip.id,
-          mode: this.Enums.StopTimesEditorMode.DUPLICATE,
-          trip: this.activeTrip
+          mode: this.Enums.StopTimesEditorMode.DUPLICATE
         }
       });
     },
@@ -203,8 +201,7 @@ export default {
         params: {
           projectId: this.$route.params.projectId,
           tripId: this.activeTrip.id,
-          mode: this.Enums.StopTimesEditorMode.COPY_USING_HEADWAY,
-          trip: this.activeTrip
+          mode: this.Enums.StopTimesEditorMode.COPY_USING_HEADWAY
         }
       });
     }

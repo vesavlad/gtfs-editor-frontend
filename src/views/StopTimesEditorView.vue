@@ -1,10 +1,10 @@
 <template>
-  <div class="section stop-times">
+  <div class="section stop-times" v-if="localTrip!==null">
     <div class="container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
     <StopTimesEditor :projectId="$route.params.projectId"
-                     :trip="trip"
+                     :trip="localTrip"
                      :mode="mode">
     </StopTimesEditor>
   </div>
@@ -14,6 +14,7 @@
 import StopTimesEditor from "@/components/stoptimes/StopTimesEditor.vue";
 import TableHeader from "@/components/vuetable/TableHeader";
 import Enums from "@/utils/enums";
+import tripsAPI from "@/api/trips.api";
 
 export default {
   name: 'StopTimesEditorView',
@@ -22,13 +23,9 @@ export default {
     TableHeader
   },
   props: {
-    trip: {
-      type: Object,
-      required: true
-    },
     mode: {
       type: String,
-      required: true,
+      default: Enums.StopTimesEditorMode.EDIT,
       validator: function (value) {
         if (Object.values(Enums.StopTimesEditorMode).indexOf(value) === -1) {
           console.error(`stop times editor mode "${value}" is not valid`)
@@ -41,8 +38,19 @@ export default {
   data() {
     return {
       tableTitle: 'Stop times',
-      infoURL: "https://developers.google.com/transit/gtfs/reference#stop_timestxt"
+      infoURL: "https://developers.google.com/transit/gtfs/reference#stop_timestxt",
+      localTrip: null
     };
-  }
+  },
+  methods: {
+    setTrip() {
+      tripsAPI.tripsAPI.detail(this.$route.params.projectId, this.$route.params.tripId).then(response => {
+        this.localTrip = response.data;
+      });
+    }
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => vm.setTrip());
+  },
 };
 </script>
