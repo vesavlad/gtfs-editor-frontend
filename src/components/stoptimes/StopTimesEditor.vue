@@ -3,11 +3,11 @@
     <div class="top-map-bar">
       <div class="right-content grid center">
         <button class="btn btn-outline-secondary" @click="orderModal.visible = true">
-          <span>Reorder using shape</span>
+          <span>{{ $t('stopTimes.editor.reorderStopsUsingShape') }}</span>
           <span class="material-icons">low_priority</span>
         </button>
         <button class="btn btn-outline-secondary" @click="openSpeedModal">
-          <span>Calc times</span><span class="material-icons">restore</span>
+          <span>{{ $t('stopTimes.editor.calculateTimes') }}</span><span class="material-icons">restore</span>
         </button>
       </div>
     </div>
@@ -18,13 +18,13 @@
         <div class="side-header">
           <div class="grid center">
             <h4>Trip ID:</h4>
-            <input v-model="trip.trip_id">
+            <input v-model="localTrip.trip_id">
           </div>
           <div class="btn-list">
             <button class="btn icon flat" @click="saveAndExit"><span class="material-icons">check</span></button>
             <label>
-              <span>Drag</span>
-              <input type="checkbox" id="enable-drag" v-model="drag_enabled">
+              <span>{{ $t('stopTimes.editor.enableCustomSortTable') }}</span>
+              <input type="checkbox" id="enable-drag" v-model="dragEnabled">
             </label>
             <label>
               <span class="material-icons">settings</span>
@@ -32,7 +32,7 @@
             </label>
           </div>
         </div>
-        <vuetable ref="table" :fields="fields" :api-mode="false" :data="stop_times" v-show="!drag_enabled">
+        <vuetable v-if="!dragEnabled" ref="table" :fields="fields" :api-mode="false" :data="stop_times">
           <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
                slot-scope="properties"
                v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
@@ -47,7 +47,7 @@
             </div>
           </div>
         </vuetable>
-        <DraggableTable :fields="base_fields" :rows="stop_times" v-show="drag_enabled" v-model="stop_times"
+        <DraggableTable v-else :fields="base_fields" :rows="stop_times" v-model="stop_times"
                         @input="$nextTick(calculateSeqs)"></DraggableTable>
       </div>
     </div>
@@ -109,46 +109,21 @@ const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 let turf = require('@turf/turf');
 let base_fields = [
-  {
-    title: "Seq",
-    name: "stop_sequence",
-  },
-  {
-    title: "Stop ID",
-    name: "stop_id",
-  },
-  {
-    title: "Arrival Time",
-    name: "arrival_time",
-  },
-  {
-    title: "Departure Time",
-    name: "departure_time",
-  }
+  {title: "Seq", name: "stop_sequence",},
+  {title: "Stop ID", name: "stop_id"},
+  {title: "Arrival Time", name: "arrival_time"},
+  {title: "Departure Time", name: "departure_time"}
 ]
 
-let optional_fields = [{
-  title: "Stop Headsign",
-  name: "stop_headsign",
-}, {
-  title: "Pickup Type",
-  name: "pickup_type",
-}, {
-  title: "Drop-Off Type",
-  name: "drop_off_type",
-}, {
-  title: "Continuous Pickup",
-  name: "continuous_pickup",
-}, {
-  title: "Continuous Drop-Off",
-  name: "continuous_dropoff",
-}, {
-  title: "Shape Distance Traveled",
-  name: "shape_dist_traveled",
-}, {
-  title: "Timepoint",
-  name: "timepoint",
-}]
+let optional_fields = [
+  {title: "Stop Headsign", name: "stop_headsign",},
+  {title: "Pickup Type", name: "pickup_type"},
+  {title: "Drop-Off Type", name: "drop_off_type"},
+  {title: "Continuous Pickup", name: "continuous_pickup"},
+  {title: "Continuous Drop-Off", name: "continuous_dropoff"},
+  {title: "Shape Distance Traveled", name: "shape_dist_traveled"},
+  {title: "Timepoint", name: "timepoint",}
+];
 
 let full_fields = base_fields.concat(optional_fields);
 
@@ -165,45 +140,14 @@ export default {
     envelopeMixin,
     fieldMixin,
   ],
-  data: function () {
-    return {
-      STSelectField: {
-        name: "stop",
-        type: "select-simple",
-        options: {},
-      },
-      speed: 60,
-      errors: {},
-      drag_enabled: false,
-      exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
-      base_fields: base_fields,
-      fields: base_fields,
-      show_optional_fields: false,
-      stop_times: this.trip.stop_times,
-      stops: [],
-      stop_map: new Map(),
-      shape: false,
-      turfShape: false,
-      orderModal: {
-        visible: false,
-      },
-      speedModal: {
-        visible: false,
-        from_stop: null,
-        to_stop: null,
-      },
-      info: [
-        "Click on a Stop to add it to the sequence",
-        "Right click on a Stop to remove it from the sequence",
-      ]
-    };
-  },
   props: {
     projectId: {
-      required: true,
+      type: [String, Number],
+      required: true
     },
     trip: {
-      required: true,
+      type: Object,
+      required: true
     },
     mode: {
       type: String,
@@ -215,18 +159,53 @@ export default {
         }
         return true;
       }
-    },
+    }
+  },
+  data() {
+    return {
+      STSelectField: {
+        name: "stop",
+        type: "select-simple",
+        options: {},
+      },
+      localTrip: this.trip,
+      speed: 60,
+      errors: {},
+      dragEnabled: false,
+      exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
+      base_fields: base_fields,
+      fields: base_fields,
+      show_optional_fields: false,
+      stop_times: this.trip.stop_times,
+      stops: [],
+      stopMap: new Map(),
+      shape: false,
+      turfShape: false,
+      orderModal: {
+        visible: false,
+      },
+      speedModal: {
+        visible: false,
+        from_stop: null,
+        to_stop: null,
+      }
+    };
   },
   watch: {
+    trip() {
+      this.localTrip = {...this.trip};
+      this.stop_times = this.localTrip.stop_times;
+    },
     show_optional_fields(val) {
       this.fields = val ? full_fields : base_fields;
     },
   },
   mounted() {
+    console.log(this.trip);
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
         this.stops = response.data;
-        this.stops.forEach(stop => this.stop_map.set(stop.id, stop));
+        this.stops.forEach(stop => this.stopMap.set(stop.id, stop));
         this.map = new mapboxgl.Map({
           container: this.$refs.mapContainer,
           style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
@@ -383,10 +362,10 @@ export default {
           return;
         }
         evt.preventDefault();
-        let stop = this.stop_map.get(feature.properties.id);
+        let stop = this.stopMap.get(feature.properties.id);
         let st = {
-          trip: this.trip.id,
-          trip_id: this.trip.trip_id,
+          trip: this.localTrip.id,
+          trip_id: this.localTrip.trip_id,
           stop: stop.id,
           stop_id: stop.stop_id,
           stop_sequence: null,
@@ -411,7 +390,7 @@ export default {
           return;
         }
         evt.preventDefault();
-        let stop = this.stop_map.get(feature.properties.id);
+        let stop = this.stopMap.get(feature.properties.id);
         this.stop_times = this.stop_times.filter(st => st.stop !== stop.id);
         this.updateStops();
       });
@@ -513,8 +492,8 @@ export default {
           }
         });
       });
-      if (this.trip.shape) {
-        shapesAPI.shapesAPI.detail(this.projectId, this.trip.shape).then(response => {
+      if (this.localTrip && this.localTrip.shape) {
+        shapesAPI.shapesAPI.detail(this.projectId, this.localTrip.shape).then(response => {
           this.shape = response.data;
           let points = this.shape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
           this.turfShape = turf.lineString(points);
@@ -544,14 +523,14 @@ export default {
       this.calculateSeqs();
     },
     calculatePosition(st) {
-      let stop = this.stop_map.get(st.stop);
+      let stop = this.stopMap.get(st.stop);
       let point = turf.point([stop.stop_lon, stop.stop_lat]);
       let nearest = turf.nearestPointOnLine(this.turfShape, point);
       return nearest.properties.location.toFixed(3);
     },
     saveAndExit() {
       let data = {
-        ...this.trip,
+        ...this.localTrip,
         stop_times: this.stop_times,
       }
       let save = null;
