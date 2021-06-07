@@ -101,7 +101,7 @@ const routes = [
             component: StopTimesView,
           },
           {
-            path: '/project/:projectId/stoptimes/:stoptimeId',
+            path: '/project/:projectId/stoptimes/:tripId',
             name: 'editStopTimes',
             component: StopTimesEditorView,
             props: true,
