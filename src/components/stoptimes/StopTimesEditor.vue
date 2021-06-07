@@ -28,7 +28,7 @@
             </label>
             <label>
               <span class="material-icons">settings</span>
-              <input type="checkbox" id="optional-fields" v-model="show_optional_fields">
+              <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
             </label>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default {
       exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
       base_fields: base_fields,
       fields: base_fields,
-      show_optional_fields: false,
+      showOptionalFields: false,
       stop_times: this.trip.stop_times,
       stops: [],
       stopMap: new Map(),
@@ -196,12 +196,11 @@ export default {
       this.localTrip = {...this.trip};
       this.stop_times = this.localTrip.stop_times;
     },
-    show_optional_fields(val) {
+    showOptionalFields(val) {
       this.fields = val ? full_fields : base_fields;
     },
   },
   mounted() {
-    console.log(this.trip);
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
         this.stops = response.data;
