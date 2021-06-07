@@ -126,6 +126,11 @@
       "duplicateExpedition": "Duplicar expedición",
       "duplicateExpeditionUsingHeadway": "Duplicar expedición usando intervalos"
     },
-    "deleteModalTitle": "¿Estás segur@ que deseas eliminar los stop-times del trip \"{tripId}\"?"
+    "deleteModalTitle": "¿Estás segur@ que deseas eliminar los stop-times del trip \"{tripId}\"?",
+    "editor": {
+      "reorderStopsUsingShape": "Ordenar paradas usando la ruta",
+      "calculateTimes": "Calcular tiempos",
+      "enableCustomSortTable": "Habilitar ordenamiento personalizado"
+    }
   }
 }

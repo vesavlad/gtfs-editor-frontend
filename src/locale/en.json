@@ -126,6 +126,11 @@
       "duplicateExpedition": "Duplicate expedition",
       "duplicateExpeditionUsingHeadway": "Duplicate expedition using headway"
     },
-    "deleteModalTitle": "Are you sure you want to delete the stop-times for trip \"{tripId}\"?"
+    "deleteModalTitle": "Are you sure you want to delete the stop-times for trip \"{tripId}\"?",
+    "editor": {
+      "reorderStopsUsingShape": "Reorder stops using shape",
+      "calculateTimes": "Calc times",
+      "enableCustomSortTable": "Enable custom sort table"
+    }
   }
 }
