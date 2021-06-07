@@ -247,7 +247,18 @@ export default {
             'case',
             ['get', 'selected'], config.stop_selected_color,
             config.stop_color
-          ]
+          ],
+          'circle-stroke-color': [
+            'case',
+            ['boolean', ['get', 'selected'], false], config.stop_stroke_selected_color,
+            config.stop_stroke_color
+          ],
+          'circle-stroke-opacity': 1,
+          'circle-stroke-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], 5,
+            2
+          ],
         }
       });
       this.map.addLayer({
@@ -288,14 +299,14 @@ export default {
           'text-allow-overlap': true,
         }
       });
-      this.map.on('click', 'layer-stops-icon', evt => {
-        let feature = evt.features[0];
+      this.map.on('click', 'layer-stops-icon', e => {
+        let feature = e.features[0];
         if (feature.properties.selected) {
           return;
         }
-        evt.preventDefault();
+        e.preventDefault();
         let stop = this.stopMap.get(feature.properties.id);
-        let st = {
+        let stopTime = {
           trip: this.localTrip.id,
           trip_id: this.localTrip.trip_id,
           stop: stop.id,
@@ -311,31 +322,37 @@ export default {
           shape_dist_traveled: null,
           timepoint: null
         }
-        st.distance = this.calculatePosition(st);
-        this.stop_times.push(st);
+        stopTime.distance = this.calculatePosition(stopTime);
+        this.stop_times.push(stopTime);
         this.updateStops();
       });
 
-      this.map.on('contextmenu', 'layer-stops-icon', evt => {
-        let feature = evt.features[0];
+      this.map.on('contextmenu', 'layer-stops-icon', e => {
+        let feature = e.features[0];
         if (!feature.properties.selected) {
           return;
         }
-        evt.preventDefault();
+        e.preventDefault();
         let stop = this.stopMap.get(feature.properties.id);
         this.stop_times = this.stop_times.filter(st => st.stop !== stop.id);
         this.updateStops();
       });
 
       let canvas = this.map.getCanvas();
-      this.map.on('mouseenter', 'layer-stops-icon', function (e) {
-        let feature = e.features[0];
-        if (feature.properties.selected) {
-          canvas.style.cursor = 'pointer';
-        }
+      let map = this.map;
+      let hoveredStops = {};
+      this.map.on('mouseenter', 'layer-stops-icon', e => {
+        canvas.style.cursor = 'pointer';
+        let feature= e.features[0];
+        hoveredStops[feature.id] = feature;
+        map.setFeatureState({source: this.stop.sourceName, id: feature.id}, {hover: true});
       });
-      this.map.on('mouseleave', 'layer-stops-icon', function () {
+      this.map.on('mouseleave', 'layer-stops-icon', () => {
         canvas.style.cursor = '';
+        Object.keys(hoveredStops).forEach(featureId => {
+          map.setFeatureState({source: this.stop.sourceName, id: featureId}, {hover: false});
+        });
+        hoveredStops = {};
       });
     },
     addShapeLayers() {
@@ -507,7 +524,8 @@ export default {
             id: stop.id,
             label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
             ...props,
-          }
+          },
+          id: stop.id,
         }
       });
     },
