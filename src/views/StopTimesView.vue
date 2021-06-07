@@ -159,10 +159,6 @@ export default {
       }
       this.editingModal.visible = false;
     },
-    beginPointSelection() {
-      this.$refs.map.beginPointSelection();
-      this.editingModal.visible = false;
-    },
     finishEditing() {
       this.editingModal.trip = false;
       this.range = false;
