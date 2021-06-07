@@ -21,10 +21,9 @@
             <i class="material-icons"
                @click="showMenu=!showMenu;activeTrip=props.rowData">more_vert</i>
             <StopTimesMenu v-if="showMenu && activeTrip.id===props.rowData.id"
-                           :tripId="props.rowData.trip_id"
-                           @edit="editShape()"
-                           @duplicate-expedition="editShape()"
-                           @duplicate-expedition-using-headway="editShape()"
+                           @edit="editStopTimes"
+                           @duplicate-trip="duplicateStopTimes"
+                           @copy-trip-using-headway="copyStopTimesUsingHeadway"
                            @delete="beginDeleteST(props.rowData)"
                            @close="showMenu=false">
             </StopTimesMenu>
@@ -176,6 +175,39 @@ export default {
         this.deleteModal.visible = true;
       })
     },
+    editStopTimes() {
+      this.$router.push({
+        name: 'editStopTimes',
+        params: {
+          projectId: this.$route.params.projectId,
+          tripId: this.activeTrip.id,
+          mode: this.Enums.StopTimesEditorMode.EDIT,
+          trip: this.activeTrip
+        }
+      });
+    },
+    duplicateStopTimes() {
+      this.$router.push({
+        name: 'editStopTimes',
+        params: {
+          projectId: this.$route.params.projectId,
+          tripId: this.activeTrip.id,
+          mode: this.Enums.StopTimesEditorMode.DUPLICATE,
+          trip: this.activeTrip
+        }
+      });
+    },
+    copyStopTimesUsingHeadway() {
+      this.$router.push({
+        name: 'editStopTimes',
+        params: {
+          projectId: this.$route.params.projectId,
+          tripId: this.activeTrip.id,
+          mode: this.Enums.StopTimesEditorMode.COPY_USING_HEADWAY,
+          trip: this.activeTrip
+        }
+      });
+    }
   },
   mounted() {
     this.doSearch = debounce(this.refresh, 300);
