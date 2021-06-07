@@ -3,20 +3,8 @@
     <div class="container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
-    <div class="map-container" v-if="!editing">
-      <div class="dynamic-map-container">
-        <div class="top-map-bar">
-          <div class="right-content grid center">
-            <button class="btn flat white"><span>How to use</span><i class="material-icons">help_outline</i></button>
-          </div>
-        </div>
-        <StopTimesTable ref="table" :project="$route.params.projectId" @focus-st="displayTrip"
-                        @edit-st="openEditingModal" @delete-st="beginDeleteST"></StopTimesTable>
-        <StopTimesMap ref="map" :project="$route.params.projectId"
-                      @range="beginEditing('range', $event)"></StopTimesMap>
-      </div>
-    </div>
-    <StopTimesEditor v-else :trip="editingModal.trip" v-on:close="finishEditing" :project="$route.params.projectId"
+    <StopTimesEditor :trip="editingModal.trip"
+                     :projectId="$route.params.projectId"
                      :mode="mode">
     </StopTimesEditor>
     <BaseModal :show="editingModal.visible" @close="editingModal.visible = false">
@@ -52,42 +40,46 @@
         </span>
       </template>
     </MessageModal>
-    <MessageModal :show="deleteModal.visible" @ok="deleteST" @cancel="deleteModal.visible = false"
-                  @close="deleteModal.visible = false" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
-                  :type="Enums.MessageModalType.WARNING">
-      <template v-slot:m-title>
-        <h2>Are you sure you want to delete the stop-times for trip "{{ deleteModal.trip.trip_id }}"?</h2>
-      </template>
-      <template v-slot:m-content>
-        <span>
-          {{ deleteModal.message }}
-        </span>
-      </template>
-    </MessageModal>
   </div>
 </template>
 
 <script>
-import StopTimesTable from "@/components/stoptimes/StopTimesTable.vue";
-import StopTimesMap from "@/components/stoptimes/StopTimesMap.vue";
 import StopTimesEditor from "@/components/stoptimes/StopTimesEditor.vue";
 import tripsAPI from "@/api/trips.api";
 import TableHeader from "@/components/vuetable/TableHeader";
 import BaseModal from "@/components/modal/BaseModal";
 import MessageModal from "@/components/modal/MessageModal";
+import Enums from "@/utils/enums";
 
 export default {
+  name: 'StopTimesEditorView',
   components: {
     MessageModal,
     BaseModal,
-    StopTimesTable,
-    StopTimesMap,
     StopTimesEditor,
     TableHeader
+  },
+  props: {
+    trip: {
+      type: Object,
+      required: true
+    },
+    mode: {
+      type: String,
+      required: true,
+      validator: function (value) {
+        if (Object.values(Enums.StopTimesEditorMode).indexOf(value) === -1) {
+          console.error(`stop times editor mode "${value}" is not valid`)
+          return false;
+        }
+        return true;
+      }
+    },
   },
   data() {
     return {
       tableTitle: 'Stop times',
+      infoURL: "https://developers.google.com/transit/gtfs/reference#stop_timestxt",
       editing: false,
       range: false,
       editingModal: {
@@ -97,14 +89,7 @@ export default {
         headway: 0,
         trip_id: "",
         error: "",
-      },
-      deleteModal: {
-        trip: null,
-        visible: false,
-        message: "",
-      },
-      mode: "",
-      infoURL: "https://developers.google.com/transit/gtfs/reference#stop_timestxt",
+      }
     };
   },
   methods: {
@@ -163,56 +148,18 @@ export default {
       this.editingModal.visible = true;
       this.editingModal.error = "";
     },
-    beginDeleteST(trip) {
-      console.log(trip);
-      this.deleteModal.message = "";
-      this.deleteModal.visible = true;
-      this.deleteModal.trip = trip;
-    },
     duplicateWithHeadway() {
       this.editingModal.visible = false;
       this.editingModal.duplicating = true;
       this.editingModal.trip_id = this.editingModal.trip.trip_id;
-    },
-    deleteST() {
-      console.log(this.deleteModal.trip)
-      let data = {
-        id: this.deleteModal.trip.id,
-        stop_times: [],
-      }
-      tripsAPI.tripsAPI.update(this.$route.params.projectId, data).then(response => {
-        console.log(response);
-        this.deleteModal = {
-          trip: null,
-          visible: false,
-          message: "",
-        }
-        this.$refs.table.refresh();
-      }).catch(err => {
-        console.log(err.response);
-        this.deleteModal.message = err.response.data.message;
-      })
     },
     beginEditing(mode, range) {
       this.mode = mode;
       if (mode === "range") {
         this.range = range;
       }
-      this.editing = true;
       this.editingModal.visible = false;
-    },
-    beginPointSelection() {
-      this.$refs.map.beginPointSelection();
-      this.editingModal.visible = false;
-    },
-    finishEditing() {
-      this.editing = false;
-      this.editingModal.trip = false;
-      this.range = false;
-    },
-    displayTrip(shape) {
-      this.$refs.map.displayTrip(shape);
-    },
+    }
   },
 };
 </script>

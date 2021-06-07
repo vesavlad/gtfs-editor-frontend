@@ -15,10 +15,6 @@ export default {
     placement: {
       type: String,
       default: Enums.MenuBoxPlacement.UPPER_LEFT,
-    },
-    tripId: {
-      type: String,
-      required: true
     }
   },
   data() {
@@ -34,14 +30,14 @@ export default {
         {
           icon: 'content_copy',
           label: 'stopTimes.menu.duplicateExpedition',
-          eventName: 'duplicateExpedition',
+          eventName: 'duplicate-trip',
           isDisabled: false,
           classes: []
         },
         {
           icon: 'content_copy',
           label: 'stopTimes.menu.duplicateExpeditionUsingHeadway',
-          eventName: 'duplicateExpeditionUsingHeadway',
+          eventName: 'copy-trip-using-headway',
           isDisabled: false,
           classes: []
         },

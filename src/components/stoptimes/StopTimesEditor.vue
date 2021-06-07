@@ -101,16 +101,18 @@ import DraggableTable from "@/components/DraggableTable.vue";
 import envelopeMixin from "@/mixins/envelopeMixin";
 import config from "@/config";
 import MessageModal from "@/components/modal/MessageModal";
+import Enums from "@/utils/enums";
 
 let Vuetable = require('vuetable-2')
 
 const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 let turf = require('@turf/turf');
-let base_fields = [{
-  title: "Seq",
-  name: "stop_sequence",
-},
+let base_fields = [
+  {
+    title: "Seq",
+    name: "stop_sequence",
+  },
   {
     title: "Stop ID",
     name: "stop_id",
@@ -122,7 +124,7 @@ let base_fields = [{
   {
     title: "Departure Time",
     name: "departure_time",
-  },
+  }
 ]
 
 let optional_fields = [{
@@ -197,14 +199,22 @@ export default {
     };
   },
   props: {
-    project: {
+    projectId: {
       required: true,
     },
     trip: {
       required: true,
     },
     mode: {
+      type: String,
       required: true,
+      validator: function (value) {
+        if (Object.values(Enums.StopTimesEditorMode).indexOf(value) === -1) {
+          console.error(`stop times editor mode "${value}" is not valid`)
+          return false;
+        }
+        return true;
+      }
     },
   },
   watch: {
@@ -214,18 +224,17 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      stopsAPI.stopsAPI.getAll(this.project).then((response) => {
+      stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
         this.stops = response.data;
         this.stops.forEach(stop => this.stop_map.set(stop.id, stop));
-        let map = new mapboxgl.Map({
+        this.map = new mapboxgl.Map({
           container: this.$refs.mapContainer,
           style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
         });
-        this.map = map;
-        map.on('load', () => {
+        this.map.on('load', () => {
           this.addSources();
           this.$emit('load');
-          this.envelope(this.map, this.project);
+          this.envelope(this.map, this.projectId);
         });
       });
     });
@@ -505,7 +514,7 @@ export default {
         });
       });
       if (this.trip.shape) {
-        shapesAPI.shapesAPI.detail(this.project, this.trip.shape).then(response => {
+        shapesAPI.shapesAPI.detail(this.projectId, this.trip.shape).then(response => {
           this.shape = response.data;
           let points = this.shape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
           this.turfShape = turf.lineString(points);
@@ -545,16 +554,18 @@ export default {
         ...this.trip,
         stop_times: this.stop_times,
       }
-      let save = undefined;
+      let save = null;
       switch (this.mode) {
-        case 'edit':
+        case this.Enums.StopTimesEditorMode.EDIT:
           save = tripsAPI.tripsAPI.update.bind(tripsAPI.tripsAPI);
           break;
-        case 'duplicate':
+        case this.Enums.StopTimesEditorMode.DUPLICATE:
           save = tripsAPI.tripsAPI.create.bind(tripsAPI.tripsAPI);
           break;
+        default:
+          throw 'Mode is not valid';
       }
-      save(this.project, data).then(() => {
+      save(this.projectId, data).then(() => {
         this.$emit('close');
       }).catch(err => {
         this.errors = err.response.data;
