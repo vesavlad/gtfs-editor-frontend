@@ -210,7 +210,8 @@ export default {
           style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
         });
         this.map.on('load', () => {
-          this.addSources();
+          this.addStopsLayers();
+          this.addShapeLayers();
           this.$emit('load');
           this.envelope(this.map, this.projectId);
         });
@@ -218,102 +219,25 @@ export default {
     });
   },
   methods: {
-    openSpeedModal() {
-      this.speedModal.from_stop = this.stop_times[0].stop_sequence;
-      this.speedModal.to_stop = this.stop_times[this.stop_times.length - 1].stop_sequence;
-      this.speedModal.visible = true;
-      this.STSelectField.options = {};
-      this.stop_times.forEach((st) => {
-        let title = `${st.stop_id} (${st.stop_sequence})`
-        this.STSelectField.options[title] = st.stop_sequence;
-      })
-    },
-    log() {
-      console.log(...arguments)
-    },
-    timeToSeconds(timeString) {
-      let times = timeString.split(":").map(t => parseInt(t));
-      let seconds = 0;
-      for (let i = 0; i < times.length; i++) {
-        seconds *= 60;
-        seconds += times[i];
-      }
-      return seconds;
-    },
-    secondsToTime(seconds) {
-      seconds = Math.floor(seconds);
-      let pad = (s) => s.length < 2 ? "0" + s : s;
-      let hours = (seconds / 3600 | 0).toString()
-      seconds = seconds % 3600
-      let minutes = (seconds / 60 | 0).toString()
-      seconds = (seconds % 60).toString()
-
-      hours = pad(hours);
-      minutes = pad(minutes);
-      seconds = pad(seconds);
-      return `${hours}:${minutes}:${seconds}`;
-    },
-    addHeadway(time, headway) {
-      return this.secondsToTime(this.timeToSeconds(time) + headway);
-    },
-    calculateTimes() {
-      if (this.stop_times.length) {
-        let speed = Number(this.speed);
-        if (Number.isNaN(speed)) {
-          return;
-        }
-        let first = this.stop_times[this.speedModal.from_stop - 1];
-        console.log(first);
-        if (!first.arrival_time) {
-          return;
-        }
-        let headway = this.timeToSeconds(first.arrival_time);
-        speed = speed * 1.0;
-        this.stop_times = this.stop_times.map(st => {
-          if (st.stop_sequence < this.speedModal.from_stop ||
-              st.stop_sequence > this.speedModal.to_stop) {
-            return st;
-          }
-          let seconds = (st.distance - first.distance) / speed * 3600;
-          let formatted_time = this.secondsToTime(seconds + headway);
-          if (st.stop_sequence > first.stop_sequence) {
-            st.arrival_time = formatted_time;
-          }
-          st.departure_time = formatted_time;
-          return st;
-        })
-      }
-      this.speedModal.visible = false;
-    },
-    addSources() {
-      this.addStops();
-      this.addShape();
-    },
-    addStops() {
+    addStopsLayers() {
       let geojson = {
         type: 'FeatureCollection',
-        features: []
+        features: this.generateStopFeatures()
       };
-      geojson.features = this.generateStopFeatures();
-      this.map.addSource('stops', {
+      this.map.addSource('stop-source', {
         'type': 'geojson',
         'data': geojson,
       });
       this.map.addLayer({
         id: "layer-stops-icon",
         type: "circle",
-        source: "stops",
+        source: "stop-source",
         paint: {
-          "circle-radius": [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-          ].concat(config.stoptimes_stop_zoom),
+          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
           "circle-color": [
             'case',
-            ['get', 'selected'],
-            config.stop_selected_color,
-            config.stop_color //default
+            ['get', 'selected'], config.stop_selected_color,
+            config.stop_color
           ]
         }
       });
@@ -394,56 +318,7 @@ export default {
         this.updateStops();
       });
     },
-    automaticallyOrder() {
-      this.stop_times.sort((st1, st2) => st1.distance - st2.distance);
-      this.orderModal.visible = false;
-      this.updateStops();
-    },
-    updateStops() {
-      this.calculateSTPositions();
-      let geojson = {
-        type: 'FeatureCollection',
-        features: this.generateStopFeatures(),
-      };
-      this.map.getSource('stops').setData(geojson);
-    },
-    generateStopFeatures() {
-      let st_map = new Map();
-      this.stop_times.forEach(st => st_map.set(st.stop, st))
-      return this.stops.map(stop => {
-        let st = st_map.get(stop.id);
-        let props = {
-          selected: false,
-          sequence: undefined,
-          arrival_time: undefined,
-          departure_time: undefined,
-        }
-        if (st) {
-          props = {
-            selected: true,
-            sequence: st.stop_sequence,
-            arrival_time: st.arrival_time,
-            departure_time: st.departure_time,
-          }
-        }
-        return {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [
-              stop.stop_lon,
-              stop.stop_lat,
-            ]
-          },
-          properties: {
-            id: stop.id,
-            label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ""),
-            ...props,
-          }
-        }
-      });
-    },
-    addShape() {
+    addShapeLayers() {
       let geojson = {
         'type': 'Feature',
         'properties': {},
@@ -503,6 +378,118 @@ export default {
       } else {
         window.alert("Warning: editing a StopTimes without a shape is not supported");
       }
+    },
+    openSpeedModal() {
+      this.speedModal.from_stop = this.stop_times[0].stop_sequence;
+      this.speedModal.to_stop = this.stop_times[this.stop_times.length - 1].stop_sequence;
+      this.speedModal.visible = true;
+      this.STSelectField.options = {};
+      this.stop_times.forEach((st) => {
+        let title = `${st.stop_id} (${st.stop_sequence})`
+        this.STSelectField.options[title] = st.stop_sequence;
+      })
+    },
+    timeToSeconds(timeString) {
+      let times = timeString.split(":").map(t => parseInt(t));
+      let seconds = 0;
+      for (let i = 0; i < times.length; i++) {
+        seconds *= 60;
+        seconds += times[i];
+      }
+      return seconds;
+    },
+    secondsToTime(seconds) {
+      seconds = Math.floor(seconds);
+      let pad = (s) => s.length < 2 ? "0" + s : s;
+      let hours = (seconds / 3600 | 0).toString()
+      seconds = seconds % 3600
+      let minutes = (seconds / 60 | 0).toString()
+      seconds = (seconds % 60).toString()
+
+      hours = pad(hours);
+      minutes = pad(minutes);
+      seconds = pad(seconds);
+      return `${hours}:${minutes}:${seconds}`;
+    },
+    addHeadway(time, headway) {
+      return this.secondsToTime(this.timeToSeconds(time) + headway);
+    },
+    calculateTimes() {
+      if (this.stop_times.length) {
+        let speed = Number(this.speed);
+        if (Number.isNaN(speed)) {
+          return;
+        }
+        let first = this.stop_times[this.speedModal.from_stop - 1];
+        if (!first.arrival_time) {
+          return;
+        }
+        let headway = this.timeToSeconds(first.arrival_time);
+        speed = speed * 1.0;
+        this.stop_times = this.stop_times.map(st => {
+          if (st.stop_sequence < this.speedModal.from_stop ||
+              st.stop_sequence > this.speedModal.to_stop) {
+            return st;
+          }
+          let seconds = (st.distance - first.distance) / speed * 3600;
+          let formatted_time = this.secondsToTime(seconds + headway);
+          if (st.stop_sequence > first.stop_sequence) {
+            st.arrival_time = formatted_time;
+          }
+          st.departure_time = formatted_time;
+          return st;
+        })
+      }
+      this.speedModal.visible = false;
+    },
+    automaticallyOrder() {
+      this.stop_times.sort((st1, st2) => st1.distance - st2.distance);
+      this.orderModal.visible = false;
+      this.updateStops();
+    },
+    updateStops() {
+      this.calculateSTPositions();
+      let geojson = {
+        type: 'FeatureCollection',
+        features: this.generateStopFeatures(),
+      };
+      this.map.getSource('stops').setData(geojson);
+    },
+    generateStopFeatures() {
+      let st_map = new Map();
+      this.stop_times.forEach(st => st_map.set(st.stop, st))
+      return this.stops.map(stop => {
+        let stopTime = st_map.get(stop.id);
+        let props = {
+          selected: false,
+          sequence: undefined,
+          arrival_time: undefined,
+          departure_time: undefined,
+        }
+        if (stopTime) {
+          props = {
+            selected: true,
+            sequence: stopTime.stop_sequence,
+            arrival_time: stopTime.arrival_time,
+            departure_time: stopTime.departure_time,
+          }
+        }
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [
+              stop.stop_lon,
+              stop.stop_lat,
+            ]
+          },
+          properties: {
+            id: stop.id,
+            label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ""),
+            ...props,
+          }
+        }
+      });
     },
     calculateSeqs() {
       let stop_times = this.stop_times;
