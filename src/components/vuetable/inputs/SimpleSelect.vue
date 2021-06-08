@@ -36,7 +36,7 @@ export default {
   watch: {
     value(newValue) {
       let option = this.translateValueToOption(newValue);
-      this.val = this.value === "" ? null : option;
+      this.val = this.value === '' ? null : option;
     },
     errors() {
       this.localErrors = [...this.errors];
