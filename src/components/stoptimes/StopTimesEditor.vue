@@ -166,6 +166,9 @@ export default {
       stop: {
         sourceName: 'stop-source'
       },
+      shape: {
+        sourceName: 'shape-source'
+      },
       STSelectField: {
         name: 'stop',
         type: 'select-simple',
@@ -182,7 +185,6 @@ export default {
       stop_times: this.trip.stop_times,
       stops: [],
       stopMap: new Map(),
-      shape: false,
       turfShape: false,
       orderModal: {
         visible: false,
@@ -343,7 +345,7 @@ export default {
       let hoveredStops = {};
       this.map.on('mouseenter', 'layer-stops-icon', e => {
         canvas.style.cursor = 'pointer';
-        let feature= e.features[0];
+        let feature = e.features[0];
         hoveredStops[feature.id] = feature;
         map.setFeatureState({source: this.stop.sourceName, id: feature.id}, {hover: true});
       });
@@ -357,28 +359,28 @@ export default {
     },
     addShapeLayers() {
       let geojson = {
-        'type': 'Feature',
-        'properties': {},
-        'geometry': {
-          'type': 'LineString',
-          'coordinates': []
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: []
         }
       }
-      this.map.addSource('shape', {
-        'type': 'geojson',
-        'data': geojson,
+      this.map.addSource(this.shape.sourceName, {
+        type: 'geojson',
+        data: geojson,
       });
       this.map.addLayer({
-        'id': 'shape-layer',
-        'type': 'line',
-        'source': 'shape',
-        'layout': {
+        id: 'shape-layer',
+        type: 'line',
+        source: this.shape.sourceName,
+        layout: {
           'line-join': 'round',
           'line-cap': 'round'
         },
-        'paint': {
+        paint: {
           'line-color': config.shape_line_color,
-          'line-width': 3
+          'line-width': 2
         }
       });
       let img = require('../../assets/img/double-arrow.png')
@@ -389,27 +391,31 @@ export default {
         }
         this.map.addImage('double-arrow', image, {sdf: true});
         this.map.addLayer({
-          'id': 'arrowId',
-          'type': 'symbol',
-          'source': 'shape',
-          'layout': {
+          id: 'shape-arrow-layer',
+          type: 'symbol',
+          source: this.shape.sourceName,
+          layout: {
             'symbol-placement': 'line',
             'symbol-spacing': 100,
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
             'icon-image': 'double-arrow',
-            'icon-size': 1,
-            'visibility': 'visible'
+            'icon-size': 0.4,
+            'visibility': 'visible',
+          },
+          paint: {
+            'icon-color': config.shape_line_color,
+            'icon-halo-color': '#fff',
+            'icon-halo-width': 2
           }
         });
       });
       if (this.localTrip && this.localTrip.shape) {
         shapesAPI.shapesAPI.detail(this.projectId, this.localTrip.shape).then(response => {
-          this.shape = response.data;
-          let points = this.shape.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
+          let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
           this.turfShape = turf.lineString(points);
           geojson.geometry.coordinates = points;
-          this.map.getSource('shape').setData(geojson);
+          this.map.getSource(this.shape.sourceName).setData(geojson);
           this.calculateSTPositions();
         }).catch(err => console.log(err));
       } else {
