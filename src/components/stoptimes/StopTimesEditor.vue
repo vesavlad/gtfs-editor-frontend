@@ -2,7 +2,7 @@
   <div class="dynamic-map-container">
     <div class="top-map-bar">
       <div class="right-content grid center">
-        <button class="btn btn-outline-secondary" @click="orderModal.visible = true">
+        <button class="btn btn-outline-secondary" @click="orderModal.visible=true">
           <span>{{ $t('stopTimes.editor.reorderStopsUsingShape') }}</span>
           <span class="material-icons">low_priority</span>
         </button>
