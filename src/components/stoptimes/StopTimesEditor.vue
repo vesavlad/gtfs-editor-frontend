@@ -32,7 +32,7 @@
             </label>
           </div>
         </div>
-        <vuetable v-if="!dragEnabled" ref="table" :fields="fields" :api-mode="false" :data="stop_times">
+        <vuetable v-if="!dragEnabled" ref="vuetable" :fields="fields" :api-mode="false" :data="stopTimes">
           <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
                slot-scope="properties"
                v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
@@ -47,7 +47,7 @@
             </div>
           </div>
         </vuetable>
-        <DraggableTable v-else :fields="base_fields" :rows="stop_times" v-model="stop_times"
+        <DraggableTable v-else :fields="base_fields" :rows="stopTimes" v-model="stopTimes"
                         @input="$nextTick(calculateSeqs)"></DraggableTable>
       </div>
     </div>
@@ -174,7 +174,7 @@ export default {
       base_fields: base_fields,
       fields: base_fields,
       showOptionalFields: false,
-      stop_times: this.trip.stop_times,
+      stopTimes: this.trip.stop_times,
       stops: [],
       stopMap: new Map(),
       turfShape: false,
@@ -197,7 +197,7 @@ export default {
   watch: {
     trip() {
       this.localTrip = {...this.trip};
-      this.stop_times = this.localTrip.stop_times;
+      this.stopTimes = this.localTrip.stop_times;
     },
     showOptionalFields(val) {
       this.fields = val ? full_fields : base_fields;
@@ -323,7 +323,7 @@ export default {
           timepoint: null
         }
         stopTime.distance = this.calculatePosition(stopTime);
-        this.stop_times.push(stopTime);
+        this.stopTimes.push(stopTime);
         this.updateStops();
       });
 
@@ -334,7 +334,7 @@ export default {
         }
         e.preventDefault();
         let stop = this.stopMap.get(feature.properties.id);
-        this.stop_times = this.stop_times.filter(st => st.stop !== stop.id);
+        this.stopTimes = this.stopTimes.filter(st => st.stop !== stop.id);
         this.updateStops();
       });
 
@@ -421,14 +421,43 @@ export default {
       }
     },
     openSpeedModal() {
-      this.speedModal.fromStop = this.stop_times[0].stop_sequence;
-      this.speedModal.toStop = this.stop_times[this.stop_times.length - 1].stop_sequence;
+      this.speedModal.fromStop = this.stopTimes[0].stop_sequence;
+      this.speedModal.toStop = this.stopTimes[this.stopTimes.length - 1].stop_sequence;
       this.speedModal.visible = true;
       this.speedModal.selectField.options = [];
-      this.stop_times.forEach((st) => {
+      this.stopTimes.forEach((st) => {
         let title = `${st.stop_id} (${st.stop_sequence})`;
         this.speedModal.selectField.options.push({name: title, value: st.stop_sequence});
       })
+    },
+    calculateTimes() {
+      if (this.stopTimes.length) {
+        let speed = Number(this.speedModal.speed);
+        if (Number.isNaN(speed)) {
+          return;
+        }
+        let first = this.stopTimes[this.speedModal.fromStop - 1];
+        if (!first.arrival_time) {
+          return;
+        }
+        let headway = this.timeToSeconds(first.arrival_time);
+        this.stopTimes = this.stopTimes.map(st => {
+          if (st.stop_sequence < this.speedModal.fromStop || this.speedModal.toStop < st.stop_sequence) {
+            return st;
+          }
+          let seconds = (st.distance - first.distance) / speed * 3600;
+          let formatted_time = this.secondsToTime(seconds + headway);
+          if (st.stop_sequence > first.stop_sequence) {
+            st.arrival_time = formatted_time;
+          }
+          st.departure_time = formatted_time;
+          return st;
+        });
+        console.log(this.stopTimes[1].arrival_time);
+        this.$refs.vuetable.refresh();
+        console.log('called');
+      }
+      this.speedModal.visible = false;
     },
     timeToSeconds(timeString) {
       let times = timeString.split(':').map(t => parseInt(t));
@@ -455,36 +484,8 @@ export default {
     addHeadway(time, headway) {
       return this.secondsToTime(this.timeToSeconds(time) + headway);
     },
-    calculateTimes() {
-      if (this.stop_times.length) {
-        let speed = Number(this.speedModal.speed);
-        if (Number.isNaN(speed)) {
-          return;
-        }
-        let first = this.stop_times[this.speedModal.fromStop - 1];
-        if (!first.arrival_time) {
-          return;
-        }
-        let headway = this.timeToSeconds(first.arrival_time);
-        speed = speed * 1.0;
-        this.stop_times = this.stop_times.map(st => {
-          if (st.stop_sequence < this.speedModal.fromStop ||
-              st.stop_sequence > this.speedModal.toStop) {
-            return st;
-          }
-          let seconds = (st.distance - first.distance) / speed * 3600;
-          let formatted_time = this.secondsToTime(seconds + headway);
-          if (st.stop_sequence > first.stop_sequence) {
-            st.arrival_time = formatted_time;
-          }
-          st.departure_time = formatted_time;
-          return st;
-        })
-      }
-      this.speedModal.visible = false;
-    },
     automaticallyOrder() {
-      this.stop_times.sort((st1, st2) => st1.distance - st2.distance);
+      this.stopTimes.sort((st1, st2) => st1.distance - st2.distance);
       this.orderModal.visible = false;
       this.updateStops();
     },
@@ -498,7 +499,7 @@ export default {
     },
     generateStopFeatures() {
       let st_map = new Map();
-      this.stop_times.forEach(st => st_map.set(st.stop, st))
+      this.stopTimes.forEach(st => st_map.set(st.stop, st))
       return this.stops.map(stop => {
         let stopTime = st_map.get(stop.id);
         let props = {
@@ -534,20 +535,20 @@ export default {
       });
     },
     calculateSeqs() {
-      let stop_times = this.stop_times;
-      for (let i = 0; i < stop_times.length; i++) {
-        stop_times[i].stop_sequence = i + 1;
+      let stopTimes = this.stopTimes;
+      for (let i = 0; i < stopTimes.length; i++) {
+        stopTimes[i].stop_sequence = i + 1;
       }
-      this.stop_times = stop_times;
+      this.stopTimes = stopTimes;
     },
     calculateSTPositions() {
-      let stop_times = this.stop_times.map(st => {
+      let stopTimes = this.stopTimes.map(st => {
         return {
           ...st,
           distance: this.calculatePosition(st),
         }
       });
-      this.stop_times = stop_times;
+      this.stopTimes = stopTimes;
       this.calculateSeqs();
     },
     calculatePosition(st) {
@@ -559,7 +560,7 @@ export default {
     saveAndExit() {
       let data = {
         ...this.localTrip,
-        stop_times: this.stop_times,
+        stop_times: this.stopTimes,
       }
       let save = null;
       switch (this.mode) {
