@@ -40,10 +40,10 @@
                               v-model="properties.rowData[getFieldID(properties.rowField)]">
             </GeneralizedInput>
             <div v-if="errors.stop_times">
-            <span class="error" :key="error"
-                  v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
-              {{ error }}
-            </span>
+              <span class="error" :key="error"
+                    v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
+                {{ error }}
+              </span>
             </div>
           </div>
         </vuetable>
@@ -542,13 +542,12 @@ export default {
       this.stopTimes = stopTimes;
     },
     calculateSTPositions() {
-      let stopTimes = this.stopTimes.map(st => {
+      this.stopTimes = this.stopTimes.map(st => {
         return {
           ...st,
           distance: this.calculatePosition(st),
         }
       });
-      this.stopTimes = stopTimes;
       this.calculateSeqs();
     },
     calculatePosition(st) {
