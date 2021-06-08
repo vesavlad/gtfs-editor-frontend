@@ -129,8 +129,16 @@
     "deleteModalTitle": "Are you sure you want to delete the stop-times for trip \"{tripId}\"?",
     "editor": {
       "reorderStopsUsingShape": "Reorder stops using shape",
-      "calculateTimes": "Calc times",
-      "enableCustomSortTable": "Enable custom sort table"
+      "calculateTimes": "Calculate times",
+      "enableCustomSortTable": "Enable custom sort table",
+      "calculateStopTimesBasedOnSpeed": {
+        "title": "Calculate stop times",
+        "warningMessage": "The current Arrival and Departure times will be replaced. The arrival time of the first stop will be used as a starting point and all other arrival/departure times will be recalculated based on that.",
+        "firstParagraph": "Automatically calculate stop times using a speed of ",
+        "secondParagraph": "[km/h]. Starting from stop ",
+        "thirdParagraph": "to stop ",
+        "okButtonLabel": "Calculate"
+      }
     }
   }
 }

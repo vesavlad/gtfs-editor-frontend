@@ -130,7 +130,15 @@
     "editor": {
       "reorderStopsUsingShape": "Ordenar paradas usando la ruta",
       "calculateTimes": "Calcular tiempos",
-      "enableCustomSortTable": "Habilitar ordenamiento personalizado"
+      "enableCustomSortTable": "Habilitar ordenamiento personalizado",
+      "calculateStopTimesBasedOnSpeed": {
+        "title": "Calcular stop times",
+        "warningMessage": "Los campos \"Arrival time\" y \"Departure time\" serán reemplazados. El tiempo de la primera parada será usado como tiempo de partida, por lo que los tiempos de las siguientes paradas serán calculadas según ese dato.",
+        "firstParagraph": "Calcular automáticamente los tiempos usando una rapidez de ",
+        "secondParagraph": "[km/h]. Comenzando en la parada ",
+        "thirdParagraph": " hasta la parada ",
+        "okButtonLabel": "Calcular"
+      }
     }
   }
 }

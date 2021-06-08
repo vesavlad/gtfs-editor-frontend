@@ -66,23 +66,21 @@
       </template>
     </MessageModal>
     <MessageModal :show="speedModal.visible" @ok="calculateTimes" @cancel="speedModal.visible = false"
-                  @close="speedModal.visible = false" :showCancelButton="true" :type="Enums.MessageModalType.WARNING">
+                  @close="speedModal.visible = false" :showCancelButton="true" :type="Enums.MessageModalType.WARNING"
+                  :okButtonLabel="$t('stopTimes.editor.calculateStopTimesBasedOnSpeed.okButtonLabel')">
       <template v-slot:m-title>
-        <h2>Are you sure you want to replace the current times?</h2>
+        <h2>{{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.title') }}</h2>
       </template>
       <template v-slot:m-content>
-        <span class="warning">
-          The current Arrival and Departure times will be replaced. The arrival time of the first stop will be used
-          as a starting point and all other arrival/departure times will be recalculated based on that.
-        </span>
+        <span class="warning">{{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.warningMessage') }}</span>
         <br>
-        <label for="automatic-time">Automatically calculate times using a speed of </label>
-        <input v-model="speed" type="number">[km/h]
-        Starting from stop
-        <SimpleSelect :field="STSelectField" v-model="speedModal.from_stop">
+        <label>{{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.firstParagraph') }}</label>
+        <input v-model="speedModal.speed" type="number">
+        {{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.secondParagraph') }}
+        <SimpleSelect :field="speedModal.selectField" v-model="speedModal.fromStop" :errors="[]">
         </SimpleSelect>
-        to stop
-        <SimpleSelect :field="STSelectField" v-model="speedModal.to_stop">
+        {{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.thirdParagraph') }}
+        <SimpleSelect :field="speedModal.selectField" v-model="speedModal.toStop" :errors="[]">
         </SimpleSelect>
       </template>
     </MessageModal>
@@ -169,13 +167,7 @@ export default {
       shape: {
         sourceName: 'shape-source'
       },
-      STSelectField: {
-        name: 'stop',
-        type: 'select-simple',
-        options: {},
-      },
       localTrip: this.trip,
-      speed: 60,
       errors: {},
       dragEnabled: false,
       exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
@@ -191,8 +183,14 @@ export default {
       },
       speedModal: {
         visible: false,
-        from_stop: null,
-        to_stop: null,
+        fromStop: null,
+        toStop: null,
+        selectField: {
+          name: 'stop',
+          type: 'select-simple',
+          options: {},
+        },
+        speed: 60,
       }
     };
   },
@@ -423,13 +421,13 @@ export default {
       }
     },
     openSpeedModal() {
-      this.speedModal.from_stop = this.stop_times[0].stop_sequence;
-      this.speedModal.to_stop = this.stop_times[this.stop_times.length - 1].stop_sequence;
+      this.speedModal.fromStop = this.stop_times[0].stop_sequence;
+      this.speedModal.toStop = this.stop_times[this.stop_times.length - 1].stop_sequence;
       this.speedModal.visible = true;
-      this.STSelectField.options = {};
+      this.speedModal.selectField.options = [];
       this.stop_times.forEach((st) => {
-        let title = `${st.stop_id} (${st.stop_sequence})`
-        this.STSelectField.options[title] = st.stop_sequence;
+        let title = `${st.stop_id} (${st.stop_sequence})`;
+        this.speedModal.selectField.options.push({name: title, value: st.stop_sequence});
       })
     },
     timeToSeconds(timeString) {
@@ -459,19 +457,19 @@ export default {
     },
     calculateTimes() {
       if (this.stop_times.length) {
-        let speed = Number(this.speed);
+        let speed = Number(this.speedModal.speed);
         if (Number.isNaN(speed)) {
           return;
         }
-        let first = this.stop_times[this.speedModal.from_stop - 1];
+        let first = this.stop_times[this.speedModal.fromStop - 1];
         if (!first.arrival_time) {
           return;
         }
         let headway = this.timeToSeconds(first.arrival_time);
         speed = speed * 1.0;
         this.stop_times = this.stop_times.map(st => {
-          if (st.stop_sequence < this.speedModal.from_stop ||
-              st.stop_sequence > this.speedModal.to_stop) {
+          if (st.stop_sequence < this.speedModal.fromStop ||
+              st.stop_sequence > this.speedModal.toStop) {
             return st;
           }
           let seconds = (st.distance - first.distance) / speed * 3600;
