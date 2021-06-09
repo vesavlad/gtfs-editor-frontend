@@ -548,13 +548,12 @@ export default {
       this.stopTimes = stopTimes;
     },
     calculateSTPositions() {
-      let stopTimes = this.stopTimes.map(st => {
+      this.stopTimes = this.stopTimes.map(st => {
         return {
           ...st,
           distance: this.calculatePosition(st),
         }
       });
-      this.stopTimes = stopTimes;
       this.calculateSeqs();
     },
     calculatePosition(st) {
