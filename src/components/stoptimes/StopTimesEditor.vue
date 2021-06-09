@@ -28,8 +28,8 @@
               <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span class="material-icons">open_with</span></div>
             </label>
             <label class="checkbox">
-              <div class="btn icon flat" :data-info="'Show/hide optional columns'"><span class="material-icons">settings</span></div>
               <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
+              <div class="btn icon flat" :data-info="'Show/hide optional columns'"><span class="material-icons">settings</span></div>
             </label>
           </div>
         </div>

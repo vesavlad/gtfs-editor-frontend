@@ -168,6 +168,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .checkbox-name:hover {background-color: #e3e7e8; color: var(--link2);}
 .checkbox input[type="checkbox"]:checked ~ .checkbox-name {background-color: var(--link); color: white;}
 .checkbox input[type="checkbox"]:checked ~ .checkbox-name:hover {background-color: var(--link-hover);}
+.checkbox input[type="checkbox"]:checked ~ .icon {color: white; background-color: rgba(255,255,255,.1);}
 
 .input-color {display: grid; grid-template-columns: 1fr auto; padding: 4px 8px; background-color: var(--gris-claro); border-radius: 8px; grid-gap: 5px; box-shadow: inset 0 1px 0 0 rgba(0,0,0,0.05);}
 .input-color.error {background: #F0ECEC; border: 1px solid rgba(198,59,46,0.40);}
@@ -290,7 +291,7 @@ input[type="color"]:focus,.input-color input[type="text"]:focus {border: 0; outl
 .icon.flat.green {color: var(--primario); background-color: transparent;}
 .icon-link {font-size: 24px; line-height: 0;}
 .icon-link:hover {color: var(--link-hover);}
-.btn.icon.flat:hover {box-shadow: none; background: transparent;}
+.btn.icon.flat:hover {box-shadow: none; background: transparent; color: var(--link);}
 .btn.icon:focus {outline: 0; box-shadow: none;}
 .btn.icon:disabled,.btn.icon:hover:disabled  {
     opacity: 0.3;

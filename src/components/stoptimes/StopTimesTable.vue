@@ -6,16 +6,14 @@
           <input v-model="quickSearch" type="search" :placeholder="$t('vuetable.quickSearch')" v-on:input="doSearch">
         </div>
       </form>
-      <div class="icon-link">
-        <button class="btn icon flat"><i class="material-icons">visibility</i></button>
-      </div>
+      <button class="btn icon flat"><i class="material-icons">visibility</i></button>
     </div>
     <div class="table-content">
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :transform="transformData">
         <div slot="actions" slot-scope="props" class="flex">
           <button class="btn flat icon" @click="$emit('focus-st', props.rowData)" alt="Display stop_times.">
-            <span class="material-icons">remove_red_eye</span>
+            <span class="material-icons">visibility</span>
           </button>
           <div class="btn icon flat">
             <i class="material-icons"
