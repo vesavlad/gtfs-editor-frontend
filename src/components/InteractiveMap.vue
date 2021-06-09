@@ -247,10 +247,15 @@ export default {
         return stopCode.indexOf(value) > -1 || stopId.indexOf(value) > -1 || stopName.indexOf(value) > -1;
       });
 
-      if (filtered.length > 0) {
+      if (filtered.length > 1) {
         let points = filtered.map(stop => [stop.stop_lon, stop.stop_lat]);
         this.map.fitBounds(this.getBounds(points), {
           padding: 50
+        });
+      } else if (filtered.length === 1) {
+        this.map.flyTo({
+          center: [filtered[0].stop_lon, filtered[0].stop_lat],
+          zoom: 15
         });
       }
     },
