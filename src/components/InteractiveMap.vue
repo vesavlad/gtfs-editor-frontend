@@ -437,6 +437,38 @@ export default {
         data: this.stop.highlightedFeatureGeojson,
       });
 
+      // We add an icon and text to the geojson
+      this.map.addLayer({
+        id: 'layer-stops-icon',
+        type: 'circle',
+        source: 'stop-source',
+        layout: {
+          visibility: 'visible',
+        },
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
+          'circle-color': [
+            'case',
+            ['boolean', ['feature-state', 'active'], false], config.stop_selected_color,
+            ['boolean', ['feature-state', 'hover'], false], config.stop_hover_color,
+            config.stop_color,
+          ],
+          'circle-stroke-color': [
+            'case',
+            ['boolean', ['feature-state', 'active'], false], config.stop_stroke_selected_color,
+            ['boolean', ['feature-state', 'hover'], false], config.stop_stroke_hover_color,
+            config.stop_stroke_color,
+          ],
+          'circle-stroke-opacity': 1,
+          'circle-stroke-width': [
+            'case',
+            ['boolean', ['feature-state', 'active'], false], 5,
+            ['boolean', ['feature-state', 'hover'], false], 5,
+            2,
+          ],
+        }
+      });
+
       let img = require('../assets/img/bg-stop-name.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
@@ -504,38 +536,6 @@ export default {
         });
       });
 
-      // We add an icon and text to the geojson
-      this.map.addLayer({
-        id: 'layer-stops-icon',
-        type: 'circle',
-        source: 'stop-source',
-        layout: {
-          visibility: 'visible',
-        },
-        paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stop_zoom),
-          'circle-color': [
-            'case',
-            ['boolean', ['feature-state', 'active'], false], config.stop_selected_color,
-            ['boolean', ['feature-state', 'hover'], false], config.stop_hover_color,
-            config.stop_color,
-          ],
-          'circle-stroke-color': [
-            'case',
-            ['boolean', ['feature-state', 'active'], false], config.stop_stroke_selected_color,
-            ['boolean', ['feature-state', 'hover'], false], config.stop_stroke_hover_color,
-            config.stop_stroke_color,
-          ],
-          'circle-stroke-opacity': 1,
-          'circle-stroke-width': [
-            'case',
-            ['boolean', ['feature-state', 'active'], false], 5,
-            ['boolean', ['feature-state', 'hover'], false], 5,
-            2,
-          ],
-        }
-      });
-
       // Icon for new stop
       this.map.addSource('creating', {
         type: 'geojson',
@@ -568,7 +568,7 @@ export default {
           'line-color': config.shape_line_color,
           'line-width': 2
         }
-      });
+      }, 'layer-stops-icon');
       let img = require('../assets/img/double-arrow.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
@@ -594,7 +594,7 @@ export default {
             'icon-halo-color': '#fff',
             'icon-halo-width': 2,
           }
-        });
+        }, 'layer-stops-icon');
       });
     },
     addListeners() {
