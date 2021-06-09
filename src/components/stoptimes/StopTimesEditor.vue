@@ -25,11 +25,12 @@
             <button class="btn icon flat"><span class="material-icons">close</span></button>
             <label class="checkbox">
               <input type="checkbox" id="enable-drag" v-model="dragEnabled">
-              <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span class="material-icons">open_with</span></div>
+              <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span
+                  class="material-icons">open_with</span></div>
             </label>
             <label class="checkbox">
-              <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
               <div class="btn icon flat" :data-info="'Show/hide optional columns'"><span class="material-icons">settings</span></div>
+              <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
             </label>
           </div>
         </div>
@@ -252,7 +253,7 @@ export default {
           'circle-color': [
             'case',
             ['get', 'selected'], config.stop_selected_color,
-            config.stop_color
+            '#FFF'
           ],
           'circle-stroke-color': [
             'case',
@@ -286,7 +287,8 @@ export default {
         filter: ['get', 'selected'],
         minzoom: minZoom,
         layout: {
-          'text-field': 'Seq: {sequence}',
+          'text-field': '{sequence}',
+          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 1.5: el)),
           'text-anchor': 'top',
           'text-offset': [0, -0.5],
           'text-allow-overlap': true,
@@ -386,7 +388,7 @@ export default {
           'line-color': config.shape_line_color,
           'line-width': 2
         }
-      });
+      }, 'layer-stops-icon');
       let img = require('../../assets/img/double-arrow.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
@@ -412,7 +414,7 @@ export default {
             'icon-halo-color': '#fff',
             'icon-halo-width': 2
           }
-        });
+        }, 'layer-stops-icon');
       });
       if (this.localTrip && this.localTrip.shape) {
         shapesAPI.shapesAPI.detail(this.projectId, this.localTrip.shape).then(response => {
@@ -447,7 +449,7 @@ export default {
           return;
         }
         let headway = this.timeToSeconds(first.arrival_time);
-        this.stopTimes = this.stopTimes.map(st => {
+        this.stopTimes.forEach(st => {
           if (st.stop_sequence < this.speedModal.fromStop || this.speedModal.toStop < st.stop_sequence) {
             return st;
           }
@@ -459,9 +461,6 @@ export default {
           st.departure_time = formatted_time;
           return st;
         });
-        console.log(this.stopTimes[1].arrival_time);
-        this.$refs.vuetable.refresh();
-        console.log('called');
       }
       this.speedModal.visible = false;
     },
