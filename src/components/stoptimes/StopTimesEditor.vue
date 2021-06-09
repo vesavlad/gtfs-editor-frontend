@@ -16,39 +16,45 @@
     <div class="map-sidebar">
       <div class="side-panel">
         <div class="side-header">
-          <div class="grid center">
+          <label class="grid center">
             <h4>Trip ID:</h4>
             <input v-model="localTrip.trip_id">
-          </div>
+          </label>
           <div class="btn-list">
             <button class="btn icon flat" @click="saveAndExit"><span class="material-icons">check</span></button>
-            <label>
-              <span>{{ $t('stopTimes.editor.enableCustomSortTable') }}</span>
+            <button class="btn icon flat"><span class="material-icons">close</span></button>
+            <label class="checkbox">
               <input type="checkbox" id="enable-drag" v-model="dragEnabled">
+              <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span class="material-icons">open_with</span></div>
             </label>
-            <label>
-              <span class="material-icons">settings</span>
+            <label class="checkbox">
+              <div class="btn icon flat" :data-info="'Show/hide optional columns'"><span class="material-icons">settings</span></div>
               <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
             </label>
           </div>
         </div>
-        <vuetable v-if="!dragEnabled" ref="vuetable" :fields="fields" :api-mode="false" :data="stopTimes">
-          <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
-               slot-scope="properties"
-               v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
-            <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
-                              v-model="properties.rowData[getFieldID(properties.rowField)]">
-            </GeneralizedInput>
-            <div v-if="errors.stop_times">
+        <div class="table-content">
+          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="fields" :api-mode="false" :data="stopTimes">
+            <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
+                 slot-scope="properties"
+                 v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
+              <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
+                                v-model="properties.rowData[getFieldID(properties.rowField)]">
+              </GeneralizedInput>
+              <div v-if="errors.stop_times">
             <span class="error" :key="error"
                   v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
               {{ error }}
             </span>
+              </div>
             </div>
-          </div>
-        </vuetable>
-        <DraggableTable v-else :fields="base_fields" :rows="stopTimes" v-model="stopTimes"
-                        @input="$nextTick(calculateSeqs)"></DraggableTable>
+          </vuetable>
+          <DraggableTable v-else :fields="base_fields" :rows="stopTimes" v-model="stopTimes"
+                          @input="$nextTick(calculateSeqs)"></DraggableTable>
+        </div>
+        <div class="table-footer">
+
+        </div>
       </div>
     </div>
     <MessageModal :show="orderModal.visible" @ok="automaticallyOrder" @cancel="orderModal.visible = false"

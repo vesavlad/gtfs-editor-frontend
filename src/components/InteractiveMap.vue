@@ -47,8 +47,7 @@
           </stop-form>
         </div>
         <div class="side-footer">
-          <h4>Errores</h4>
-          <p>Footer</p>
+          <p>* Campos requeridos</p>
         </div>
       </div>
       <div class="side-panel adding-new-point" v-if="status===Enums.InteractiveMapStatus.ADDING_NEW_POINT">

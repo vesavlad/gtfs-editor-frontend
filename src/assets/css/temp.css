@@ -77,10 +77,6 @@ div.mapboxgl-popup-content {
     background: darkred;
 }
 
-.handle {
-    cursor: grab;
-}
-
 button.ui.button {
     padding: 8px 3px 8px 10px;
     margin-top: 1px;
