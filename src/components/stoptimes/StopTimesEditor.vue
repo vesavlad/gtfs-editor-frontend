@@ -275,6 +275,7 @@ export default {
         minzoom: minZoom,
         layout: {
           'text-field': '{label}',
+          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 2: el)),
           'text-anchor': 'top',
           'text-offset': [0, 0.5],
           'text-allow-overlap': true,
@@ -290,7 +291,7 @@ export default {
           'text-field': '{sequence}',
           'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 1.5: el)),
           'text-anchor': 'top',
-          'text-offset': [0, -0.5],
+          'text-offset': [-0.1, -0.6],
           'text-allow-overlap': true,
         }
       });
