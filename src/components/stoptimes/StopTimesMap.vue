@@ -182,33 +182,50 @@ export default {
           'text-color': config.stop_label_color,
         }
       });
-      this.map.addLayer({
-        id: 'layer-stops-label',
-        type: 'symbol',
-        source: 'stops-source',
-        filter: ['==', 'selected', true],
-        minzoom: 14,
-        layout: {
-          'text-field': '{label}',
-          'text-size': 13,
-          'text-anchor': 'top',
-          'text-offset': [0, 0.5],
-          'text-allow-overlap': true,
+      let img = require('../../assets/img/bg-stop-name.png')
+      this.map.loadImage(img, (err, image) => {
+        if (err) {
+          console.log(err);
+          return;
         }
-      });
-      this.map.addLayer({
-        id: 'layer-stops-times',
-        type: 'symbol',
-        source: 'stops-source',
-        filter: ['==', 'selected', true],
-        minzoom: 14,
-        layout: {
-          'text-field': '{time}',
-          'text-size': 13,
-          'text-anchor': 'top',
-          'text-offset': [0, -1.8],
-          'text-allow-overlap': true,
-        }
+        this.map.addImage('bg-stop-name', image, {sdf: true});
+        this.map.addLayer({
+          id: 'layer-stops-label',
+          type: 'symbol',
+          source: 'stops-source',
+          filter: ['==', 'selected', true],
+          minzoom: 14,
+          layout: {
+            'text-field': '{label}',
+            'text-size': 13,
+            'text-anchor': 'top',
+            'text-offset': [0, 0.5],
+            'text-allow-overlap': true,
+            'icon-image': 'bg-stop-name',
+            'icon-anchor': 'bottom',
+            'icon-text-fit': 'both',
+            'icon-text-fit-padding': [4, 6, 0, 6],
+          }
+        });
+
+        this.map.addLayer({
+          id: 'layer-stops-times',
+          type: 'symbol',
+          source: 'stops-source',
+          filter: ['==', 'selected', true],
+          minzoom: 14,
+          layout: {
+            'text-field': '{time}',
+            'text-size': 13,
+            'text-anchor': 'top',
+            'text-offset': [0, -1.8],
+            'text-allow-overlap': true,
+            'icon-image': 'bg-stop-name',
+            'icon-anchor': 'bottom',
+            'icon-text-fit': 'both',
+            'icon-text-fit-padding': [4, 6, 0, 6],
+          }
+        });
       });
     },
     displayTrip(trip) {
