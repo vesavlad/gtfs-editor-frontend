@@ -92,9 +92,6 @@ export default {
     };
   },
   methods: {
-    openInfo() {
-      window.open(this.infoURL);
-    },
     timeToSeconds(timeString) {
       let times = timeString.split(":").map(t => parseInt(t));
       let seconds = 0;
