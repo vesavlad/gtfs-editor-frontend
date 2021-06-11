@@ -156,8 +156,8 @@ export default {
         baseFields: [
           {title: this.$i18n.t('vuetable.actions'), name: 'actions', type: null},
           {title: 'Seq', name: 'stop_sequence'},
-          {title: 'Distance', name: 'distance'},
           {title: 'Stop ID', name: 'stop_id'},
+          {title: 'Shape Distance Traveled', name: 'shape_dist_traveled'},
           {title: 'Arrival Time', name: 'arrival_time'},
           {title: 'Departure Time', name: 'departure_time'}
         ],
@@ -167,12 +167,11 @@ export default {
           {title: 'Drop-Off Type', name: 'drop_off_type'},
           {title: 'Continuous Pickup', name: 'continuous_pickup'},
           {title: 'Continuous Drop-Off', name: 'continuous_dropoff'},
-          {title: 'Shape Distance Traveled', name: 'shape_dist_traveled'},
           {title: 'Timepoint', name: 'timepoint'}
         ],
         fields: [],
         fullFields: [],
-        exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
+        exclusions: ['actions', 'stop_sequence', 'stop_id'],
         activeRow: {},
         showOptionalFields: false,
       },
@@ -341,7 +340,7 @@ export default {
           shape_dist_traveled: null,
           timepoint: null
         }
-        stopTime.distance = this.calculatePosition(stopTime);
+        stopTime.shape_dist_traveled = this.calculatePosition(stopTime);
         this.stopTimes.push(stopTime);
         this.updateStops();
       });
@@ -464,7 +463,7 @@ export default {
           if (st.stop_sequence < this.speedModal.fromStop || this.speedModal.toStop < st.stop_sequence) {
             return st;
           }
-          let seconds = (st.distance - first.distance) / speed * 3600;
+          let seconds = (st.shape_dist_traveled - first.shape_dist_traveled) / speed * 3600;
           let formatted_time = this.secondsToTime(seconds + headway);
           if (st.stop_sequence > first.stop_sequence) {
             st.arrival_time = formatted_time;
@@ -501,7 +500,7 @@ export default {
       return this.secondsToTime(this.timeToSeconds(time) + headway);
     },
     automaticallyOrder() {
-      this.stopTimes.sort((st1, st2) => st1.distance - st2.distance);
+      this.stopTimes.sort((st1, st2) => st1.shape_dist_traveled - st2.shape_dist_traveled);
       this.orderModal.visible = false;
       this.updateStops();
     },
@@ -558,11 +557,8 @@ export default {
       this.stopTimes = stopTimes;
     },
     calculateSTPositions() {
-      this.stopTimes = this.stopTimes.map(st => {
-        return {
-          ...st,
-          distance: this.calculatePosition(st),
-        }
+      this.stopTimes.forEach(st => {
+        st.shape_dist_traveled= this.calculatePosition(st);
       });
       this.calculateSeqs();
     },
