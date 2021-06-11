@@ -29,28 +29,31 @@
                   class="material-icons">open_with</span></div>
             </label>
             <label class="checkbox">
-              <div class="btn icon flat" :data-info="'Show/hide optional columns'"><span class="material-icons">settings</span></div>
+              <div class="btn icon flat" :data-info="'Show/hide optional columns'"><span
+                  class="material-icons">settings</span></div>
               <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
             </label>
           </div>
         </div>
         <div class="table-content">
-          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="fields" :api-mode="false" :data="stopTimes">
-            <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
-                 slot-scope="properties"
-                 v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
-              <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
-                                v-model="properties.rowData[getFieldID(properties.rowField)]">
-              </GeneralizedInput>
-              <div v-if="errors.stop_times">
-            <span class="error" :key="error"
-                  v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
-              {{ error }}
-            </span>
-              </div>
+          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="vuetable.fields" :api-mode="false" :data="stopTimes">
+            <div slot="actions" slot-scope="props" class="flex">
+              <button class="btn flat icon" @click="setActiveRow(props.rowData)" alt="Display stop_times.">
+                <span class="material-icons">edit</span>
+              </button>
             </div>
+            <template v-for="(field, index) in getProperFields(vuetable.fields, {exclusions: vuetable.exclusions})"
+                      :slot="field.name" slot-scope="props">
+              <GeneralizedInput v-if="vuetable.activeRow.id===props.rowData.id" :key="index"
+                                v-model="props.rowData[getFieldID(props.rowField)]"
+                                :data="props.rowData"
+                                :field="props.rowField"
+                                :errors="errors.stop_times?errors.stop_times[props.rowIndex]:{}">
+              </GeneralizedInput>
+              <span v-else :key="index">{{ props.rowData[getFieldID(props.rowField)] }}</span>
+            </template>
           </vuetable>
-          <DraggableTable v-else :fields="base_fields" :rows="stopTimes" v-model="stopTimes"
+          <DraggableTable v-else :fields="vuetable.baseFields" :rows="stopTimes" v-model="stopTimes"
                           @input="$nextTick(calculateSeqs)"></DraggableTable>
         </div>
         <div class="table-footer">
@@ -113,24 +116,7 @@ let Vuetable = require('vuetable-2')
 const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 let turf = require('@turf/turf');
-let base_fields = [
-  {title: 'Seq', name: 'stop_sequence',},
-  {title: 'Stop ID', name: 'stop_id'},
-  {title: 'Arrival Time', name: 'arrival_time'},
-  {title: 'Departure Time', name: 'departure_time'}
-]
 
-let optional_fields = [
-  {title: 'Stop Headsign', name: 'stop_headsign',},
-  {title: 'Pickup Type', name: 'pickup_type'},
-  {title: 'Drop-Off Type', name: 'drop_off_type'},
-  {title: 'Continuous Pickup', name: 'continuous_pickup'},
-  {title: 'Continuous Drop-Off', name: 'continuous_dropoff'},
-  {title: 'Shape Distance Traveled', name: 'shape_dist_traveled'},
-  {title: 'Timepoint', name: 'timepoint',}
-];
-
-let full_fields = base_fields.concat(optional_fields);
 
 export default {
   name: 'StopTimesEditor',
@@ -168,6 +154,29 @@ export default {
   },
   data() {
     return {
+      vuetable: {
+        baseFields: [
+          {title: this.$i18n.t('vuetable.actions'), name: 'actions', type: null},
+          {title: 'Seq', name: 'stop_sequence'},
+          {title: 'Distance', name: 'distance'},
+          {title: 'Stop ID', name: 'stop_id'},
+          {title: 'Arrival Time', name: 'arrival_time'},
+          {title: 'Departure Time', name: 'departure_time'}
+        ],
+        optionalFields: [
+          {title: 'Stop Headsign', name: 'stop_headsign',},
+          {title: 'Pickup Type', name: 'pickup_type'},
+          {title: 'Drop-Off Type', name: 'drop_off_type'},
+          {title: 'Continuous Pickup', name: 'continuous_pickup'},
+          {title: 'Continuous Drop-Off', name: 'continuous_dropoff'},
+          {title: 'Shape Distance Traveled', name: 'shape_dist_traveled'},
+          {title: 'Timepoint', name: 'timepoint'}
+        ],
+        fields: [],
+        fullFields: [],
+        exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
+        activeRow: {}
+      },
       stop: {
         sourceName: 'stop-source'
       },
@@ -177,9 +186,6 @@ export default {
       localTrip: this.trip,
       errors: {},
       dragEnabled: false,
-      exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
-      base_fields: base_fields,
-      fields: base_fields,
       showOptionalFields: false,
       stopTimes: this.trip.stop_times,
       stops: [],
@@ -207,10 +213,12 @@ export default {
       this.stopTimes = this.localTrip.stop_times;
     },
     showOptionalFields(val) {
-      this.fields = val ? full_fields : base_fields;
+      this.vuetable.fields = val ? this.vuetable.fullFields : this.vuetable.baseFields;
     },
   },
   mounted() {
+    this.vuetable.fields = this.vuetable.baseFields;
+    this.vuetable.fullFields = this.vuetable.baseFields.concat(this.vuetable.optionalFields);
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
         this.stops = response.data;
@@ -229,6 +237,9 @@ export default {
     });
   },
   methods: {
+    setActiveRow(rowData) {
+      this.vuetable.activeRow = rowData;
+    },
     addStopsLayers() {
       let minZoom = 14;
       let geojson = {
@@ -275,7 +286,7 @@ export default {
         minzoom: minZoom,
         layout: {
           'text-field': '{label}',
-          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 2: el)),
+          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 2 : el)),
           'text-anchor': 'top',
           'text-offset': [0, 0.5],
           'text-allow-overlap': true,
@@ -289,7 +300,7 @@ export default {
         minzoom: minZoom,
         layout: {
           'text-field': '{sequence}',
-          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 1.5: el)),
+          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 1.5 : el)),
           'text-anchor': 'top',
           'text-offset': [-0.1, -0.6],
           'text-allow-overlap': true,
