@@ -131,6 +131,7 @@
       "reorderStopsUsingShape": "Ordenar paradas usando la ruta",
       "calculateTimes": "Calcular tiempos",
       "enableCustomSortTable": "Habilitar ordenamiento personalizado",
+      "hintToShowExtraColumns": "Mostrar/Ocultar columnas opcionales",
       "calculateStopTimesBasedOnSpeed": {
         "title": "Calcular stop times",
         "warningMessage": "Los campos \"Arrival time\" y \"Departure time\" serán reemplazados. El tiempo de la primera parada será usado como tiempo de partida, por lo que los tiempos de las siguientes paradas serán calculadas según ese dato.",
@@ -138,6 +139,10 @@
         "secondParagraph": "[km/h]. Comenzando en la parada ",
         "thirdParagraph": " hasta la parada ",
         "okButtonLabel": "Calcular"
+      },
+      "orderStopsByDistance": {
+        "title": "¿Estás segur@ que quieres ordenar las paradas por su distancia?",
+        "body": "La secuencia de paradas actual será reemplazada. El punto más cercano a la ruta será usado para determinar su posición. Sin embargo, esto podría fallar si no es posible determinar la distancia. Por ejemplo, si el shape pasa dos veces por una parada."
       }
     }
   }

@@ -22,7 +22,7 @@
           </label>
           <div class="btn-list">
             <button class="btn icon flat" @click="saveAndExit"><span class="material-icons">check</span></button>
-            <button class="btn icon flat"><span class="material-icons">close</span></button>
+            <button class="btn icon flat" @click="exit"><span class="material-icons">close</span></button>
             <label class="checkbox">
               <input type="checkbox" id="enable-drag" v-model="dragEnabled">
               <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span
@@ -30,27 +30,29 @@
             </label>
             <label class="checkbox">
               <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
-              <div class="btn icon flat" :data-info="'Show/hide optional columns'"><span class="material-icons">settings</span></div>
+              <div class="btn icon flat" :data-info="$t('stopTimes.editor.hintToShowExtraColumns')"><span class="material-icons">settings</span></div>
             </label>
           </div>
         </div>
         <div class="table-content">
-          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="fields" :api-mode="false" :data="stopTimes">
-            <div :key="index" v-for="(field, index) in getProperFields(fields, {exclusions})" :slot="field.name"
-                 slot-scope="properties"
-                 v-bind:class="{error: errors.stop_times && errors.stop_times[properties.rowIndex][properties.rowField.name]}">
-              <GeneralizedInput :data="properties.rowData" :field="properties.rowField"
-                                v-model="properties.rowData[getFieldID(properties.rowField)]">
-              </GeneralizedInput>
-              <div v-if="errors.stop_times">
-            <span class="error" :key="error"
-                  v-for="error in errors.stop_times[properties.rowIndex][properties.rowField.name]">
-              {{ error }}
-            </span>
-              </div>
+          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="vuetable.fields" :api-mode="false" :data="stopTimes">
+            <div slot="actions" slot-scope="props" class="flex">
+              <button class="btn flat icon" @click="setActiveRow(props.rowData)" alt="Display stop_times.">
+                <span class="material-icons">edit</span>
+              </button>
             </div>
+            <template v-for="(field, index) in getProperFields(vuetable.fields, {exclusions: vuetable.exclusions})"
+                      :slot="field.name" slot-scope="props">
+              <GeneralizedInput v-if="vuetable.activeRow.id===props.rowData.id" :key="index"
+                                v-model="props.rowData[getFieldID(props.rowField)]"
+                                :data="props.rowData"
+                                :field="props.rowField"
+                                :errors="errors.stop_times?errors.stop_times[props.rowIndex]:{}">
+              </GeneralizedInput>
+              <span v-else :key="index">{{ props.rowData[getFieldID(props.rowField)] }}</span>
+            </template>
           </vuetable>
-          <DraggableTable v-else :fields="base_fields" :rows="stopTimes" v-model="stopTimes"
+          <DraggableTable v-else :fields="vuetable.baseFields" :rows="stopTimes" v-model="stopTimes"
                           @input="$nextTick(calculateSeqs)"></DraggableTable>
         </div>
         <div class="table-footer">
@@ -61,14 +63,11 @@
     <MessageModal :show="orderModal.visible" @ok="automaticallyOrder" @cancel="orderModal.visible = false"
                   @close="orderModal.visible = false" :showCancelButton="true" :type="Enums.MessageModalType.WARNING">
       <template v-slot:m-title>
-        <h2>Are you sure you want to automatically order the stops?</h2>
+        <h2>{{ $t('stopTimes.editor.orderStopsByDistance.title') }}</h2>
       </template>
       <template v-slot:m-content>
         <span class="warning">
-          The current Stop Sequence will be overwritten. The closest point of the Shape will be used to determine the
-          position,
-          however this may fail if there's no way to accurately determine where this is. For instance, if the Shape
-          passes twice next to the same Stop.
+          {{ $t('stopTimes.editor.orderStopsByDistance.body') }}
         </span>
       </template>
     </MessageModal>
@@ -113,24 +112,7 @@ let Vuetable = require('vuetable-2')
 const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 let turf = require('@turf/turf');
-let base_fields = [
-  {title: 'Seq', name: 'stop_sequence',},
-  {title: 'Stop ID', name: 'stop_id'},
-  {title: 'Arrival Time', name: 'arrival_time'},
-  {title: 'Departure Time', name: 'departure_time'}
-]
 
-let optional_fields = [
-  {title: 'Stop Headsign', name: 'stop_headsign',},
-  {title: 'Pickup Type', name: 'pickup_type'},
-  {title: 'Drop-Off Type', name: 'drop_off_type'},
-  {title: 'Continuous Pickup', name: 'continuous_pickup'},
-  {title: 'Continuous Drop-Off', name: 'continuous_dropoff'},
-  {title: 'Shape Distance Traveled', name: 'shape_dist_traveled'},
-  {title: 'Timepoint', name: 'timepoint',}
-];
-
-let full_fields = base_fields.concat(optional_fields);
 
 export default {
   name: 'StopTimesEditor',
@@ -168,23 +150,43 @@ export default {
   },
   data() {
     return {
+      vuetable: {
+        baseFields: [
+          {title: this.$i18n.t('vuetable.actions'), name: 'actions', type: null},
+          {title: 'Seq', name: 'stop_sequence'},
+          {title: 'Distance', name: 'distance'},
+          {title: 'Stop ID', name: 'stop_id'},
+          {title: 'Arrival Time', name: 'arrival_time'},
+          {title: 'Departure Time', name: 'departure_time'}
+        ],
+        optionalFields: [
+          {title: 'Stop Headsign', name: 'stop_headsign',},
+          {title: 'Pickup Type', name: 'pickup_type'},
+          {title: 'Drop-Off Type', name: 'drop_off_type'},
+          {title: 'Continuous Pickup', name: 'continuous_pickup'},
+          {title: 'Continuous Drop-Off', name: 'continuous_dropoff'},
+          {title: 'Shape Distance Traveled', name: 'shape_dist_traveled'},
+          {title: 'Timepoint', name: 'timepoint'}
+        ],
+        fields: [],
+        fullFields: [],
+        exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
+        activeRow: {},
+        showOptionalFields: false,
+      },
       stop: {
-        sourceName: 'stop-source'
+        sourceName: 'stop-source',
+        stops: [],
+        stopMap: new Map(),
       },
       shape: {
-        sourceName: 'shape-source'
+        sourceName: 'shape-source',
+        turfShape: false
       },
       localTrip: this.trip,
       errors: {},
-      dragEnabled: false,
-      exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
-      base_fields: base_fields,
-      fields: base_fields,
-      showOptionalFields: false,
       stopTimes: this.trip.stop_times,
-      stops: [],
-      stopMap: new Map(),
-      turfShape: false,
+      dragEnabled: false,
       orderModal: {
         visible: false,
       },
@@ -205,16 +207,15 @@ export default {
     trip() {
       this.localTrip = {...this.trip};
       this.stopTimes = this.localTrip.stop_times;
-    },
-    showOptionalFields(val) {
-      this.fields = val ? full_fields : base_fields;
-    },
+    }
   },
   mounted() {
+    this.vuetable.fields = this.vuetable.baseFields;
+    this.vuetable.fullFields = this.vuetable.baseFields.concat(this.vuetable.optionalFields);
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
-        this.stops = response.data;
-        this.stops.forEach(stop => this.stopMap.set(stop.id, stop));
+        this.stop.stops = response.data;
+        this.stop.stops.forEach(stop => this.stop.stopMap.set(stop.id, stop));
         this.map = new mapboxgl.Map({
           container: this.$refs.mapContainer,
           style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
@@ -229,6 +230,13 @@ export default {
     });
   },
   methods: {
+    showOptionalFields() {
+      this.vuetable.showOptionalFields = !this.vuetable.showOptionalFields;
+      this.vuetable.fields = this.vuetable.showOptionalFields ? this.vuetable.fullFields : this.vuetable.baseFields;
+    },
+    setActiveRow(rowData) {
+      this.vuetable.activeRow = rowData;
+    },
     addStopsLayers() {
       let minZoom = 14;
       let geojson = {
@@ -279,7 +287,7 @@ export default {
         minzoom: minZoom,
         layout: {
           'text-field': '{label}',
-          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 2: el)),
+          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 2 : el)),
           'text-anchor': 'top',
           'text-offset': [0, 0.5],
           'text-allow-overlap': true,
@@ -322,7 +330,7 @@ export default {
           return;
         }
         e.preventDefault();
-        let stop = this.stopMap.get(feature.properties.id);
+        let stop = this.stop.stopMap.get(feature.properties.id);
         let stopTime = {
           trip: this.localTrip.id,
           trip_id: this.localTrip.trip_id,
@@ -350,7 +358,7 @@ export default {
           return;
         }
         e.preventDefault();
-        let stop = this.stopMap.get(feature.properties.id);
+        let stop = this.stop.stopMap.get(feature.properties.id);
         this.stopTimes = this.stopTimes.filter(st => st.stop !== stop.id);
         this.updateStops();
       });
@@ -428,7 +436,7 @@ export default {
       if (this.localTrip && this.localTrip.shape) {
         shapesAPI.shapesAPI.detail(this.projectId, this.localTrip.shape).then(response => {
           let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-          this.turfShape = turf.lineString(points);
+          this.shape.turfShape = turf.lineString(points);
           geojson.geometry.coordinates = points;
           this.map.getSource(this.shape.sourceName).setData(geojson);
           this.calculateSTPositions();
@@ -514,7 +522,7 @@ export default {
     generateStopFeatures() {
       let st_map = new Map();
       this.stopTimes.forEach(st => st_map.set(st.stop, st))
-      return this.stops.map(stop => {
+      return this.stop.stops.map(stop => {
         let stopTime = st_map.get(stop.id);
         let props = {
           selected: false,
@@ -565,9 +573,9 @@ export default {
       this.calculateSeqs();
     },
     calculatePosition(st) {
-      let stop = this.stopMap.get(st.stop);
+      let stop = this.stop.stopMap.get(st.stop);
       let point = turf.point([stop.stop_lon, stop.stop_lat]);
-      let nearest = turf.nearestPointOnLine(this.turfShape, point);
+      let nearest = turf.nearestPointOnLine(this.shape.turfShape, point);
       return nearest.properties.location.toFixed(3);
     },
     saveAndExit() {
@@ -592,6 +600,9 @@ export default {
         this.errors = err.response.data;
         console.log(this.errors);
       })
+    },
+    exit() {
+      console.log('exit');
     }
   }
 };

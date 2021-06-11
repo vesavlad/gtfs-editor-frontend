@@ -131,6 +131,7 @@
       "reorderStopsUsingShape": "Reorder stops using shape",
       "calculateTimes": "Calculate times",
       "enableCustomSortTable": "Enable custom sort table",
+      "hintToShowExtraColumns": "Show/Hide optional columns",
       "calculateStopTimesBasedOnSpeed": {
         "title": "Calculate stop times",
         "warningMessage": "The current Arrival and Departure times will be replaced. The arrival time of the first stop will be used as a starting point and all other arrival/departure times will be recalculated based on that.",
@@ -138,6 +139,10 @@
         "secondParagraph": "[km/h]. Starting from stop ",
         "thirdParagraph": "to stop ",
         "okButtonLabel": "Calculate"
+      },
+      "orderStopsByDistance": {
+        "title": "Are you sure you want to automatically order the stops?",
+        "body": "The current Stop Sequence will be overwritten. The closest point of the Shape will be used to determine the position, however this may fail if there's no way to accurately determine where this is. For instance, if the Shape passes twice next to the same Stop."
       }
     }
   }
