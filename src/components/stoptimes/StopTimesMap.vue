@@ -79,7 +79,8 @@ export default {
           id: stop.id,
           label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
           selected: false,
-          sequence: null
+          sequence: null,
+          time: null
         }
       }
     },
@@ -195,6 +196,20 @@ export default {
           'text-allow-overlap': true,
         }
       });
+      this.map.addLayer({
+        id: 'layer-stops-times',
+        type: 'symbol',
+        source: 'stops-source',
+        filter: ['==', 'selected', true],
+        minzoom: 14,
+        layout: {
+          'text-field': '{time}',
+          'text-size': 13,
+          'text-anchor': 'top',
+          'text-offset': [0, -1.8],
+          'text-allow-overlap': true,
+        }
+      });
     },
     displayTrip(trip) {
       tripsAPI.tripsAPI.detail(this.projectId, trip.id).then(response => {
@@ -204,13 +219,17 @@ export default {
         }
         let stopIds = [];
         let sequence = {}
+        let time = {}
         response.data.stop_times.forEach((st, index) => {
           sequence[st.stop] = index + 1;
+          time[st.stop] = st.arrival_time;
+          console.log(st);
           stopIds.push(st.stop);
         });
         this.stopsGeojson.features = this.stopsGeojson.features.map(feature => {
           feature.properties.selected = stopIds.includes(feature.properties.id);
           feature.properties.sequence = sequence[feature.properties.id]
+          feature.properties.time = time[feature.properties.id];
           return feature;
         });
         this.map.getSource('stops-source').setData(this.stopsGeojson);
