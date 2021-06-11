@@ -29,7 +29,7 @@
                   class="material-icons">open_with</span></div>
             </label>
             <label class="checkbox">
-              <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
+              <input type="checkbox" id="optional-fields" v-model="vuetable.showOptionalFields" @change="setOptionalFieldsVisibility">
               <div class="btn icon flat" :data-info="$t('stopTimes.editor.hintToShowExtraColumns')"><span class="material-icons">settings</span></div>
             </label>
           </div>
@@ -229,8 +229,7 @@ export default {
     });
   },
   methods: {
-    showOptionalFields() {
-      this.vuetable.showOptionalFields = !this.vuetable.showOptionalFields;
+    setOptionalFieldsVisibility() {
       this.vuetable.fields = this.vuetable.showOptionalFields ? this.vuetable.fullFields : this.vuetable.baseFields;
     },
     setActiveRow(rowData) {
