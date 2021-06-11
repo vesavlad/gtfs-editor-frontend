@@ -47,8 +47,8 @@ export default {
       });
       this.map.on('load', () => {
         this.envelope(this.map, this.projectId);
-        this.addShapeLayers();
         this.addStopLayers();
+        this.addShapeLayers();
         this.loadStops();
         this.$emit('load');
       });
@@ -99,7 +99,7 @@ export default {
           'line-color': config.shape_line_color,
           'line-width': 2
         }
-      });
+      }, 'layer-stops-icon');
       let img = require('../../assets/img/double-arrow.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
@@ -125,7 +125,7 @@ export default {
             'icon-halo-color': '#fff',
             'icon-halo-width': 2,
           }
-        });
+        }, 'layer-stops-icon');
       });
     },
     addStopLayers() {
