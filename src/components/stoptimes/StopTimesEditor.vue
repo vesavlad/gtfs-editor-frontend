@@ -2,11 +2,12 @@
   <div class="dynamic-map-container">
     <div class="top-map-bar">
       <div class="right-content grid center">
-        <button class="btn btn-outline-secondary" @click="orderModal.visible=true">
+        <button class="btn btn-outline-secondary" @click="orderModal.visible=true"
+                :disabled="this.stopTimes.length===0">
           <span>{{ $t('stopTimes.editor.reorderStopsUsingShape') }}</span>
           <span class="material-icons">low_priority</span>
         </button>
-        <button class="btn btn-outline-secondary" @click="openSpeedModal">
+        <button class="btn btn-outline-secondary" @click="openSpeedModal" :disabled="this.stopTimes.length===0">
           <span>{{ $t('stopTimes.editor.calculateTimes') }}</span><span class="material-icons">restore</span>
         </button>
       </div>
@@ -29,8 +30,10 @@
                   class="material-icons">open_with</span></div>
             </label>
             <label class="checkbox">
-              <input type="checkbox" id="optional-fields" v-model="vuetable.showOptionalFields" @change="setOptionalFieldsVisibility">
-              <div class="btn icon flat" :data-info="$t('stopTimes.editor.hintToShowExtraColumns')"><span class="material-icons">settings</span></div>
+              <input type="checkbox" id="optional-fields" v-model="vuetable.showOptionalFields"
+                     @change="setOptionalFieldsVisibility">
+              <div class="btn icon flat" :data-info="$t('stopTimes.editor.hintToShowExtraColumns')"><span
+                  class="material-icons">settings</span></div>
             </label>
           </div>
         </div>
@@ -81,7 +84,9 @@
         <span class="warning">{{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.warningMessage') }}</span>
         <br>
         <label>{{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.firstParagraph') }}</label>
-        <input v-model="speedModal.speed" type="number">
+        <input v-model="speedModal.speed"
+               v-tooltip="{ theme: 'error-tooltip', content: speedModal.speedFormatError, shown: !!speedModal.speedFormatError }"
+               @focus="speedModal.speedFormatError=null">
         {{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.secondParagraph') }}
         <SimpleSelect :field="speedModal.selectField" v-model="speedModal.fromStop" :errors="[]">
         </SimpleSelect>
@@ -199,6 +204,7 @@ export default {
           options: {},
         },
         speed: 60,
+        speedFormatError: null
       }
     };
   },
@@ -457,6 +463,7 @@ export default {
       if (this.stopTimes.length) {
         let speed = Number(this.speedModal.speed);
         if (Number.isNaN(speed)) {
+          this.speedModal.speedFormatError = this.$t('stopTimes.editor.calculateStopTimesBasedOnSpeed.speedFormatError');
           return;
         }
         let first = this.stopTimes[this.speedModal.fromStop - 1];
@@ -468,7 +475,7 @@ export default {
           if (st.stop_sequence < this.speedModal.fromStop || this.speedModal.toStop < st.stop_sequence) {
             return st;
           }
-          let seconds = (st.shape_dist_traveled - first.shape_dist_traveled) / speed * 3600;
+          let seconds = (parseFloat(st.shape_dist_traveled) - parseFloat(first.shape_dist_traveled)) / speed * 3600;
           let formatted_time = this.secondsToTime(seconds + headway);
           if (st.stop_sequence > first.stop_sequence) {
             st.arrival_time = formatted_time;
@@ -505,7 +512,7 @@ export default {
       return this.secondsToTime(this.timeToSeconds(time) + headway);
     },
     automaticallyOrder() {
-      this.stopTimes.sort((st1, st2) => st1.shape_dist_traveled - st2.shape_dist_traveled);
+      this.stopTimes.sort((st1, st2) => parseFloat(st1.shape_dist_traveled) - parseFloat(st2.shape_dist_traveled));
       this.orderModal.visible = false;
       this.updateStops();
     },
@@ -563,7 +570,7 @@ export default {
     },
     calculateSTPositions() {
       this.stopTimes.forEach(st => {
-        st.shape_dist_traveled= this.calculatePosition(st);
+        st.shape_dist_traveled = this.calculatePosition(st);
       });
       this.calculateSeqs();
     },
