@@ -28,10 +28,11 @@
               <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span
                   class="material-icons">open_with</span></div>
             </label>
-            <label class="checkbox">
-              <div class="btn icon flat" :data-info="$t('stopTimes.editor.hintToShowExtraColumns')"><span
-                  class="material-icons">settings</span></div>
-              <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
+            <label>
+              <button class="btn icon flat" @click="showOptionalFields"
+                      :data-info="$t('stopTimes.editor.hintToShowExtraColumns')">
+                <span class="material-icons">settings</span>
+              </button>
             </label>
           </div>
         </div>
@@ -172,22 +173,22 @@ export default {
         fields: [],
         fullFields: [],
         exclusions: ['actions', 'stop_sequence', 'stop_id', 'distance'],
-        activeRow: {}
+        activeRow: {},
+        showOptionalFields: false,
       },
       stop: {
-        sourceName: 'stop-source'
+        sourceName: 'stop-source',
+        stops: [],
+        stopMap: new Map(),
       },
       shape: {
-        sourceName: 'shape-source'
+        sourceName: 'shape-source',
+        turfShape: false
       },
       localTrip: this.trip,
       errors: {},
-      dragEnabled: false,
-      showOptionalFields: false,
       stopTimes: this.trip.stop_times,
-      stops: [],
-      stopMap: new Map(),
-      turfShape: false,
+      dragEnabled: false,
       orderModal: {
         visible: false,
       },
@@ -208,18 +209,15 @@ export default {
     trip() {
       this.localTrip = {...this.trip};
       this.stopTimes = this.localTrip.stop_times;
-    },
-    showOptionalFields(val) {
-      this.vuetable.fields = val ? this.vuetable.fullFields : this.vuetable.baseFields;
-    },
+    }
   },
   mounted() {
     this.vuetable.fields = this.vuetable.baseFields;
     this.vuetable.fullFields = this.vuetable.baseFields.concat(this.vuetable.optionalFields);
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
-        this.stops = response.data;
-        this.stops.forEach(stop => this.stopMap.set(stop.id, stop));
+        this.stop.stops = response.data;
+        this.stop.stops.forEach(stop => this.stop.stopMap.set(stop.id, stop));
         this.map = new mapboxgl.Map({
           container: this.$refs.mapContainer,
           style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
@@ -234,6 +232,10 @@ export default {
     });
   },
   methods: {
+    showOptionalFields() {
+      this.vuetable.showOptionalFields = !this.vuetable.showOptionalFields;
+      this.vuetable.fields = this.vuetable.showOptionalFields ? this.vuetable.fullFields : this.vuetable.baseFields;
+    },
     setActiveRow(rowData) {
       this.vuetable.activeRow = rowData;
     },
@@ -322,7 +324,7 @@ export default {
           return;
         }
         e.preventDefault();
-        let stop = this.stopMap.get(feature.properties.id);
+        let stop = this.stop.stopMap.get(feature.properties.id);
         let stopTime = {
           trip: this.localTrip.id,
           trip_id: this.localTrip.trip_id,
@@ -350,7 +352,7 @@ export default {
           return;
         }
         e.preventDefault();
-        let stop = this.stopMap.get(feature.properties.id);
+        let stop = this.stop.stopMap.get(feature.properties.id);
         this.stopTimes = this.stopTimes.filter(st => st.stop !== stop.id);
         this.updateStops();
       });
@@ -428,7 +430,7 @@ export default {
       if (this.localTrip && this.localTrip.shape) {
         shapesAPI.shapesAPI.detail(this.projectId, this.localTrip.shape).then(response => {
           let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
-          this.turfShape = turf.lineString(points);
+          this.shape.turfShape = turf.lineString(points);
           geojson.geometry.coordinates = points;
           this.map.getSource(this.shape.sourceName).setData(geojson);
           this.calculateSTPositions();
@@ -514,7 +516,7 @@ export default {
     generateStopFeatures() {
       let st_map = new Map();
       this.stopTimes.forEach(st => st_map.set(st.stop, st))
-      return this.stops.map(stop => {
+      return this.stop.stops.map(stop => {
         let stopTime = st_map.get(stop.id);
         let props = {
           selected: false,
@@ -565,9 +567,9 @@ export default {
       this.calculateSeqs();
     },
     calculatePosition(st) {
-      let stop = this.stopMap.get(st.stop);
+      let stop = this.stop.stopMap.get(st.stop);
       let point = turf.point([stop.stop_lon, stop.stop_lat]);
-      let nearest = turf.nearestPointOnLine(this.turfShape, point);
+      let nearest = turf.nearestPointOnLine(this.shape.turfShape, point);
       return nearest.properties.location.toFixed(3);
     },
     saveAndExit() {
