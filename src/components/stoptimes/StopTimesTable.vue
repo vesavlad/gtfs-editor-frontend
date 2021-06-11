@@ -15,9 +15,12 @@
           <button class="btn flat icon" @click="$emit('focus-st', props.rowData)" alt="Display stop_times.">
             <span class="material-icons">visibility</span>
           </button>
-          <div class="btn icon flat">
-            <i class="material-icons"
-               @click="showMenu=!showMenu;activeTrip=props.rowData">more_vert</i>
+          <button v-if="props.rowData.stop_times.length===0" class="btn flat icon"
+                  @click="activeTrip=props.rowData;editStopTimes()" alt="edit stop times">
+            <span class="material-icons">add_circle</span>
+          </button>
+          <div v-else class="btn icon flat" @click="showMenu=!showMenu;activeTrip=props.rowData">
+            <i class="material-icons">more_vert</i>
             <StopTimesMenu v-if="showMenu && activeTrip.id===props.rowData.id"
                            @edit="editStopTimes"
                            @duplicate-trip="duplicateStopTimes"
