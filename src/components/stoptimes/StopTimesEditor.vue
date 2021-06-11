@@ -46,7 +46,7 @@
             </div>
             <template v-for="(field, index) in getProperFields(vuetable.fields, {exclusions: vuetable.exclusions})"
                       :slot="field.name" slot-scope="props">
-              <GeneralizedInput v-if="vuetable.activeRow.id===props.rowData.id" :key="index"
+              <GeneralizedInput v-if="vuetable.activeRow.stop_id===props.rowData.stop_id" :key="index"
                                 v-model="props.rowData[getFieldID(props.rowField)]"
                                 :data="props.rowData"
                                 :field="props.rowField"
@@ -353,6 +353,7 @@ export default {
         }
         stopTime.shape_dist_traveled = this.calculatePosition(stopTime);
         this.stopTimes.push(stopTime);
+        this.vuetable.activeRow = stopTime;
         this.updateStops();
       });
 
