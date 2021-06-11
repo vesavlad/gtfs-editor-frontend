@@ -598,7 +598,7 @@ export default {
       })
     },
     exit() {
-      console.log('exit');
+      this.$router.push({name: "StopTimes", params: {projectId: this.$route.params.projectId}});
     },
     flyToStop(rowData) {
       let stop = this.stop.stopMap.get(rowData.stop);
