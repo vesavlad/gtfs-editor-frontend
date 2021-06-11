@@ -64,14 +64,11 @@
     <MessageModal :show="orderModal.visible" @ok="automaticallyOrder" @cancel="orderModal.visible = false"
                   @close="orderModal.visible = false" :showCancelButton="true" :type="Enums.MessageModalType.WARNING">
       <template v-slot:m-title>
-        <h2>Are you sure you want to automatically order the stops?</h2>
+        <h2>{{ $t('stopTimes.editor.orderStopsByDistance.title') }}</h2>
       </template>
       <template v-slot:m-content>
         <span class="warning">
-          The current Stop Sequence will be overwritten. The closest point of the Shape will be used to determine the
-          position,
-          however this may fail if there's no way to accurately determine where this is. For instance, if the Shape
-          passes twice next to the same Stop.
+          {{ $t('stopTimes.editor.orderStopsByDistance.body') }}
         </span>
       </template>
     </MessageModal>
@@ -595,6 +592,9 @@ export default {
         this.errors = err.response.data;
         console.log(this.errors);
       })
+    },
+    exit() {
+      console.log('exit');
     }
   }
 };

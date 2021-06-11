@@ -139,6 +139,10 @@
         "secondParagraph": "[km/h]. Comenzando en la parada ",
         "thirdParagraph": " hasta la parada ",
         "okButtonLabel": "Calcular"
+      },
+      "orderStopsByDistance": {
+        "title": "¿Estás segur@ que quieres ordenar las paradas por su distancia?",
+        "body": "La secuencia de paradas actual será reemplazada. El punto más cercano a la ruta será usado para determinar su posición. Sin embargo, esto podría fallar si no es posible determinar la distancia. Por ejemplo, si el shape pasa dos veces por una parada."
       }
     }
   }
