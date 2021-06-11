@@ -147,6 +147,9 @@ export default {
         search: this.quickSearch,
       }
     },
+    refresh() {
+      this.$refs.vuetable.refresh();
+    },
     transformData(data) {
       data.results.map(trip => {
         trip.stop_count = trip.stop_times.length;
@@ -174,7 +177,7 @@ export default {
         this.deleteModal.trip = null;
         this.deleteModal.visible = false;
         this.deleteModal.message = '';
-        this.$refs.vuetable.refresh();
+        this.refresh();
       }).catch(err => {
         console.log(err.response);
         this.deleteModal.message = err.response.data.message;
