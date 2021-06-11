@@ -79,6 +79,7 @@ export default {
           id: stop.id,
           label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ""),
           selected: false,
+          sequence: null
         }
       }
     },
@@ -169,7 +170,7 @@ export default {
         filter: ["==", "selected", true],
         minzoom: 14,
         layout: {
-          "text-field": "s:{sequence}",
+          "text-field": "{sequence}",
           'text-size': 14,
           'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
           "text-anchor": "top",
@@ -200,9 +201,15 @@ export default {
         if (data.shape) {
           this.displayShape(data.shape);
         }
-        let stop_ids = response.data.stop_times.map(st => st.stop);
+        let stopIds = [];
+        let sequence = {}
+        response.data.stop_times.forEach((st, index) => {
+          sequence[st.stop] = index + 1;
+          stopIds.push(st.stop);
+        });
         this.stopsGeojson.features = this.stopsGeojson.features.map(feature => {
-          feature.properties.selected = stop_ids.includes(feature.properties.id);
+          feature.properties.selected = stopIds.includes(feature.properties.id);
+          feature.properties.sequence = sequence[feature.properties.id]
           return feature;
         });
         this.map.getSource('stops-source').setData(this.stopsGeojson);
