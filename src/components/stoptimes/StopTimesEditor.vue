@@ -43,6 +43,9 @@
               <button class="btn flat icon" @click="setActiveRow(props.rowData)" alt="Display stop_times.">
                 <span class="material-icons">edit</span>
               </button>
+              <button class="btn flat icon" @click="flyToStop(props.rowData)" alt="move to stop.">
+                <span class="material-icons">map</span>
+              </button>
             </div>
             <template v-for="(field, index) in getProperFields(vuetable.fields, {exclusions: vuetable.exclusions})"
                       :slot="field.name" slot-scope="props">
@@ -596,6 +599,13 @@ export default {
     },
     exit() {
       console.log('exit');
+    },
+    flyToStop(rowData) {
+      let stop = this.stop.stopMap.get(rowData.stop);
+      this.map.flyTo({
+        center: [stop.stop_lon, stop.stop_lat],
+        zoom: 16,
+      });
     }
   }
 };
