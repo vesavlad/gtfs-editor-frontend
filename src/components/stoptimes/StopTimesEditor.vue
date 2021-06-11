@@ -165,7 +165,7 @@ export default {
           {title: 'Departure Time', name: 'departure_time'}
         ],
         optionalFields: [
-          {title: 'Stop Headsign', name: 'stop_headsign',},
+          {title: 'Stop Headsign', name: 'stop_headsign'},
           {title: 'Pickup Type', name: 'pickup_type'},
           {title: 'Drop-Off Type', name: 'drop_off_type'},
           {title: 'Continuous Pickup', name: 'continuous_pickup'},
@@ -329,42 +329,32 @@ export default {
         }
       });
       this.map.on('click', 'layer-stops-icon', e => {
-        let feature = e.features[0];
-        if (feature.properties.selected) {
-          return;
-        }
         e.preventDefault();
-        let stop = this.stop.stopMap.get(feature.properties.id);
-        let stopTime = {
-          trip: this.localTrip.id,
-          trip_id: this.localTrip.trip_id,
-          stop: stop.id,
-          stop_id: stop.stop_id,
-          stop_sequence: null,
-          arrival_time: null,
-          departure_time: null,
-          stop_headsign: null,
-          pickup_type: null,
-          drop_off_type: null,
-          continuous_pickup: null,
-          continuous_dropoff: null,
-          shape_dist_traveled: null,
-          timepoint: null
-        }
-        stopTime.shape_dist_traveled = this.calculatePosition(stopTime);
-        this.stopTimes.push(stopTime);
-        this.vuetable.activeRow = stopTime;
-        this.updateStops();
-      });
-
-      this.map.on('contextmenu', 'layer-stops-icon', e => {
         let feature = e.features[0];
+        let stop = this.stop.stopMap.get(feature.properties.id);
         if (!feature.properties.selected) {
-          return;
+          let stopTime = {
+            trip: this.localTrip.id,
+            trip_id: this.localTrip.trip_id,
+            stop: stop.id,
+            stop_id: stop.stop_id,
+            stop_sequence: null,
+            arrival_time: null,
+            departure_time: null,
+            stop_headsign: null,
+            pickup_type: null,
+            drop_off_type: null,
+            continuous_pickup: null,
+            continuous_dropoff: null,
+            shape_dist_traveled: null,
+            timepoint: null
+          };
+          stopTime.shape_dist_traveled = this.calculatePosition(stopTime);
+          this.stopTimes.push(stopTime);
+          this.vuetable.activeRow = stopTime;
+        } else {
+          this.stopTimes = this.stopTimes.filter(st => st.stop !== stop.id);
         }
-        e.preventDefault();
-        let stop = this.stop.stopMap.get(feature.properties.id);
-        this.stopTimes = this.stopTimes.filter(st => st.stop !== stop.id);
         this.updateStops();
       });
 
