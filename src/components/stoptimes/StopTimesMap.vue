@@ -3,17 +3,17 @@
 </template>
 
 <script>
-import tripsAPI from "@/api/trips.api";
-import stopsAPI from "@/api/stops.api";
-import shapesAPI from "@/api/shapes.api";
-import envelopeMixin from "@/mixins/envelopeMixin"
-import config from "@/config.js"
+import tripsAPI from '@/api/trips.api';
+import stopsAPI from '@/api/stops.api';
+import shapesAPI from '@/api/shapes.api';
+import envelopeMixin from '@/mixins/envelopeMixin'
+import config from '@/config.js'
 
 const mapboxgl = require('mapbox-gl');
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 
 export default {
-  name: "SopTimesMap",
+  name: 'SopTimesMap',
   mixins: [
     envelopeMixin,
   ],
@@ -77,7 +77,7 @@ export default {
         },
         properties: {
           id: stop.id,
-          label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ""),
+          label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
           selected: false,
           sequence: null
         }
@@ -136,23 +136,23 @@ export default {
       });
 
       this.map.addLayer({
-        id: "layer-stops-icon",
-        type: "circle",
-        source: "stops-source",
-        filter: ["==", "selected", true],
+        id: 'layer-stops-icon',
+        type: 'circle',
+        source: 'stops-source',
+        filter: ['==', 'selected', true],
         paint: {
-          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
+          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
           'circle-color': [
             'case',
             ['get', 'selected'], '#21b0cf',
-            ['boolean', ['feature-state', 'hover'], false], "#21b0cf",
+            ['boolean', ['feature-state', 'hover'], false], '#21b0cf',
             '#39505d'
           ],
           'circle-stroke-color': [
             'case',
-            ['boolean', ['get', 'selected'], false], "#21b0cf",
-            ['boolean', ['feature-state', 'hover'], false], "#21b0cf",
-            "white"
+            ['boolean', ['get', 'selected'], false], '#21b0cf',
+            ['boolean', ['feature-state', 'hover'], false], '#21b0cf',
+            'white'
           ],
           'circle-stroke-opacity': 1,
           'circle-stroke-width': [
@@ -164,34 +164,35 @@ export default {
         }
       });
       this.map.addLayer({
-        id: "layer-stops-seq",
-        type: "symbol",
-        source: "stops-source",
-        filter: ["==", "selected", true],
+        id: 'layer-stops-seq',
+        type: 'symbol',
+        source: 'stops-source',
+        filter: ['==', 'selected', true],
         minzoom: 14,
         layout: {
-          "text-field": "{sequence}",
+          'text-field': '{sequence}',
           'text-size': 14,
           'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
-          "text-anchor": "top",
-          "text-offset": [0, -0.5],
-          "text-allow-overlap": true,
+          'text-anchor': 'top',
+          'text-offset': [0, -0.5],
+          'text-allow-overlap': true,
         },
         paint: {
           'text-color': config.stop_label_color,
         }
       });
       this.map.addLayer({
-        id: "layer-stops-label",
-        type: "symbol",
-        source: "stops-source",
-        filter: ["==", "selected", true],
-        minzoom: 16,
+        id: 'layer-stops-label',
+        type: 'symbol',
+        source: 'stops-source',
+        filter: ['==', 'selected', true],
+        minzoom: 14,
         layout: {
-          "text-field": "{label}",
-          "text-anchor": "top",
-          "text-offset": [0, 0.5],
-          "text-allow-overlap": true,
+          'text-field': '{label}',
+          'text-size': 13,
+          'text-anchor': 'top',
+          'text-offset': [0, 0.5],
+          'text-allow-overlap': true,
         }
       });
     },
