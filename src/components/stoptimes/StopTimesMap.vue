@@ -141,7 +141,25 @@ export default {
         filter: ["==", "selected", true],
         paint: {
           "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
-          "circle-color": config.stop_color
+          'circle-color': [
+            'case',
+            ['get', 'selected'], '#21b0cf',
+            ['boolean', ['feature-state', 'hover'], false], "#21b0cf",
+            '#39505d'
+          ],
+          'circle-stroke-color': [
+            'case',
+            ['boolean', ['get', 'selected'], false], "#21b0cf",
+            ['boolean', ['feature-state', 'hover'], false], "#21b0cf",
+            "white"
+          ],
+          'circle-stroke-opacity': 1,
+          'circle-stroke-width': [
+            'case',
+            ['boolean', ['get', 'selected'], false], 5,
+            ['boolean', ['feature-state', 'hover'], false], 2,
+            1
+          ],
         }
       });
       this.map.addLayer({
@@ -151,10 +169,15 @@ export default {
         filter: ["==", "selected", true],
         minzoom: 14,
         layout: {
-          "text-field": "seq:{sequence}",
+          "text-field": "s:{sequence}",
+          'text-size': 14,
+          'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
           "text-anchor": "top",
           "text-offset": [0, -0.5],
           "text-allow-overlap": true,
+        },
+        paint: {
+          'text-color': config.stop_label_color,
         }
       });
       this.map.addLayer({

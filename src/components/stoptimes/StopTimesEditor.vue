@@ -18,7 +18,7 @@
         <div class="side-header">
           <label class="grid center">
             <h4>Trip ID:</h4>
-            <input v-model="localTrip.trip_id">
+            <input type="text" v-model="localTrip.trip_id">
           </label>
           <div class="btn-list">
             <button class="btn icon flat" @click="saveAndExit"><span class="material-icons">check</span></button>
@@ -28,11 +28,9 @@
               <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span
                   class="material-icons">open_with</span></div>
             </label>
-            <label>
-              <button class="btn icon flat" @click="showOptionalFields"
-                      :data-info="$t('stopTimes.editor.hintToShowExtraColumns')">
-                <span class="material-icons">settings</span>
-              </button>
+            <label class="checkbox">
+              <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
+              <div class="btn icon flat" :data-info="$t('stopTimes.editor.hintToShowExtraColumns')"><span class="material-icons">settings</span></div>
             </label>
           </div>
         </div>
@@ -258,22 +256,26 @@ export default {
           'visibility': 'visible'
         },
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
+          'circle-radius':
+              ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
           'circle-color': [
             'case',
-            ['get', 'selected'], config.stop_selected_color,
-            '#FFF'
+            ['get', 'selected'], '#21b0cf',
+            ['boolean', ['feature-state', 'hover'], false], "#21b0cf",
+            '#39505d'
           ],
           'circle-stroke-color': [
             'case',
-            ['boolean', ['get', 'selected'], false], config.stop_stroke_selected_color,
-            config.stop_stroke_color
+            ['boolean', ['get', 'selected'], false], "#21b0cf",
+            ['boolean', ['feature-state', 'hover'], false], "#21b0cf",
+            "white"
           ],
           'circle-stroke-opacity': 1,
           'circle-stroke-width': [
             'case',
-            ['boolean', ['feature-state', 'hover'], false], 5,
-            2
+            ['boolean', ['get', 'selected'], false], 5,
+            ['boolean', ['feature-state', 'hover'], false], 2,
+            1
           ],
         }
       });
@@ -298,10 +300,14 @@ export default {
         minzoom: minZoom,
         layout: {
           'text-field': '{sequence}',
-          'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 1.5 : el)),
+          'text-size': 14,
+          'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
           'text-anchor': 'top',
-          'text-offset': [-0.1, -0.6],
+          'text-offset': [0, -0.4],
           'text-allow-overlap': true,
+        },
+        paint: {
+          'text-color': config.stop_label_color,
         }
       });
       this.map.addLayer({
