@@ -103,11 +103,13 @@ export default {
         },
         {
           name: "start_time",
-          title: "Start Time"
+          title: "Start Time",
+          formatter: start_time => start_time ? start_time: this.$t('stopTimes.table.emptyStopTimes')
         },
         {
           name: "end_time",
-          title: "End Time"
+          title: "End Time",
+          formatter: end_time => end_time ? end_time: this.$t('stopTimes.table.emptyStopTimes')
         },
         {
           name: "shape",
@@ -151,6 +153,9 @@ export default {
         if (trip.stop_count) {
           trip.start_time = trip.stop_times[0].arrival_time;
           trip.end_time = trip.stop_times[trip.stop_times.length - 1].departure_time;
+        } else {
+          trip.start_time = null;
+          trip.end_time = null;
         }
       })
       return data;
