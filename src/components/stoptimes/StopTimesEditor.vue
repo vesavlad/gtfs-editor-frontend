@@ -22,14 +22,14 @@
           </label>
           <div class="btn-list">
             <button class="btn icon flat" @click="saveAndExit"><span class="material-icons">check</span></button>
-            <button class="btn icon flat"><span class="material-icons">close</span></button>
+            <button class="btn icon flat" @click="exit"><span class="material-icons">close</span></button>
             <label class="checkbox">
               <input type="checkbox" id="enable-drag" v-model="dragEnabled">
               <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span
                   class="material-icons">open_with</span></div>
             </label>
             <label class="checkbox">
-              <div class="btn icon flat" :data-info="'Show/hide optional columns'"><span
+              <div class="btn icon flat" :data-info="$t('stopTimes.editor.hintToShowExtraColumns')"><span
                   class="material-icons">settings</span></div>
               <input type="checkbox" id="optional-fields" v-model="showOptionalFields">
             </label>
