@@ -98,6 +98,10 @@ export default {
           title: 'Trip ID',
         },
         {
+          name: 'direction_id',
+          title: 'Direction ID',
+        },
+        {
           name: 'stop_count',
           title: 'Stops',
         },
