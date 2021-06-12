@@ -100,10 +100,7 @@ export default {
     },
     uploadCSV(file) {
       return agenciesAPI.agenciesAPI.uploadCSV(this.$route.params.projectId, file);
-    },
-    log(out) {
-      console.log(out);
-    },
+    }
   },
 };
 </script>
