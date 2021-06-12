@@ -44,7 +44,7 @@
                 <span class="material-icons">edit</span>
               </button>
               <button class="btn flat icon" @click="flyToStop(props.rowData)" alt="move to stop.">
-                <span class="material-icons">map</span>
+                <span class="material-icons">my_location</span>
               </button>
             </div>
             <template v-for="(field, index) in getProperFields(vuetable.fields, {exclusions: vuetable.exclusions})"
@@ -309,6 +309,9 @@ export default {
             'icon-anchor': 'bottom',
             'icon-text-fit': 'both',
             'icon-text-fit-padding': [4, 6, 0, 6],
+          },
+          paint: {
+            'text-color': config.stop_label_color,
           }
         });
       });

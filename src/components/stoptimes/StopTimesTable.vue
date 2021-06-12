@@ -13,7 +13,7 @@
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :transform="transformData">
         <div slot="actions" slot-scope="props" class="flex">
           <button class="btn flat icon" @click="$emit('focus-st', props.rowData)" alt="Display stop_times.">
-            <span class="material-icons">visibility</span>
+            <span class="material-icons">my_location</span>
           </button>
           <button v-if="props.rowData.stop_times.length===0" class="btn flat icon"
                   @click="activeTrip=props.rowData;editStopTimes()" alt="edit stop times">

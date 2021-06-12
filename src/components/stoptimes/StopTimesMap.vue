@@ -158,9 +158,9 @@ export default {
           'circle-stroke-opacity': 1,
           'circle-stroke-width': [
             'case',
-            ['boolean', ['get', 'selected'], false], 5,
+            ['boolean', ['get', 'selected'], false], 6,
             ['boolean', ['feature-state', 'hover'], false], 2,
-            1
+            10
           ],
         }
       });
@@ -175,7 +175,7 @@ export default {
           'text-size': 14,
           'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
           'text-anchor': 'top',
-          'text-offset': [0, -0.5],
+          'text-offset': [-0.03, -0.4],
           'text-allow-overlap': true,
         },
         paint: {
@@ -197,14 +197,18 @@ export default {
           minzoom: 14,
           layout: {
             'text-field': '{label}',
-            'text-size': 13,
-            'text-anchor': 'top',
-            'text-offset': [0, 0.5],
-            'text-allow-overlap': true,
+            'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
             'icon-image': 'bg-stop-name',
             'icon-anchor': 'bottom',
+            'text-anchor': 'top',
+            'text-offset': [0, 1.3],
+            'text-size': 14,
             'icon-text-fit': 'both',
             'icon-text-fit-padding': [4, 6, 0, 6],
+            'text-allow-overlap': true,
+          },
+          paint: {
+            'text-color': config.stop_label_color,
           }
         });
 
@@ -216,14 +220,18 @@ export default {
           minzoom: 14,
           layout: {
             'text-field': '{time}',
-            'text-size': 13,
-            'text-anchor': 'top',
-            'text-offset': [0, -1.8],
-            'text-allow-overlap': true,
+            'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
             'icon-image': 'bg-stop-name',
             'icon-anchor': 'bottom',
+            'text-anchor': 'top',
+            'text-offset': [0, -2],
+            'text-size': 14,
             'icon-text-fit': 'both',
             'icon-text-fit-padding': [4, 6, 0, 6],
+            'text-allow-overlap': true,
+          },
+          paint: {
+            'text-color': config.stop_label_color,
           }
         });
       });
