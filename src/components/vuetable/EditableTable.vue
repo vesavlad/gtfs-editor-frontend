@@ -32,6 +32,9 @@
             <VuetableRowHeader></VuetableRowHeader>
           </template>
           <div slot="actions" slot-scope="props" class="grid min center">
+            <button class="btn icon flat" @click="setActiveRow(props.rowData)">
+              <span class="material-icons">edit</span>
+            </button>
             <button class="btn icon flat error" @click="beginDeleteRow(props.rowData)">
               <span class="material-icons">delete</span>
             </button>
@@ -40,13 +43,15 @@
           </div>
           <!-- This is where the fields are converted into inputs to make the table editable.
                We build slots for every field and inside change html with input and logic -->
-          <GeneralizedInput :key="index" v-for="(field, index) in cleanFields" :slot="field.name"
-                            slot-scope="properties"
-                            :data="properties.rowData" :field="properties.rowField"
-                            v-model="properties.rowData[getFieldID(properties.rowField)]"
-                            v-on:input="changeHandler(properties)"
-                            :errors="$refs.vuetable.tableData[properties.rowIndex].errors">
-          </GeneralizedInput>
+          <template v-for="(field, index) in cleanFields" :slot="field.name" slot-scope="properties">
+            <GeneralizedInput v-if="vuetable.activeRow.id===properties.rowData.id" :key="index"
+                              :data="properties.rowData" :field="properties.rowField"
+                              v-model="properties.rowData[getFieldID(properties.rowField)]"
+                              v-on:input="changeHandler(properties)"
+                              :errors="$refs.vuetable.tableData[properties.rowIndex].errors">
+            </GeneralizedInput>
+            <span v-else :key="index">{{ properties.rowData[getFieldID(properties.rowField)] }}</span>
+          </template>
         </vuetable>
       </div>
       <div class="table-footer">
@@ -156,6 +161,9 @@ export default {
         error: "",
         visible: false,
       },
+      vuetable: {
+        activeRow: {}
+      },
       test: true,
       quickSearch: this.$route.query.search ? this.$route.query.search : '',
       hasChanged: false,
@@ -218,6 +226,9 @@ export default {
     }
   },
   methods: {
+    setActiveRow(rowData) {
+      this.vuetable.activeRow = rowData;
+    },
     updateTotalDataLabel(response) {
       this.totalDataInTable = response.data.pagination.total.toLocaleString();
     },
@@ -254,30 +265,28 @@ export default {
       let data = this.$refs.vuetable.tableData;
 
       data.filter(row => row.changed).map(row => {
-            for (let i = 0; i < this.fields.length; i++) {
-              let field = this.fields[i];
-              let fieldName = field.name;
+        for (let i = 0; i < this.fields.length; i++) {
+          let field = this.fields[i];
+          let fieldName = field.name;
 
-              if (row[fieldName] === '') {
-                row[fieldName] = null;
-              }
-            }
-            console.log("Updating Row")
-            console.log(row);
-            this.updateMethod(row).then(response => {
-              row.changed = false;
-              row.error = false;
-              row.errors = {};
-              this.$emit('update', response.data);
-              this.reRender();
-            }).catch(error => {
-              let response = error.response;
-              row.error = true;
-              row.errors = response.data;
-              this.reRender();
-            });
+          if (row[fieldName] === '') {
+            row[fieldName] = null;
           }
-      );
+        }
+        this.updateMethod(row).then(response => {
+          row.changed = false;
+          row.error = false;
+          row.errors = {};
+          this.$emit('update', response.data);
+          this.reRender();
+          this.vuetable.activeRow = {};
+        }).catch(error => {
+          let response = error.response;
+          row.error = true;
+          row.errors = response.data;
+          this.reRender();
+        });
+      });
     },
     reRender() {
       this.$refs.vuetable.setData(
