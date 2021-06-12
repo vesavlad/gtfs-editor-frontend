@@ -54,16 +54,16 @@
 
 <script>
 import VuetablePaginationDropDown from '@/components/vuetable/VuetablePaginationDropDown.vue';
-import VuetablePagination from "@/components/vuetable/VueTablePagination.vue";
-import tripsAPI from "@/api/trips.api";
-import {debounce} from "debounce";
-import StopTimesMenu from "@/components/stoptimes/StopTimesMenu";
-import MessageModal from "@/components/modal/MessageModal";
+import VuetablePagination from '@/components/vuetable/VueTablePagination.vue';
+import tripsAPI from '@/api/trips.api';
+import {debounce} from 'debounce';
+import StopTimesMenu from '@/components/stoptimes/StopTimesMenu';
+import MessageModal from '@/components/modal/MessageModal';
 
 let Vuetable = require('vuetable-2')
 
 export default {
-  name: "StopTimesTable",
+  name: 'StopTimesTable',
   components: {
     Vuetable: Vuetable.Vuetable,
     VuetablePagination,
@@ -78,7 +78,7 @@ export default {
   },
   data: function () {
     return {
-      quickSearch: "",
+      quickSearch: '',
       doSearch: false,
       showMenu: false,
       activeTrip: null,
@@ -94,26 +94,26 @@ export default {
           type: null
         },
         {
-          name: "trip_id",
-          title: "Trip ID",
+          name: 'trip_id',
+          title: 'Trip ID',
         },
         {
-          name: "stop_count",
-          title: "Stops",
+          name: 'stop_count',
+          title: 'Stops',
         },
         {
-          name: "start_time",
-          title: "Start Time",
+          name: 'start_time',
+          title: 'Start Time',
           formatter: start_time => start_time ? start_time: this.$t('stopTimes.table.emptyStopTimes')
         },
         {
-          name: "end_time",
-          title: "End Time",
+          name: 'end_time',
+          title: 'End Time',
           formatter: end_time => end_time ? end_time: this.$t('stopTimes.table.emptyStopTimes')
         },
         {
-          name: "shape",
-          title: "Has Shape",
+          name: 'shape',
+          title: 'Has Shape',
           formatter: shape => shape ? '<span class="material-icons">check</span>' : '<span class="material-icons">close</span>',
         },
       ],
@@ -136,9 +136,9 @@ export default {
       this.$refs.vuetable.changePage(page);
     },
     makeQueryParams(sortOrder, currentPage, perPage) {
-      let sorting = ""
+      let sorting = ''
       if (sortOrder.length > 0) {
-        sorting = sortOrder[0].sortField + "|" + sortOrder[0].direction;
+        sorting = sortOrder[0].sortField + '|' + sortOrder[0].direction;
       }
       return {
         sort: sorting,
@@ -164,7 +164,7 @@ export default {
       return data;
     },
     beginDeleteST(trip) {
-      this.deleteModal.message = "";
+      this.deleteModal.message = '';
       this.deleteModal.visible = true;
       this.deleteModal.trip = trip;
     },
