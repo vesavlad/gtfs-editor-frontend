@@ -99,11 +99,10 @@ export default {
           name = this.field.fk_name;
         }
         let options = response.data.results.map(result => {
-          let option = {
+          return {
             name: result[name],
             value: result.id
           };
-          return option;
         });
         options.concat([this.selectedOption]);
         this.options = options;
