@@ -1,15 +1,15 @@
 <template>
   <FKSelect v-if="field.type===inputType.FK_SELECT"
-            v-model="val" :field="field" :data="data" :errors="fieldErrors" v-on="$listeners">
+            :value="value" :field="field" :data="data" :errors="fieldErrors" v-on="$listeners">
   </FKSelect>
   <SimpleSelect v-else-if="field.type===inputType.SIMPLE_SELECT"
-                v-model="val" :field="field" :errors="fieldErrors" v-on="$listeners">
+                :value="value" :field="field" :errors="fieldErrors" v-on="$listeners">
   </SimpleSelect>
   <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX"
-                  v-model="val" :field="field" v-on="$listeners">
+                  :value="value" :field="field" v-on="$listeners">
   </SimpleCheckbox>
   <ColorInput v-else-if="field.type===inputType.COLOR"
-              v-model="val" :errors="fieldErrors" v-on="$listeners">
+              :value="value" :errors="fieldErrors" v-on="$listeners">
   </ColorInput>
   <!-- Default -->
   <SimpleInput v-else
