@@ -13,7 +13,7 @@
   </ColorInput>
   <!-- Default -->
   <SimpleInput v-else
-               v-model="val" :field="field" :errors="fieldErrors" v-on="$listeners">
+               :value="value" :field="field" :errors="fieldErrors" v-on="$listeners">
   </SimpleInput>
 </template>
 
@@ -47,6 +47,8 @@ export default {
       type: Object,
       required: true,
     },
+    value: {
+    },
     errors: {
       type: Object,
       default: () => {
@@ -56,13 +58,7 @@ export default {
   },
   data() {
     return {
-      val: this.data[this.getFieldID(this.field)],
       inputType: Enums.InputType
-    }
-  },
-  watch: {
-    data() {
-      this.val = this.data[this.getFieldID(this.field)]
     }
   },
   computed: {
