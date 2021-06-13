@@ -10,9 +10,11 @@
     </div>
     <div class="table-content">
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
-                @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :transform="transformData">
+                @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :transform="transformData"
+                :row-class="getRowClass">
         <div slot="actions" slot-scope="props" class="flex">
-          <button class="btn flat icon" @click="$emit('focus-st', props.rowData)" alt="Display stop_times.">
+          <button class="btn flat icon" @click="tripWithFocus=props.rowData;$emit('focus-st', props.rowData)"
+                  alt="Display stop_times.">
             <span class="material-icons">my_location</span>
           </button>
           <button v-if="props.rowData.stop_times.length===0" class="btn flat icon"
@@ -81,7 +83,8 @@ export default {
       quickSearch: '',
       doSearch: false,
       showMenu: false,
-      activeTrip: null,
+      tripWithFocus: {},
+      activeTrip: {},
       deleteModal: {
         visible: false,
         trip: null,
@@ -108,12 +111,12 @@ export default {
         {
           name: 'start_time',
           title: 'Start Time',
-          formatter: start_time => start_time ? start_time: this.$t('stopTimes.table.emptyStopTimes')
+          formatter: start_time => start_time ? start_time : this.$t('stopTimes.table.emptyStopTimes')
         },
         {
           name: 'end_time',
           title: 'End Time',
-          formatter: end_time => end_time ? end_time: this.$t('stopTimes.table.emptyStopTimes')
+          formatter: end_time => end_time ? end_time : this.$t('stopTimes.table.emptyStopTimes')
         },
         {
           name: 'shape',
@@ -125,6 +128,12 @@ export default {
     };
   },
   methods: {
+    getRowClass(rowData) {
+      if (rowData.id === this.tripWithFocus.id) {
+        return 'active';
+      }
+      return '';
+    },
     onPaginationData(paginationData) {
       if (paginationData.current_page !== this.current_page || paginationData.last_page !== this.last_page) {
         this.current_page = paginationData.current_page;
