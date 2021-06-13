@@ -38,7 +38,8 @@
           </div>
         </div>
         <div class="table-content">
-          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="vuetable.fields" :api-mode="false" :data="stopTimes">
+          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="vuetable.fields" :api-mode="false" :data="stopTimes"
+                    :row-class="getRowClass">
             <div slot="actions" slot-scope="props" class="flex">
               <button class="btn flat icon" @click="setActiveRow(props.rowData)" alt="Display stop_times.">
                 <span class="material-icons">edit</span>
@@ -238,6 +239,12 @@ export default {
     });
   },
   methods: {
+    getRowClass(rowData) {
+      if (rowData.id === this.vuetable.activeRow.id) {
+        return 'active';
+      }
+      return '';
+    },
     setOptionalFieldsVisibility() {
       this.vuetable.fields = this.vuetable.showOptionalFields ? this.vuetable.fullFields : this.vuetable.baseFields;
     },
