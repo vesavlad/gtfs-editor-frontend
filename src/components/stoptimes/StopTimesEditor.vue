@@ -23,7 +23,8 @@
           </label>
           <div class="btn-list">
             <button class="btn icon flat" @click="saveStopTimes"><span class="material-icons">check</span></button>
-            <button class="btn icon flat" @click="exit"><span class="material-icons">close</span></button>
+            <button class="btn icon flat" @click="closeWarning.visible=true"><span class="material-icons">close</span>
+            </button>
             <label class="checkbox">
               <input type="checkbox" id="enable-drag" v-model="dragEnabled">
               <div class="btn icon flat" :data-info="$t('stopTimes.editor.enableCustomSortTable')"><span
@@ -96,6 +97,15 @@
         {{ $t('stopTimes.editor.calculateStopTimesBasedOnSpeed.thirdParagraph') }}
         <SimpleSelect :field="speedModal.selectField" v-model="speedModal.toStop" :errors="[]">
         </SimpleSelect>
+      </template>
+    </MessageModal>
+    <MessageModal :show="closeWarning.visible" @ok="exit" @cancel="closeWarning.visible = false"
+                  @close="closeWarning.visible = false" :showCancelButton="true" :type="Enums.MessageModalType.WARNING">
+      <template v-slot:m-title>
+        <h2>{{ $t('stopTimes.editor.closeWarning.title') }}</h2>
+      </template>
+      <template v-slot:m-content>
+        <p>{{ $t('stopTimes.editor.closeWarning.body') }}</p>
       </template>
     </MessageModal>
   </div>
@@ -208,6 +218,9 @@ export default {
         },
         speed: 60,
         speedFormatError: null
+      },
+      closeWarning: {
+        visible: false
       }
     };
   },
@@ -240,7 +253,7 @@ export default {
   methods: {
     getRowClass(rowData) {
       if (rowData.id === this.vuetable.activeRow.id) {
-        return 'active';
+        return 'editable';
       }
       return '';
     },
@@ -628,6 +641,7 @@ export default {
       this.$router.push({name: "StopTimes", params: {projectId: this.$route.params.projectId}});
     },
     flyToStop(rowData) {
+      // agregar clase focus a la tabla cuando se llame esta función
       let stop = this.stop.stopMap.get(rowData.stop);
       this.map.flyTo({
         center: [stop.stop_lon, stop.stop_lat],

@@ -130,7 +130,7 @@ export default {
   methods: {
     getRowClass(rowData) {
       if (rowData.id === this.tripWithFocus.id) {
-        return 'active';
+        return 'focus';
       }
       return '';
     },

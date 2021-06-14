@@ -145,7 +145,11 @@
         "title": "¿Estás segur@ que quieres ordenar las paradas por su distancia?",
         "body": "La secuencia de paradas actual será reemplazada. El punto más cercano a la ruta será usado para determinar su posición. Sin embargo, esto podría fallar si no es posible determinar la distancia. Por ejemplo, si el shape pasa dos veces por una parada."
       },
-      "recordsSaved": "Stop times guardados exitosamente"
+      "recordsSaved": "Stop times guardados exitosamente",
+      "closeWarning": {
+        "title": "Descartar cambios",
+        "body": "¿Estás segur@ que quieres descartar todos los cambios?"
+      }
     },
     "table": {
       "emptyStopTimes": "Sin dato"
