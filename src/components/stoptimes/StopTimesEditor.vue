@@ -22,7 +22,7 @@
             <input type="text" v-model="localTrip.trip_id">
           </label>
           <div class="btn-list">
-            <button class="btn icon flat" @click="saveAndExit"><span class="material-icons">check</span></button>
+            <button class="btn icon flat" @click="saveStopTimes"><span class="material-icons">check</span></button>
             <button class="btn icon flat" @click="exit"><span class="material-icons">close</span></button>
             <label class="checkbox">
               <input type="checkbox" id="enable-drag" v-model="dragEnabled">
@@ -595,7 +595,7 @@ export default {
       let nearest = turf.nearestPointOnLine(this.shape.turfShape, point);
       return nearest.properties.location.toFixed(3);
     },
-    saveAndExit() {
+    saveStopTimes() {
       let data = {
         ...this.localTrip,
         stop_times: this.stopTimes,
@@ -612,7 +612,13 @@ export default {
           throw 'Mode is not valid';
       }
       save(this.projectId, data).then(() => {
-        this.$emit('close');
+        this.$toast.open({
+          message: 'wena wena',
+          type: 'success',
+          position: 'bottom',
+          duration: 1000,
+          pauseOnHover: false
+        });
       }).catch(err => {
         this.errors = err.response.data;
         console.log(this.errors);

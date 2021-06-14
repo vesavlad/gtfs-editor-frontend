@@ -7,10 +7,14 @@ import i18n from './i18n'
 import VTooltip from 'v-tooltip'
 import VueInputAutowidth from 'vue-input-autowidth'
 import Enums from "@/utils/enums";
+import VueToast from 'vue-toast-notification';
 
 require('@/assets/css/base.css')
 require('@/assets/css/style.css')
 
+import 'vue-toast-notification/dist/theme-default.css';
+
+Vue.use(VueToast)
 Vue.use(VueInputAutowidth)
 Vue.use(VTooltip, {
   themes: {
