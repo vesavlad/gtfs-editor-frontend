@@ -477,7 +477,7 @@ export default {
     calculateTimes() {
       if (this.stopTimes.length) {
         let speed = Number(this.speedModal.speed);
-        if (Number.isNaN(speed)) {
+        if (this.speedModal.speed === '' || Number.isNaN(speed) || speed === 0) {
           this.speedModal.speedFormatError = this.$t('stopTimes.editor.calculateStopTimesBasedOnSpeed.speedFormatError');
           return;
         }
