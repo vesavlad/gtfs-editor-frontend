@@ -44,13 +44,12 @@
           <!-- This is where the fields are converted into inputs to make the table editable.
                We build slots for every field and inside change html with input and logic -->
           <template v-for="(field, index) in cleanFields" :slot="field.name" slot-scope="properties">
-            <GeneralizedInput v-if="vuetable.activeRow.id===properties.rowData.id" :key="index"
+            <GeneralizedInput :readonly="vuetable.activeRow.id!==properties.rowData.id" :key="index"
                               :data="properties.rowData" :field="properties.rowField"
                               v-model="properties.rowData[getFieldID(properties.rowField)]"
                               v-on:input="changeHandler(properties)"
                               :errors="$refs.vuetable.tableData[properties.rowIndex].errors">
             </GeneralizedInput>
-            <span v-else :key="index">{{ properties.rowData[getFieldID(properties.rowField)] }}</span>
           </template>
         </vuetable>
       </div>

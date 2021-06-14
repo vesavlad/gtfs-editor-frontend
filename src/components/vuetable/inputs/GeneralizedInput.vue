@@ -1,19 +1,19 @@
 <template>
   <FKSelect v-if="field.type===inputType.FK_SELECT"
-            :value="value" :field="field" :data="data" :errors="fieldErrors" v-on="$listeners">
+            :value="value" :field="field" :data="data" :errors="fieldErrors" :readonly="readonly" v-on="$listeners">
   </FKSelect>
   <SimpleSelect v-else-if="field.type===inputType.SIMPLE_SELECT"
-                :value="value" :field="field" :errors="fieldErrors" v-on="$listeners">
+                :value="value" :field="field" :errors="fieldErrors" :readonly="readonly" v-on="$listeners">
   </SimpleSelect>
   <SimpleCheckbox v-else-if="field.type===inputType.CHECKBOX"
-                  :value="value" :field="field" v-on="$listeners">
+                  :value="value" :field="field" :readonly="readonly" v-on="$listeners">
   </SimpleCheckbox>
   <ColorInput v-else-if="field.type===inputType.COLOR"
-              :value="value" :errors="fieldErrors" v-on="$listeners">
+              :value="value" :errors="fieldErrors" :readonly="readonly" v-on="$listeners">
   </ColorInput>
   <!-- Default -->
   <SimpleInput v-else
-               :value="value" :field="field" :errors="fieldErrors" v-on="$listeners">
+               :value="value" :field="field" :errors="fieldErrors" :readonly="readonly" v-on="$listeners">
   </SimpleInput>
 </template>
 
@@ -47,14 +47,17 @@ export default {
       type: Object,
       required: true,
     },
-    value: {
-    },
+    value: {},
     errors: {
       type: Object,
       default: () => {
         return {};
       },
     },
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

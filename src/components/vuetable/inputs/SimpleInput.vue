@@ -1,9 +1,10 @@
 <template>
-  <input :value="value" @input="$emit('input', $event.target.value)"
+  <input v-if="!readonly" :value="value" @input="$emit('input', $event.target.value)"
          :type="field.type" :placeholder="`${field.title.toLowerCase()}`" @focus="localErrors=[]"
          :class="{error: hasErrors}"
          v-tooltip="{ theme: 'error-tooltip', content: hasErrors?errors[0]:'', shown: hasErrors }"
          v-autowidth="{minWidth: 'calc(100% - 20px)'}"/>
+  <span v-else>{{ value }}</span>
 </template>
 
 <script>
@@ -19,6 +20,10 @@ export default {
     },
     errors: {
       type: Array,
+    },
+    readonly: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

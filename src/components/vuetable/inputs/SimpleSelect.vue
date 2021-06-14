@@ -1,9 +1,10 @@
 <template>
-  <MyMultiselect v-model="val" :options="field.options" :showLabels="false" track-by="value"
+  <MyMultiselect v-if="!readonly" v-model="val" :options="field.options" :showLabels="false" track-by="value"
                  label="name" @input="onChange" @open="localErrors=[]" :class="{error: hasErrors}"
                  :placeholder="$t('general.select')"
                  v-tooltip="{ theme: 'error-tooltip', content: hasErrors?localErrors[0]:'', shown: hasErrors }">
   </MyMultiselect>
+  <span v-else>{{ translateValueToOption(value).name }}</span>
 </template>
 
 <script>
@@ -25,6 +26,10 @@ export default {
     errors: {
       type: Array,
       required: true
+    },
+    readonly: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

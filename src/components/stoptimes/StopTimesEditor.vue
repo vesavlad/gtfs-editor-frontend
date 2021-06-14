@@ -50,13 +50,12 @@
             </div>
             <template v-for="(field, index) in getProperFields(vuetable.fields, {exclusions: vuetable.exclusions})"
                       :slot="field.name" slot-scope="props">
-              <GeneralizedInput v-if="vuetable.activeRow.stop_id===props.rowData.stop_id" :key="index"
+              <GeneralizedInput :readonly="vuetable.activeRow.stop_id!==props.rowData.stop_id" :key="index"
                                 v-model="props.rowData[getFieldID(props.rowField)]"
                                 :data="props.rowData"
                                 :field="props.rowField"
                                 :errors="errors.stop_times?errors.stop_times[props.rowIndex]:{}">
               </GeneralizedInput>
-              <span v-else :key="index">{{ props.rowData[getFieldID(props.rowField)] }}</span>
             </template>
           </vuetable>
           <DraggableTable v-else :fields="vuetable.baseFields" :rows="stopTimes" v-model="stopTimes"

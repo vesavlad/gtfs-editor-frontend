@@ -1,6 +1,6 @@
 <template>
   <label class="checkbox">
-    <input type="checkbox" v-model="val" @input="$emit('input', $event.target.checked)"/>
+    <input :disabled="readonly" type="checkbox" v-model="val" @input="$emit('input', $event.target.checked)"/>
     <div class="checkbox-name"><span>{{ label }}</span></div>
   </label>
 </template>
@@ -15,6 +15,10 @@ export default {
     value: {
       required: true,
     },
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
