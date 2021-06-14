@@ -613,7 +613,7 @@ export default {
       }
       save(this.projectId, data).then(() => {
         this.$toast.open({
-          message: 'wena wena',
+          message: this.$t('stopTimes.editor.recordsSaved'),
           type: 'success',
           position: 'bottom',
           duration: 1000,

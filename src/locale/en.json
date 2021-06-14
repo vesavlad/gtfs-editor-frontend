@@ -144,7 +144,8 @@
       "orderStopsByDistance": {
         "title": "Are you sure you want to automatically order the stops?",
         "body": "The current Stop Sequence will be overwritten. The closest point of the Shape will be used to determine the position, however this may fail if there's no way to accurately determine where this is. For instance, if the Shape passes twice next to the same Stop."
-      }
+      },
+      "recordsSaved": "Stop times saved successfully"
     },
     "table": {
       "emptyStopTimes": "Empty"
