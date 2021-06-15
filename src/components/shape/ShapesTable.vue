@@ -1,5 +1,5 @@
 <template>
-  <div class="side-panel">
+  <div class="map-sidebar">
     <div class="side-table-header">
       <form class="search" @submit.stop.prevent="doSearch">
         <div class="input-group">
@@ -30,12 +30,10 @@
       </Vuetable>
     </div>
     <div class="table-footer">
-      <div class="grid-pagination">
-        <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
-        </VuetablePagination>
-        <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
-        </VuetablePaginationDropDown>
-      </div>
+      <VuetablePagination ref="pagination" @vuetable-pagination:change-page="onChangePage">
+      </VuetablePagination>
+      <VuetablePaginationDropDown ref="paginationDropDown" @vuetable-pagination:change-page="onChangePage">
+      </VuetablePaginationDropDown>
     </div>
     <MessageModal :show="deleteModal.visible" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
                   :type="Enums.MessageModalType.WARNING"

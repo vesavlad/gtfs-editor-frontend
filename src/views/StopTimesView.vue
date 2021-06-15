@@ -6,7 +6,7 @@
     <div class="map-container">
       <div class="dynamic-map-container">
         <div class="top-map-bar">
-          <div class="right-content grid center">
+          <div class="right-content">
             <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
           </div>
         </div>

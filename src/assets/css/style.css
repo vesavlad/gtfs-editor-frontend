@@ -169,13 +169,15 @@ input[type="search"]::-webkit-search-cancel-button {
 .checkbox input[type="checkbox"]:checked ~ .checkbox-name {background-color: var(--link); color: white;}
 .checkbox input[type="checkbox"]:checked ~ .checkbox-name:hover {background-color: var(--link-hover);}
 .checkbox input[type="checkbox"]:checked ~ .icon {color: white; background-color: rgba(255,255,255,.1);}
+.checkbox input[type="checkbox"]:disabled ~ .checkbox-name, .checkbox input[type="checkbox"]:disabled ~ .checkbox-name:hover {cursor: default; background-color: transparent; color: var(--gris-claro2);}
+.checkbox input[type="checkbox"]:checked:disabled ~ .checkbox-name, .checkbox input[type="checkbox"]:checked:disabled ~ .checkbox-name:hover {background-color: var(--link); color: white;}
 
 .input-color {display: grid; grid-template-columns: 1fr auto; padding: 4px 8px; background-color: var(--gris-claro); border-radius: 8px; grid-gap: 5px; box-shadow: inset 0 1px 0 0 rgba(0,0,0,0.05);}
 .input-color.error {background: #F0ECEC; border: 1px solid rgba(198,59,46,0.40);}
 .input-color:focus {box-shadow: 0 2px 5px rgba(0,0,0,0.05), 0 4px 10px rgba(84,101,115,0.15); background-color: white;}
 .input-color input {all: revert; font-family: 'Roboto',sans-serif;}
 .input-color input[type="text"] {border: 0; background-color: transparent; min-width: 60px; width: 100%; color: var(--gris-osc2); font-size: 14px;}
-input[type="color"] {
+input[type="color"], .color-indicator {
     -webkit-appearance: none;
     border: var(--border);
     padding: 0px;
@@ -185,9 +187,10 @@ input[type="color"] {
     cursor: pointer;
     border-radius: 4px;
 }
+.color-indicator {cursor: default; margin: 0 auto;}
 input[type="color"]:focus,.input-color input[type="text"]:focus {border: 0; outline: 0;}
 .input-color input[type="text"]:focus {background-color: transparent; box-shadow: none; font-weight: 500; color: var(--negro);}
-
+input[type="date" i]::-webkit-calendar-picker-indicator {color: var(--link);}
 
 /* ============  ELEMENTOS BASE  ============== */
 .btn {
@@ -246,12 +249,13 @@ input[type="color"]:focus,.input-color input[type="text"]:focus {border: 0; outl
     display: block;
     line-height: 0;
     padding: 0;
-    color: var(--link);
+    color: var(--gris-medio);
     background-color: transparent;
     font-size: 24px;
     position: relative;
     margin: 0 auto;
 }
+.btn.icon:hover {color: var(--link);}
 .btn.icon:before,.icon:before {display: none;}
 .icon {display: flex; align-items: center; justify-content: center;}
 .btn.icon.active {color: var(--link); box-shadow: none;}
@@ -466,7 +470,7 @@ input[type="file"]:disabled ~ .btn:before {display: none;}
 .report-box.errors, .report-box.error h4 {border-color: var(--error); color: var(--error);}
 .report-box.warnings, .report-box.warnings h4 {border-color: var(--warning); color: var(--warning);}
 
-    /* ============  TABLES  ============== */
+/* ============  TABLES  ============== */
 
 .table-container {margin-bottom: 20px;}
 .table-header {padding: 20px; display: grid; grid-gap: 10px; grid-template-columns: minmax(100px, 320px) 1fr auto; align-items: center;}
@@ -504,7 +508,10 @@ table th {
     border: 1px solid #D4DDE1;
     border-bottom-width: 3px;
 }
+.focus .btn-focus {color: var(--link);}
 .vuetable-td-stop_sequence {text-align: center; color: var(--gris-medio); font-weight: 500;}
+.vuetable-slot {white-space: nowrap;}
+
 
 /* Multiselect */
 .multiselect {
@@ -547,6 +554,9 @@ tr.error>td {
 .page-item.active .page-link {font-weight: bold; color: var(--gris-medio2); background-color: var(--gris-claro); cursor: default;}
 .page-item.disabled .page-link,.page-item.disabled .page-link:hover { color: var(--gris-claro2); background-color: transparent; cursor: default;}
 
+/* ============  TOAST  ============== */
+
+.v-toast__item p {color: white;}
 
 /* ============  MENU LIST  ============== */
 

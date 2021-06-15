@@ -6,7 +6,7 @@
     <input type="color" v-model="val" @input="$emit('input', getValue($event.target))"
            @focus="localErrors=[]"/>
   </div>
-  <div v-else>{{ val }}</div>
+  <div v-else class="color-indicator" :style="'background-color:'+val+';'"></div>
 </template>
 
 <script>

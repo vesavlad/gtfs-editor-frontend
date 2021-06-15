@@ -1,20 +1,17 @@
 <template>
   <div class="section shapes">
-    <div class="grid container">
+    <div class="container">
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
     <div class="map-container">
       <div class="dynamic-map-container">
         <div class="top-map-bar">
           <div class="right-content">
-            <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i>
-            </button>
+            <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
           </div>
         </div>
-        <div class="map-sidebar">
-          <ShapesTable ref="table" :project="$route.params.projectId" @focus-shape="displayShape"
+        <ShapesTable ref="table" :project="$route.params.projectId" @focus-shape="displayShape"
                        @select-range="beginRangeSelection"></ShapesTable>
-        </div>
         <ShapesMap ref="map" :project="$route.params.projectId"
                    @selected-range="goToEditRange($event)"></ShapesMap>
       </div>
