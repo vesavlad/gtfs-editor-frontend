@@ -61,7 +61,7 @@ export default {
       type: String,
       required: true,
       validator(value) {
-        return [Enums.MessageModalType.ERROR, Enums.MessageModalType.WARNING].indexOf(value) !== -1;
+        return Object.values(Enums.MessageModalType).indexOf(value) !== -1;
       }
     }
   },
