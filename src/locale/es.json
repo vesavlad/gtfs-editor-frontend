@@ -124,7 +124,6 @@
     "menu": {
       "edit": "Editar",
       "duplicateExpedition": "Duplicar expedición",
-      "duplicateExpeditionUsingHeadway": "Duplicar expedición usando intervalos",
       "duplicationModal": {
         "duplicate": "Duplicar",
         "title": "Crear copia de trip {tripId}",

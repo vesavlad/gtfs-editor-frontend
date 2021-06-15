@@ -35,13 +35,6 @@ export default {
           classes: []
         },
         {
-          icon: 'content_copy',
-          label: 'stopTimes.menu.duplicateExpeditionUsingHeadway',
-          eventName: 'copy-trip-using-headway',
-          isDisabled: false,
-          classes: []
-        },
-        {
           icon: 'delete',
           label: 'general.delete',
           eventName: 'delete',

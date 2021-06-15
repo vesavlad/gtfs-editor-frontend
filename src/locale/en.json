@@ -124,7 +124,6 @@
     "menu": {
       "edit": "Edit",
       "duplicateExpedition": "Duplicate expedition",
-      "duplicateExpeditionUsingHeadway": "Duplicate expedition using headway",
       "duplicationModal": {
         "duplicate": "Duplicate",
         "title": "Creating copy of trip {tripId}",
