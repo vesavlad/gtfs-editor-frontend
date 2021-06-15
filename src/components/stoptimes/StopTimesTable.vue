@@ -25,7 +25,7 @@
             <i class="material-icons">more_vert</i>
             <StopTimesMenu v-if="showMenu && activeTrip.id===props.rowData.id"
                            @edit="editStopTimes"
-                           @duplicate-trip="duplicateStopTimes"
+                           @duplicate-trip="showDuplicationModal"
                            @copy-trip-using-headway="copyStopTimesUsingHeadway"
                            @delete="beginDeleteST(props.rowData)"
                            @close="showMenu=false">
@@ -48,6 +48,23 @@
       </template>
       <template v-slot:m-content>
         <span>{{ deleteModal.message }}</span>
+      </template>
+    </MessageModal>
+    <MessageModal :show="duplicationModal.visible" @ok="duplicateStopTimes" @cancel="duplicationModal.visible = false"
+                  @close="duplicationModal.visible = false" :showCancelButton="true"
+                  :okButtonLabel="$t('stopTimes.menu.duplicationModal.duplicate')" :type="Enums.MessageModalType.WARNING">
+      <template v-slot:m-title>
+        <h2>{{ $t('stopTimes.menu.duplicationModal.title', {tripId: activeTrip.trip_id}) }}</h2>
+      </template>
+      <template v-slot:m-content>
+        {{ $t('stopTimes.menu.duplicationModal.createCopyOf', {tripId: activeTrip.trip_id}) }}
+        <input v-model="duplicationModal.headway" type="number"
+               v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.headwayFormatError, shown: !!duplicationModal.headwayFormatError }"
+               @focus="duplicationModal.headwayFormatError=null">
+        {{ $t('stopTimes.menu.duplicationModal.secondsWithTripId') }}
+        <input v-model="duplicationModal.newTripId"
+               v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.tripIdFormatError, shown: !!duplicationModal.tripIdFormatError }"
+               @focus="duplicationModal.tripIdFormatError=null">
       </template>
     </MessageModal>
   </div>
@@ -90,6 +107,13 @@ export default {
         trip: null,
         message: ''
       },
+      duplicationModal: {
+        visible: false,
+        headway: 0,
+        newTripId: null,
+        headwayFormatError: null,
+        tripIdFormatError: null
+      },
       fields: [
         {
           name: 'actions',
@@ -128,6 +152,10 @@ export default {
     };
   },
   methods: {
+    showDuplicationModal() {
+      this.duplicationModal.visible = true;
+      this.duplicationModal.newTripId = `${this.$t('stopTimes.menu.duplicationModal.prefixForNewTrip')} ${this.activeTrip.trip_id}`;
+    },
     getRowClass(rowData) {
       if (rowData.id === this.tripWithFocus.id) {
         return 'focus';
@@ -207,15 +235,58 @@ export default {
         }
       });
     },
+    timeToSeconds(timeString) {
+      let times = timeString.split(":").map(t => parseInt(t));
+      let seconds = 0;
+      for (let i = 0; i < times.length; i++) {
+        seconds *= 60;
+        seconds += times[i];
+      }
+      return seconds;
+    },
+    secondsToTime(seconds) {
+      return new Date(null, null, null, null, null, seconds).toTimeString().match(/\d{2}:\d{2}:\d{2}/)[0];
+    },
+    addHeadway(time, headway) {
+      return this.secondsToTime(this.timeToSeconds(time) + headway);
+    },
     duplicateStopTimes() {
-      this.$router.push({
-        name: 'editStopTimes',
-        params: {
-          projectId: this.$route.params.projectId,
-          tripId: this.activeTrip.id,
-          mode: this.Enums.StopTimesEditorMode.DUPLICATE
+      let headway = Number(this.duplicationModal.headway);
+      if (this.duplicationModal.headway === '' || Number.isNaN(headway) || headway === 0) {
+        this.duplicationModal.headwayFormatError = this.$t('stopTimes.menu.duplicationModal.headwayFormatError');
+      } else if (!this.duplicationModal.newTripId) {
+        this.duplicationModal.tripIdFormatError = this.$t('stopTimes.menu.duplicationModal.tripIdFormatError');
+      } else {
+        let newTrip = {
+          ...this.activeTrip,
+          trip_id: this.duplicationModal.newTripId
         }
-      });
+        delete newTrip.id;
+        newTrip.stop_times.forEach(st => {
+          if (st.arrival_time) {
+            st.arrival_time = this.addHeadway(st.arrival_time, headway);
+          }
+          if (st.departure_time) {
+            st.departure_time = this.addHeadway(st.departure_time, headway);
+          }
+          delete st.id;
+        });
+        tripsAPI.tripsAPI.create(this.$route.params.projectId, newTrip).then(response => {
+          this.duplicationModal.visible = false;
+          let newTripData = response.data;
+          this.$router.push({
+            name: 'editStopTimes',
+            params: {
+              projectId: this.$route.params.projectId,
+              tripId: newTripData.id,
+              mode: this.Enums.StopTimesEditorMode.EDIT
+            }
+          });
+        }).catch(err => {
+          console.log(err.response);
+          this.duplicationModal.tripIdFormatError = this.$t('stopTimes.menu.duplicationModal.tripIdDuplicated');
+        });
+      }
     },
     copyStopTimesUsingHeadway() {
       this.$router.push({

@@ -124,7 +124,17 @@
     "menu": {
       "edit": "Edit",
       "duplicateExpedition": "Duplicate expedition",
-      "duplicateExpeditionUsingHeadway": "Duplicate expedition using headway"
+      "duplicateExpeditionUsingHeadway": "Duplicate expedition using headway",
+      "duplicationModal": {
+        "duplicate": "Duplicate",
+        "title": "Creating copy of trip {tripId}",
+        "createCopyOf": "Create copy of trip \"{tripId}\" with headway of:",
+        "secondsWithTripId": "seconds with trip id:",
+        "prefixForNewTrip": "copy of",
+        "headwayFormatError": "Headway value is not a valid number",
+        "tripIdFormatError": "Trip id is not valid",
+        "tripIdDuplicated": "Trip id is duplicated"
+      }
     },
     "deleteModalTitle": "Are you sure you want to delete the stop-times for trip \"{tripId}\"?",
     "editor": {
