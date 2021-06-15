@@ -320,14 +320,15 @@ export default {
           minzoom: minZoom,
           layout: {
             'text-field': '{label}',
-            'text-size': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom.map((el, index) => index % 2 ? el * 2 : el)),
-            'text-anchor': 'top',
-            'text-offset': [0, 0.5],
-            'text-allow-overlap': true,
+            'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
             'icon-image': 'bg-stop-name',
             'icon-anchor': 'bottom',
+            'text-anchor': 'top',
+            'text-offset': [0, 1.3],
+            'text-size': 14,
             'icon-text-fit': 'both',
             'icon-text-fit-padding': [4, 6, 0, 6],
+            'text-allow-overlap': true,
           },
           paint: {
             'text-color': config.stop_label_color,
@@ -345,7 +346,7 @@ export default {
           'text-size': 14,
           'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
           'text-anchor': 'top',
-          'text-offset': [0, -0.4],
+          'text-offset': [-0.03, -0.4],
           'text-allow-overlap': true,
         },
         paint: {
