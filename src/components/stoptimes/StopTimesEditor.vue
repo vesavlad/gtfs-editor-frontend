@@ -536,9 +536,6 @@ export default {
       seconds = pad(seconds);
       return `${hours}:${minutes}:${seconds}`;
     },
-    addHeadway(time, headway) {
-      return this.secondsToTime(this.timeToSeconds(time) + headway);
-    },
     automaticallyOrder() {
       this.localTrip.stop_times.sort((st1, st2) => parseFloat(st1.shape_dist_traveled) - parseFloat(st2.shape_dist_traveled));
       this.orderModal.visible = false;
