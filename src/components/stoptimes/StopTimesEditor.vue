@@ -240,7 +240,7 @@ export default {
   methods: {
     getRowClass(rowData) {
       if (rowData.id === this.vuetable.activeRow.id) {
-        return 'editable';
+        return 'changed';
       }
       return '';
     },
