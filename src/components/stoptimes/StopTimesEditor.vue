@@ -387,6 +387,7 @@ export default {
             timepoint: null
           };
           stopTime.shape_dist_traveled = this.calculatePosition(stopTime);
+          stopTime.stop_sequence = this.localTrip.stop_times.length + 1;
           this.localTrip.stop_times.push(stopTime);
           this.vuetable.activeRow = stopTime;
         } else {
@@ -541,10 +542,10 @@ export default {
     automaticallyOrder() {
       this.localTrip.stop_times.sort((st1, st2) => parseFloat(st1.shape_dist_traveled) - parseFloat(st2.shape_dist_traveled));
       this.orderModal.visible = false;
+      this.calculateSTPositions();
       this.updateStops();
     },
     updateStops() {
-      this.calculateSTPositions();
       let geojson = {
         type: 'FeatureCollection',
         features: this.generateStopFeatures(),
