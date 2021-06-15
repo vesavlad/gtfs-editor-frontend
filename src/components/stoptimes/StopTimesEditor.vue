@@ -471,7 +471,6 @@ export default {
           this.shape.turfShape = turf.lineString(points);
           geojson.geometry.coordinates = points;
           this.map.getSource(this.shape.sourceName).setData(geojson);
-          this.calculateSTPositions();
         }).catch(err => console.log(err));
       } else {
         window.alert('Warning: editing a StopTimes without a shape is not supported');
