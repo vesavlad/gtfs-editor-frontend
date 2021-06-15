@@ -3,11 +3,12 @@
     <div class="top-map-bar">
       <div class="right-content grid center">
         <button class="btn btn-outline-secondary" @click="orderModal.visible=true"
-                :disabled="this.stopTimes.length===0">
+                :disabled="this.localTrip.stop_times.length===0">
           <span>{{ $t('stopTimes.editor.reorderStopsUsingShape') }}</span>
           <span class="material-icons">low_priority</span>
         </button>
-        <button class="btn btn-outline-secondary" @click="openSpeedModal" :disabled="this.stopTimes.length===0">
+        <button class="btn btn-outline-secondary" @click="openSpeedModal"
+                :disabled="this.localTrip.stop_times.length===0">
           <span>{{ $t('stopTimes.editor.calculateTimes') }}</span><span class="material-icons">restore</span>
         </button>
       </div>
@@ -39,8 +40,8 @@
           </div>
         </div>
         <div class="table-content">
-          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="vuetable.fields" :api-mode="false" :data="stopTimes"
-                    :row-class="getRowClass">
+          <vuetable v-if="!dragEnabled" ref="vuetable" :fields="vuetable.fields" :api-mode="false"
+                    :data="localTrip.stop_times" :row-class="getRowClass">
             <div slot="actions" slot-scope="props" class="flex">
               <button class="btn flat icon" @click="setActiveRow(props.rowData)" alt="Display stop_times.">
                 <span class="material-icons">edit</span>
@@ -59,8 +60,8 @@
               </GeneralizedInput>
             </template>
           </vuetable>
-          <DraggableTable v-else :fields="vuetable.baseFields" :rows="stopTimes" v-model="stopTimes"
-                          @input="$nextTick(calculateSeqs)"></DraggableTable>
+          <DraggableTable v-else :fields="vuetable.baseFields" :rows="localTrip.stop_times"
+                          v-model="localTrip.stop_times" @input="$nextTick(calculateSequenceNumber)"></DraggableTable>
         </div>
         <div class="table-footer">
 
@@ -202,7 +203,6 @@ export default {
       },
       localTrip: this.trip,
       errors: {},
-      stopTimes: this.trip.stop_times,
       dragEnabled: false,
       orderModal: {
         visible: false,
@@ -227,7 +227,6 @@ export default {
   watch: {
     trip() {
       this.localTrip = {...this.trip};
-      this.stopTimes = this.localTrip.stop_times;
     }
   },
   mounted() {
@@ -388,10 +387,10 @@ export default {
             timepoint: null
           };
           stopTime.shape_dist_traveled = this.calculatePosition(stopTime);
-          this.stopTimes.push(stopTime);
+          this.localTrip.stop_times.push(stopTime);
           this.vuetable.activeRow = stopTime;
         } else {
-          this.stopTimes = this.stopTimes.filter(st => st.stop !== stop.id);
+          this.localTrip.stop_times = this.localTrip.stop_times.filter(st => st.stop !== stop.id);
         }
         this.updateStops();
       });
@@ -479,28 +478,28 @@ export default {
       }
     },
     openSpeedModal() {
-      this.speedModal.fromStop = this.stopTimes[0].stop_sequence;
-      this.speedModal.toStop = this.stopTimes[this.stopTimes.length - 1].stop_sequence;
+      this.speedModal.fromStop = this.localTrip.stop_times[0].stop_sequence;
+      this.speedModal.toStop = this.localTrip.stop_times[this.localTrip.stop_times.length - 1].stop_sequence;
       this.speedModal.visible = true;
       this.speedModal.selectField.options = [];
-      this.stopTimes.forEach((st) => {
+      this.localTrip.stop_times.forEach((st) => {
         let title = `${st.stop_id} (${st.stop_sequence})`;
         this.speedModal.selectField.options.push({name: title, value: st.stop_sequence});
       })
     },
     calculateTimes() {
-      if (this.stopTimes.length) {
+      if (this.localTrip.stop_times.length) {
         let speed = Number(this.speedModal.speed);
         if (this.speedModal.speed === '' || Number.isNaN(speed) || speed === 0) {
           this.speedModal.speedFormatError = this.$t('stopTimes.editor.calculateStopTimesBasedOnSpeed.speedFormatError');
           return;
         }
-        let first = this.stopTimes[this.speedModal.fromStop - 1];
+        let first = this.localTrip.stop_times[this.speedModal.fromStop - 1];
         if (!first.arrival_time) {
           return;
         }
         let headway = this.timeToSeconds(first.arrival_time);
-        this.stopTimes.forEach(st => {
+        this.localTrip.stop_times.forEach(st => {
           if (st.stop_sequence < this.speedModal.fromStop || this.speedModal.toStop < st.stop_sequence) {
             return st;
           }
@@ -541,7 +540,7 @@ export default {
       return this.secondsToTime(this.timeToSeconds(time) + headway);
     },
     automaticallyOrder() {
-      this.stopTimes.sort((st1, st2) => parseFloat(st1.shape_dist_traveled) - parseFloat(st2.shape_dist_traveled));
+      this.localTrip.stop_times.sort((st1, st2) => parseFloat(st1.shape_dist_traveled) - parseFloat(st2.shape_dist_traveled));
       this.orderModal.visible = false;
       this.updateStops();
     },
@@ -555,7 +554,7 @@ export default {
     },
     generateStopFeatures() {
       let st_map = new Map();
-      this.stopTimes.forEach(st => st_map.set(st.stop, st))
+      this.localTrip.stop_times.forEach(st => st_map.set(st.stop, st))
       return this.stop.stops.map(stop => {
         let stopTime = st_map.get(stop.id);
         let props = {
@@ -590,18 +589,16 @@ export default {
         }
       });
     },
-    calculateSeqs() {
-      let stopTimes = this.stopTimes;
-      for (let i = 0; i < stopTimes.length; i++) {
-        stopTimes[i].stop_sequence = i + 1;
-      }
-      this.stopTimes = stopTimes;
+    calculateSequenceNumber() {
+      this.localTrip.stop_times.forEach((el, index) => {
+        el.stop_sequence = index + 1;
+      });
     },
     calculateSTPositions() {
-      this.stopTimes.forEach(st => {
+      this.localTrip.stop_times.forEach(st => {
         st.shape_dist_traveled = this.calculatePosition(st);
       });
-      this.calculateSeqs();
+      this.calculateSequenceNumber();
     },
     calculatePosition(st) {
       let stop = this.stop.stopMap.get(st.stop);
@@ -610,10 +607,7 @@ export default {
       return nearest.properties.location.toFixed(3);
     },
     saveStopTimes() {
-      let data = {
-        ...this.localTrip,
-        stop_times: this.stopTimes,
-      }
+      let data = this.localTrip;
       let save = null;
       switch (this.mode) {
         case this.Enums.StopTimesEditorMode.EDIT:
