@@ -26,7 +26,6 @@
             <StopTimesMenu v-if="showMenu && activeTrip.id===props.rowData.id"
                            @edit="editStopTimes"
                            @duplicate-trip="showDuplicationModal"
-                           @copy-trip-using-headway="copyStopTimesUsingHeadway"
                            @delete="beginDeleteST(props.rowData)"
                            @close="showMenu=false">
             </StopTimesMenu>
@@ -50,13 +49,10 @@
         <span>{{ deleteModal.message }}</span>
       </template>
     </MessageModal>
-    <MessageModal :show="duplicationModal.visible" @ok="duplicateStopTimes" @cancel="duplicationModal.visible = false"
-                  @close="duplicationModal.visible = false" :showCancelButton="true"
-                  :okButtonLabel="$t('stopTimes.menu.duplicationModal.duplicate')" :type="Enums.MessageModalType.WARNING">
-      <template v-slot:m-title>
-        <h2>{{ $t('stopTimes.menu.duplicationModal.title', {tripId: activeTrip.trip_id}) }}</h2>
-      </template>
+    <BaseModal :show="duplicationModal.visible" @close="duplicationModal.visible = false">
       <template v-slot:m-content>
+        <h2>{{ $t('stopTimes.menu.duplicationModal.title', {tripId: activeTrip.trip_id}) }}</h2>
+
         {{ $t('stopTimes.menu.duplicationModal.createCopyOf', {tripId: activeTrip.trip_id}) }}
         <input v-model="duplicationModal.headway" type="number"
                v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.headwayFormatError, shown: !!duplicationModal.headwayFormatError }"
@@ -65,8 +61,11 @@
         <input v-model="duplicationModal.newTripId"
                v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.tripIdFormatError, shown: !!duplicationModal.tripIdFormatError }"
                @focus="duplicationModal.tripIdFormatError=null">
+        <button class="btn" @click="duplicateStopTimes"><span>{{
+            $t('stopTimes.menu.duplicationModal.duplicate')
+          }}</span></button>
       </template>
-    </MessageModal>
+    </BaseModal>
   </div>
 </template>
 
@@ -78,6 +77,7 @@ import tripsAPI from '@/api/trips.api';
 import {debounce} from 'debounce';
 import StopTimesMenu from '@/components/stoptimes/StopTimesMenu';
 import MessageModal from '@/components/modal/MessageModal';
+import BaseModal from "@/components/modal/BaseModal";
 
 let Vuetable = require('vuetable-2')
 
@@ -88,7 +88,8 @@ export default {
     VuetablePagination,
     VuetablePaginationDropDown,
     StopTimesMenu,
-    MessageModal
+    MessageModal,
+    BaseModal
   },
   props: {
     projectId: {
@@ -230,8 +231,7 @@ export default {
         name: 'editStopTimes',
         params: {
           projectId: this.$route.params.projectId,
-          tripId: this.activeTrip.id,
-          mode: this.Enums.StopTimesEditorMode.EDIT
+          tripId: this.activeTrip.id
         }
       });
     },
@@ -278,8 +278,7 @@ export default {
             name: 'editStopTimes',
             params: {
               projectId: this.$route.params.projectId,
-              tripId: newTripData.id,
-              mode: this.Enums.StopTimesEditorMode.EDIT
+              tripId: newTripData.id
             }
           });
         }).catch(err => {
@@ -287,16 +286,6 @@ export default {
           this.duplicationModal.tripIdFormatError = this.$t('stopTimes.menu.duplicationModal.tripIdDuplicated');
         });
       }
-    },
-    copyStopTimesUsingHeadway() {
-      this.$router.push({
-        name: 'editStopTimes',
-        params: {
-          projectId: this.$route.params.projectId,
-          tripId: this.activeTrip.id,
-          mode: this.Enums.StopTimesEditorMode.COPY_USING_HEADWAY
-        }
-      });
     }
   },
   mounted() {
