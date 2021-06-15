@@ -124,7 +124,6 @@ import DraggableTable from '@/components/DraggableTable.vue';
 import envelopeMixin from '@/mixins/envelopeMixin';
 import config from '@/config';
 import MessageModal from '@/components/modal/MessageModal';
-import Enums from '@/utils/enums';
 
 let Vuetable = require('vuetable-2')
 
@@ -154,17 +153,6 @@ export default {
     trip: {
       type: Object,
       required: true
-    },
-    mode: {
-      type: String,
-      required: true,
-      validator: function (value) {
-        if (Object.values(Enums.StopTimesEditorMode).indexOf(value) === -1) {
-          console.error(`stop times editor mode "${value}" is not valid`)
-          return false;
-        }
-        return true;
-      }
     }
   },
   data() {
@@ -605,18 +593,7 @@ export default {
     },
     saveStopTimes() {
       let data = this.localTrip;
-      let save = null;
-      switch (this.mode) {
-        case this.Enums.StopTimesEditorMode.EDIT:
-          save = tripsAPI.tripsAPI.update.bind(tripsAPI.tripsAPI);
-          break;
-        case this.Enums.StopTimesEditorMode.DUPLICATE:
-          save = tripsAPI.tripsAPI.create.bind(tripsAPI.tripsAPI);
-          break;
-        default:
-          throw 'Mode is not valid';
-      }
-      save(this.projectId, data).then(() => {
+      tripsAPI.tripsAPI.update(this.projectId, data).then(() => {
         this.$toast.open({
           message: this.$t('stopTimes.editor.recordsSaved'),
           type: 'success',

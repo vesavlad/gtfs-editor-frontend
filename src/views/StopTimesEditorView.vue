@@ -4,8 +4,7 @@
       <TableHeader :title="tableTitle" :infoURL="infoURL"></TableHeader>
     </div>
     <StopTimesEditor :projectId="$route.params.projectId"
-                     :trip="localTrip"
-                     :mode="mode">
+                     :trip="localTrip">
     </StopTimesEditor>
   </div>
 </template>
@@ -13,7 +12,6 @@
 <script>
 import StopTimesEditor from "@/components/stoptimes/StopTimesEditor.vue";
 import TableHeader from "@/components/vuetable/TableHeader";
-import Enums from "@/utils/enums";
 import tripsAPI from "@/api/trips.api";
 
 export default {
@@ -21,19 +19,6 @@ export default {
   components: {
     StopTimesEditor,
     TableHeader
-  },
-  props: {
-    mode: {
-      type: String,
-      default: Enums.StopTimesEditorMode.EDIT,
-      validator: function (value) {
-        if (Object.values(Enums.StopTimesEditorMode).indexOf(value) === -1) {
-          console.error(`stop times editor mode "${value}" is not valid`)
-          return false;
-        }
-        return true;
-      }
-    },
   },
   data() {
     return {

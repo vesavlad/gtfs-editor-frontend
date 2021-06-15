@@ -62,11 +62,6 @@ const Enums = {
     FILL_NEW_DATA_POINT: 'addDataPoint',
     EDIT_DATA_POINT: 'editDataPoint',
     MOVING_POINT: 'movingPoint'
-  },
-  StopTimesEditorMode: {
-    EDIT: 'edit',
-    DUPLICATE: 'duplicate',
-    COPY_USING_HEADWAY: 'copyUsingHeadway'
   }
 }
 
