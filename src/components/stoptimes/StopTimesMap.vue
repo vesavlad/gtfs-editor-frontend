@@ -248,7 +248,6 @@ export default {
         response.data.stop_times.forEach((st, index) => {
           sequence[st.stop] = index + 1;
           time[st.stop] = st.arrival_time;
-          console.log(st);
           stopIds.push(st.stop);
         });
         this.stopsGeojson.features = this.stopsGeojson.features.map(feature => {
