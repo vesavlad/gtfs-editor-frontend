@@ -14,11 +14,7 @@ export default {
   props: {
     placement: {
       type: String,
-      default: Enums.MenuBoxPlacement.UPPER_LEFT,
-    },
-    shapeId: {
-      type: String,
-      required: true
+      default: Enums.MenuBoxPlacement.UPPER_LEFT
     }
   },
   data() {
