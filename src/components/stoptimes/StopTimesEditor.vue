@@ -24,7 +24,8 @@
           </label>
           <div class="btn-list">
             <button class="btn icon flat" @click="saveStopTimes"><span class="material-icons">check</span></button>
-            <button class="btn icon flat" @click="closeWarning.visible=true"><span class="material-icons">close</span>
+            <button class="btn icon flat" @click="dataChanged?closeWarning.visible=true:exit()">
+              <span class="material-icons">close</span>
             </button>
             <label class="checkbox">
               <input type="checkbox" id="enable-drag" v-model="dragEnabled">
