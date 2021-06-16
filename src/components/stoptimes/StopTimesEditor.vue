@@ -193,6 +193,7 @@ export default {
         turfShape: false
       },
       localTrip: _.cloneDeep(this.trip),
+      unchangedTrip: _.cloneDeep(this.trip),
       dataChanged: false,
       errors: {},
       dragEnabled: false,
@@ -218,11 +219,12 @@ export default {
   },
   watch: {
     trip() {
-      this.localTrip = {...this.trip};
+      this.localTrip = _.cloneDeep(this.trip);
+      this.unchangedTrip = _.cloneDeep(this.trip);
     },
     localTrip: {
       handler() {
-        this.dataChanged = !_.isEqual(this.trip, this.localTrip);
+        this.dataChanged = !_.isEqual(this.unchangedTrip, this.localTrip);
       },
       deep: true
     }
@@ -611,6 +613,8 @@ export default {
           duration: 1000,
           pauseOnHover: false
         });
+        this.unchangedTrip = _.cloneDeep(data);
+        this.dataChanged = false;
       }).catch(err => {
         this.errors = err.response.data;
         console.log(this.errors);
