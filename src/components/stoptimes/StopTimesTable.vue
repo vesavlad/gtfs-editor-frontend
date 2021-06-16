@@ -21,8 +21,8 @@
                   @click="activeTrip=props.rowData;editStopTimes()" alt="edit stop times">
             <span class="material-icons">add_circle</span>
           </button>
-          <div v-else class="btn icon flat" @click="showMenu=!showMenu;activeTrip=props.rowData">
-            <i class="material-icons">more_vert</i>
+          <div v-else class="btn icon flat">
+            <i class="material-icons" @click="showMenu=!showMenu;activeTrip=props.rowData">more_vert</i>
             <StopTimesMenu v-if="showMenu && activeTrip.id===props.rowData.id"
                            @edit="editStopTimes"
                            @duplicate-trip="showDuplicationModal"
@@ -42,7 +42,7 @@
     <MessageModal :show="deleteModal.visible" @ok="deleteST" @cancel="deleteModal.visible = false"
                   @close="deleteModal.visible = false" :showCancelButton="true" :okButtonLabel="$t('general.delete')"
                   :type="Enums.MessageModalType.WARNING">
-      <template v-slot:m-title>
+      <template v-slot:m-title><h2>showMenu: {{ showMenu }}</h2>
         <h2>{{ $t('stopTimes.deleteModalTitle', {tripId: deleteModal.trip.trip_id}) }}</h2>
       </template>
       <template v-slot:m-content>
