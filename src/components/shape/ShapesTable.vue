@@ -9,9 +9,10 @@
     </div>
     <div class="table-content">
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
-                @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams">
+                @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :row-class="getRowClass">
         <div slot="actions" slot-scope="props" class="flex">
-          <button class="btn icon flat" @click="$emit('focus-shape', props.rowData)" alt="Display shape.">
+          <button class="btn icon flat" @click="$emit('focus-shape', props.rowData);shapeWithFocus=props.rowData"
+                  alt="Display shape.">
             <span class="material-icons">my_location</span>
           </button>
           <div class="btn icon flat">
@@ -73,6 +74,7 @@ export default {
       doSearch: false,
       showMenu: false,
       activeShape: null,
+      shapeWithFocus: {},
       deleteModal: {
         visible: false,
         message: '',
@@ -104,6 +106,12 @@ export default {
     }
   },
   methods: {
+    getRowClass(rowData) {
+      if (rowData.id === this.shapeWithFocus.id) {
+        return 'focus';
+      }
+      return '';
+    },
     onPaginationData(paginationData) {
       if (paginationData.current_page !== this.current_page || paginationData.last_page !== this.last_page) {
         this.current_page = paginationData.current_page;
