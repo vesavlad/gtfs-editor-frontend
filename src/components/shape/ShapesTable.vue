@@ -18,13 +18,12 @@
             <i class="material-icons"
                @click="showMenu=!showMenu;activeShape=props.rowData">more_vert</i>
             <ShapeMenu v-if="showMenu && activeShape.id===props.rowData.id"
-                       :shapeId="props.rowData.shape_id"
                        @edit="editShape()"
-                       @editRange="$emit('select-range', props.rowData)"
+                       @edit-range="$emit('select-range', props.rowData)"
                        @duplicate="duplicateShape()"
                        @delete="beginDeleteShape(props.rowData)"
-                       @close="showMenu=false"
-            ></ShapeMenu>
+                       @close="showMenu=false">
+            </ShapeMenu>
           </div>
         </div>
       </Vuetable>
