@@ -160,6 +160,11 @@ export default {
   },
   data() {
     return {
+      localTrip: _.cloneDeep(this.trip),
+      unchangedTrip: _.cloneDeep(this.trip),
+      dataChanged: false,
+      errors: {},
+      dragEnabled: false,
       vuetable: {
         baseFields: [
           {title: this.$i18n.t('vuetable.actions'), name: 'actions', type: null},
@@ -192,11 +197,6 @@ export default {
         sourceName: 'shape-source',
         turfShape: false
       },
-      localTrip: _.cloneDeep(this.trip),
-      unchangedTrip: _.cloneDeep(this.trip),
-      dataChanged: false,
-      errors: {},
-      dragEnabled: false,
       orderModal: {
         visible: false,
       },
