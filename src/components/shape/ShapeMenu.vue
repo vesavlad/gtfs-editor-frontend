@@ -30,7 +30,7 @@ export default {
         {
           icon: 'timeline',
           label: 'shape.menu.editSectionOfShape',
-          eventName: 'editRange',
+          eventName: 'edit-range',
           isDisabled: false,
           classes: []
         },
