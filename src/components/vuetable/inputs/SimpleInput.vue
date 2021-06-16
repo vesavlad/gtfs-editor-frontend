@@ -44,7 +44,7 @@ export default {
   methods: {
     emitInputEvent(e) {
       let value = e.target.value;
-      if (this.Enums.InputType.NUMBER) {
+      if (this.field.type === this.Enums.InputType.NUMBER) {
         value = Number(value);
       }
       this.$emit('input', value);
