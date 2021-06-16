@@ -53,7 +53,7 @@
             </div>
             <template v-for="(field, index) in getProperFields(vuetable.fields, {exclusions: vuetable.exclusions})"
                       :slot="field.name" slot-scope="props">
-              <GeneralizedInput :readonly="vuetable.activeRow.stop_id!==props.rowData.stop_id" :key="index"
+              <GeneralizedInput :readonly="vuetable.activeRow.stop!==props.rowData.stop" :key="index"
                                 v-model="props.rowData[getFieldID(props.rowField)]"
                                 :data="props.rowData"
                                 :field="props.rowField"
@@ -251,7 +251,7 @@ export default {
   },
   methods: {
     getRowClass(rowData) {
-      if (rowData.id === this.vuetable.activeRow.id) {
+      if (rowData.stop === this.vuetable.activeRow.stop) {
         return 'changed';
       }
       return '';
@@ -260,7 +260,13 @@ export default {
       this.vuetable.fields = this.vuetable.showOptionalFields ? this.vuetable.fullFields : this.vuetable.baseFields;
     },
     setActiveRow(rowData) {
+      if (this.vuetable.activeRow.stop) {
+        this.map.setFeatureState({source: this.stop.sourceName, id: this.vuetable.activeRow.stop}, {focus: false});
+      }
       this.vuetable.activeRow = rowData;
+      if (rowData.stop) {
+        this.map.setFeatureState({source: this.stop.sourceName, id: rowData.stop}, {focus: true});
+      }
     },
     addStopsLayers() {
       let minZoom = 14;
@@ -299,6 +305,7 @@ export default {
           'circle-stroke-opacity': 1,
           'circle-stroke-width': [
             'case',
+            ['boolean', ['feature-state', 'focus'], false], 10,
             ['boolean', ['get', 'selected'], false], 5,
             ['boolean', ['feature-state', 'hover'], false], 2,
             1
@@ -331,6 +338,11 @@ export default {
           },
           paint: {
             'text-color': config.stop_label_color,
+            'icon-color': [
+              'case',
+              ['boolean', ['feature-state', 'focus'], false], config.stop_label_background_hover_color,
+              config.stop_label_background_color,
+            ],
           }
         });
       });
@@ -368,8 +380,22 @@ export default {
       this.map.on('click', 'layer-stops-icon', e => {
         e.preventDefault();
         let feature = e.features[0];
-        let stop = this.stop.stopMap.get(feature.properties.id);
-        if (!feature.properties.selected) {
+
+        let stopHasFocus = this.map.getFeatureState({
+          source: this.stop.sourceName,
+          id: feature.id
+        }).focus;
+
+        if (stopHasFocus) {
+          this.localTrip.stop_times = this.localTrip.stop_times.filter(st => st.stop !== feature.id);
+          this.setActiveRow({});
+          this.calculateSequenceNumber()
+          this.updateStops();
+        } else if (feature.properties.selected) {
+          let stopTime = this.localTrip.stop_times.filter(st => st.stop === feature.id)[0];
+          this.setActiveRow(stopTime);
+        } else {
+          let stop = this.stop.stopMap.get(feature.properties.id);
           let stopTime = {
             trip: this.localTrip.id,
             trip_id: this.localTrip.trip_id,
@@ -389,12 +415,10 @@ export default {
           stopTime.shape_dist_traveled = this.calculateShapeDistanceTraveled(stopTime);
           stopTime.stop_sequence = this.localTrip.stop_times.length + 1;
           this.localTrip.stop_times.push(stopTime);
-          this.vuetable.activeRow = stopTime;
-        } else {
-          this.localTrip.stop_times = this.localTrip.stop_times.filter(st => st.stop !== stop.id);
+          this.setActiveRow(stopTime);
+          this.calculateSequenceNumber();
+          this.updateStops();
         }
-        this.calculateSequenceNumber()
-        this.updateStops();
       });
 
       let canvas = this.map.getCanvas();
