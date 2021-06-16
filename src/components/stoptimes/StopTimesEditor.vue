@@ -386,13 +386,14 @@ export default {
             shape_dist_traveled: null,
             timepoint: null
           };
-          stopTime.shape_dist_traveled = this.calculatePosition(stopTime);
+          stopTime.shape_dist_traveled = this.calculateShapeDistanceTraveled(stopTime);
           stopTime.stop_sequence = this.localTrip.stop_times.length + 1;
           this.localTrip.stop_times.push(stopTime);
           this.vuetable.activeRow = stopTime;
         } else {
           this.localTrip.stop_times = this.localTrip.stop_times.filter(st => st.stop !== stop.id);
         }
+        this.calculateSequenceNumber()
         this.updateStops();
       });
 
@@ -593,11 +594,11 @@ export default {
     },
     calculateSTPositions() {
       this.localTrip.stop_times.forEach(st => {
-        st.shape_dist_traveled = this.calculatePosition(st);
+        st.shape_dist_traveled = this.calculateShapeDistanceTraveled(st);
       });
       this.calculateSequenceNumber();
     },
-    calculatePosition(st) {
+    calculateShapeDistanceTraveled(st) {
       let stop = this.stop.stopMap.get(st.stop);
       let point = turf.point([stop.stop_lon, stop.stop_lat]);
       let nearest = turf.nearestPointOnLine(this.shape.turfShape, point);
