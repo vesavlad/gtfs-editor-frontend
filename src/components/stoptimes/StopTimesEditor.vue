@@ -16,7 +16,7 @@
     <div id="map" class="map" ref="mapContainer">
     </div>
     <div class="map-sidebar">
-      <div class="side-panel">
+      <div class="side-panel" :class="{changed: dataChanged}">
         <div class="side-header">
           <label class="grid center">
             <h4>Trip ID:</h4>
@@ -124,6 +124,8 @@ import DraggableTable from '@/components/DraggableTable.vue';
 import envelopeMixin from '@/mixins/envelopeMixin';
 import config from '@/config';
 import MessageModal from '@/components/modal/MessageModal';
+import _ from 'lodash';
+import Enums from '@/utils/enums';
 
 let Vuetable = require('vuetable-2')
 
@@ -162,7 +164,7 @@ export default {
           {title: this.$i18n.t('vuetable.actions'), name: 'actions', type: null},
           {title: 'Seq', name: 'stop_sequence'},
           {title: 'Stop ID', name: 'stop_id'},
-          {title: 'Shape Distance Traveled', name: 'shape_dist_traveled'},
+          {title: 'Shape Distance Traveled', name: 'shape_dist_traveled', type: Enums.InputType.NUMBER},
           {title: 'Arrival Time', name: 'arrival_time'},
           {title: 'Departure Time', name: 'departure_time'}
         ],
@@ -189,7 +191,8 @@ export default {
         sourceName: 'shape-source',
         turfShape: false
       },
-      localTrip: this.trip,
+      localTrip: _.cloneDeep(this.trip),
+      dataChanged: false,
       errors: {},
       dragEnabled: false,
       orderModal: {
@@ -215,6 +218,12 @@ export default {
   watch: {
     trip() {
       this.localTrip = {...this.trip};
+    },
+    localTrip: {
+      handler() {
+        this.dataChanged = !_.isEqual(this.trip, this.localTrip);
+      },
+      deep: true
     }
   },
   mounted() {
