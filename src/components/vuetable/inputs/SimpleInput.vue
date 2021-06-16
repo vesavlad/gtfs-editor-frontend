@@ -4,7 +4,7 @@
          :class="{error: hasErrors}"
          v-tooltip="{ theme: 'error-tooltip', content: hasErrors?errors[0]:'', shown: hasErrors }"
          v-autowidth="{minWidth: 'calc(100% - 20px)'}"/>
-  <span v-else>{{ value.toLocaleString() }}</span>
+  <span v-else>{{ value ? value.toLocaleString() : value }}</span>
 </template>
 
 <script>
