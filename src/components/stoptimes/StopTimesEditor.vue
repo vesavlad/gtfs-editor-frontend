@@ -51,8 +51,7 @@
               <template v-else>
                 <button class="btn icon save" @click="setActiveRow({})"><span class="material-icons">check</span>
                 </button>
-                <button class="btn icon cancel"
-                        @click="lodash.assign(props.rowData, unchangedStopTime);setActiveRow({})">
+                <button class="btn icon cancel" @click="cancelStopTimeChange(props.rowData)">
                   <span class="material-icons">close</span>
                 </button>
               </template>
@@ -169,7 +168,6 @@ export default {
   },
   data() {
     return {
-      lodash: _,
       localTrip: _.cloneDeep(this.trip),
       unchangedTrip: _.cloneDeep(this.trip),
       dataChanged: false,
@@ -264,6 +262,10 @@ export default {
     });
   },
   methods: {
+    cancelStopTimeChange(rowData) {
+      _.assign(rowData, this.unchangedStopTime);
+      this.setActiveRow({});
+    },
     getRowClass(rowData) {
       if (rowData.stop === this.vuetable.activeRow.stop) {
         return 'changed';
