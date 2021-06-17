@@ -1,5 +1,5 @@
 <template>
-  <div class="section stops">
+  <div class="section stops" :class="{scroll: activeTab===tabType.TABLE}">
     <div class="container">
       <TableHeader :title="tableTitle" :infoURL="infoURL">
         <template v-slot:right-section>
