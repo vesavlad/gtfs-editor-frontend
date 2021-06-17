@@ -51,7 +51,8 @@
               <template v-else>
                 <button class="btn icon save" @click="setActiveRow({})"><span class="material-icons">check</span>
                 </button>
-                <button class="btn icon cancel" @click="lodash.assign(props.rowData, unchangedStopTime);setActiveRow({})">
+                <button class="btn icon cancel"
+                        @click="lodash.assign(props.rowData, unchangedStopTime);setActiveRow({})">
                   <span class="material-icons">close</span>
                 </button>
               </template>
@@ -200,6 +201,7 @@ export default {
       },
       stop: {
         sourceName: 'stop-source',
+        sourceNameHighlightLabel: 'stop-source-highlight-label',
         stops: [],
         stopMap: new Map(),
       },
@@ -273,10 +275,28 @@ export default {
       this.unchangedStopTime = _.cloneDeep(rowData);
       if (this.vuetable.activeRow.stop) {
         this.map.setFeatureState({source: this.stop.sourceName, id: this.vuetable.activeRow.stop}, {focus: false});
+        let geojson = {
+          type: 'FeatureCollection',
+          features: []
+        }
+        this.map.getSource(this.stop.sourceNameHighlightLabel).setData(geojson);
       }
       this.vuetable.activeRow = rowData;
       if (rowData.stop) {
         this.map.setFeatureState({source: this.stop.sourceName, id: rowData.stop}, {focus: true});
+        let stop = this.stop.stopMap.get(rowData.stop);
+        let geojson = {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [stop.stop_lon, stop.stop_lat]
+          },
+          properties: {
+            label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
+          }
+        };
+        console.log(geojson);
+        this.map.getSource(this.stop.sourceNameHighlightLabel).setData(geojson);
       }
     },
     addStopsLayers() {
@@ -289,6 +309,14 @@ export default {
       this.map.addSource(this.stop.sourceName, {
         'type': 'geojson',
         'data': geojson,
+      });
+
+      this.map.addSource(this.stop.sourceNameHighlightLabel, {
+        'type': 'geojson',
+        'data': {
+          type: 'FeatureCollection',
+          features: []
+        },
       });
 
       this.map.addLayer({
@@ -354,6 +382,27 @@ export default {
               ['boolean', ['feature-state', 'focus'], false], config.stop_label_background_hover_color,
               config.stop_label_background_color,
             ],
+          }
+        });
+        this.map.addLayer({
+          id: 'layer-stop-highlight-label',
+          type: 'symbol',
+          source: this.stop.sourceNameHighlightLabel,
+          layout: {
+            'text-field': '{label}',
+            'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
+            'icon-image': 'bg-stop-name',
+            'icon-anchor': 'bottom',
+            'text-anchor': 'top',
+            'text-offset': [0, 1.3],
+            'text-size': 14,
+            'icon-text-fit': 'both',
+            'icon-text-fit-padding': [4, 6, 0, 6],
+            'text-allow-overlap': true,
+          },
+          paint: {
+            'text-color': config.stop_label_color,
+            'icon-color': config.stop_label_background_hover_color
           }
         });
       });
