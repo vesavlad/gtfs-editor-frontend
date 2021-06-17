@@ -295,7 +295,6 @@ export default {
             label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
           }
         };
-        console.log(geojson);
         this.map.getSource(this.stop.sourceNameHighlightLabel).setData(geojson);
       }
     },
