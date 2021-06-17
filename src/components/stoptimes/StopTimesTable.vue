@@ -50,8 +50,8 @@
       </template>
     </MessageModal>
     <MessageModal :show="duplicationModal.visible" @ok="duplicateStopTimes" @close="duplicationModal.visible = false"
-                  :okButtonLabel="$t('stopTimes.menu.duplicationModal.duplicate')"
-    >
+                  @cancel="duplicationModal.visible = false"
+                  :okButtonLabel="$t('stopTimes.menu.duplicationModal.duplicate')">
       <template v-slot:m-title>
         {{ $t('stopTimes.menu.duplicationModal.title', {tripId: activeTrip.trip_id}) }}
       </template>
@@ -62,12 +62,13 @@
             <input v-model="duplicationModal.headway" type="number"
                    v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.headwayFormatError, shown: !!duplicationModal.headwayFormatError }"
                    @focus="duplicationModal.headwayFormatError=null">
-            <span>seconds</span>
+            <span>{{ $t('stopTimes.menu.duplicationModal.seconds') }}</span>
           </div>
           <div class="grid v-center">
-            <span>{{ $t('stopTimes.menu.duplicationModal.secondsWithTripId') }}</span>
+            <span>{{ $t('stopTimes.menu.duplicationModal.withTripId') }}</span>
             <input type="text" v-model="duplicationModal.newTripId"
                    v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.tripIdFormatError, shown: !!duplicationModal.tripIdFormatError }"
+                   v-autowidth="{minWidth: '60px'}"
                    @focus="duplicationModal.tripIdFormatError=null">
           </div>
         </div>
