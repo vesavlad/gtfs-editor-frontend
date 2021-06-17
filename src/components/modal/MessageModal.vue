@@ -59,9 +59,9 @@ export default {
     },
     type: {
       type: String,
-      required: true,
+      default: '',
       validator(value) {
-        return Object.values(Enums.MessageModalType).indexOf(value) !== -1;
+        return Object.values(Enums.MessageModalType).concat(['']).indexOf(value) !== -1;
       }
     }
   },
