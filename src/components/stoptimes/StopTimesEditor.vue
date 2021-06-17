@@ -44,11 +44,17 @@
           <vuetable v-if="!dragEnabled" ref="vuetable" :fields="vuetable.fields" :api-mode="false"
                     :data="localTrip.stop_times" :row-class="getRowClass">
             <div slot="actions" slot-scope="props" class="grid min center">
-              <button class="btn flat icon" @click="setActiveRow(props.rowData)" alt="Display stop_times.">
+              <button v-if="vuetable.activeRow.stop!==props.rowData.stop" class="btn flat icon"
+                      @click="setActiveRow(props.rowData)" alt="Display stop_times.">
                 <span class="material-icons">edit</span>
               </button>
-              <button class="btn icon save" ><span class="material-icons">check</span></button>
-              <button class="btn icon cancel" ><span class="material-icons">close</span></button>
+              <template v-else>
+                <button class="btn icon save" @click="setActiveRow({})"><span class="material-icons">check</span>
+                </button>
+                <button class="btn icon cancel" @click="lodash.assign(props.rowData, unchangedStopTime);setActiveRow({})">
+                  <span class="material-icons">close</span>
+                </button>
+              </template>
               <button class="btn icon btn-focus" @click="flyToStop(props.rowData)" alt="move to stop.">
                 <span class="material-icons">my_location</span>
               </button>
@@ -162,9 +168,11 @@ export default {
   },
   data() {
     return {
+      lodash: _,
       localTrip: _.cloneDeep(this.trip),
       unchangedTrip: _.cloneDeep(this.trip),
       dataChanged: false,
+      unchangedStopTime: null,
       errors: {},
       dragEnabled: false,
       vuetable: {
@@ -262,6 +270,7 @@ export default {
       this.vuetable.fields = this.vuetable.showOptionalFields ? this.vuetable.fullFields : this.vuetable.baseFields;
     },
     setActiveRow(rowData) {
+      this.unchangedStopTime = _.cloneDeep(rowData);
       if (this.vuetable.activeRow.stop) {
         this.map.setFeatureState({source: this.stop.sourceName, id: this.vuetable.activeRow.stop}, {focus: false});
       }
