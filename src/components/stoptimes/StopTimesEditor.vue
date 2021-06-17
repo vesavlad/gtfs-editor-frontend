@@ -204,6 +204,7 @@ export default {
         sourceNameHighlightLabel: 'stop-source-highlight-label',
         stops: [],
         stopMap: new Map(),
+        popup: null
       },
       shape: {
         sourceName: 'shape-source',
@@ -244,6 +245,7 @@ export default {
   mounted() {
     this.vuetable.fields = this.vuetable.baseFields;
     this.vuetable.fullFields = this.vuetable.baseFields.concat(this.vuetable.optionalFields);
+    this.stop.popup = new mapboxgl.Popup({closeOnClick: false, closeButton: false});
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
         this.stop.stops = response.data;
@@ -478,6 +480,7 @@ export default {
           this.calculateSequenceNumber();
           this.updateStops();
         }
+        this.showPopup(feature);
       });
 
       let canvas = this.map.getCanvas();
@@ -488,6 +491,7 @@ export default {
         let feature = e.features[0];
         hoveredStops[feature.id] = feature;
         map.setFeatureState({source: this.stop.sourceName, id: feature.id}, {hover: true});
+        this.showPopup(feature);
       });
       this.map.on('mouseleave', 'layer-stops-icon', () => {
         canvas.style.cursor = '';
@@ -495,7 +499,24 @@ export default {
           map.setFeatureState({source: this.stop.sourceName, id: featureId}, {hover: false});
         });
         hoveredStops = {};
+        this.hidePopup();
       });
+    },
+    showPopup(feature) {
+      let stopHasFocus = this.map.getFeatureState({
+        source: this.stop.sourceName,
+        id: feature.id
+      }).focus;
+      let icon = '<span class="material-icons">add</span>';
+      if (stopHasFocus) {
+        icon = '<span class="material-icons">delete</span>';
+      } else if (feature.properties.selected) {
+        icon = '<span class="material-icons">edit</span>';
+      }
+      this.stop.popup.setLngLat(feature.geometry.coordinates).setHTML(icon).addTo(this.map);
+    },
+    hidePopup() {
+      this.stop.popup.remove();
     },
     addShapeLayers() {
       let geojson = {
