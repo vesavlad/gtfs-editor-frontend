@@ -12,7 +12,7 @@
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :transform="transformData"
                 :row-class="getRowClass">
-        <div slot="actions" slot-scope="props" class="flex">
+        <div slot="actions" slot-scope="props" class="grid min center">
           <button class="btn icon btn-focus" @click="tripWithFocus=props.rowData;$emit('focus-st', props.rowData)"
                   alt="Display stop_times.">
             <span class="material-icons">my_location</span>
@@ -49,23 +49,30 @@
         <span>{{ deleteModal.message }}</span>
       </template>
     </MessageModal>
-    <BaseModal :show="duplicationModal.visible" @close="duplicationModal.visible = false">
-      <template v-slot:m-content>
-        <h2>{{ $t('stopTimes.menu.duplicationModal.title', {tripId: activeTrip.trip_id}) }}</h2>
-
-        {{ $t('stopTimes.menu.duplicationModal.createCopyOf', {tripId: activeTrip.trip_id}) }}
-        <input v-model="duplicationModal.headway" type="number"
-               v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.headwayFormatError, shown: !!duplicationModal.headwayFormatError }"
-               @focus="duplicationModal.headwayFormatError=null">
-        {{ $t('stopTimes.menu.duplicationModal.secondsWithTripId') }}
-        <input v-model="duplicationModal.newTripId"
-               v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.tripIdFormatError, shown: !!duplicationModal.tripIdFormatError }"
-               @focus="duplicationModal.tripIdFormatError=null">
-        <button class="btn" @click="duplicateStopTimes"><span>{{
-            $t('stopTimes.menu.duplicationModal.duplicate')
-          }}</span></button>
+    <MessageModal :show="duplicationModal.visible" @ok="duplicateStopTimes" @close="duplicationModal.visible = false"
+                  :okButtonLabel="$t('stopTimes.menu.duplicationModal.duplicate')"
+    >
+      <template v-slot:m-title>
+        {{ $t('stopTimes.menu.duplicationModal.title', {tripId: activeTrip.trip_id}) }}
       </template>
-    </BaseModal>
+      <template v-slot:m-content>
+        <div class="stoptime-copy">
+          <div class="grid v-center">
+            {{ $t('stopTimes.menu.duplicationModal.createCopyOf', {tripId: activeTrip.trip_id}) }}
+            <input v-model="duplicationModal.headway" type="number"
+                   v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.headwayFormatError, shown: !!duplicationModal.headwayFormatError }"
+                   @focus="duplicationModal.headwayFormatError=null">
+            <span>seconds</span>
+          </div>
+          <div class="grid v-center">
+            <span>{{ $t('stopTimes.menu.duplicationModal.secondsWithTripId') }}</span>
+            <input type="text" v-model="duplicationModal.newTripId"
+                   v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.tripIdFormatError, shown: !!duplicationModal.tripIdFormatError }"
+                   @focus="duplicationModal.tripIdFormatError=null">
+          </div>
+        </div>
+      </template>
+    </MessageModal>
   </div>
 </template>
 
@@ -77,7 +84,6 @@ import tripsAPI from '@/api/trips.api';
 import {debounce} from 'debounce';
 import StopTimesMenu from '@/components/stoptimes/StopTimesMenu';
 import MessageModal from '@/components/modal/MessageModal';
-import BaseModal from "@/components/modal/BaseModal";
 
 let Vuetable = require('vuetable-2')
 
@@ -89,7 +95,6 @@ export default {
     VuetablePaginationDropDown,
     StopTimesMenu,
     MessageModal,
-    BaseModal
   },
   props: {
     projectId: {

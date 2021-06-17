@@ -470,6 +470,12 @@ input[type="file"]:disabled ~ .btn:before {display: none;}
 .report-box.errors, .report-box.error h4 {border-color: var(--error); color: var(--error);}
 .report-box.warnings, .report-box.warnings h4 {border-color: var(--warning); color: var(--warning);}
 
+/* MODAL COPY STOP TIME */
+
+.stoptime-copy {display: grid; grid-gap: 10px;}
+.stoptime-copy input[type="number"] {width: 60px;}
+.stoptime-copy input[type="text"] {width: 120px;}
+
 /* ============  TABLES  ============== */
 
 .table-container {margin-bottom: 20px;}
@@ -657,7 +663,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 }
 .tablinks:hover:not(.active) { background-color: rgba(0,0,0,.1); color: white;}
 .tablinks.active {background-color: white; color: var(--link);}
-.side-table-header,.side-header {background-color: var(--secundario-claro); padding: 10px; min-height: 68px; display: grid; grid-template-columns: 1fr auto; align-items: center; grid-gap: 10px; color: white; justify-items: flex-start;}
+.side-table-header,.side-header {background-color: var(--secundario-claro); transition: background-color .5s; padding: 10px; min-height: 68px; display: grid; grid-template-columns: 1fr auto; align-items: center; grid-gap: 10px; color: white; justify-items: flex-start;}
 .side-table-header input[type="search"] {background-color: rgba(255,255,255,.1); color: white;}
 .side-table-header input[type="search"]::placeholder {color: rgba(255,255,255,.35);}
 .side-table-header input[type="search"]:focus {background-color: rgba(255,255,255,.2);}
@@ -665,8 +671,9 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 .side-panel {min-height: 100%; display: grid; grid-template-rows: auto 1fr auto;}
 .side-panel.empty,.side-panel.adding-new-point {align-items: flex-start; max-width: 350px;}
 .side-header .btn.icon {padding: 10px; color: var(--semi-blanco);}
-.side-header .btn.icon.save {color: var(--primario);}
 .side-header .btn.icon:hover {color: white;}
+.changed .side-header {background-color: #3f6206; transition: background-color .2s;}
+.changed .btn-list .save {color: var(--primario); text-shadow: 2px 2px 4px #00000087;}
 .side-header input {background: rgba(255,255,255,.1); color: white;}
 .side-header input:not(.multiselect input):focus {background: rgba(255,255,255,.15);}
 .empty .side-header {background-color: transparent; color: var(--gris-medio);}
@@ -785,7 +792,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
     height: 0;
 }
 .fade-enter-active, .fade-leave-active {
-    transition: opacity 1s;
+    transition: opacity .3s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;

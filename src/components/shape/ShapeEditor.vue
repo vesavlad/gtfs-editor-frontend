@@ -18,9 +18,7 @@
             class="material-icons">help_outline</i></button>
       </div>
     </div>
-    <div id='map-container'>
-      <div id='map' ref='map'>
-      </div>
+    <div id='map' class="map" ref='map'>
     </div>
     <div class="map-sidebar">
       <div class="side-panel edit-shape">

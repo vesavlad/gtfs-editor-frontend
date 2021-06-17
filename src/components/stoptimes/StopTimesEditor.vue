@@ -23,8 +23,8 @@
             <input type="text" v-model="localTrip.trip_id">
           </label>
           <div class="btn-list">
-            <button class="btn icon flat" @click="saveStopTimes"><span class="material-icons">check</span></button>
-            <button class="btn icon flat" @click="dataChanged?closeWarning.visible=true:exit()">
+            <button class="btn icon save" @click="saveStopTimes"><span class="material-icons">check</span></button>
+            <button class="btn icon cancel" @click="dataChanged?closeWarning.visible=true:exit()">
               <span class="material-icons">close</span>
             </button>
             <label class="checkbox">
@@ -43,11 +43,13 @@
         <div class="table-content">
           <vuetable v-if="!dragEnabled" ref="vuetable" :fields="vuetable.fields" :api-mode="false"
                     :data="localTrip.stop_times" :row-class="getRowClass">
-            <div slot="actions" slot-scope="props" class="flex">
+            <div slot="actions" slot-scope="props" class="grid min center">
               <button class="btn flat icon" @click="setActiveRow(props.rowData)" alt="Display stop_times.">
                 <span class="material-icons">edit</span>
               </button>
-              <button class="btn flat icon" @click="flyToStop(props.rowData)" alt="move to stop.">
+              <button class="btn icon save" ><span class="material-icons">check</span></button>
+              <button class="btn icon cancel" ><span class="material-icons">close</span></button>
+              <button class="btn icon btn-focus" @click="flyToStop(props.rowData)" alt="move to stop.">
                 <span class="material-icons">my_location</span>
               </button>
             </div>
