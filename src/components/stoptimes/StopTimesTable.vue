@@ -57,14 +57,14 @@
       </template>
       <template v-slot:m-content>
         <div class="stoptime-copy">
-          <div class="grid v-center">
-            {{ $t('stopTimes.menu.duplicationModal.createCopyOf', {tripId: activeTrip.trip_id}) }}
+          <div class="flex v-center">
+            <span>{{ $t('stopTimes.menu.duplicationModal.createCopyOf', {tripId: activeTrip.trip_id}) }}</span>
             <input v-model="duplicationModal.headway" type="number"
                    v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.headwayFormatError, shown: !!duplicationModal.headwayFormatError }"
                    @focus="duplicationModal.headwayFormatError=null">
             <span>{{ $t('stopTimes.menu.duplicationModal.seconds') }}</span>
           </div>
-          <div class="grid v-center">
+          <div class="flex v-center">
             <span>{{ $t('stopTimes.menu.duplicationModal.withTripId') }}</span>
             <input type="text" v-model="duplicationModal.newTripId"
                    v-tooltip="{ theme: 'error-tooltip', content: duplicationModal.tripIdFormatError, shown: !!duplicationModal.tripIdFormatError }"
