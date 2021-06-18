@@ -53,8 +53,9 @@ const Enums = {
   },
   ShapeEditorEditionMode: {
     SIMPLE: 'simple',
-    RANGE: 'range',
-    DUPLICATE: 'duplicate'
+    DUPLICATE: 'duplicate',
+    SELECT_RANGE: 'selectRange',
+    EDIT_RANGE: 'editRange',
   },
   InteractiveMapStatus: {
     READER: 'reader',

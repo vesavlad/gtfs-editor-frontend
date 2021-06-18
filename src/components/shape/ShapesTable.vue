@@ -20,8 +20,8 @@
                @click="showMenu=!showMenu;activeShape=props.rowData">more_vert</i>
             <ShapeMenu v-if="showMenu && activeShape.id===props.rowData.id"
                        @edit="editShape()"
-                       @edit-range="$emit('select-range', props.rowData)"
-                       @duplicate="duplicateShape()"
+                       @edit-range="editRangeOfShape"
+                       @duplicate="duplicateShape"
                        @delete="beginDeleteShape(props.rowData)"
                        @close="showMenu=false">
             </ShapeMenu>
@@ -180,6 +180,16 @@ export default {
             editionMode: this.Enums.ShapeEditorEditionMode.DUPLICATE,
           }
         });
+      });
+    },
+    editRangeOfShape() {
+      this.$router.push({
+        name: 'editShape',
+        params: {
+          projectId: this.$route.params.projectId,
+          shapeId: this.activeShape.id,
+          editionMode: this.Enums.ShapeEditorEditionMode.SELECT_RANGE,
+        }
       });
     }
   },

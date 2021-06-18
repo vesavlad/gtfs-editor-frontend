@@ -10,10 +10,8 @@
             <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
           </div>
         </div>
-        <ShapesTable ref="table" :project="$route.params.projectId" @focus-shape="displayShape"
-                       @select-range="beginRangeSelection"></ShapesTable>
-        <ShapesMap ref="map" :project="$route.params.projectId"
-                   @selected-range="goToEditRange($event)"></ShapesMap>
+        <ShapesTable ref="table" :project="$route.params.projectId" @focus-shape="displayShape"></ShapesTable>
+        <ShapesMap ref="map" :project="$route.params.projectId"></ShapesMap>
       </div>
       <router-link :to="{name: 'createShape', params: {projectId: $route.params.projectId}}" class="btn floating">
         <i class="material-icons">add</i>
@@ -41,21 +39,6 @@ export default {
     };
   },
   methods: {
-    goToEditRange(range) {
-      this.$router.push({
-        name: 'editShape', params: {
-          projectId: this.$route.params.projectId,
-          shapeId: this.activeShape.id,
-          editionMode: this.Enums.ShapeEditorEditionMode.RANGE,
-          range: range
-        }
-      })
-    },
-    beginRangeSelection(shape) {
-      this.activeShape = shape;
-      this.$refs.map.displayShape(shape);
-      this.$refs.map.beginRangeSelection();
-    },
     displayShape(shape) {
       this.$refs.map.displayShape(shape);
     }
