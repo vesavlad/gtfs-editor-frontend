@@ -315,6 +315,8 @@ input[type="date" i]::-webkit-calendar-picker-indicator {color: var(--link);}
 .pill-base.empty i {display: none;}
 .pill-base.loading {background-color: var(--gris-claro); color: var(--gris-medio);}
 .pill-base.loading i:not(.icon-loading) {display: none;}
+p.warning {background-color: var(--bg-warning); padding: 10px; border-radius: 5px 20px; color: var(--warning);}
+
 
 /* ==============  BREADCRUMB  ============== */
 
@@ -385,7 +387,7 @@ section {padding-bottom: 40px;}
     border-bottom: var(--border) ;
 }
 .m-header {font-size: 20px; color: var(--gris-osc2);}
-.m-content {padding: 20px; overflow-y: scroll; display: grid;}
+.m-content {padding: 20px; overflow-y: auto; display: grid;}
 .m-footer {padding: 20px; border-top: var(--border);}
 .m-content > li {display: grid; grid-template-columns: 3fr 5fr; grid-gap: 20px; padding: 10px 20px; align-items: center;}
 .input-row-title span {font-size: 16px; color: var(--gris-medio2); font-weight: 500;}
@@ -475,6 +477,7 @@ input[type="file"]:disabled ~ .btn:before {display: none;}
 .stoptime-copy {display: grid; grid-gap: 10px;}
 .stoptime-copy input[type="number"] {width: 60px;}
 .stoptime-copy input[type="text"] {width: 120px;}
+.stoptime-copy .flex {column-gap: 10px;}
 
 /* ============  TABLES  ============== */
 
@@ -625,6 +628,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 .data-card.locked .data-footer .btn {background-color: var(--gris-claro2);}
 .data-card.locked h4 {color:var(--gris-medio2);}
 .msj-builder-execution {min-height: 24px; line-height: 24px;}
+.stops.scroll {overflow: visible;}
 
 /* ============  DYNAMICS MAP VIEWS  ============== */
 
@@ -680,6 +684,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 .empty .side-header .btn.flat {color: var(--gris-medio);}
 .side-content {padding: 10px; align-content: flex-start;}
 .side-content li {margin-bottom: 10px;}
+.edit-shape .side-content {max-width:386px;}
 .empty .side-content,.adding-new-point .side-content {display: grid; grid-gap: 20px; justify-items: flex-start; color: var(--gris-medio2); font-weight: 500;}
 .empty.img {display:flex; cursor: default; user-select: none; color: var(--gris-medio2); padding: 20px; background-color: var(--gris-claro); border-radius: 50%;}
 .empty.img .material-icons {font-size: 36px;}
@@ -689,7 +694,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 .stop-input-row-detail .error-message {position: absolute;}
 .stop-input-details span {font-weight: 500; color: var(--gris-medio2);}
 .edit-data-point .side-header {background-color: var(--link2);}
-.side-footer  {display: grid; grid-gap: 10px; grid-template-columns: auto 1fr auto; padding: 15px 20px; align-items: center;}
+.side-footer {display: grid; grid-gap: 10px; grid-template-columns: auto 1fr auto; padding: 15px 20px; align-items: center;}
 
 
 /* Edit shape */

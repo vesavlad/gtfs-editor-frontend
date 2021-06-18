@@ -27,8 +27,8 @@
             <h4 v-else>{{ $t('shape.editor.editShape') }}</h4>
           </div>
           <div class="btn-list">
-            <button class="btn flat" @click="saveAndExit"><span class="material-icons">check</span></button>
-            <button class="btn flat" @click="exitModal.visible = true"><span class="material-icons">close</span>
+            <button class="btn icon save" @click="saveAndExit"><span class="material-icons">check</span></button>
+            <button class="btn icon" @click="exitModal.visible = true"><span class="material-icons">close</span>
             </button>
           </div>
         </div>
@@ -45,9 +45,10 @@
               {{ text }}
             </div>
           </div>
-          <div v-if="warning" class="errors warning">
-            {{ warning }}
-          </div>
+          <p v-if="warning" class="errors warning grid">
+            <span class="material-icons">warning</span>
+            <span>{{ warning }}</span>
+          </p>
         </div>
       </div>
     </div>
@@ -359,8 +360,18 @@ export default {
         filter: ["==", "$type", "Point"],
         paint: {
           "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
-          "circle-color": "white",
-          "circle-stroke-color": config.shape_point_color,
+          'circle-color': [
+            'case',
+            ['boolean', ['get', 'selected'], false], "#21b0cf",
+            ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
+            'white'
+          ],
+          'circle-stroke-color': [
+            'case',
+            ['boolean', ['get', 'selected'], false], "#21b0cf",
+            ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
+            config.shape_line_color,
+          ],
           "circle-stroke-opacity": 1,
           "circle-stroke-width": 3
         }
@@ -444,7 +455,7 @@ export default {
         self.reGeneratePoints();
       });
       map.on('mouseenter', 'point-line-layer', () => {
-        canvas.style.cursor = 'crosshair';
+        canvas.style.cursor = 'pointer';
       });
 
 
