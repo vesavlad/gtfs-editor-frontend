@@ -1,6 +1,5 @@
 <template>
-  <div id="map" ref="mapContainer" class="map">
-  </div>
+  <div ref="map" class="map"></div>
 </template>
 
 <script>
@@ -43,7 +42,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.map = new mapboxgl.Map({
-        container: this.$refs.mapContainer,
+        container: this.$refs.map,
         style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
       });
       this.map.on('load', () => {

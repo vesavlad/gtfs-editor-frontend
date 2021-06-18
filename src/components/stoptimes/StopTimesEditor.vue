@@ -200,11 +200,11 @@ export default {
       stop: {
         sources: {
           stops: 'stop-source',
-          outstandingLabel: 'stop-source-highlight-label'
+          outstandingLabel: 'stop-source-highlight-label',
+          helpIcon: 'stop-help-icon'
         },
         stops: [],
-        stopMap: new Map(),
-        popup: null
+        stopMap: new Map()
       },
       shape: {
         sourceName: 'shape-source',
@@ -245,7 +245,6 @@ export default {
   mounted() {
     this.vuetable.fields = this.vuetable.baseFields;
     this.vuetable.fullFields = this.vuetable.baseFields.concat(this.vuetable.optionalFields);
-    this.stop.popup = new mapboxgl.Popup({closeOnClick: false, closeButton: false});
     this.$nextTick(() => {
       stopsAPI.stopsAPI.getAll(this.projectId).then((response) => {
         this.stop.stops = response.data;
@@ -320,6 +319,14 @@ export default {
       });
 
       this.map.addSource(this.stop.sources.outstandingLabel, {
+        'type': 'geojson',
+        'data': {
+          type: 'FeatureCollection',
+          features: []
+        },
+      });
+
+      this.map.addSource(this.stop.sources.helpIcon, {
         'type': 'geojson',
         'data': {
           type: 'FeatureCollection',
@@ -414,6 +421,7 @@ export default {
           }
         });
       });
+
       this.map.addLayer({
         id: 'layer-stops-seq',
         type: 'symbol',
@@ -426,33 +434,62 @@ export default {
           'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
           'text-anchor': 'top',
           'text-offset': [-0.03, -0.4],
-          'text-allow-overlap': true,
+          'text-allow-overlap': true
         },
         paint: {
           'text-color': config.stop_label_color,
+          'text-opacity': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], 0,
+            1
+          ]
         }
       });
-      this.map.addLayer({
-        id: 'layer-stops-time',
-        type: 'symbol',
-        source: this.stop.sources.stops,
-        filter: ['get', 'arrival_time'],
-        minzoom: minZoom,
-        layout: {
-          'text-field': '{arrival_time}',
-          'text-anchor': 'top',
-          'text-offset': [0, 1.5],
-          'text-allow-overlap': true,
+
+      let editImg = require('../../assets/img/double-arrow.png');
+      let addImg = require('../../assets/img/double-arrow.png');
+      let removeImg = require('../../assets/img/double-arrow.png');
+      this.map.loadImage(editImg, (err, editImage) => {
+        if (err) {
+          console.log(err);
+          return;
         }
+        this.map.loadImage(addImg, (err, addImage) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          this.map.loadImage(removeImg, (err, removeImage) => {
+            if (err) {
+              console.log(err);
+              return;
+            }
+
+            this.map.addImage('edit-image', editImage, {sdf: true});
+            this.map.addImage('add-image', addImage, {sdf: true});
+            this.map.addImage('remove-image', removeImage, {sdf: true});
+
+            this.map.addLayer({
+              id: 'layer-help-icon',
+              type: 'symbol',
+              source: this.stop.sources.helpIcon,
+              layout: {
+                'icon-image': 'edit-image',
+                'icon-size': 0.5,
+                'visibility': 'visible'
+              },
+              paint: {
+                'icon-color': 'red'
+              }
+            });
+          });
+        });
       });
+
       this.map.on('click', 'layer-stops-icon', e => {
         e.preventDefault();
         let feature = e.features[0];
-
-        let stopHasFocus = this.map.getFeatureState({
-          source: this.stop.sources.stops,
-          id: feature.id
-        }).focus;
+        let stopHasFocus = this.map.getFeatureState({source: this.stop.sources.stops, id: feature.id}).focus;
 
         if (stopHasFocus) {
           this.localTrip.stop_times = this.localTrip.stop_times.filter(st => st.stop !== feature.id);
@@ -487,7 +524,7 @@ export default {
           this.calculateSequenceNumber();
           this.updateStops();
         }
-        this.showPopup(feature);
+        this.showHelpIcon(feature);
       });
 
       let canvas = this.map.getCanvas();
@@ -498,7 +535,7 @@ export default {
         let feature = e.features[0];
         hoveredStops[feature.id] = feature;
         map.setFeatureState({source: this.stop.sources.stops, id: feature.id}, {hover: true});
-        this.showPopup(feature);
+        this.showHelpIcon(feature);
       });
       this.map.on('mouseleave', 'layer-stops-icon', () => {
         canvas.style.cursor = '';
@@ -506,24 +543,25 @@ export default {
           map.setFeatureState({source: this.stop.sources.stops, id: featureId}, {hover: false});
         });
         hoveredStops = {};
-        this.hidePopup();
+        this.hideHelpIcon();
       });
     },
-    showPopup(feature) {
-      let stopHasFocus = this.map.getFeatureState({
-        source: this.stop.sources.stops,
-        id: feature.id
-      }).focus;
-      let icon = '<span class="material-icons">add</span>';
+    showHelpIcon(feature) {
+      let stopHasFocus = this.map.getFeatureState({source: this.stop.sources.stops, id: feature.id}).focus;
+      let icon = 'add-image';
       if (stopHasFocus) {
-        icon = '<span class="material-icons">delete</span>';
+        icon = 'remove-image';
       } else if (feature.properties.selected) {
-        icon = '<span class="material-icons">edit</span>';
+        icon = 'edit-image';
       }
-      this.stop.popup.setLngLat(feature.geometry.coordinates).setHTML(icon).addTo(this.map);
+
+      let geojson = this.createGeojsonPoint(feature.geometry.coordinates[0], feature.geometry.coordinates[1], 1, {});
+      this.map.getSource(this.stop.sources.helpIcon).setData(geojson);
+      this.map.setLayoutProperty('layer-help-icon', 'icon-image', icon);
+      this.map.setLayoutProperty('layer-help-icon', 'visibility', 'visible');
     },
-    hidePopup() {
-      this.stop.popup.remove();
+    hideHelpIcon() {
+      this.map.setLayoutProperty('layer-help-icon', 'visibility', 'none');
     },
     addShapeLayers() {
       let geojson = {
@@ -659,7 +697,7 @@ export default {
         type: 'FeatureCollection',
         features: this.generateStopFeatures(),
       };
-      this.map.getSource(this.stop.source.stop).setData(geojson);
+      this.map.getSource(this.stop.sources.stops).setData(geojson);
     },
     generateStopFeatures() {
       let st_map = new Map();

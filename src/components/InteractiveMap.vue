@@ -10,10 +10,10 @@
             class="material-icons">help_outline</i></button>
       </div>
     </div>
-    <div id='map' class="map">
+    <div ref='map' class="map">
       <button :disabled="status!==Enums.InteractiveMapStatus.READER" class="btn floating" alt="Create Stop"
               @click="beginCreation"
-              v-tooltip="{ placement: 'left', content: $t('stop.helpMessageAddNewStop'), shown: status===Enums.InteractiveMapStatus.READER}">
+              v-tooltip="{ placement: 'left', content: $t('stop.helpMessageAddNewStop')}">
         <span class="material-icons">add_location_alt</span>
       </button>
     </div>
@@ -209,7 +209,7 @@ export default {
           this.stop.stops[el.id] = el;
         });
         this.map = new mapboxgl.Map({
-          container: 'map',
+          container: this.$refs.map,
           style: 'mapbox://styles/mapbox/light-v10',
           zoom: 16
         });
