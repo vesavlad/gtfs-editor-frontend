@@ -10,8 +10,8 @@
             <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i class="material-icons">help_outline</i></button>
           </div>
         </div>
-        <ShapesTable ref="table" :project="$route.params.projectId" @focus-shape="displayShape"></ShapesTable>
-        <ShapesMap ref="map" :project="$route.params.projectId"></ShapesMap>
+        <ShapesTable ref="table" :projectId="$route.params.projectId" @focus-shape="displayShape"></ShapesTable>
+        <ShapesMap ref="map" :projectId="$route.params.projectId"></ShapesMap>
       </div>
       <router-link :to="{name: 'createShape', params: {projectId: $route.params.projectId}}" class="btn floating">
         <i class="material-icons">add</i>

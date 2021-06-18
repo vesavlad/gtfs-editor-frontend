@@ -97,11 +97,11 @@ export default {
           type: Enums.InputType.INPUT
         },
       ],
-      url: shapesAPI.shapesAPI.getFullBaseURL(this.project),
+      url: shapesAPI.shapesAPI.getFullBaseURL(this.projectId),
     };
   },
   props: {
-    project: {
+    projectId: {
       required: true,
     }
   },
@@ -147,7 +147,7 @@ export default {
       this.deleteModal.shape = shape;
     },
     deleteShape() {
-      shapesAPI.shapesAPI.remove(this.$route.params.projectId, this.deleteModal.shape).then(() => {
+      shapesAPI.shapesAPI.remove(this.projectId, this.deleteModal.shape).then(() => {
         this.deleteModal = {
           shape: null,
           visible: false,
@@ -163,19 +163,19 @@ export default {
       this.$router.push({
         name: 'editShape',
         params: {
-          projectId: this.$route.params.projectId,
+          projectId: this.projectId,
           shapeId: this.activeShape.id,
           editionMode: this.Enums.ShapeEditorEditionMode.SIMPLE,
         }
       });
     },
     duplicateShape() {
-      shapesAPI.shapesAPI.detail(this.$route.params.projectId, this.activeShape.id).then(response => {
+      shapesAPI.shapesAPI.detail(this.projectId, this.activeShape.id).then(response => {
         let shape = response.data;
         this.$router.push({
           name: 'createShape',
           params: {
-            projectId: this.$route.params.projectId,
+            projectId: this.projectId,
             shape: shape,
             editionMode: this.Enums.ShapeEditorEditionMode.DUPLICATE,
           }
@@ -186,7 +186,7 @@ export default {
       this.$router.push({
         name: 'editShape',
         params: {
-          projectId: this.$route.params.projectId,
+          projectId: this.projectId,
           shapeId: this.activeShape.id,
           editionMode: this.Enums.ShapeEditorEditionMode.SELECT_RANGE,
         }

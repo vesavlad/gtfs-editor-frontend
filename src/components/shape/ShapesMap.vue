@@ -35,7 +35,7 @@ export default {
     };
   },
   props: {
-    project: {
+    projectId: {
       required: true,
     }
   },
@@ -46,7 +46,7 @@ export default {
         style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
       });
       this.map.on('load', () => {
-        this.envelope(this.map, this.project);
+        this.envelope(this.map, this.projectId);
         this.addLayers();
         this.$emit('load');
       })
@@ -126,23 +126,9 @@ export default {
           }
         });
       });
-      this.map.on('click', 'shape-circle-layer', (evt) => {
-        let feature = evt.features[0];
-        if (this.selectingRange) {
-          this.range.push(feature.properties.label);
-          if (this.range.length === 2) {
-            this.$emit("selected-range", {start: this.range[0], finish: this.range[1],})
-            this.selectingRange = false;
-          }
-        }
-      })
-    },
-    beginRangeSelection() {
-      this.selectingRange = true;
-      this.range = [];
     },
     displayShape(shape) {
-      shapesAPI.shapesAPI.detail(this.project, shape.id).then(response => {
+      shapesAPI.shapesAPI.detail(this.projectId, shape.id).then(response => {
         let points = response.data.points.map(point => [point.shape_pt_lon, point.shape_pt_lat]);
         this.pointsGeojson.features = response.data.points.map(point => {
           let coordinates = [
