@@ -18,8 +18,7 @@
             class="material-icons">help_outline</i></button>
       </div>
     </div>
-    <div id='map' class="map" ref='map'>
-    </div>
+    <div class="map" ref='map'></div>
     <div class="map-sidebar">
       <div class="side-panel edit-shape">
         <div class="side-header">
@@ -173,7 +172,7 @@ export default {
   },
   mounted() {
     this.map = new mapboxgl.Map({
-      container: 'map',
+      container: this.$refs.map,
       style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
     });
     this.map.on('load', () => {
