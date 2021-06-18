@@ -414,6 +414,7 @@ export default {
           }
         });
       });
+
       this.map.addLayer({
         id: 'layer-stops-seq',
         type: 'symbol',
@@ -432,27 +433,11 @@ export default {
           'text-color': config.stop_label_color,
         }
       });
-      this.map.addLayer({
-        id: 'layer-stops-time',
-        type: 'symbol',
-        source: this.stop.sources.stops,
-        filter: ['get', 'arrival_time'],
-        minzoom: minZoom,
-        layout: {
-          'text-field': '{arrival_time}',
-          'text-anchor': 'top',
-          'text-offset': [0, 1.5],
-          'text-allow-overlap': true,
-        }
-      });
+
       this.map.on('click', 'layer-stops-icon', e => {
         e.preventDefault();
         let feature = e.features[0];
-
-        let stopHasFocus = this.map.getFeatureState({
-          source: this.stop.sources.stops,
-          id: feature.id
-        }).focus;
+        let stopHasFocus = this.map.getFeatureState({source: this.stop.sources.stops, id: feature.id}).focus;
 
         if (stopHasFocus) {
           this.localTrip.stop_times = this.localTrip.stop_times.filter(st => st.stop !== feature.id);
