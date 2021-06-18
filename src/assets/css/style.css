@@ -315,6 +315,8 @@ input[type="date" i]::-webkit-calendar-picker-indicator {color: var(--link);}
 .pill-base.empty i {display: none;}
 .pill-base.loading {background-color: var(--gris-claro); color: var(--gris-medio);}
 .pill-base.loading i:not(.icon-loading) {display: none;}
+p.warning {background-color: var(--bg-warning); padding: 10px; border-radius: 5px 20px; color: var(--warning);}
+
 
 /* ==============  BREADCRUMB  ============== */
 
