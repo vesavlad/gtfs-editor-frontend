@@ -198,8 +198,10 @@ export default {
         showOptionalFields: false,
       },
       stop: {
-        sourceName: 'stop-source',
-        sourceNameHighlightLabel: 'stop-source-highlight-label',
+        sources: {
+          stops: 'stop-source',
+          outstandingLabel: 'stop-source-highlight-label'
+        },
         stops: [],
         stopMap: new Map(),
         popup: null
@@ -275,31 +277,34 @@ export default {
     setOptionalFieldsVisibility() {
       this.vuetable.fields = this.vuetable.showOptionalFields ? this.vuetable.fullFields : this.vuetable.baseFields;
     },
+    createGeojsonPoint(longitude, latitude, id, properties) {
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [longitude, latitude]
+        },
+        properties: properties,
+        id: id
+      };
+    },
     setActiveRow(rowData) {
       this.unchangedStopTime = _.cloneDeep(rowData);
       if (this.vuetable.activeRow.stop) {
-        this.map.setFeatureState({source: this.stop.sourceName, id: this.vuetable.activeRow.stop}, {focus: false});
+        this.map.setFeatureState({source: this.stop.sources.stops, id: this.vuetable.activeRow.stop}, {focus: false});
         let geojson = {
           type: 'FeatureCollection',
           features: []
-        }
-        this.map.getSource(this.stop.sourceNameHighlightLabel).setData(geojson);
+        };
+        this.map.getSource(this.stop.sources.outstandingLabel).setData(geojson);
       }
       this.vuetable.activeRow = rowData;
       if (rowData.stop) {
-        this.map.setFeatureState({source: this.stop.sourceName, id: rowData.stop}, {focus: true});
+        this.map.setFeatureState({source: this.stop.sources.stops, id: rowData.stop}, {focus: true});
         let stop = this.stop.stopMap.get(rowData.stop);
-        let geojson = {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [stop.stop_lon, stop.stop_lat]
-          },
-          properties: {
-            label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
-          }
-        };
-        this.map.getSource(this.stop.sourceNameHighlightLabel).setData(geojson);
+        let properties = {label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : '')};
+        let geojson = this.createGeojsonPoint(stop.stop_lon, stop.stop_lat, stop.id, properties);
+        this.map.getSource(this.stop.sources.outstandingLabel).setData(geojson);
       }
     },
     addStopsLayers() {
@@ -309,12 +314,12 @@ export default {
         features: this.generateStopFeatures()
       };
 
-      this.map.addSource(this.stop.sourceName, {
+      this.map.addSource(this.stop.sources.stops, {
         'type': 'geojson',
         'data': geojson,
       });
 
-      this.map.addSource(this.stop.sourceNameHighlightLabel, {
+      this.map.addSource(this.stop.sources.outstandingLabel, {
         'type': 'geojson',
         'data': {
           type: 'FeatureCollection',
@@ -325,7 +330,7 @@ export default {
       this.map.addLayer({
         id: 'layer-stops-icon',
         type: 'circle',
-        source: this.stop.sourceName,
+        source: this.stop.sources.stops,
         layout: {
           'visibility': 'visible'
         },
@@ -364,7 +369,7 @@ export default {
         this.map.addLayer({
           id: 'layer-stops-label',
           type: 'symbol',
-          source: this.stop.sourceName,
+          source: this.stop.sources.stops,
           minzoom: minZoom,
           layout: {
             'text-field': '{label}',
@@ -390,7 +395,7 @@ export default {
         this.map.addLayer({
           id: 'layer-stop-highlight-label',
           type: 'symbol',
-          source: this.stop.sourceNameHighlightLabel,
+          source: this.stop.sources.outstandingLabel,
           layout: {
             'text-field': '{label}',
             'text-font': ['Roboto Medium', 'Arial Unicode MS Regular'],
@@ -412,7 +417,7 @@ export default {
       this.map.addLayer({
         id: 'layer-stops-seq',
         type: 'symbol',
-        source: this.stop.sourceName,
+        source: this.stop.sources.stops,
         filter: ['get', 'selected'],
         minzoom: minZoom,
         layout: {
@@ -430,7 +435,7 @@ export default {
       this.map.addLayer({
         id: 'layer-stops-time',
         type: 'symbol',
-        source: this.stop.sourceName,
+        source: this.stop.sources.stops,
         filter: ['get', 'arrival_time'],
         minzoom: minZoom,
         layout: {
@@ -445,7 +450,7 @@ export default {
         let feature = e.features[0];
 
         let stopHasFocus = this.map.getFeatureState({
-          source: this.stop.sourceName,
+          source: this.stop.sources.stops,
           id: feature.id
         }).focus;
 
@@ -458,7 +463,7 @@ export default {
           let stopTime = this.localTrip.stop_times.filter(st => st.stop === feature.id)[0];
           this.setActiveRow(stopTime);
         } else {
-          let stop = this.stop.stopMap.get(feature.properties.id);
+          let stop = this.stop.stopMap.get(feature.id);
           let stopTime = {
             trip: this.localTrip.id,
             trip_id: this.localTrip.trip_id,
@@ -492,13 +497,13 @@ export default {
         canvas.style.cursor = 'pointer';
         let feature = e.features[0];
         hoveredStops[feature.id] = feature;
-        map.setFeatureState({source: this.stop.sourceName, id: feature.id}, {hover: true});
+        map.setFeatureState({source: this.stop.sources.stops, id: feature.id}, {hover: true});
         this.showPopup(feature);
       });
       this.map.on('mouseleave', 'layer-stops-icon', () => {
         canvas.style.cursor = '';
         Object.keys(hoveredStops).forEach(featureId => {
-          map.setFeatureState({source: this.stop.sourceName, id: featureId}, {hover: false});
+          map.setFeatureState({source: this.stop.sources.stops, id: featureId}, {hover: false});
         });
         hoveredStops = {};
         this.hidePopup();
@@ -506,7 +511,7 @@ export default {
     },
     showPopup(feature) {
       let stopHasFocus = this.map.getFeatureState({
-        source: this.stop.sourceName,
+        source: this.stop.sources.stops,
         id: feature.id
       }).focus;
       let icon = '<span class="material-icons">add</span>';
@@ -654,7 +659,7 @@ export default {
         type: 'FeatureCollection',
         features: this.generateStopFeatures(),
       };
-      this.map.getSource(this.stop.sourceName).setData(geojson);
+      this.map.getSource(this.stop.source.stop).setData(geojson);
     },
     generateStopFeatures() {
       let st_map = new Map();
@@ -675,22 +680,11 @@ export default {
             departure_time: stopTime.departure_time,
           }
         }
-        return {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [
-              stop.stop_lon,
-              stop.stop_lat,
-            ]
-          },
-          properties: {
-            id: stop.id,
-            label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
-            ...props,
-          },
-          id: stop.id,
-        }
+        let properties = {
+          label: stop.stop_id + (stop.stop_code ? ` (${stop.stop_code})` : ''),
+          ...props,
+        };
+        return this.createGeojsonPoint(stop.stop_lon, stop.stop_lat, stop.id, properties);
       });
     },
     calculateSequenceNumber() {
