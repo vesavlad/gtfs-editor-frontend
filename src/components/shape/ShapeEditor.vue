@@ -95,9 +95,6 @@ export default {
       type: Object,
       default: null
     },
-    range: {
-      default: null,
-    },
     mode: {
       type: String,
       validator: function (value) {
@@ -186,7 +183,6 @@ export default {
   },
   methods: {
     addSources() {
-      // This are our base points
       this.map.addSource('points', {
         'type': 'geojson',
         'data': this.pointGeojson,
@@ -197,7 +193,6 @@ export default {
         'data': this.pointSeqGeojson,
       });
 
-      // This is the shape from mapbox
       this.map.addSource('line', {
         'type': 'geojson',
         'data': this.lineGeojson,
@@ -230,7 +225,7 @@ export default {
 
       if (this.mode === this.Enums.ShapeEditorMode.EDIT) {
         this.mapMatching = false;
-        if (this.Enums.ShapeEditorEditionMode.RANGE && this.range !== null) {
+        if (this.Enums.ShapeEditorEditionMode.EDIT_RANGE && !!this.range) {
           // Range uses the shape_pt_sequence so let's say you want to edit between 10-20, this would mean
           // that you want to keep the values at array positions 0-9 (seq 1-10) and 19- (seq 20), so we have
           // to adjust the indexes to use slice in order to split the array.
@@ -289,7 +284,7 @@ export default {
       }
     },
     exit() {
-      this.$router.push({name: "Shapes", params: {projectId: this.$route.params.projectId}});
+      this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
     },
     addLayers() {
       // Line for the shape itself
@@ -454,14 +449,22 @@ export default {
         self.points.splice(self.getPointIndex(feature.properties.to), 0, newStop);
         self.reGeneratePoints();
       });
-      map.on('mouseenter', 'point-line-layer', () => {
-        canvas.style.cursor = 'pointer';
-      });
 
+      let hoveredStops = {};
+      map.on('mouseenter', 'point-line-layer', e => {
+        let feature = e.features[0];
+        hoveredStops[feature.id] = feature;
+        canvas.style.cursor = 'pointer';
+        map.setFeatureState({source: 'points', id: feature.id,}, {hover: true});
+      });
 
       map.on('mouseleave', 'point-line-layer', () => {
         canvas.style.cursor = '';
+        Object.keys(hoveredStops).forEach(featureId => {
+          map.setFeatureState({source: 'points', id: featureId}, {hover: false});
+        });
       });
+
       // When we double click the map we add a point in that position
       this.map.on('dblclick', (e) => {
         if (e.defaultPrevented) {
@@ -518,7 +521,7 @@ export default {
     },
     reGeneratePoints() {
       // We add the features
-      this.pointGeojson.features = this.points.map(this.generatePointGeojson);
+      this.pointGeojson.features = this.points.map(this.generateGeojsonPoint);
       // And the polyline
       this.pointSeqGeojson.features = this.generateLineFeatures(this.points);
       this.map.getSource('points').setData(this.pointGeojson);
@@ -615,7 +618,7 @@ export default {
       });
       return features;
     },
-    generatePointGeojson(point) {
+    generateGeojsonPoint(point) {
       return {
         type: 'Feature',
         geometry: {
@@ -679,7 +682,7 @@ export default {
       };
       if (this.mode === this.Enums.ShapeEditorMode.CREATE || this.editionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
         shapesAPI.shapesAPI.create(this.projectId, data).then(() => {
-          this.$router.push({name: "Shapes", params: {projectId: this.$route.params.projectId}});
+          this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
         }).catch(err => {
           console.log(err.response);
           this.generateErrorMessage(err.response.data);
@@ -689,7 +692,7 @@ export default {
         data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(
             generatePointJson);
         shapesAPI.shapesAPI.put(this.projectId, data).then(() => {
-          this.$router.push({name: "Shapes", params: {projectId: this.$route.params.projectId}});
+          this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
         }).catch(err => {
           console.log(err.response);
           this.generateErrorMessage(err.response.data);
