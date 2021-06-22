@@ -91,6 +91,7 @@ let shapeEditorSelectRangeMixin = {
       }
 
       this.selectRange.stopsInBetween.forEach(stop => {
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: false});
         this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: false});
       });
       this.selectRange.stopsInBetween = [];
@@ -99,7 +100,11 @@ let shapeEditorSelectRangeMixin = {
       for (let i = firstPoint.properties.sequence; i <= lastPoint.properties.sequence; i++) {
         let stop = this.selectRange.points[i];
         this.selectRange.stopsInBetween.push(stop);
-        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
+        if ([firstPoint.properties.sequence,  lastPoint.properties.sequence].includes(i)) {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: true});
+        } else {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
+        }
         pointsForLine.push([stop.lng, stop.lat]);
       }
       this.selectRange.geojsonBetweenLine.geometry.coordinates = pointsForLine;
@@ -167,8 +172,8 @@ let shapeEditorSelectRangeMixin = {
           'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
           'circle-color': [
             'case',
-            ['boolean', ['feature-state', 'between'], false], 'red',
             ['boolean', ['feature-state', 'selected'], false], '#21b0cf',
+            ['boolean', ['feature-state', 'between'], false], 'red',
             ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
             'white'
           ],
