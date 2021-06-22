@@ -112,7 +112,8 @@
       "discardChangesMessage": "Are you sure you want to exit and discard your changes?",
       "editShapeRange": "Edit shape range",
       "startPoint": "Start point",
-      "endPoint": "End point"
+      "endPoint": "End point",
+      "helpMessageToSelectRange": "Choose a starting point and ending point to edit"
     }
   },
   "stop": {

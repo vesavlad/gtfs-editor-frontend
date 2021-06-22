@@ -112,7 +112,8 @@
       "discardChangesMessage": "¿Está segur@ de salir y descargar los cambios no guardados?",
       "editShapeRange": "Editar tramo de geometría",
       "startPoint": "Punto de inicio",
-      "endPoint": "Punto de fin"
+      "endPoint": "Punto de fin",
+      "helpMessageToSelectRange": "Selecciona el punto inicial y final del tramo a editar"
     }
   },
   "stop": {
