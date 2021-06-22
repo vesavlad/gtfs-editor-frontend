@@ -2,7 +2,7 @@
   <div class="dynamic-map-container">
     <div class="top-map-bar">
       <div class="left-content">
-        <template v-if="editionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
+        <template v-if="localEditionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
           <div>{{ $t('shape.editor.helpMessageToSelectRange') }}</div>
         </template>
         <template v-else>
@@ -18,7 +18,7 @@
       </div>
       <div class="right-content grid center">
         <template
-            v-if="[Enums.ShapeEditorEditionMode.SIMPLE, Enums.ShapeEditorEditionMode.DUPLICATE].includes(editionMode)">
+            v-if="[Enums.ShapeEditorEditionMode.SIMPLE, Enums.ShapeEditorEditionMode.DUPLICATE].includes(localEditionMode)">
           <button class="btn" @click="invertPoints"><span>{{ $t('shape.editor.invertShape') }}</span><span
               class="material-icons">cached</span></button>
         </template>
@@ -28,7 +28,7 @@
     </div>
     <div class="map" ref='map'></div>
     <div class="map-sidebar">
-      <div class="side-panel edit-shape-range" v-if="editionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
+      <div class="side-panel edit-shape-range" v-if="localEditionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
         <div class="side-header">
           <h4>{{ $t('shape.editor.editShapeRange') }}</h4>
         </div>
@@ -145,6 +145,7 @@ export default {
   data() {
     return {
       localShape: this.shape,
+      localEditionMode: this.editionMode,
       map: null,
       fixedPoints: {
         start: [],
@@ -187,7 +188,7 @@ export default {
       style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
     });
     this.map.on('load', () => {
-      if (this.editionMode === this.Enums.ShapeEditorEditionMode.SELECT_RANGE) {
+      if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SELECT_RANGE) {
         this.changeToSelectRange(this.localShape);
       } else {
         this.addSources();
@@ -284,7 +285,7 @@ export default {
           this.map.getSource('fixedPoints').setData(fixedPointsGeojson);
         }
       } else {
-        if (this.editionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
+        if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
           this.localShape.id = null;
           this.localShape.shape_id = this.$t('shape.editor.duplicationPrefix') + this.localShape.shape_id;
         } else {
@@ -296,7 +297,7 @@ export default {
 
       this.points = points;
       if (this.mode === this.Enums.ShapeEditorMode.EDIT ||
-          (this.mode === this.Enums.ShapeEditorMode.CREATE && this.editionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE)) {
+          (this.mode === this.Enums.ShapeEditorMode.CREATE && this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE)) {
         let bounds = this.getBounds(this.points);
         let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 0.1;
         this.map.fitBounds(bounds, {
@@ -688,7 +689,7 @@ export default {
         shape_id: this.localShape.shape_id,
         points: this.points.map(generatePointJson)
       };
-      if (this.mode === this.Enums.ShapeEditorMode.CREATE || this.editionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
+      if (this.mode === this.Enums.ShapeEditorMode.CREATE || this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
         shapesAPI.shapesAPI.create(this.projectId, data).then(() => {
           this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
         }).catch(err => {
