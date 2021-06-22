@@ -109,7 +109,10 @@
       "replacePoints": "Reemplazar puntos",
       "invertShape": "Invertir geometría",
       "length": "Largo",
-      "discardChangesMessage": "¿Está segur@ de salir y descargar los cambios no guardados?"
+      "discardChangesMessage": "¿Está segur@ de salir y descargar los cambios no guardados?",
+      "editShapeRange": "Editar tramo de geometría",
+      "startPoint": "Punto de inicio",
+      "endPoint": "Punto de fin"
     }
   },
   "stop": {

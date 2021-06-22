@@ -109,7 +109,10 @@
       "replacePoints": "Replace points",
       "invertShape": "invert Shape",
       "length": "Length",
-      "discardChangesMessage": "Are you sure you want to exit and discard your changes?"
+      "discardChangesMessage": "Are you sure you want to exit and discard your changes?",
+      "editShapeRange": "Edit shape range",
+      "startPoint": "Start point",
+      "endPoint": "End point"
     }
   },
   "stop": {
