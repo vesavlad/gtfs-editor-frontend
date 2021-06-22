@@ -2,27 +2,26 @@ import config from "@/config";
 
 let shapeEditorSelectRangeMixin = {
   computed: {
-    firstSelectedPointSequence() {
+    firstSelectedPoint() {
       let firstPoint = this.selectRange.selectedStopFeatures[0];
       let lastPoint = this.selectRange.selectedStopFeatures[1];
       if (firstPoint.properties.sequence > lastPoint.properties.sequence) {
-        return lastPoint.properties.sequence;
+        return lastPoint;
       }
-      return firstPoint.properties.sequence;
+      return firstPoint;
     },
-    endSelectedPointSequence() {
+    endSelectedPoint() {
       let firstPoint = this.selectRange.selectedStopFeatures[0];
       let lastPoint = this.selectRange.selectedStopFeatures[1];
       if (firstPoint.properties.sequence > lastPoint.properties.sequence) {
-        return firstPoint.properties.sequence;
+        return firstPoint;
       }
-      return lastPoint.properties.sequence;
+      return lastPoint;
     }
   },
   data() {
     return {
       selectRange: {
-        map: null,
         points: null,
         geojsonPoints: {
           type: 'FeatureCollection',
@@ -41,11 +40,27 @@ let shapeEditorSelectRangeMixin = {
           }
         },
         selectedStopFeatures: [{id: null, properties: {sequence: null}}, {id: null, properties: {sequence: null}}],
-        stopsInBetween: []
+        stopsInBetween: [],
+        hoveredStops: {},
+        lastUsedIndex: 0
       }
     }
   },
   methods: {
+    cleanMapFromSelectRangeLogic() {
+      this.map.off('mouseenter', 'point-layer', this.selectRangeMouseEnter);
+      this.map.off('mousemove', 'point-layer', this.selectRangeMouseMove);
+      this.map.off('mouseleave', 'point-layer', this.selectRangeMouseLeave);
+      this.map.off('click', 'point-layer', this.selectRangeClick);
+      this.map.removeLayer('point-line-layer');
+      this.map.removeLayer('point-layer');
+      this.map.removeLayer('point-arrow');
+      this.map.removeLayer('point-arrow-between-selected-points-layer');
+      this.map.removeLayer('line-between-selected-points-layer');
+      this.map.removeSource('shape-points-source');
+      this.map.removeSource('shape-line-source');
+      this.map.removeSource('shape-line-between-source');
+    },
     generateGeojsonPoint(point, properties) {
       return {
         type: 'Feature',
@@ -253,52 +268,49 @@ let shapeEditorSelectRangeMixin = {
         }
       });
 
-      let hoveredStops = {};
-      let canvas = this.map.getCanvas();
-      this.map.on('mouseenter', 'point-layer', e => {
-        let feature = e.features[0];
-        hoveredStops[feature.id] = feature;
-        canvas.style.cursor = 'pointer';
-        this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+      this.map.on('mouseenter', 'point-layer', this.selectRangeMouseEnter);
+      this.map.on('mousemove', 'point-layer', this.selectRangeMouseMove);
+      this.map.on('mouseleave', 'point-layer', this.selectRangeMouseLeave);
+      this.map.on('click', 'point-layer', this.selectRangeClick);
+    },
+    selectRangeMouseEnter(e) {
+      let feature = e.features[0];
+      this.selectRange.hoveredStops[feature.id] = feature;
+      this.map.getCanvas().style.cursor = 'pointer';
+      this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+    },
+    selectRangeMouseMove(e) {
+      let features = this.map.queryRenderedFeatures(e.point);
+      let currentHoveredStops = {};
+      features.forEach(feature => {
+        if (feature.layer.id === 'point-layer') {
+          this.selectRange.hoveredStops[feature.id] = feature;
+          currentHoveredStops[feature.id] = feature;
+          this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+        }
       });
-
-      this.map.on('mousemove', 'point-layer', e => {
-        let features = this.map.queryRenderedFeatures(e.point);
-        let currentHoveredStops = {};
-        features.forEach(feature => {
-          if (feature.layer.id === 'point-layer') {
-            hoveredStops[feature.id] = feature;
-            currentHoveredStops[feature.id] = feature;
-            this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
-          }
-        });
-        Object.keys(hoveredStops).forEach(featureId => {
-          if (!Object.keys(currentHoveredStops).includes(featureId)) {
-            this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
-          }
-        });
-      });
-
-      this.map.on('mouseleave', 'point-layer', () => {
-        canvas.style.cursor = '';
-        Object.keys(hoveredStops).forEach(featureId => {
+      Object.keys(this.selectRange.hoveredStops).forEach(featureId => {
+        if (!Object.keys(currentHoveredStops).includes(featureId)) {
           this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
-        });
-      });
-
-      // we use just two points
-      let lastUsedIndex = 0;
-      this.map.on('click', 'point-layer', e => {
-        // unselect previous point
-        let previousFeatureId = this.selectRange.selectedStopFeatures[lastUsedIndex].id;
-        this.map.setFeatureState({source: 'shape-points-source', id: previousFeatureId}, {selected: false});
-        let feature = e.features[0];
-        this.$set(this.selectRange.selectedStopFeatures, lastUsedIndex, feature);
-        this.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {selected: true});
-        lastUsedIndex = lastUsedIndex ? 0 : 1;
-        this.setBetweenData();
+        }
       });
     },
+    selectRangeMouseLeave() {
+      this.map.getCanvas().style.cursor = '';
+      Object.keys(this.selectRange.hoveredStops).forEach(featureId => {
+        this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+      });
+    },
+    selectRangeClick(e) {
+      // unselect previous point
+      let previousFeatureId = this.selectRange.selectedStopFeatures[this.selectRange.lastUsedIndex].id;
+      this.map.setFeatureState({source: 'shape-points-source', id: previousFeatureId}, {selected: false});
+      let feature = e.features[0];
+      this.$set(this.selectRange.selectedStopFeatures, this.selectRange.lastUsedIndex, feature);
+      this.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {selected: true});
+      this.selectRange.lastUsedIndex = this.selectRange.lastUsedIndex ? 0 : 1;
+      this.setBetweenData();
+    }
   }
 };
 

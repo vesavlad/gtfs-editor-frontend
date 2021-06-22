@@ -34,10 +34,11 @@
         </div>
         <div class="side-content">
           <div class="field-name"><span>{{ $t('shape.editor.startPoint') }}</span></div>
-          <div class="field">{{ firstSelectedPointSequence }}</div>
+          <div class="field">{{ firstSelectedPoint.properties.sequence }}</div>
           <div class="field-name"><span>{{ $t('shape.editor.endPoint') }}</span></div>
-          <div class="field">{{ endSelectedPointSequence }}</div>
-          <button class="btn" @click="changeToEditRange" :disabled="firstSelectedPointSequence===null || endSelectedPointSequence===null">
+          <div class="field">{{ endSelectedPoint.properties.sequence }}</div>
+          <button class="btn" @click="changeToEditRangeClick"
+                  :disabled="firstSelectedPoint.properties.sequence===null || endSelectedPoint.properties.sequence===null">
             {{ $t('shape.editor.startEditionOfRangeButtonLabel') }}
             <span class="material-icons">edit</span></button>
         </div>
@@ -188,7 +189,6 @@ export default {
     this.map.on('load', () => {
       if (this.editionMode === this.Enums.ShapeEditorEditionMode.SELECT_RANGE) {
         this.changeToSelectRange(this.localShape);
-        console.log('select range');
       } else {
         this.addSources();
         this.setData();
@@ -200,8 +200,10 @@ export default {
     });
   },
   methods: {
-    changeToEditRange() {
-
+    changeToEditRangeClick() {
+      this.localModeEdition = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
+      this.cleanMapFromSelectRangeLogic();
+      this.changeToEditRange(this.firstSelectedPoint, this.endSelectedPoint);
     },
     addSources() {
       this.map.addSource('points', {
