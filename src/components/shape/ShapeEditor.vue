@@ -1,26 +1,44 @@
 <template>
   <div class="dynamic-map-container">
     <div class="top-map-bar">
-      <div class="left-content" v-if="map">
-        <div class="grid center">
-          <label class="switch">
-            <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
-            <span class="slider round"></span>
-          </label>
-          <span>Map Matching</span>
-        </div>
-        <button v-if="mapMatching" class="btn" @click="replacePoints">{{ $t('shape.editor.replacePoints') }}</button>
+      <div class="left-content">
+        <template v-if="editionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
+          <div>{{ $t('shape.editor.helpMessageToSelectRange') }}</div>
+        </template>
+        <template v-else>
+          <div class="grid center">
+            <label class="switch">
+              <input type="checkbox" v-model="mapMatching" @change="reGeneratePoints">
+              <span class="slider round"></span>
+            </label>
+            <span>Map Matching</span>
+          </div>
+          <button v-if="mapMatching" class="btn" @click="replacePoints">{{ $t('shape.editor.replacePoints') }}</button>
+        </template>
       </div>
       <div class="right-content grid center">
-        <button class="btn" @click="invertPoints"><span>{{ $t('shape.editor.invertShape') }}</span><span
-            class="material-icons">cached</span></button>
+        <template v-if="[Enums.ShapeEditorEditionMode.SIMPLE, Enums.ShapeEditorEditionMode.DUPLICATE].includes(editionMode)">
+          <button class="btn" @click="invertPoints"><span>{{ $t('shape.editor.invertShape') }}</span><span
+              class="material-icons">cached</span></button>
+        </template>
         <button class="btn flat white"><span>{{ $t('general.howToUse') }}</span><i
             class="material-icons">help_outline</i></button>
       </div>
     </div>
     <div class="map" ref='map'></div>
     <div class="map-sidebar">
-      <div class="side-panel edit-shape">
+      <div class="side-panel edit-shape-range" v-if="editionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
+        <div class="side-header">
+          <h4>{{ $t('shape.editor.editShapeRange') }}</h4>
+        </div>
+        <div class="side-content">
+          <div class="field-name"><span>{{ $t('shape.editor.startPoint') }}</span></div>
+          <div class="field">{{ firstSelectedPointSequence }}</div>
+          <div class="field-name"><span>{{ $t('shape.editor.endPoint') }}</span></div>
+          <div class="field">{{ endSelectedPointSequence }}</div>
+        </div>
+      </div>
+      <div class="side-panel edit-shape" v-else>
         <div class="side-header">
           <div>
             <h4 v-if="mode===Enums.ShapeEditorMode.CREATE">{{ $t('shape.editor.addNewShape') }}</h4>
@@ -71,6 +89,7 @@ import Enums from '@/utils/enums.js'
 import errorMessageMixin from '@/mixins/shapeMapMixin';
 import shapeMapMixin from '@/mixins/errorMessageMixin';
 import envelopeMixin from "@/mixins/envelopeMixin";
+import shapeEditorSelectRangeMixin from "@/mixins/shapeEditorSelectRangeMixin";
 import config from "@/config";
 import MessageModal from "@/components/modal/MessageModal";
 
@@ -85,6 +104,7 @@ export default {
     errorMessageMixin,
     shapeMapMixin,
     envelopeMixin,
+    shapeEditorSelectRangeMixin,
   ],
   props: {
     projectId: {
@@ -121,18 +141,6 @@ export default {
     return {
       localShape: this.shape,
       map: null,
-      pointGeojson: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-      lineGeojson: {
-        'type': 'Feature',
-        'properties': {},
-        'geometry': {
-          'type': 'LineString',
-          'coordinates': []
-        }
-      },
       fixedPoints: {
         start: [],
         finish: [],
@@ -174,10 +182,16 @@ export default {
       style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
     });
     this.map.on('load', () => {
-      this.addSources();
-      this.setData();
-      this.addLayers();
-      this.addListeners();
+      if (this.editionMode === this.Enums.ShapeEditorEditionMode.SELECT_RANGE) {
+        this.changeToSelectRange(this.localShape);
+        console.log('select range');
+      } else {
+        this.addSources();
+        this.setData();
+        this.addLayers();
+        this.addListeners();
+      }
+      this.envelope(this.map, this.projectId);
       this.$emit('load');
     });
   },
