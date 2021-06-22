@@ -17,7 +17,8 @@
         </template>
       </div>
       <div class="right-content grid center">
-        <template v-if="[Enums.ShapeEditorEditionMode.SIMPLE, Enums.ShapeEditorEditionMode.DUPLICATE].includes(editionMode)">
+        <template
+            v-if="[Enums.ShapeEditorEditionMode.SIMPLE, Enums.ShapeEditorEditionMode.DUPLICATE].includes(editionMode)">
           <button class="btn" @click="invertPoints"><span>{{ $t('shape.editor.invertShape') }}</span><span
               class="material-icons">cached</span></button>
         </template>
@@ -36,6 +37,9 @@
           <div class="field">{{ firstSelectedPointSequence }}</div>
           <div class="field-name"><span>{{ $t('shape.editor.endPoint') }}</span></div>
           <div class="field">{{ endSelectedPointSequence }}</div>
+          <button class="btn" @click="changeToEditRange" :disabled="firstSelectedPointSequence===null || endSelectedPointSequence===null">
+            {{ $t('shape.editor.startEditionOfRangeButtonLabel') }}
+            <span class="material-icons">edit</span></button>
         </div>
       </div>
       <div class="side-panel edit-shape" v-else>
@@ -196,6 +200,9 @@ export default {
     });
   },
   methods: {
+    changeToEditRange() {
+
+    },
     addSources() {
       this.map.addSource('points', {
         'type': 'geojson',

@@ -113,7 +113,8 @@
       "editShapeRange": "Edit shape range",
       "startPoint": "Start point",
       "endPoint": "End point",
-      "helpMessageToSelectRange": "Choose a starting point and ending point to edit"
+      "helpMessageToSelectRange": "Choose a starting point and ending point to edit",
+      "startEditionOfRangeButtonLabel": "Start to edit"
     }
   },
   "stop": {
