@@ -28,12 +28,8 @@ let shapeEditorSelectRangeMixin = {
           features: [],
         },
         geojsonLine: {
-          'type': 'Feature',
-          'properties': {},
-          'geometry': {
-            'type': 'LineString',
-            'coordinates': []
-          }
+          type: "FeatureCollection",
+          features: []
         },
         geojsonBetweenLine: {
           'type': 'Feature',
@@ -69,8 +65,17 @@ let shapeEditorSelectRangeMixin = {
           lng: point.shape_pt_lon,
         }
       });
-      this.selectRange.geojsonPoints.features = this.selectRange.points.map(el => this.generateGeojsonPoint(el, {sequence: el.id}));
-      this.selectRange.geojsonLine.geometry.coordinates = this.selectRange.points.map(p => [p.lng, p.lat]);
+      this.selectRange.geojsonPoints.features = this.selectRange.points.map(el => {
+        return this.generateGeojsonPoint(el, {sequence: el.id});
+      });
+      this.selectRange.geojsonLine.features.push({
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: this.selectRange.points.map(p => [p.lng, p.lat])
+        },
+        properties: {}
+      });
     },
     setBetweenData() {
       let firstPoint = this.selectRange.selectedStopFeatures[0];
@@ -99,6 +104,27 @@ let shapeEditorSelectRangeMixin = {
       }
       this.selectRange.geojsonBetweenLine.geometry.coordinates = pointsForLine;
       this.map.getSource('shape-line-between-source').setData(this.selectRange.geojsonBetweenLine);
+
+      let firstSegment = this.selectRange.points.slice(0, firstPoint.properties.sequence + 1);
+      let secondSegment = this.selectRange.points.slice(lastPoint.properties.sequence, this.selectRange.points.length - 1);
+      this.selectRange.geojsonLine.features[0].geometry.coordinates = firstSegment.map(stop => [stop.lng, stop.lat]);
+      if (this.selectRange.geojsonLine.features.length > 1) {
+        if (secondSegment.length > 1) {
+          this.selectRange.geojsonLine.features[1].geometry.coordinates = secondSegment.map(stop => [stop.lng, stop.lat]);
+        } else {
+          this.selectRange.geojsonLine.features.pop();
+        }
+      } else if (secondSegment.length > 1) {
+        this.selectRange.geojsonLine.features.push({
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: secondSegment.map(stop => [stop.lng, stop.lat])
+          },
+          properties: {}
+        });
+      }
+      this.map.getSource('shape-line-source').setData(this.selectRange.geojsonLine);
     },
     changeToSelectRange(shape) {
       this.setShapeData(shape);
