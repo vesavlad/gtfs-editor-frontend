@@ -101,7 +101,7 @@ let shapeEditorSelectRangeMixin = {
       for (let i = firstPoint.properties.sequence; i <= lastPoint.properties.sequence; i++) {
         let stop = this.selectRange.points[i];
         this.selectRange.stopsInBetween.push(stop);
-        if ([firstPoint.properties.sequence,  lastPoint.properties.sequence].includes(i)) {
+        if ([firstPoint.properties.sequence, lastPoint.properties.sequence].includes(i)) {
           this.selectRange.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: true});
         } else {
           this.selectRange.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
