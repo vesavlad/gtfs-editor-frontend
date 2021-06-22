@@ -284,7 +284,7 @@ export default {
       }
     },
     exit() {
-      this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
+      this.$router.push({name: 'Shapes', params: {projectId: this.projectId}});
     },
     addLayers() {
       // Line for the shape itself
@@ -479,7 +479,7 @@ export default {
       });
       map.on('contextmenu', 'point-layer', evt => {
         evt.preventDefault();
-        let id = evt.features[0].properties.id;
+        let id = evt.features[0].id;
         this.points = this.points.filter(point => point.id !== id);
         this.reGeneratePoints();
       });
@@ -501,7 +501,7 @@ export default {
     },
     updatePoint(pt, coords) {
       this.points = this.points.map(point => {
-        if (pt.properties.id === point.id) {
+        if (pt.id === point.id) {
           point = {
             ...point,
             ...coords,
@@ -617,21 +617,6 @@ export default {
         lastPoint = point;
       });
       return features;
-    },
-    generateGeojsonPoint(point) {
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [
-            point.lng,
-            point.lat,
-          ]
-        },
-        properties: {
-          id: point.id,
-        }
-      }
     },
     replacePoints() {
       let coords = this.lineGeojson.geometry.coordinates;
