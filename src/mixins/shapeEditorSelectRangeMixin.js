@@ -92,8 +92,8 @@ let shapeEditorSelectRangeMixin = {
       }
 
       this.selectRange.stopsInBetween.forEach(stop => {
-        this.selectRange.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: false});
-        this.selectRange.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: false});
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: false});
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: false});
       });
       this.selectRange.stopsInBetween = [];
 
@@ -102,14 +102,14 @@ let shapeEditorSelectRangeMixin = {
         let stop = this.selectRange.points[i];
         this.selectRange.stopsInBetween.push(stop);
         if ([firstPoint.properties.sequence, lastPoint.properties.sequence].includes(i)) {
-          this.selectRange.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: true});
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: true});
         } else {
-          this.selectRange.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
         }
         pointsForLine.push([stop.lng, stop.lat]);
       }
       this.selectRange.geojsonBetweenLine.geometry.coordinates = pointsForLine;
-      this.selectRange.map.getSource('shape-line-between-source').setData(this.selectRange.geojsonBetweenLine);
+      this.map.getSource('shape-line-between-source').setData(this.selectRange.geojsonBetweenLine);
 
       let firstSegment = this.selectRange.points.slice(0, firstPoint.properties.sequence + 1);
       let secondSegment = this.selectRange.points.slice(lastPoint.properties.sequence, this.selectRange.points.length - 1);
@@ -130,27 +130,27 @@ let shapeEditorSelectRangeMixin = {
           properties: {}
         });
       }
-      this.selectRange.map.getSource('shape-line-source').setData(this.selectRange.geojsonLine);
+      this.map.getSource('shape-line-source').setData(this.selectRange.geojsonLine);
     },
     changeToSelectRange(shape) {
       this.setShapeData(shape);
-      this.selectRange.map.addSource('shape-points-source', {
+      this.map.addSource('shape-points-source', {
         'type': 'geojson',
         'data': this.selectRange.geojsonPoints,
       });
 
-      this.selectRange.map.addSource('shape-line-source', {
+      this.map.addSource('shape-line-source', {
         'type': 'geojson',
         'data': this.selectRange.geojsonLine,
       });
 
-      this.selectRange.map.addSource('shape-line-between-source', {
+      this.map.addSource('shape-line-between-source', {
         'type': 'geojson',
         'data': this.selectRange.geojsonBetweenLine,
       });
 
       // Line for the shape itself
-      this.selectRange.map.addLayer({
+      this.map.addLayer({
         'id': 'point-line-layer',
         'type': 'line',
         'source': 'shape-line-source',
@@ -165,7 +165,7 @@ let shapeEditorSelectRangeMixin = {
       });
 
       // Circles for the points
-      this.selectRange.map.addLayer({
+      this.map.addLayer({
         id: 'point-layer',
         type: 'circle',
         source: 'shape-points-source',
@@ -191,13 +191,13 @@ let shapeEditorSelectRangeMixin = {
 
       // Arrow for the shape
       let img = require('../assets/img/double-arrow.png')
-      this.selectRange.map.loadImage(img, (err, image) => {
+      this.map.loadImage(img, (err, image) => {
         if (err) {
           console.log(err);
           return;
         }
-        this.selectRange.map.addImage('double-arrow', image, {sdf: true});
-        this.selectRange.map.addLayer({
+        this.map.addImage('double-arrow', image, {sdf: true});
+        this.map.addLayer({
           'id': 'point-arrow',
           'type': 'symbol',
           'source': 'shape-line-source',
@@ -217,7 +217,7 @@ let shapeEditorSelectRangeMixin = {
           }
         }, 'point-layer');
 
-        this.selectRange.map.addLayer({
+        this.map.addLayer({
           'id': 'point-arrow-between-selected-points-layer',
           'type': 'symbol',
           'source': 'shape-line-between-source',
@@ -239,7 +239,7 @@ let shapeEditorSelectRangeMixin = {
       });
 
       // Line for the shape itself
-      this.selectRange.map.addLayer({
+      this.map.addLayer({
         'id': 'line-between-selected-points-layer',
         'type': 'line',
         'source': 'shape-line-between-source',
@@ -254,47 +254,47 @@ let shapeEditorSelectRangeMixin = {
       });
 
       let hoveredStops = {};
-      let canvas = this.selectRange.map.getCanvas();
-      this.selectRange.map.on('mouseenter', 'point-layer', e => {
+      let canvas = this.map.getCanvas();
+      this.map.on('mouseenter', 'point-layer', e => {
         let feature = e.features[0];
         hoveredStops[feature.id] = feature;
         canvas.style.cursor = 'pointer';
-        this.selectRange.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+        this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
       });
 
-      this.selectRange.map.on('mousemove', 'point-layer', e => {
-        let features = this.selectRange.map.queryRenderedFeatures(e.point);
+      this.map.on('mousemove', 'point-layer', e => {
+        let features = this.map.queryRenderedFeatures(e.point);
         let currentHoveredStops = {};
         features.forEach(feature => {
           if (feature.layer.id === 'point-layer') {
             hoveredStops[feature.id] = feature;
             currentHoveredStops[feature.id] = feature;
-            this.selectRange.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+            this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
           }
         });
         Object.keys(hoveredStops).forEach(featureId => {
           if (!Object.keys(currentHoveredStops).includes(featureId)) {
-            this.selectRange.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+            this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
           }
         });
       });
 
-      this.selectRange.map.on('mouseleave', 'point-layer', () => {
+      this.map.on('mouseleave', 'point-layer', () => {
         canvas.style.cursor = '';
         Object.keys(hoveredStops).forEach(featureId => {
-          this.selectRange.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+          this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
         });
       });
 
       // we use just two points
       let lastUsedIndex = 0;
-      this.selectRange.map.on('click', 'point-layer', e => {
+      this.map.on('click', 'point-layer', e => {
         // unselect previous point
         let previousFeatureId = this.selectRange.selectedStopFeatures[lastUsedIndex].id;
-        this.selectRange.map.setFeatureState({source: 'shape-points-source', id: previousFeatureId}, {selected: false});
+        this.map.setFeatureState({source: 'shape-points-source', id: previousFeatureId}, {selected: false});
         let feature = e.features[0];
         this.$set(this.selectRange.selectedStopFeatures, lastUsedIndex, feature);
-        this.selectRange.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {selected: true});
+        this.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {selected: true});
         lastUsedIndex = lastUsedIndex ? 0 : 1;
         this.setBetweenData();
       });
