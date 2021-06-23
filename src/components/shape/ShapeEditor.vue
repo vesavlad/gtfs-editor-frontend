@@ -245,7 +245,7 @@ export default {
       });
     },
     changeToEditRangeClick() {
-      this.localModeEdition = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
       this.changeToEditRange();
     },
     addSources() {
