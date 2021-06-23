@@ -22,22 +22,14 @@ let shapeEditorSelectRangeMixin = {
   data() {
     return {
       selectRange: {
-        points: null,
-        geojsonPoints: {
-          type: 'FeatureCollection',
-          features: [],
-        },
-        geojsonLine: {
-          type: "FeatureCollection",
-          features: []
-        },
         geojsonBetweenLine: {
           'type': 'Feature',
           'properties': {},
           'geometry': {
             'type': 'LineString',
             'coordinates': []
-          }
+          },
+          id: 1
         },
         selectedStopFeatures: [{id: null, properties: {sequence: null}}, {id: null, properties: {sequence: null}}],
         stopsInBetween: [],
@@ -47,52 +39,6 @@ let shapeEditorSelectRangeMixin = {
     }
   },
   methods: {
-    cleanMapFromSelectRangeLogic() {
-      this.map.off('mouseenter', 'point-layer', this.selectRangeMouseEnter);
-      this.map.off('mousemove', 'point-layer', this.selectRangeMouseMove);
-      this.map.off('mouseleave', 'point-layer', this.selectRangeMouseLeave);
-      this.map.off('click', 'point-layer', this.selectRangeClick);
-      this.map.removeLayer('point-line-layer');
-      this.map.removeLayer('point-layer');
-      this.map.removeLayer('point-arrow');
-      this.map.removeLayer('point-arrow-between-selected-points-layer');
-      this.map.removeLayer('line-between-selected-points-layer');
-      this.map.removeSource('shape-points-source');
-      this.map.removeSource('shape-line-source');
-      this.map.removeSource('shape-line-between-source');
-    },
-    generateGeojsonPoint(point, properties) {
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [point.lng, point.lat]
-        },
-        properties: properties,
-        id: point.id
-      }
-    },
-    setShapeData(shape) {
-      this.selectRange.points = [];
-      this.selectRange.points = shape.points.map(point => {
-        return {
-          id: this.id++,
-          lat: point.shape_pt_lat,
-          lng: point.shape_pt_lon,
-        }
-      });
-      this.selectRange.geojsonPoints.features = this.selectRange.points.map(el => {
-        return this.generateGeojsonPoint(el, {sequence: el.id});
-      });
-      this.selectRange.geojsonLine.features.push({
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: this.selectRange.points.map(p => [p.lng, p.lat])
-        },
-        properties: {}
-      });
-    },
     setBetweenData() {
       let firstPoint = this.selectRange.selectedStopFeatures[0];
       let lastPoint = this.selectRange.selectedStopFeatures[1];
@@ -114,7 +60,7 @@ let shapeEditorSelectRangeMixin = {
 
       let pointsForLine = [];
       for (let i = firstPoint.properties.sequence; i <= lastPoint.properties.sequence; i++) {
-        let stop = this.selectRange.points[i];
+        let stop = this.points[i];
         this.selectRange.stopsInBetween.push(stop);
         if ([firstPoint.properties.sequence, lastPoint.properties.sequence].includes(i)) {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: true});
@@ -126,37 +72,38 @@ let shapeEditorSelectRangeMixin = {
       this.selectRange.geojsonBetweenLine.geometry.coordinates = pointsForLine;
       this.map.getSource('shape-line-between-source').setData(this.selectRange.geojsonBetweenLine);
 
-      let firstSegment = this.selectRange.points.slice(0, firstPoint.properties.sequence + 1);
-      let secondSegment = this.selectRange.points.slice(lastPoint.properties.sequence, this.selectRange.points.length - 1);
-      this.selectRange.geojsonLine.features[0].geometry.coordinates = firstSegment.map(stop => [stop.lng, stop.lat]);
-      if (this.selectRange.geojsonLine.features.length > 1) {
+      let firstSegment = this.points.slice(0, firstPoint.properties.sequence + 1);
+      let secondSegment = this.points.slice(lastPoint.properties.sequence, this.points.length - 1);
+      this.geojsonLine.features[0].geometry.coordinates = firstSegment.map(stop => [stop.lng, stop.lat]);
+      if (this.geojsonLine.features.length > 1) {
         if (secondSegment.length > 1) {
-          this.selectRange.geojsonLine.features[1].geometry.coordinates = secondSegment.map(stop => [stop.lng, stop.lat]);
+          this.geojsonLine.features[1].geometry.coordinates = secondSegment.map(stop => [stop.lng, stop.lat]);
         } else {
-          this.selectRange.geojsonLine.features.pop();
+          this.geojsonLine.features.pop();
         }
       } else if (secondSegment.length > 1) {
-        this.selectRange.geojsonLine.features.push({
+        this.geojsonLine.features.push({
           type: 'Feature',
           geometry: {
             type: 'LineString',
             coordinates: secondSegment.map(stop => [stop.lng, stop.lat])
           },
-          properties: {}
+          properties: {},
+          id: 2
         });
       }
-      this.map.getSource('shape-line-source').setData(this.selectRange.geojsonLine);
+      this.map.getSource('shape-line-source').setData(this.geojsonLine);
     },
     changeToSelectRange(shape) {
       this.setShapeData(shape);
       this.map.addSource('shape-points-source', {
         'type': 'geojson',
-        'data': this.selectRange.geojsonPoints,
+        'data': this.geojsonPoints,
       });
 
       this.map.addSource('shape-line-source', {
         'type': 'geojson',
-        'data': this.selectRange.geojsonLine,
+        'data': this.geojsonLine,
       });
 
       this.map.addSource('shape-line-between-source', {
@@ -174,7 +121,11 @@ let shapeEditorSelectRangeMixin = {
           'line-cap': 'round'
         },
         'paint': {
-          'line-color': config.shape_line_color,
+          'line-color': [
+            'case',
+            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
+            config.shape_line_color
+          ],
           'line-width': 1
         }
       });
@@ -188,19 +139,28 @@ let shapeEditorSelectRangeMixin = {
           'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
           'circle-color': [
             'case',
+            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
+            ['boolean', ['feature-state', 'editable'], false], 'white',
             ['boolean', ['feature-state', 'selected'], false], '#21b0cf',
-            ['boolean', ['feature-state', 'between'], false], 'red',
+            ['boolean', ['feature-state', 'between'], false], 'white',
             ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
             'white'
           ],
           'circle-stroke-color': [
             'case',
+            ['boolean', ['feature-state', 'editable'], false], config.shape_line_color,
             ['boolean', ['feature-state', 'selected'], false], '#21b0cf',
+            ['boolean', ['feature-state', 'between'], false], '#7dc242',
             ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
             config.shape_line_color,
           ],
           'circle-stroke-opacity': 1,
-          'circle-stroke-width': 3
+          'circle-stroke-width': [
+            'case',
+            ['boolean', ['feature-state', 'editable'], false], 2,
+            ['boolean', ['feature-state', 'frozen'], false], 0,
+            3
+          ]
         }
       });
 
@@ -226,7 +186,11 @@ let shapeEditorSelectRangeMixin = {
             'visibility': 'visible'
           },
           paint: {
-            'icon-color': config.shape_line_color,
+            'icon-color': [
+              'case',
+              ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
+              config.shape_line_color
+            ],
             'icon-halo-color': '#fff',
             'icon-halo-width': 2,
           }
@@ -246,7 +210,11 @@ let shapeEditorSelectRangeMixin = {
             'visibility': 'visible'
           },
           paint: {
-            'icon-color': 'red',
+            'icon-color': [
+              'case',
+              ['boolean', ['feature-state', 'editable'], false], '#19849c',
+              '#7dc242'
+            ],
             'icon-halo-color': '#fff',
             'icon-halo-width': 2,
           }
@@ -263,10 +231,14 @@ let shapeEditorSelectRangeMixin = {
           'line-cap': 'round'
         },
         'paint': {
-          'line-color': 'red',
+          'line-color': [
+            'case',
+            ['boolean', ['feature-state', 'editable'], false], '#19849c',
+            '#7dc242'
+          ],
           'line-width': 2
         }
-      });
+      }, 'point-layer');
 
       this.map.on('mouseenter', 'point-layer', this.selectRangeMouseEnter);
       this.map.on('mousemove', 'point-layer', this.selectRangeMouseMove);
@@ -310,6 +282,26 @@ let shapeEditorSelectRangeMixin = {
       this.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {selected: true});
       this.selectRange.lastUsedIndex = this.selectRange.lastUsedIndex ? 0 : 1;
       this.setBetweenData();
+    },
+    changeToEditRange() {
+      this.map.on('mouseenter', 'point-layer', this.selectRangeMouseEnter);
+      this.map.on('mousemove', 'point-layer', this.selectRangeMouseMove);
+      this.map.on('mouseleave', 'point-layer', this.selectRangeMouseLeave);
+      this.map.on('click', 'point-layer', this.selectRangeClick);
+
+      for (let i = 0; i < this.points.length; i++) {
+        let stop = this.points[i];
+        if (i === this.firstSelectedPoint.properties.sequence || i === this.endSelectedPoint.properties.sequence) {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+        } else if (this.firstSelectedPoint.properties.sequence < i && i < this.endSelectedPoint.properties.sequence) {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+        } else {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {frozen: true});
+        }
+      }
+      this.map.setFeatureState({source: 'shape-line-source', id: 1}, {frozen: true});
+      this.map.setFeatureState({source: 'shape-line-source', id: 2}, {frozen: true});
+      this.map.setFeatureState({source: 'shape-line-between-source', id: 1}, {editable: true});
     }
   }
 };

@@ -109,7 +109,7 @@ export default {
     errorMessageMixin,
     shapeMapMixin,
     envelopeMixin,
-    shapeEditorSelectRangeMixin,
+    shapeEditorSelectRangeMixin
   ],
   props: {
     projectId: {
@@ -147,9 +147,14 @@ export default {
       localShape: this.shape,
       localEditionMode: this.editionMode,
       map: null,
-      fixedPoints: {
-        start: [],
-        finish: [],
+      points: [],
+      geojsonPoints: {
+        'type': 'FeatureCollection',
+        features: [],
+      },
+      geojsonLine: {
+        'type': 'FeatureCollection',
+        features: [],
       },
       connectingLineGeojson: {
         'type': 'FeatureCollection',
@@ -159,7 +164,6 @@ export default {
         'type': 'FeatureCollection',
         features: [],
       },
-      points: [],
       lineCoords: [],
       id: 0,
       mapMatching: false,
@@ -201,10 +205,42 @@ export default {
     });
   },
   methods: {
+    generateGeojsonPoint(point, properties) {
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [point.lng, point.lat]
+        },
+        properties: properties,
+        id: point.id
+      }
+    },
+    setShapeData(shape) {
+      this.points = [];
+      this.points = shape.points.map(point => {
+        return {
+          id: this.id++,
+          lat: point.shape_pt_lat,
+          lng: point.shape_pt_lon,
+        }
+      });
+      this.geojsonPoints.features = this.points.map(el => {
+        return this.generateGeojsonPoint(el, {sequence: el.id});
+      });
+      this.geojsonLine.features.push({
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: this.points.map(p => [p.lng, p.lat])
+        },
+        properties: {},
+        id: 1
+      });
+    },
     changeToEditRangeClick() {
       this.localModeEdition = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
-      this.cleanMapFromSelectRangeLogic();
-      this.changeToEditRange(this.firstSelectedPoint, this.endSelectedPoint);
+      this.changeToEditRange();
     },
     addSources() {
       this.map.addSource('points', {
