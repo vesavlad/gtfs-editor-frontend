@@ -126,7 +126,26 @@ let shapeEditorSelectRangeMixin = {
             ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
             config.shape_line_color
           ],
-          'line-width': 1
+          'line-width': 2
+        }
+      });
+
+      // Line for the shape itself
+      this.map.addLayer({
+        'id': 'line-between-selected-points-layer',
+        'type': 'line',
+        'source': 'shape-line-between-source',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': [
+            'case',
+            ['boolean', ['feature-state', 'editable'], false], '#19849c',
+            '#7dc242'
+          ],
+          'line-width': 4
         }
       });
 
@@ -136,22 +155,41 @@ let shapeEditorSelectRangeMixin = {
         type: 'circle',
         source: 'shape-points-source',
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
+          'circle-radius':
+            ['interpolate', ['linear'], ['zoom'],
+              12, [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false], 5,
+              ['boolean', ['feature-state', 'selected'], false], 5,
+              1.5
+            ],
+              14, [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false], 5,
+              ['boolean', ['feature-state', 'selected'], false], 5,
+              3
+            ],
+              20, [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false], 5,
+              ['boolean', ['feature-state', 'selected'], false], 5,
+              3
+            ],],
           'circle-color': [
             'case',
             ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
             ['boolean', ['feature-state', 'editable'], false], 'white',
-            ['boolean', ['feature-state', 'selected'], false], '#21b0cf',
+            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
             ['boolean', ['feature-state', 'between'], false], 'white',
-            ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
+            ['boolean', ['feature-state', 'hover'], false], '7DC242',
             'white'
           ],
           'circle-stroke-color': [
             'case',
             ['boolean', ['feature-state', 'editable'], false], config.shape_line_color,
-            ['boolean', ['feature-state', 'selected'], false], '#21b0cf',
-            ['boolean', ['feature-state', 'between'], false], '#7dc242',
-            ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
+            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
+            ['boolean', ['feature-state', 'between'], false], '#7DC242',
+            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
             config.shape_line_color,
           ],
           'circle-stroke-opacity': 1,
@@ -159,7 +197,10 @@ let shapeEditorSelectRangeMixin = {
             'case',
             ['boolean', ['feature-state', 'editable'], false], 2,
             ['boolean', ['feature-state', 'frozen'], false], 0,
-            3
+            ['boolean', ['feature-state', 'selected'], false], 3,
+            ['boolean', ['feature-state', 'between'], false], 3,
+            ['boolean', ['feature-state', 'hover'], false], 3,
+            2
           ]
         }
       });
@@ -196,6 +237,8 @@ let shapeEditorSelectRangeMixin = {
           }
         }, 'point-layer');
 
+        // Arrow for the line selected
+
         this.map.addLayer({
           'id': 'point-arrow-between-selected-points-layer',
           'type': 'symbol',
@@ -220,25 +263,6 @@ let shapeEditorSelectRangeMixin = {
           }
         }, 'point-layer');
       });
-
-      // Line for the shape itself
-      this.map.addLayer({
-        'id': 'line-between-selected-points-layer',
-        'type': 'line',
-        'source': 'shape-line-between-source',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': [
-            'case',
-            ['boolean', ['feature-state', 'editable'], false], '#19849c',
-            '#7dc242'
-          ],
-          'line-width': 2
-        }
-      }, 'point-layer');
 
       this.map.on('mouseenter', 'point-layer', this.selectRangeMouseEnter);
       this.map.on('mousemove', 'point-layer', this.selectRangeMouseMove);

@@ -704,6 +704,7 @@ a.disabled {color: var(--gris-medio); cursor: default;}
 .edit-shape .field-name {grid-column: 1; font-size: 16px; font-weight: 500; color: var(--gris-medio2);}
 .edit-shape .field {grid-column: 2;}
 .edit-shape .errors {grid-column: 1/3;}
+.edit-shape .submit {grid-column: 1/3; justify-self: center;}
 
     /* LOADER */
 
