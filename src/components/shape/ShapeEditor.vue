@@ -28,7 +28,7 @@
     </div>
     <div class="map" ref='map'></div>
     <div class="map-sidebar">
-      <div class="side-panel edit-shape-range" v-if="localEditionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
+      <div class="side-panel edit-shape edit-shape-range" v-if="localEditionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
         <div class="side-header">
           <h4>{{ $t('shape.editor.editShapeRange') }}</h4>
         </div>
@@ -37,10 +37,12 @@
           <div class="field">{{ firstSelectedPoint.properties.sequence }}</div>
           <div class="field-name"><span>{{ $t('shape.editor.endPoint') }}</span></div>
           <div class="field">{{ endSelectedPoint.properties.sequence }}</div>
-          <button class="btn" @click="changeToEditRangeClick"
+          <div class="field-name"><span>Total points</span></div>
+          <div class="field">0000</div>
+          <button class="btn submit" @click="changeToEditRangeClick"
                   :disabled="firstSelectedPoint.properties.sequence===null || endSelectedPoint.properties.sequence===null">
             {{ $t('shape.editor.startEditionOfRangeButtonLabel') }}
-            <span class="material-icons">edit</span></button>
+          </button>
         </div>
       </div>
       <div class="side-panel edit-shape" v-else>
@@ -392,7 +394,7 @@ export default {
             config.shape_line_color,
           ],
           "circle-stroke-opacity": 1,
-          "circle-stroke-width": 3
+          "circle-stroke-width": 2
         }
       });
       // Arrow for the shape
@@ -402,24 +404,25 @@ export default {
           console.log(err);
           return;
         }
-        this.map.addImage('double-arrow', image, {sdf: true});
+        this.map.addImage('double-arrow', image, {sdf: true},{ pixelRatio: 2 });
         this.map.addLayer({
           'id': 'point-arrow',
           'type': 'symbol',
           'source': 'points-seq',
           'layout': {
             'symbol-placement': 'line',
-            'symbol-spacing': 100,
+            'symbol-spacing': 200,
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
             'icon-image': 'double-arrow',
-            'icon-size': 0.4,
+            'icon-size': .7,
             'visibility': 'visible'
           },
           paint: {
             'icon-color': config.shape_line_color,
             'icon-halo-color': "#fff",
             'icon-halo-width': 2,
+            'icon-halo-blur': 0,
           }
         });
         this.map.addLayer({
@@ -432,7 +435,7 @@ export default {
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
             'icon-image': 'double-arrow',
-            'icon-size': 0.4,
+            'icon-size': 1,
             'visibility': 'visible'
           },
           paint: {
@@ -552,7 +555,7 @@ export default {
       this.map.getSource('points-seq').setData(this.pointSeqGeojson);
       if (this.mapMatching) {
         if (this.points.length > 100) {
-          this.warning = "Warning: Mapmatching not available with >100 points";
+          this.warning = "Mapmatching not available with >100 points";
           this.lineGeojson.geometry.coordinates = [];
           this.map.getSource('line').setData(this.lineGeojson);
           return;

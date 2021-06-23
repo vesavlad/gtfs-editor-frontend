@@ -80,11 +80,16 @@ export default {
         type: "circle",
         source: "shape-pts",
         paint: {
-          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
-          "circle-color": "white",
+          "circle-radius":
+              ['interpolate', ['linear'], ['zoom'],
+                  12, 1.5,
+                  14, 3,
+                  20, 3,
+              ],
+          "circle-color": config.shape_point_color,
           "circle-stroke-color": config.shape_point_color,
           "circle-stroke-opacity": 1,
-          "circle-stroke-width": 3
+          "circle-stroke-width": 2
         }
       });
       this.map.addLayer({

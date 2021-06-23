@@ -343,27 +343,31 @@ export default {
         },
         paint: {
           'circle-radius':
-              ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
+            ['interpolate', ['linear'], ['zoom'],
+              12, ['case',
+                ['boolean', ['feature-state', 'hover'], false], 15,
+                ['get', 'selected'], 3,
+                1.5
+              ],
+              14, ['case',
+                ['boolean', ['feature-state', 'hover'], false], 15,
+                ['get', 'selected'], 12,
+                4
+              ],
+              20, ['case',
+                ['boolean', ['feature-state', 'hover'], false], 15,
+                ['get', 'selected'], 12,
+              10
+            ],],
           'circle-color': [
             'case',
-            ['get', 'selected'], '#21b0cf',
-            ['boolean', ['feature-state', 'hover'], false], "#21b0cf",
+            ['get', 'selected'], '#19849C',
+            ['boolean', ['feature-state', 'hover'], false], "#21B0CF",
             '#39505d'
           ],
-          'circle-stroke-color': [
-            'case',
-            ['boolean', ['get', 'selected'], false], "#21b0cf",
-            ['boolean', ['feature-state', 'hover'], false], "#21b0cf",
-            "white"
-          ],
+          'circle-stroke-color': "white",
           'circle-stroke-opacity': 1,
-          'circle-stroke-width': [
-            'case',
-            ['boolean', ['feature-state', 'focus'], false], 10,
-            ['boolean', ['get', 'selected'], false], 5,
-            ['boolean', ['feature-state', 'hover'], false], 2,
-            1
-          ],
+          'circle-stroke-width': 1,
         }
       });
       let img = require('../../assets/img/bg-stop-name.png')
@@ -446,9 +450,9 @@ export default {
         }
       });
 
-      let editImg = require('../../assets/img/double-arrow.png');
-      let addImg = require('../../assets/img/double-arrow.png');
-      let removeImg = require('../../assets/img/double-arrow.png');
+      let editImg = require('../../assets/img/icon-edit.png');
+      let addImg = require('../../assets/img/icon-add.png');
+      let removeImg = require('../../assets/img/icon-remove.png');
       this.map.loadImage(editImg, (err, editImage) => {
         if (err) {
           console.log(err);
@@ -476,10 +480,14 @@ export default {
               layout: {
                 'icon-image': 'edit-image',
                 'icon-size': 0.5,
-                'visibility': 'visible'
               },
               paint: {
-                'icon-color': 'red'
+                'icon-color': 'white',
+                'icon-opacity': 0,
+                'icon-opacity-transition': {
+                  "delay": 0,
+                  "duration": 0
+                },
               }
             });
           });
@@ -558,10 +566,10 @@ export default {
       let geojson = this.createGeojsonPoint(feature.geometry.coordinates[0], feature.geometry.coordinates[1], 1, {});
       this.map.getSource(this.stop.sources.helpIcon).setData(geojson);
       this.map.setLayoutProperty('layer-help-icon', 'icon-image', icon);
-      this.map.setLayoutProperty('layer-help-icon', 'visibility', 'visible');
+      this.map.setPaintProperty('layer-help-icon', 'icon-opacity', 1);
     },
     hideHelpIcon() {
-      this.map.setLayoutProperty('layer-help-icon', 'visibility', 'none');
+      this.map.setPaintProperty('layer-help-icon', 'icon-opacity', 0);
     },
     addShapeLayers() {
       let geojson = {

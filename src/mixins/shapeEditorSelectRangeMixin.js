@@ -175,7 +175,22 @@ let shapeEditorSelectRangeMixin = {
         },
         'paint': {
           'line-color': config.shape_line_color,
-          'line-width': 1
+          'line-width': 2
+        }
+      });
+
+      // Line for the shape itself
+      this.map.addLayer({
+        'id': 'line-between-selected-points-layer',
+        'type': 'line',
+        'source': 'shape-line-between-source',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#7DC242',
+          'line-width': 4
         }
       });
 
@@ -185,22 +200,48 @@ let shapeEditorSelectRangeMixin = {
         type: 'circle',
         source: 'shape-points-source',
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
+          'circle-radius':
+              ['interpolate', ['linear'], ['zoom'],
+                12, [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false], 5,
+                    ['boolean', ['feature-state', 'selected'], false], 5,
+                1.5
+              ],
+                14, [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false], 5,
+                    ['boolean', ['feature-state', 'selected'], false], 5,
+                3
+              ],
+                20, [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false], 5,
+                    ['boolean', ['feature-state', 'selected'], false], 5,
+                3
+              ],],
           'circle-color': [
             'case',
-            ['boolean', ['feature-state', 'selected'], false], '#21b0cf',
-            ['boolean', ['feature-state', 'between'], false], 'red',
-            ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
+            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
+            ['boolean', ['feature-state', 'between'], false], 'white',
+            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
             'white'
           ],
           'circle-stroke-color': [
             'case',
-            ['boolean', ['feature-state', 'selected'], false], '#21b0cf',
-            ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
+            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
+            ['boolean', ['feature-state', 'between'], false], '#7DC242',
+            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
             config.shape_line_color,
           ],
           'circle-stroke-opacity': 1,
-          'circle-stroke-width': 3
+          'circle-stroke-width': [
+              'case',
+              ['boolean', ['feature-state', 'selected'], false], 3,
+              ['boolean', ['feature-state', 'between'], false], 3,
+              ['boolean', ['feature-state', 'hover'], false], 3,
+              2,
+          ],
         }
       });
 
@@ -232,6 +273,8 @@ let shapeEditorSelectRangeMixin = {
           }
         }, 'point-layer');
 
+        // Arrow for the line selected
+
         this.map.addLayer({
           'id': 'point-arrow-between-selected-points-layer',
           'type': 'symbol',
@@ -246,27 +289,13 @@ let shapeEditorSelectRangeMixin = {
             'visibility': 'visible'
           },
           paint: {
-            'icon-color': 'red',
+            'icon-color': '#7DC242',
             'icon-halo-color': '#fff',
             'icon-halo-width': 2,
           }
         }, 'point-layer');
       });
 
-      // Line for the shape itself
-      this.map.addLayer({
-        'id': 'line-between-selected-points-layer',
-        'type': 'line',
-        'source': 'shape-line-between-source',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': 'red',
-          'line-width': 2
-        }
-      });
 
       this.map.on('mouseenter', 'point-layer', this.selectRangeMouseEnter);
       this.map.on('mousemove', 'point-layer', this.selectRangeMouseMove);
