@@ -181,7 +181,7 @@ let shapeEditorSelectRangeMixin = {
             ['boolean', ['feature-state', 'editable'], false], 'white',
             ['boolean', ['feature-state', 'selected'], false], '#7DC242',
             ['boolean', ['feature-state', 'between'], false], 'white',
-            ['boolean', ['feature-state', 'hover'], false], '7DC242',
+            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
             'white'
           ],
           'circle-stroke-color': [
@@ -308,11 +308,13 @@ let shapeEditorSelectRangeMixin = {
       this.setBetweenData();
     },
     changeToEditRange() {
-      this.map.on('mouseenter', 'point-layer', this.selectRangeMouseEnter);
-      this.map.on('mousemove', 'point-layer', this.selectRangeMouseMove);
-      this.map.on('mouseleave', 'point-layer', this.selectRangeMouseLeave);
-      this.map.on('click', 'point-layer', this.selectRangeClick);
+      // disable previous events
+      this.map.off('mouseenter', 'point-layer', this.selectRangeMouseEnter);
+      this.map.off('mousemove', 'point-layer', this.selectRangeMouseMove);
+      this.map.off('mouseleave', 'point-layer', this.selectRangeMouseLeave);
+      this.map.off('click', 'point-layer', this.selectRangeClick);
 
+      // set style to edit range
       for (let i = 0; i < this.points.length; i++) {
         let stop = this.points[i];
         if (i === this.firstSelectedPoint.properties.sequence || i === this.endSelectedPoint.properties.sequence) {
@@ -326,6 +328,43 @@ let shapeEditorSelectRangeMixin = {
       this.map.setFeatureState({source: 'shape-line-source', id: 1}, {frozen: true});
       this.map.setFeatureState({source: 'shape-line-source', id: 2}, {frozen: true});
       this.map.setFeatureState({source: 'shape-line-between-source', id: 1}, {editable: true});
+
+      // add new map behaviour
+
+      // logic for line
+      this.map.on('dblclick', 'line-between-selected-points-layer', e => {
+        // disable zoom with double click over line
+        e.preventDefault();
+      });
+
+      // when click on a line we add a point in there between the ends
+      this.map.on('click', 'line-between-selected-points-layer', e => {
+        e.preventDefault();
+        let feature = e.features[0];
+        let newStop = {
+          ...e.lngLat,
+          id: this.id++,
+        }
+        this.points.splice(self.getPointIndex(feature.properties.to), 0, newStop);
+        this.reGeneratePoints();
+      });
+
+      this.map.on('mouseenter', 'line-between-selected-points-layer', () => {
+        this.map.getCanvas().style.cursor = 'copy';
+      });
+
+      this.map.on('mouseleave', 'line-between-selected-points-layer', () => {
+        this.map.getCanvas().style.cursor = '';
+      });
+
+      // logic for point
+      this.map.on('mouseenter', 'point-layer', () => {
+        this.map.getCanvas().style.cursor = 'copy';
+      });
+
+      this.map.on('mouseleave', 'point-layer', () => {
+        this.map.getCanvas().style.cursor = '';
+      });
     }
   }
 };
