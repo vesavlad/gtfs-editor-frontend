@@ -196,6 +196,10 @@ export default {
     this.map.on('load', () => {
       if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SELECT_RANGE) {
         this.changeToSelectRange(this.localShape);
+      } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SIMPLE) {
+        console.log("simple");
+      } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
+        console.log("duplicate");
       } else {
         this.addSources();
         this.setData();
