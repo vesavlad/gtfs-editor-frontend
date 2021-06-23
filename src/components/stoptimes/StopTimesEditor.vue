@@ -361,8 +361,9 @@ export default {
             ],],
           'circle-color': [
             'case',
-            ['get', 'selected'], '#19849C',
             ['boolean', ['feature-state', 'hover'], false], "#21B0CF",
+            ['boolean', ['feature-state', 'focus'], false], "red",
+            ['get', 'selected'], '#19849C',
             '#39505d'
           ],
           'circle-stroke-color': "white",
@@ -502,8 +503,9 @@ export default {
         if (stopHasFocus) {
           this.localTrip.stop_times = this.localTrip.stop_times.filter(st => st.stop !== feature.id);
           this.setActiveRow({});
-          this.calculateSequenceNumber()
+          this.calculateSequenceNumber();
           this.updateStops();
+          feature.properties.selected = false;
         } else if (feature.properties.selected) {
           let stopTime = this.localTrip.stop_times.filter(st => st.stop === feature.id)[0];
           this.setActiveRow(stopTime);
