@@ -3,7 +3,7 @@
     <div class="top-map-bar">
       <div class="left-content">
         <template v-if="localEditionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
-          <div>{{ $t('shape.editor.helpMessageToSelectRange') }}</div>
+          <div class="edit-shape-range">{{ $t('shape.editor.helpMessageToSelectRange') }}</div>
         </template>
         <template v-else>
           <div class="grid center">
@@ -584,7 +584,7 @@ export default {
     },
     reGeneratePoints() {
       // We add the features
-      this.pointGeojson.features = this.points.map(this.generateGeojsonPoint);
+      this.pointGeojson.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
       // And the polyline
       this.pointSeqGeojson.features = this.generateLineFeatures(this.points);
       this.map.getSource('points').setData(this.pointGeojson);
