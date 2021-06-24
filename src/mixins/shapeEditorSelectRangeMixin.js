@@ -345,7 +345,7 @@ let shapeEditorSelectRangeMixin = {
           ...e.lngLat,
           id: this.id++,
         }
-        this.points.splice(self.getPointIndex(feature.properties.to), 0, newStop);
+        this.points.splice(this.getPointIndex(feature.properties.to), 0, newStop);
         this.reGeneratePoints();
       });
 
@@ -358,8 +358,12 @@ let shapeEditorSelectRangeMixin = {
       });
 
       // logic for point
-      this.map.on('mouseenter', 'point-layer', () => {
-        this.map.getCanvas().style.cursor = 'copy';
+      this.map.on('mouseenter', 'point-layer', e => {
+        let feature = e.features[0];
+        let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
+        if (isEditable) {
+         this.map.getCanvas().style.cursor = 'copy';
+        }
       });
 
       this.map.on('mouseleave', 'point-layer', () => {
