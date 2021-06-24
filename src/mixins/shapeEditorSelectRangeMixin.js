@@ -23,13 +23,8 @@ let shapeEditorSelectRangeMixin = {
     return {
       selectRange: {
         geojsonLineToEdit: {
-          'type': 'Feature',
-          'properties': {},
-          'geometry': {
-            'type': 'LineString',
-            'coordinates': []
-          },
-          id: 1
+          'type': 'FeatureCollection',
+          'features': []
         },
         selectedStopFeatures: [{id: null, properties: {sequence: null}}, {id: null, properties: {sequence: null}}],
         stopsInBetween: [],
@@ -58,7 +53,6 @@ let shapeEditorSelectRangeMixin = {
       });
       this.selectRange.stopsInBetween = [];
 
-      let pointsForLine = [];
       for (let i = firstPoint.properties.sequence; i <= lastPoint.properties.sequence; i++) {
         let stop = this.points[i];
         this.selectRange.stopsInBetween.push(stop);
@@ -67,9 +61,8 @@ let shapeEditorSelectRangeMixin = {
         } else {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
         }
-        pointsForLine.push([stop.lng, stop.lat]);
       }
-      this.selectRange.geojsonLineToEdit.geometry.coordinates = pointsForLine;
+      this.selectRange.geojsonLineToEdit.features = this.generateLineFeatures(this.selectRange.stopsInBetween);
       this.map.getSource('shape-line-to-edit-source').setData(this.selectRange.geojsonLineToEdit);
 
       let firstSegment = this.points.slice(0, firstPoint.properties.sequence + 1);
@@ -327,7 +320,9 @@ let shapeEditorSelectRangeMixin = {
       }
       this.map.setFeatureState({source: 'shape-line-source', id: 1}, {frozen: true});
       this.map.setFeatureState({source: 'shape-line-source', id: 2}, {frozen: true});
-      this.map.setFeatureState({source: 'shape-line-to-edit-source', id: 1}, {editable: true});
+      this.selectRange.stopsInBetween.slice(1).forEach(stop => {
+        this.map.setFeatureState({source: 'shape-line-to-edit-source', id: stop.id}, {editable: true});
+      })
 
       // add new map behaviour
 
@@ -364,7 +359,7 @@ let shapeEditorSelectRangeMixin = {
         let feature = e.features[0];
         let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
         if (isEditable) {
-         this.map.getCanvas().style.cursor = 'move';
+          this.map.getCanvas().style.cursor = 'move';
         }
       });
 

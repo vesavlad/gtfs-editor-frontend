@@ -588,7 +588,7 @@ export default {
     },
     reGeneratePoints() {
       // We add the features
-      this.pointGeojson.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
+      this.geojsonPoints.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
       // And the polyline
       this.pointSeqGeojson.features = this.generateLineFeatures(this.points);
       this.map.getSource('points').setData(this.pointGeojson);
@@ -665,23 +665,24 @@ export default {
     },
     generateLineFeatures(points) {
       let features = []
-      let lastPoint = points[0];
+      let previousPoint = points[0];
       points.slice(1).forEach(point => {
         features.push({
           'type': 'Feature',
           'properties': {
-            from: lastPoint.id,
+            from: previousPoint.id,
             to: point.id,
           },
           'geometry': {
             'type': 'LineString',
             'coordinates': [
-              [lastPoint.lng, lastPoint.lat],
+              [previousPoint.lng, previousPoint.lat],
               [point.lng, point.lat],
             ]
-          }
+          },
+          id: point.id
         });
-        lastPoint = point;
+        previousPoint = point;
       });
       return features;
     },
