@@ -113,6 +113,7 @@
       "editShapeRange": "Editar tramo de geometría",
       "startPoint": "Punto de inicio",
       "endPoint": "Punto de fin",
+      "pointsToEdit": "Puntos a editar",
       "helpMessageToSelectRange": "Selecciona el punto inicial y final del tramo a editar",
       "startEditionOfRangeButtonLabel": "Comenzar a editar"
     }

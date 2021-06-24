@@ -37,8 +37,8 @@
           <div class="field">{{ firstSelectedPoint.properties.sequence }}</div>
           <div class="field-name"><span>{{ $t('shape.editor.endPoint') }}</span></div>
           <div class="field">{{ endSelectedPoint.properties.sequence }}</div>
-          <div class="field-name"><span>Total points</span></div>
-          <div class="field">0000</div>
+          <div class="field-name"><span>{{ $t('shape.editor.pointsToEdit') }}</span></div>
+          <div class="field">{{ endSelectedPoint.properties.sequence - firstSelectedPoint.properties.sequence }}</div>
           <button class="btn submit" @click="changeToEditRangeClick"
                   :disabled="firstSelectedPoint.properties.sequence===null || endSelectedPoint.properties.sequence===null">
             {{ $t('shape.editor.startEditionOfRangeButtonLabel') }}
