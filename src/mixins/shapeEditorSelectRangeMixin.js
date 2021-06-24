@@ -22,7 +22,7 @@ let shapeEditorSelectRangeMixin = {
   data() {
     return {
       selectRange: {
-        geojsonBetweenLine: {
+        geojsonLineToEdit: {
           'type': 'Feature',
           'properties': {},
           'geometry': {
@@ -69,8 +69,8 @@ let shapeEditorSelectRangeMixin = {
         }
         pointsForLine.push([stop.lng, stop.lat]);
       }
-      this.selectRange.geojsonBetweenLine.geometry.coordinates = pointsForLine;
-      this.map.getSource('shape-line-between-source').setData(this.selectRange.geojsonBetweenLine);
+      this.selectRange.geojsonLineToEdit.geometry.coordinates = pointsForLine;
+      this.map.getSource('shape-line-to-edit-source').setData(this.selectRange.geojsonLineToEdit);
 
       let firstSegment = this.points.slice(0, firstPoint.properties.sequence + 1);
       let secondSegment = this.points.slice(lastPoint.properties.sequence, this.points.length - 1);
@@ -106,9 +106,9 @@ let shapeEditorSelectRangeMixin = {
         'data': this.geojsonLine,
       });
 
-      this.map.addSource('shape-line-between-source', {
+      this.map.addSource('shape-line-to-edit-source', {
         'type': 'geojson',
-        'data': this.selectRange.geojsonBetweenLine,
+        'data': this.selectRange.geojsonLineToEdit,
       });
 
       // Line for the shape itself
@@ -134,7 +134,7 @@ let shapeEditorSelectRangeMixin = {
       this.map.addLayer({
         'id': 'line-between-selected-points-layer',
         'type': 'line',
-        'source': 'shape-line-between-source',
+        'source': 'shape-line-to-edit-source',
         'layout': {
           'line-join': 'round',
           'line-cap': 'round'
@@ -242,7 +242,7 @@ let shapeEditorSelectRangeMixin = {
         this.map.addLayer({
           'id': 'point-arrow-between-selected-points-layer',
           'type': 'symbol',
-          'source': 'shape-line-between-source',
+          'source': 'shape-line-to-edit-source',
           'layout': {
             'symbol-placement': 'line',
             'symbol-spacing': 100,
@@ -327,7 +327,7 @@ let shapeEditorSelectRangeMixin = {
       }
       this.map.setFeatureState({source: 'shape-line-source', id: 1}, {frozen: true});
       this.map.setFeatureState({source: 'shape-line-source', id: 2}, {frozen: true});
-      this.map.setFeatureState({source: 'shape-line-between-source', id: 1}, {editable: true});
+      this.map.setFeatureState({source: 'shape-line-to-edit-source', id: 1}, {editable: true});
 
       // add new map behaviour
 
@@ -359,10 +359,12 @@ let shapeEditorSelectRangeMixin = {
 
       // logic for point
       this.map.on('mouseenter', 'point-layer', e => {
+        // avoid to add new point when point is clicked
+        e.preventDefault();
         let feature = e.features[0];
         let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
         if (isEditable) {
-         this.map.getCanvas().style.cursor = 'copy';
+         this.map.getCanvas().style.cursor = 'move';
         }
       });
 
