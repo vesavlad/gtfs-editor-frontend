@@ -362,7 +362,7 @@ export default {
           'circle-color': [
             'case',
             ['boolean', ['feature-state', 'hover'], false], "#21B0CF",
-            ['boolean', ['feature-state', 'focus'], false], "red",
+            ['boolean', ['feature-state', 'focus'], false], "#21B0CF",
             ['get', 'selected'], '#19849C',
             '#39505d'
           ],
