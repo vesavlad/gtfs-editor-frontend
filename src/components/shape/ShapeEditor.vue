@@ -28,7 +28,8 @@
     </div>
     <div class="map" ref='map'></div>
     <div class="map-sidebar">
-      <div class="side-panel edit-shape edit-shape-range" v-if="localEditionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
+      <div class="side-panel edit-shape edit-shape-range"
+           v-if="localEditionMode===Enums.ShapeEditorEditionMode.SELECT_RANGE">
         <div class="side-header">
           <h4>{{ $t('shape.editor.editShapeRange') }}</h4>
         </div>
@@ -158,7 +159,16 @@ export default {
         'type': 'FeatureCollection',
         features: [],
       },
-      connectingLineGeojson: {
+      geojsonMapMatchingLine: {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: []
+        },
+        properties: {},
+        id: 1
+      },
+      geojsonConnectingLine: {
         'type': 'FeatureCollection',
         features: [],
       },
@@ -274,7 +284,7 @@ export default {
 
       this.map.addSource('connecting-line', {
         'type': 'geojson',
-        'data': this.connectingLineGeojson,
+        'data': this.geojsonConnectingLine,
       });
     },
     setData() {
@@ -444,7 +454,7 @@ export default {
           console.log(err);
           return;
         }
-        this.map.addImage('double-arrow', image, {sdf: true},{ pixelRatio: 2 });
+        this.map.addImage('double-arrow', image, {sdf: true}, {pixelRatio: 2});
         this.map.addLayer({
           'id': 'point-arrow',
           'type': 'symbol',
@@ -586,24 +596,17 @@ export default {
       let ydif = e2.y - e2.y;
       return Math.sqrt(xdif * xdif + ydif * ydif)
     },
-    reGeneratePoints() {
-      // We add the features
-      this.geojsonPoints.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
-      // And the polyline
-      this.pointSeqGeojson.features = this.generateLineFeatures(this.points);
-      this.map.getSource('points').setData(this.pointGeojson);
-      this.map.getSource('points-seq').setData(this.pointSeqGeojson);
+    calculateMapMatching() {
       if (this.mapMatching) {
-        if (this.points.length > 100) {
+        if (this.selectRange.stopsInBetween.length > 100) {
           this.warning = "Mapmatching not available with >100 points";
-          this.lineGeojson.geometry.coordinates = [];
-          this.map.getSource('line').setData(this.lineGeojson);
+          this.geojsonMapMatchingLine.geometry.coordinates = [];
+          this.map.getSource('line').setData(this.geojsonMapMatchingLine);
+          return;
+        } else if (this.selectRange.stopsInBetween.length < 2) {
           return;
         }
-        if (this.points.length < 2) {
-          return;
-        }
-        mapMatching.match(this.points).then(response => {
+        mapMatching.match(this.selectRange.stopsInBetween).then(response => {
           console.log(response.data);
           if (response.data.code !== "Ok") {
             this.error = response.data;
@@ -611,41 +614,34 @@ export default {
           }
           let matchings = response.data.matchings;
           if (matchings.length === 0) {
-            this.lineGeojson.geometry.coordinates = [];
+            this.geojsonMapMatchingLine.geometry.coordinates = [];
             console.log("No matchings")
           } else {
-            this.lineGeojson.geometry.coordinates = matchings[0].geometry.coordinates;
+            this.geojsonMapMatchingLine.geometry.coordinates = matchings[0].geometry.coordinates;
           }
 
-          this.map.getSource('line').setData(this.lineGeojson);
+          this.map.getSource('line').setData(this.geojsonMapMatchingLine);
           this.error = false;
         }).catch(err => {
           console.log(err.response);
           this.error = err.response.data;
-          this.lineGeojson.geometry.coordinates = [];
-          this.map.getSource('line').setData(this.lineGeojson);
+          this.geojsonMapMatchingLine.geometry.coordinates = [];
+          this.map.getSource('line').setData(this.geojsonMapMatchingLine);
         });
       } else {
-        this.lineGeojson.geometry.coordinates = [];
-        this.map.getSource('line').setData(this.lineGeojson);
+        this.geojsonMapMatchingLine.geometry.coordinates = [];
+        this.map.getSource('line').setData(this.geojsonMapMatchingLine);
+        this.warning = false;
       }
-      let connectingLines = [];
-      if (this.fixedPoints.start.length > 0) {
-        let connectee = this.points.concat(this.fixedPoints.finish);
-        if (connectee.length) {
-          connectingLines.push(this.generateLine(this.fixedPoints.start[this.fixedPoints.start.length - 1], connectee[
-              0]))
-        }
-      }
-      if (this.fixedPoints.finish.length > 0) {
-        let connectee = this.fixedPoints.start.concat(this.points);
-        if (connectee.length) {
-          connectingLines.push(this.generateLine(connectee[connectee.length - 1], this.fixedPoints.finish[0]))
-        }
-      }
-      this.connectingLineGeojson.features = connectingLines;
-      this.map.getSource('connecting-line').setData(this.connectingLineGeojson);
-      this.warning = false;
+    },
+    reGeneratePoints() {
+      // We add the features
+      this.geojsonPoints.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
+      // And the polyline
+      this.pointSeqGeojson.features = this.generateLineFeatures(this.points);
+      this.map.getSource('shape-points-source').setData(this.geojsonPoints);
+      //this.map.getSource('points-seq').setData(this.pointSeqGeojson);
+      this.calculateMapMatching();
     },
     generateLine(from, to) {
       return {
