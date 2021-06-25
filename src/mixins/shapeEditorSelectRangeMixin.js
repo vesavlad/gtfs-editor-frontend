@@ -104,6 +104,26 @@ let shapeEditorSelectRangeMixin = {
         'data': this.selectRange.geojsonLineToEdit,
       });
 
+      this.map.addSource('mapmatching-line-source', {
+        'type': 'geojson',
+        'data': this.geojsonMapMatchingLine,
+      });
+
+      // Line for the map matching shape
+      this.map.addLayer({
+        'id': 'line-layer',
+        'type': 'line',
+        'source': 'mapmatching-line-source',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': config.map_matching_color,
+          'line-width': 2
+        }
+      });
+
       // Line for the shape itself
       this.map.addLayer({
         'id': 'point-line-layer',
@@ -231,7 +251,6 @@ let shapeEditorSelectRangeMixin = {
         }, 'point-layer');
 
         // Arrow for the line selected
-
         this.map.addLayer({
           'id': 'point-arrow-between-selected-points-layer',
           'type': 'symbol',
@@ -255,6 +274,26 @@ let shapeEditorSelectRangeMixin = {
             'icon-halo-width': 2,
           }
         }, 'point-layer');
+
+        this.map.addLayer({
+          'id': 'mapmathing-line-arrow',
+          'type': 'symbol',
+          'source': 'mapmatching-line-source',
+          'layout': {
+            'symbol-placement': 'line',
+            'symbol-spacing': 100,
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
+            'icon-image': 'double-arrow',
+            'icon-size': 1,
+            'visibility': 'visible'
+          },
+          paint: {
+            'icon-color': config.map_matching_color,
+            'icon-halo-color': "#fff",
+            'icon-halo-width': 2,
+          }
+        });
       });
 
       this.map.on('mouseenter', 'point-layer', this.selectRangeMouseEnter);

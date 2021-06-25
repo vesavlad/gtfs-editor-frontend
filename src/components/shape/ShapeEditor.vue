@@ -423,7 +423,7 @@ export default {
       this.map.addLayer({
         'id': 'line-layer',
         'type': 'line',
-        'source': 'line',
+        'source': 'mapmatching-line-source',
         'layout': {
           'line-join': 'round',
           'line-cap': 'round'
@@ -489,7 +489,7 @@ export default {
         this.map.addLayer({
           'id': 'line-arrow',
           'type': 'symbol',
-          'source': 'line',
+          'source': 'mapmatching-line-source',
           'layout': {
             'symbol-placement': 'line',
             'symbol-spacing': 100,
@@ -612,7 +612,7 @@ export default {
         if (this.selectRange.stopsInBetween.length > 100) {
           this.warning = "Mapmatching not available with >100 points";
           this.geojsonMapMatchingLine.geometry.coordinates = [];
-          this.map.getSource('line').setData(this.geojsonMapMatchingLine);
+          this.map.getSource('mapmatching-line-source').setData(this.geojsonMapMatchingLine);
           return;
         } else if (this.selectRange.stopsInBetween.length < 2) {
           return;
@@ -631,17 +631,17 @@ export default {
             this.geojsonMapMatchingLine.geometry.coordinates = matchings[0].geometry.coordinates;
           }
 
-          this.map.getSource('line').setData(this.geojsonMapMatchingLine);
+          this.map.getSource('mapmatching-line-source').setData(this.geojsonMapMatchingLine);
           this.error = false;
         }).catch(err => {
           console.log(err.response);
           this.error = err.response.data;
           this.geojsonMapMatchingLine.geometry.coordinates = [];
-          this.map.getSource('line').setData(this.geojsonMapMatchingLine);
+          this.map.getSource('mapmatching-line-source').setData(this.geojsonMapMatchingLine);
         });
       } else {
         this.geojsonMapMatchingLine.geometry.coordinates = [];
-        this.map.getSource('line').setData(this.geojsonMapMatchingLine);
+        this.map.getSource('mapmatching-line-source').setData(this.geojsonMapMatchingLine);
         this.warning = false;
       }
     },
