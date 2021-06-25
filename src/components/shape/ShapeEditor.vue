@@ -207,9 +207,9 @@ export default {
       if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SELECT_RANGE) {
         this.changeToSelectRange(this.localShape);
       } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SIMPLE) {
-        console.log("simple");
+        this.changeToCreate();
       } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
-        console.log("duplicate");
+        this.changeToDuplicate(this.localShape);
       } else {
         this.addSources();
         this.setData();
@@ -258,6 +258,17 @@ export default {
       this.localEditionMode = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
       this.changeToEditRange();
     },
+    changeToCreate() {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.SIMPLE;
+      console.log("create shape");
+    },
+    changeToDuplicate(shape) {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.DUPLICATE;
+      this.setShapeData(shape);
+    },
+    // =============================================================
+    // código viejo
+    // =============================================================
     addSources() {
       this.map.addSource('points', {
         'type': 'geojson',
