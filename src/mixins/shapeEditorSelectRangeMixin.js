@@ -411,7 +411,11 @@ let shapeEditorSelectRangeMixin = {
       });
 
       this.map.on('click', 'point-layer', e => {
-        console.log(`click en el punto (${e.clickOnLayer})`);
+        // remove point
+        let id = e.features[0].id;
+        this.points = this.points.filter(point => point.id !== id);
+        this.reGeneratePoints();
+        this.map.getCanvas().style.cursor = '';
       });
 
       this.map.on('mouseenter', 'point-layer', e => {

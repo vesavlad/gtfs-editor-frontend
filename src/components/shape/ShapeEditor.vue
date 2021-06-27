@@ -649,9 +649,9 @@ export default {
       // We add the features
       this.geojsonPoints.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
       // And the polyline
-      this.pointSeqGeojson.features = this.generateLineFeatures(this.points);
+      this.selectRange.geojsonLineToEdit.features = this.generateLineFeatures(this.selectRange.stopsInBetween);
       this.map.getSource('shape-points-source').setData(this.geojsonPoints);
-      //this.map.getSource('points-seq').setData(this.pointSeqGeojson);
+      this.map.getSource('shape-line-to-edit-source').setData(this.selectRange.geojsonLineToEdit);
       this.calculateMapMatching();
     },
     generateLine(from, to) {
