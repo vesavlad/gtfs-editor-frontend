@@ -28,7 +28,7 @@ let shapeEditorSelectRangeMixin = {
         },
         selectedStopFeatures: [{id: null, properties: {sequence: null}}, {id: null, properties: {sequence: null}}],
         stopsInBetween: [],
-        hoveredStops: {},
+        hoveredStops: new Set(),
         lastUsedIndex: 0
       }
     }
@@ -109,6 +109,62 @@ let shapeEditorSelectRangeMixin = {
         'data': this.geojsonMapMatchingLine,
       });
 
+      // Circles for the points
+      this.map.addLayer({
+        id: 'point-layer',
+        type: 'circle',
+        source: 'shape-points-source',
+        paint: {
+          'circle-radius':
+            ['interpolate', ['linear'], ['zoom'],
+              12, [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false], 5,
+              ['boolean', ['feature-state', 'selected'], false], 5,
+              1.5
+            ],
+              14, [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false], 5,
+              ['boolean', ['feature-state', 'selected'], false], 5,
+              3
+            ],
+              20, [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false], 5,
+              ['boolean', ['feature-state', 'selected'], false], 5,
+              3
+            ],],
+          'circle-color': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
+            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
+            ['boolean', ['feature-state', 'editable'], false], 'white',
+            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
+            ['boolean', ['feature-state', 'between'], false], 'white',
+            'white'
+          ],
+          'circle-stroke-color': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
+            ['boolean', ['feature-state', 'editable'], false], config.shape_line_color,
+            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
+            ['boolean', ['feature-state', 'between'], false], '#7DC242',
+            config.shape_line_color,
+          ],
+          'circle-stroke-opacity': 1,
+          'circle-stroke-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], 3,
+            ['boolean', ['feature-state', 'editable'], false], 2,
+            ['boolean', ['feature-state', 'frozen'], false], 0,
+            ['boolean', ['feature-state', 'selected'], false], 3,
+            ['boolean', ['feature-state', 'between'], false], 3,
+            2
+          ]
+        }
+      });
+
       // Line for the map matching shape
       this.map.addLayer({
         'id': 'line-layer',
@@ -141,7 +197,7 @@ let shapeEditorSelectRangeMixin = {
           ],
           'line-width': 2
         }
-      });
+      }, 'point-layer');
 
       // Line for the shape itself
       this.map.addLayer({
@@ -160,63 +216,7 @@ let shapeEditorSelectRangeMixin = {
           ],
           'line-width': 4
         }
-      });
-
-      // Circles for the points
-      this.map.addLayer({
-        id: 'point-layer',
-        type: 'circle',
-        source: 'shape-points-source',
-        paint: {
-          'circle-radius':
-            ['interpolate', ['linear'], ['zoom'],
-              12, [
-              'case',
-              ['boolean', ['feature-state', 'hover'], false], 5,
-              ['boolean', ['feature-state', 'selected'], false], 5,
-              1.5
-            ],
-              14, [
-              'case',
-              ['boolean', ['feature-state', 'hover'], false], 5,
-              ['boolean', ['feature-state', 'selected'], false], 5,
-              3
-            ],
-              20, [
-              'case',
-              ['boolean', ['feature-state', 'hover'], false], 5,
-              ['boolean', ['feature-state', 'selected'], false], 5,
-              3
-            ],],
-          'circle-color': [
-            'case',
-            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
-            ['boolean', ['feature-state', 'editable'], false], 'white',
-            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
-            ['boolean', ['feature-state', 'between'], false], 'white',
-            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
-            'white'
-          ],
-          'circle-stroke-color': [
-            'case',
-            ['boolean', ['feature-state', 'editable'], false], config.shape_line_color,
-            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
-            ['boolean', ['feature-state', 'between'], false], '#7DC242',
-            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
-            config.shape_line_color,
-          ],
-          'circle-stroke-opacity': 1,
-          'circle-stroke-width': [
-            'case',
-            ['boolean', ['feature-state', 'editable'], false], 2,
-            ['boolean', ['feature-state', 'frozen'], false], 0,
-            ['boolean', ['feature-state', 'selected'], false], 3,
-            ['boolean', ['feature-state', 'between'], false], 3,
-            ['boolean', ['feature-state', 'hover'], false], 3,
-            2
-          ]
-        }
-      });
+      }, 'point-layer');
 
       // Arrow for the shape
       let img = require('../assets/img/double-arrow.png')
@@ -303,29 +303,29 @@ let shapeEditorSelectRangeMixin = {
     },
     selectRangeMouseEnter(e) {
       let feature = e.features[0];
-      this.selectRange.hoveredStops[feature.id] = feature;
+      this.selectRange.hoveredStops.add(feature.id);
       this.map.getCanvas().style.cursor = 'pointer';
       this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
     },
     selectRangeMouseMove(e) {
       let features = this.map.queryRenderedFeatures(e.point);
-      let currentHoveredStops = {};
+      let currentHoveredStops = new Set();
       features.forEach(feature => {
         if (feature.layer.id === 'point-layer') {
-          this.selectRange.hoveredStops[feature.id] = feature;
-          currentHoveredStops[feature.id] = feature;
+          this.selectRange.hoveredStops.add(feature.id);
+          currentHoveredStops.add(feature.id);
           this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
         }
       });
-      Object.keys(this.selectRange.hoveredStops).forEach(featureId => {
-        if (!Object.keys(currentHoveredStops).includes(featureId)) {
+      this.selectRange.hoveredStops.forEach(featureId => {
+        if (!currentHoveredStops.has(featureId)) {
           this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
         }
       });
     },
     selectRangeMouseLeave() {
       this.map.getCanvas().style.cursor = '';
-      Object.keys(this.selectRange.hoveredStops).forEach(featureId => {
+      this.selectRange.hoveredStops.forEach(featureId => {
         this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
       });
     },
@@ -366,14 +366,19 @@ let shapeEditorSelectRangeMixin = {
       // add new map behaviour
 
       // logic for line
+      let hoveredStops = new Set();
+
       this.map.on('dblclick', 'line-between-selected-points-layer', e => {
         // disable zoom with double click over line
+        console.log('double click on line-between-selected-points-layer');
         e.preventDefault();
       });
 
       // when click on a line we add a point in there between the ends
       this.map.on('click', 'line-between-selected-points-layer', e => {
-        e.preventDefault();
+        if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'point-layer').length > 0) {
+          return;
+        }
         let feature = e.features[0];
         let newStop = {
           ...e.lngLat,
@@ -381,10 +386,17 @@ let shapeEditorSelectRangeMixin = {
         }
         this.points.splice(this.getPointIndex(feature.properties.to), 0, newStop);
         this.reGeneratePoints();
+        // set point status
+        this.map.setFeatureState({source: 'shape-points-source', id: newStop.id}, {editable: true});
+        this.map.setFeatureState({source: 'shape-points-source', id: newStop.id}, {hover: true});
+        hoveredStops.add(newStop.id);
+        this.map.getCanvas().style.cursor = 'move';
       });
 
       this.map.on('mouseenter', 'line-between-selected-points-layer', () => {
-        this.map.getCanvas().style.cursor = 'copy';
+        if (hoveredStops.size === 0) {
+          this.map.getCanvas().style.cursor = 'copy';
+        }
       });
 
       this.map.on('mouseleave', 'line-between-selected-points-layer', () => {
@@ -392,18 +404,52 @@ let shapeEditorSelectRangeMixin = {
       });
 
       // logic for point
-      this.map.on('mouseenter', 'point-layer', e => {
-        // avoid to add new point when point is clicked
+
+      this.map.on('dblclick', 'point-layer', e => {
+        // disable zoom with double click over line
         e.preventDefault();
+      });
+
+      this.map.on('click', 'point-layer', e => {
+        console.log(`click en el punto (${e.clickOnLayer})`);
+      });
+
+      this.map.on('mouseenter', 'point-layer', e => {
         let feature = e.features[0];
+        hoveredStops.add(feature.id);
+        this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
         let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
         if (isEditable) {
           this.map.getCanvas().style.cursor = 'move';
         }
       });
 
+      this.map.on('mousemove', 'point-layer', e => {
+        let features = this.map.queryRenderedFeatures(e.point);
+        let currentHoveredStops = new Set();
+        features.forEach(feature => {
+          if (feature.id) {
+            let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
+            if (isEditable && feature.layer.id === 'point-layer') {
+              hoveredStops.add(feature.id);
+              currentHoveredStops.add(feature.id);
+              this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+            }
+          }
+        });
+        hoveredStops.forEach(featureId => {
+          if (!currentHoveredStops.has(featureId)) {
+            this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+          }
+        });
+      });
+
       this.map.on('mouseleave', 'point-layer', () => {
         this.map.getCanvas().style.cursor = '';
+        hoveredStops.forEach(featureId => {
+          this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+        });
+        hoveredStops = new Set();
       });
     }
   }
