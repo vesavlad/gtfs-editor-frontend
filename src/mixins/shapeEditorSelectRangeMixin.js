@@ -415,7 +415,12 @@ let shapeEditorSelectRangeMixin = {
         let id = e.features[0].id;
         this.points = this.points.filter(point => point.id !== id);
         this.reGeneratePoints();
-        this.map.getCanvas().style.cursor = '';
+        hoveredStops.delete(id);
+        if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'line-between-selected-points-layer').length > 0) {
+          this.map.getCanvas().style.cursor = 'copy';
+        } else {
+          this.map.getCanvas().style.cursor = '';
+        }
       });
 
       this.map.on('mouseenter', 'point-layer', e => {
