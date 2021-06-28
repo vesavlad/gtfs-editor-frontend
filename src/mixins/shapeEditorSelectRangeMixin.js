@@ -5,20 +5,17 @@ import _ from 'lodash';
 let shapeEditorSelectRangeMixin = {
   computed: {
     firstSelectedPoint() {
-      let firstPoint = this.selectRange.selectedStopFeatures[0];
-      let lastPoint = this.selectRange.selectedStopFeatures[1];
-      if (firstPoint.properties.sequence > lastPoint.properties.sequence) {
-        return lastPoint;
-      }
-      return firstPoint;
+      return this.selectRange.selectedStopFeatures[0];
     },
     endSelectedPoint() {
-      let firstPoint = this.selectRange.selectedStopFeatures[0];
-      let lastPoint = this.selectRange.selectedStopFeatures[1];
-      if (firstPoint.properties.sequence > lastPoint.properties.sequence) {
-        return firstPoint;
+      return this.selectRange.selectedStopFeatures[1];
+    },
+    pointsToEdit() {
+      if (this.selectRange.selectedStopFeatures[0].properties.sequence !== null &&
+        this.selectRange.selectedStopFeatures[1].properties.sequence !== null) {
+        return this.selectRange.selectedStopFeatures[1].properties.sequence - this.selectRange.selectedStopFeatures[0].properties.sequence;
       }
-      return lastPoint;
+      return 0;
     }
   },
   data() {
@@ -30,8 +27,7 @@ let shapeEditorSelectRangeMixin = {
         },
         selectedStopFeatures: [{id: null, properties: {sequence: null}}, {id: null, properties: {sequence: null}}],
         stopsInBetween: [],
-        hoveredStops: new Set(),
-        lastUsedIndex: 0
+        hoveredStops: new Set()
       },
       geojsonMovingPoint: {
         type: 'Feature',
@@ -46,23 +42,21 @@ let shapeEditorSelectRangeMixin = {
   },
   methods: {
     setBetweenData() {
+      // clean previous points
+      this.selectRange.stopsInBetween.forEach(stop => {
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: false});
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: false});
+      });
+      this.selectRange.stopsInBetween = [];
+      this.selectRange.geojsonLineToEdit.features = [];
+      this.map.getSource('shape-line-to-edit-source').setData(this.selectRange.geojsonLineToEdit);
+
       let firstPoint = this.selectRange.selectedStopFeatures[0];
       let lastPoint = this.selectRange.selectedStopFeatures[1];
       if (!firstPoint.id || !lastPoint.id) {
         console.warn('points are not defined yet');
         return;
       }
-      if (firstPoint.properties.sequence > lastPoint.properties.sequence) {
-        let aux = firstPoint;
-        firstPoint = lastPoint;
-        lastPoint = aux;
-      }
-
-      this.selectRange.stopsInBetween.forEach(stop => {
-        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: false});
-        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: false});
-      });
-      this.selectRange.stopsInBetween = [];
 
       for (let i = firstPoint.properties.sequence; i <= lastPoint.properties.sequence; i++) {
         let stop = this.points[i];
@@ -341,13 +335,32 @@ let shapeEditorSelectRangeMixin = {
       });
     },
     selectRangeClick(e) {
-      // unselect previous point
-      let previousFeatureId = this.selectRange.selectedStopFeatures[this.selectRange.lastUsedIndex].id;
-      this.map.setFeatureState({source: 'shape-points-source', id: previousFeatureId}, {selected: false});
       let feature = e.features[0];
-      this.$set(this.selectRange.selectedStopFeatures, this.selectRange.lastUsedIndex, feature);
+      let indexToChange = null;
+
+      if (this.selectRange.selectedStopFeatures[0].properties.sequence === null) {
+        indexToChange = 0;
+      } else if (this.selectRange.selectedStopFeatures[1].properties.sequence === null) {
+        if (this.selectRange.selectedStopFeatures[0].properties.sequence > feature.properties.sequence) {
+          let tmp = this.selectRange.selectedStopFeatures[0];
+          this.$set(this.selectRange.selectedStopFeatures, 0, feature);
+          feature = tmp;
+        }
+        indexToChange = 1;
+      } else {
+        // unselect previous selected points
+        let previousFirstFeatureId = this.selectRange.selectedStopFeatures[0].id;
+        let previousSecondFeatureId = this.selectRange.selectedStopFeatures[1].id;
+        this.map.setFeatureState({source: 'shape-points-source', id: previousFirstFeatureId}, {selected: false});
+        this.map.setFeatureState({source: 'shape-points-source', id: previousSecondFeatureId}, {selected: false});
+
+        this.$set(this.selectRange.selectedStopFeatures, 1, {id: null, properties: {sequence: null}});
+        indexToChange = 0;
+      }
+
+      this.$set(this.selectRange.selectedStopFeatures, indexToChange, feature);
       this.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {selected: true});
-      this.selectRange.lastUsedIndex = this.selectRange.lastUsedIndex ? 0 : 1;
+
       this.setBetweenData();
     },
     changeToEditRange() {
@@ -496,7 +509,7 @@ let shapeEditorSelectRangeMixin = {
 
       this.map.on('mousedown', 'point-layer', eDown => {
         // only works when user raises mousedown event with left click
-        if (eDown.originalEvent.button !== 0){
+        if (eDown.originalEvent.button !== 0) {
           return;
         }
         // Prevent the default map drag behavior.
