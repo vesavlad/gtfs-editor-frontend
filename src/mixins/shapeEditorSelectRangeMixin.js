@@ -1,4 +1,6 @@
 import config from "@/config";
+import _ from 'lodash';
+
 
 let shapeEditorSelectRangeMixin = {
   computed: {
@@ -30,6 +32,15 @@ let shapeEditorSelectRangeMixin = {
         stopsInBetween: [],
         hoveredStops: new Set(),
         lastUsedIndex: 0
+      },
+      geojsonMovingPoint: {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: []
+        },
+        properties: {},
+        id: 1,
       }
     }
   },
@@ -346,6 +357,28 @@ let shapeEditorSelectRangeMixin = {
       this.map.off('mouseleave', 'point-layer', this.selectRangeMouseLeave);
       this.map.off('click', 'point-layer', this.selectRangeClick);
 
+      // set moving point source and layer
+      this.map.addSource('moving-point-source', {
+        'type': 'geojson',
+        'data': this.geojsonMovingPoint,
+      });
+
+      this.map.addLayer({
+        id: 'moving-point-layer',
+        type: 'circle',
+        source: 'moving-point-source',
+        layout: {
+          'visibility': 'none'
+        },
+        paint: {
+          'circle-radius': 5,
+          'circle-color': '#7DC242',
+          'circle-stroke-color': '#7DC242',
+          'circle-stroke-opacity': 1,
+          'circle-stroke-width': 3
+        }
+      });
+
       // set style to edit range
       for (let i = 0; i < this.points.length; i++) {
         let stop = this.points[i];
@@ -410,7 +443,7 @@ let shapeEditorSelectRangeMixin = {
         e.preventDefault();
       });
 
-      this.map.on('click', 'point-layer', e => {
+      this.map.on('contextmenu', 'point-layer', e => {
         // remove point
         let id = e.features[0].id;
         this.points = this.points.filter(point => point.id !== id);
@@ -459,6 +492,33 @@ let shapeEditorSelectRangeMixin = {
           this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
         });
         hoveredStops = new Set();
+      });
+
+      this.map.on('mousedown', 'point-layer', eDown => {
+        // Prevent the default map drag behavior.
+        eDown.preventDefault();
+        this.map.getCanvas().style.cursor = 'grab';
+        let feature = eDown.features[0]
+
+        this.map.setLayoutProperty('moving-point-layer', 'visibility', 'visible');
+        this.map.setFilter('point-layer', ['!=', ['id'], feature.id]);
+
+        let mouseMove = eMove => {
+          this.geojsonMovingPoint.geometry.coordinates = [eMove.lngLat.lng, eMove.lngLat.lat];
+          this.map.getSource('moving-point-source').setData(this.geojsonMovingPoint);
+          this.map.getCanvas().style.cursor = 'grabbing';
+        }
+        this.map.on('mousemove', mouseMove);
+
+        this.map.once('mouseup', eUp => {
+          if (!_.isEqual(eUp.lngLat, eDown.lngLat)) {
+            this.updatePoint(feature, eUp.lngLat);
+            this.map.getCanvas().style.cursor = '';
+          }
+          this.map.off('mousemove', mouseMove);
+          this.map.setLayoutProperty('moving-point-layer', 'visibility', 'none');
+          this.map.setFilter('point-layer', null);
+        });
       });
     }
   }
