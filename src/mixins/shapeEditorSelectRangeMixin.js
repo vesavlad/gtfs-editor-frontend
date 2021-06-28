@@ -495,6 +495,10 @@ let shapeEditorSelectRangeMixin = {
       });
 
       this.map.on('mousedown', 'point-layer', eDown => {
+        // only works when user raises mousedown event with left click
+        if (eDown.originalEvent.button !== 0){
+          return;
+        }
         // Prevent the default map drag behavior.
         eDown.preventDefault();
         this.map.getCanvas().style.cursor = 'grab';
