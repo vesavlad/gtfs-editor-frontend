@@ -3,56 +3,15 @@ import _ from 'lodash';
 
 
 let shapeEditorSelectRangeMixin = {
-  computed: {
-    firstSelectedPoint() {
-      return this.selectRange.selectedStopFeatures[0];
-    },
-    endSelectedPoint() {
-      return this.selectRange.selectedStopFeatures[1];
-    },
-    pointsToEdit() {
-      if (this.selectRange.selectedStopFeatures[0].properties.sequence !== null &&
-        this.selectRange.selectedStopFeatures[1].properties.sequence !== null) {
-        return this.selectRange.selectedStopFeatures[1].properties.sequence - this.selectRange.selectedStopFeatures[0].properties.sequence;
-      }
-      return 0;
-    }
-  },
-  data() {
-    return {
-      selectRange: {
-        geojsonLineToEdit: {
-          'type': 'FeatureCollection',
-          'features': []
-        },
-        selectedStopFeatures: [
-          {id: null, properties: {sequence: null}},
-          {id: null, properties: {sequence: null}}
-        ],
-        stopsInBetween: [],
-        hoveredStops: new Set()
-      },
-      geojsonMovingPoint: {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: []
-        },
-        properties: {},
-        id: 1,
-      }
-    }
-  },
   methods: {
     setBetweenData() {
       // clean previous points
       this.selectRange.stopsInBetween.forEach(stop => {
         this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: false});
         this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: false});
+        this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {between: false});
       });
       this.selectRange.stopsInBetween = [];
-      this.selectRange.geojsonLineToEdit.features = [];
-      this.map.getSource('shape-line-to-edit-source').setData(this.selectRange.geojsonLineToEdit);
 
       let firstPoint = this.selectRange.selectedStopFeatures[0];
       let lastPoint = this.selectRange.selectedStopFeatures[1];
@@ -69,52 +28,26 @@ let shapeEditorSelectRangeMixin = {
         } else {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
         }
-      }
-      this.selectRange.geojsonLineToEdit.features = this.generateLineFeatures(this.selectRange.stopsInBetween);
-      this.map.getSource('shape-line-to-edit-source').setData(this.selectRange.geojsonLineToEdit);
-
-      let firstSegment = this.points.slice(0, firstPoint.properties.sequence + 1);
-      let secondSegment = this.points.slice(lastPoint.properties.sequence, this.points.length - 1);
-      this.geojsonLine.features[0].geometry.coordinates = firstSegment.map(stop => [stop.lng, stop.lat]);
-      if (this.geojsonLine.features.length > 1) {
-        if (secondSegment.length > 1) {
-          this.geojsonLine.features[1].geometry.coordinates = secondSegment.map(stop => [stop.lng, stop.lat]);
-        } else {
-          this.geojsonLine.features.pop();
+        if (i !== lastPoint.properties.sequence) {
+          this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {between: true});
         }
-      } else if (secondSegment.length > 1) {
-        this.geojsonLine.features.push({
-          type: 'Feature',
-          geometry: {
-            type: 'LineString',
-            coordinates: secondSegment.map(stop => [stop.lng, stop.lat])
-          },
-          properties: {},
-          id: 2
-        });
       }
-      this.map.getSource('shape-line-source').setData(this.geojsonLine);
     },
     changeToSelectRange(shape) {
       this.setShapeData(shape);
       this.map.addSource('shape-points-source', {
         'type': 'geojson',
-        'data': this.geojsonPoints,
+        'data': this.geojson.points,
       });
 
-      this.map.addSource('shape-line-source', {
+      this.map.addSource('shape-lines-source', {
         'type': 'geojson',
-        'data': this.geojsonLine,
-      });
-
-      this.map.addSource('shape-line-to-edit-source', {
-        'type': 'geojson',
-        'data': this.selectRange.geojsonLineToEdit,
+        'data': this.geojson.lines,
       });
 
       this.map.addSource('mapmatching-line-source', {
         'type': 'geojson',
-        'data': this.geojsonMapMatchingLine,
+        'data': this.geojson.mapMatchingLine,
       });
 
       // Circles for the points
@@ -192,26 +125,7 @@ let shapeEditorSelectRangeMixin = {
       this.map.addLayer({
         'id': 'point-line-layer',
         'type': 'line',
-        'source': 'shape-line-source',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': [
-            'case',
-            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
-            config.shape_line_color
-          ],
-          'line-width': 2
-        }
-      }, 'point-layer');
-
-      // Line for the shape itself
-      this.map.addLayer({
-        'id': 'line-between-selected-points-layer',
-        'type': 'line',
-        'source': 'shape-line-to-edit-source',
+        'source': 'shape-lines-source',
         'layout': {
           'line-join': 'round',
           'line-cap': 'round'
@@ -220,9 +134,15 @@ let shapeEditorSelectRangeMixin = {
           'line-color': [
             'case',
             ['boolean', ['feature-state', 'editable'], false], '#19849c',
-            '#7dc242'
+            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
+            ['boolean', ['feature-state', 'between'], false], '#7dc242',
+            '#19849c'
           ],
-          'line-width': 4
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'editable'], false], 4,
+            2
+          ]
         }
       }, 'point-layer');
 
@@ -237,7 +157,7 @@ let shapeEditorSelectRangeMixin = {
         this.map.addLayer({
           'id': 'point-arrow',
           'type': 'symbol',
-          'source': 'shape-line-source',
+          'source': 'shape-lines-source',
           'layout': {
             'symbol-placement': 'line',
             'symbol-spacing': 100,
@@ -251,32 +171,9 @@ let shapeEditorSelectRangeMixin = {
             'icon-color': [
               'case',
               ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
-              config.shape_line_color
-            ],
-            'icon-halo-color': '#fff',
-            'icon-halo-width': 2,
-          }
-        }, 'point-layer');
-
-        // Arrow for the line selected
-        this.map.addLayer({
-          'id': 'point-arrow-between-selected-points-layer',
-          'type': 'symbol',
-          'source': 'shape-line-to-edit-source',
-          'layout': {
-            'symbol-placement': 'line',
-            'symbol-spacing': 100,
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true,
-            'icon-image': 'double-arrow',
-            'icon-size': 0.4,
-            'visibility': 'visible'
-          },
-          paint: {
-            'icon-color': [
-              'case',
               ['boolean', ['feature-state', 'editable'], false], '#19849c',
-              '#7dc242'
+              ['boolean', ['feature-state', 'between'], false], '#7dc242',
+              '#19849c'
             ],
             'icon-halo-color': '#fff',
             'icon-halo-width': 2,
@@ -293,7 +190,7 @@ let shapeEditorSelectRangeMixin = {
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
             'icon-image': 'double-arrow',
-            'icon-size': 1,
+            'icon-size': 0.4,
             'visibility': 'visible'
           },
           paint: {
@@ -376,7 +273,7 @@ let shapeEditorSelectRangeMixin = {
       // set moving point source and layer
       this.map.addSource('moving-point-source', {
         'type': 'geojson',
-        'data': this.geojsonMovingPoint,
+        'data': this.geojson.movingPoint,
       });
 
       this.map.addLayer({
@@ -398,37 +295,38 @@ let shapeEditorSelectRangeMixin = {
       // set style to edit range
       for (let i = 0; i < this.points.length; i++) {
         let stop = this.points[i];
-        if (i === this.firstSelectedPoint.properties.sequence || i === this.endSelectedPoint.properties.sequence) {
+        if ([this.firstSelectedPoint.properties.sequence, this.endSelectedPoint.properties.sequence].includes(i)) {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+          if (i === this.firstSelectedPoint.properties.sequence) {
+            this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
+          }
         } else if (this.firstSelectedPoint.properties.sequence < i && i < this.endSelectedPoint.properties.sequence) {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+          this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
         } else {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {frozen: true});
+          this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {frozen: true});
         }
       }
-      this.map.setFeatureState({source: 'shape-line-source', id: 1}, {frozen: true});
-      this.map.setFeatureState({source: 'shape-line-source', id: 2}, {frozen: true});
-      this.selectRange.stopsInBetween.slice(1).forEach(stop => {
-        this.map.setFeatureState({source: 'shape-line-to-edit-source', id: stop.id}, {editable: true});
-      })
 
       // add new map behaviour
 
       // logic for line
       let hoveredStops = new Set();
 
-      this.map.on('dblclick', 'line-between-selected-points-layer', e => {
+      this.map.on('dblclick', 'point-line-layer', e => {
         // disable zoom with double click over line
         console.log('double click on line-between-selected-points-layer');
         e.preventDefault();
       });
 
       // when click on a line we add a point in there between the ends
-      this.map.on('click', 'line-between-selected-points-layer', e => {
-        if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'point-layer').length > 0) {
+      this.map.on('click', 'point-line-layer', e => {
+        let feature = e.features[0];
+        if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'point-layer').length > 0 ||
+          !this.map.getFeatureState({source: 'shape-lines-source', id: feature.id}).editable) {
           return;
         }
-        let feature = e.features[0];
         let newStop = {
           ...e.lngLat,
           id: this.id++,
@@ -438,17 +336,21 @@ let shapeEditorSelectRangeMixin = {
         // set point status
         this.map.setFeatureState({source: 'shape-points-source', id: newStop.id}, {editable: true});
         this.map.setFeatureState({source: 'shape-points-source', id: newStop.id}, {hover: true});
+        // set line status
+        this.map.setFeatureState({source: 'shape-lines-source', id: newStop.id}, {editable: true});
         hoveredStops.add(newStop.id);
         this.map.getCanvas().style.cursor = 'move';
       });
 
-      this.map.on('mouseenter', 'line-between-selected-points-layer', () => {
-        if (hoveredStops.size === 0) {
+      this.map.on('mouseenter', 'point-line-layer', e => {
+        let feature = e.features[0];
+        let isEditable = this.map.getFeatureState({source: 'shape-lines-source', id: feature.id}).editable;
+        if (hoveredStops.size === 0 && isEditable) {
           this.map.getCanvas().style.cursor = 'copy';
         }
       });
 
-      this.map.on('mouseleave', 'line-between-selected-points-layer', () => {
+      this.map.on('mouseleave', 'point-line-layer', () => {
         this.map.getCanvas().style.cursor = '';
       });
 
@@ -465,7 +367,7 @@ let shapeEditorSelectRangeMixin = {
         this.points = this.points.filter(point => point.id !== id);
         this.reGeneratePoints();
         hoveredStops.delete(id);
-        if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'line-between-selected-points-layer').length > 0) {
+        if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'point-line-layer').length > 0) {
           this.map.getCanvas().style.cursor = 'copy';
         } else {
           this.map.getCanvas().style.cursor = '';
@@ -524,8 +426,8 @@ let shapeEditorSelectRangeMixin = {
         this.map.setFilter('point-layer', ['!=', ['id'], feature.id]);
 
         let mouseMove = eMove => {
-          this.geojsonMovingPoint.geometry.coordinates = [eMove.lngLat.lng, eMove.lngLat.lat];
-          this.map.getSource('moving-point-source').setData(this.geojsonMovingPoint);
+          this.geojson.movingPoint.geometry.coordinates = [eMove.lngLat.lng, eMove.lngLat.lat];
+          this.map.getSource('moving-point-source').setData(this.geojson.movingPoint);
           this.map.getCanvas().style.cursor = 'grabbing';
         }
         this.map.on('mousemove', mouseMove);

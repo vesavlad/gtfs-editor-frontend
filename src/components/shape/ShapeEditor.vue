@@ -97,7 +97,6 @@ import errorMessageMixin from '@/mixins/shapeMapMixin';
 import shapeMapMixin from '@/mixins/errorMessageMixin';
 import envelopeMixin from "@/mixins/envelopeMixin";
 import shapeEditorSelectRangeMixin from "@/mixins/shapeEditorSelectRangeMixin";
-import config from "@/config";
 import MessageModal from "@/components/modal/MessageModal";
 
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
@@ -150,38 +149,48 @@ export default {
       localEditionMode: this.editionMode,
       map: null,
       points: [],
-      geojsonPoints: {
-        'type': 'FeatureCollection',
-        features: [],
-      },
-      geojsonLine: {
-        'type': 'FeatureCollection',
-        features: [],
-      },
-      geojsonMapMatchingLine: {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: []
+      geojson: {
+        points: {
+          'type': 'FeatureCollection',
+          features: [],
         },
-        properties: {},
-        id: 1
+        lines: {
+          'type': 'FeatureCollection',
+          features: [],
+        },
+        mapMatchingLine: {
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: []
+          },
+          properties: {},
+          id: 1
+        },
+        movingPoint: {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: []
+          },
+          properties: {},
+          id: 1,
+        }
       },
-      geojsonConnectingLine: {
-        'type': 'FeatureCollection',
-        features: [],
-      },
-      pointSeqGeojson: {
-        'type': 'FeatureCollection',
-        features: [],
-      },
-      lineCoords: [],
       id: 0,
       mapMatching: false,
       warning: false,
       error: false,
       exitModal: {
         visible: false,
+      },
+      selectRange: {
+        selectedStopFeatures: [
+          {id: null, properties: {sequence: null}},
+          {id: null, properties: {sequence: null}}
+        ],
+        stopsInBetween: [],
+        hoveredStops: new Set()
       }
     }
   },
@@ -195,6 +204,19 @@ export default {
         result = answer.properties.location.toFixed(2);
       }
       return result + " kms";
+    },
+    firstSelectedPoint() {
+      return this.selectRange.selectedStopFeatures[0];
+    },
+    endSelectedPoint() {
+      return this.selectRange.selectedStopFeatures[1];
+    },
+    pointsToEdit() {
+      if (this.selectRange.selectedStopFeatures[0].properties.sequence !== null &&
+          this.selectRange.selectedStopFeatures[1].properties.sequence !== null) {
+        return this.selectRange.selectedStopFeatures[1].properties.sequence - this.selectRange.selectedStopFeatures[0].properties.sequence;
+      }
+      return 0;
     }
   },
   mounted() {
@@ -209,11 +231,6 @@ export default {
         this.changeToCreate();
       } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
         this.changeToDuplicate(this.localShape);
-      } else {
-        this.addSources();
-        this.setData();
-        this.addLayers();
-        this.addListeners();
       }
       this.envelope(this.map, this.projectId);
       this.$emit('load');
@@ -229,444 +246,6 @@ export default {
         },
         properties: properties,
         id: point.id
-      }
-    },
-    setShapeData(shape) {
-      this.points = [];
-      this.points = shape.points.map(point => {
-        return {
-          id: this.id++,
-          lat: point.shape_pt_lat,
-          lng: point.shape_pt_lon,
-        }
-      });
-      this.geojsonPoints.features = this.points.map(el => {
-        return this.generateGeojsonPoint(el, {sequence: el.id});
-      });
-      this.geojsonLine.features.push({
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: this.points.map(p => [p.lng, p.lat])
-        },
-        properties: {},
-        id: 1
-      });
-    },
-    changeToEditRangeClick() {
-      this.localEditionMode = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
-      this.changeToEditRange();
-    },
-    changeToCreate() {
-      this.localEditionMode = this.Enums.ShapeEditorEditionMode.SIMPLE;
-      console.log("create shape");
-    },
-    changeToDuplicate(shape) {
-      this.localEditionMode = this.Enums.ShapeEditorEditionMode.DUPLICATE;
-      this.setShapeData(shape);
-    },
-    // =============================================================
-    // código viejo
-    // =============================================================
-    addSources() {
-      this.map.addSource('points', {
-        'type': 'geojson',
-        'data': this.pointGeojson,
-      });
-
-      this.map.addSource('points-seq', {
-        'type': 'geojson',
-        'data': this.pointSeqGeojson,
-      });
-
-      this.map.addSource('line', {
-        'type': 'geojson',
-        'data': this.lineGeojson,
-      });
-
-      this.map.addSource('fixedPoints', {
-        'type': 'geojson',
-        'data': {
-          type: 'FeatureCollection',
-          features: [],
-        },
-      });
-
-      this.map.addSource('connecting-line', {
-        'type': 'geojson',
-        'data': this.geojsonConnectingLine,
-      });
-    },
-    setData() {
-      let points = [];
-      if (this.localShape !== null) {
-        points = this.localShape.points.map(point => {
-          return {
-            id: this.id++,
-            lat: point.shape_pt_lat,
-            lng: point.shape_pt_lon,
-          }
-        });
-      }
-
-      if (this.mode === this.Enums.ShapeEditorMode.EDIT) {
-        this.mapMatching = false;
-        if (this.Enums.ShapeEditorEditionMode.EDIT_RANGE && !!this.range) {
-          // Range uses the shape_pt_sequence so let's say you want to edit between 10-20, this would mean
-          // that you want to keep the values at array positions 0-9 (seq 1-10) and 19- (seq 20), so we have
-          // to adjust the indexes to use slice in order to split the array.
-          let start = this.range.start;
-          let finish = this.range.finish - 1;
-          let startingPoints = points.slice(0, start);
-          let finishingPoints = points.slice(finish);
-          this.fixedPoints = {
-            start: startingPoints,
-            finish: finishingPoints,
-          }
-          points = points.slice(start, finish);
-          if (points.length > 1) {
-            points = [points[0], points[points.length - 1]]
-          }
-
-          let fixedPointsGeojson = {
-            type: 'FeatureCollection',
-            features: [],
-          };
-
-          [startingPoints, finishingPoints].map(pointSeq => {
-            let feature = {
-              'type': 'Feature',
-              'properties': {},
-              'geometry': {
-                'type': 'LineString',
-                'coordinates': pointSeq.map(point => [point.lng, point.lat])
-              }
-            };
-            fixedPointsGeojson.features.push(feature);
-          });
-          this.map.getSource('fixedPoints').setData(fixedPointsGeojson);
-        }
-      } else {
-        if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
-          this.localShape.id = null;
-          this.localShape.shape_id = this.$t('shape.editor.duplicationPrefix') + this.localShape.shape_id;
-        } else {
-          this.localShape = {id: null, shape_id: null, points: []};
-          this.mapMatching = true;
-          this.envelope(this.map, this.projectId);
-        }
-      }
-
-      this.points = points;
-      if (this.mode === this.Enums.ShapeEditorMode.EDIT ||
-          (this.mode === this.Enums.ShapeEditorMode.CREATE && this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE)) {
-        let bounds = this.getBounds(this.points);
-        let padding = Math.min(this.$refs.map.offsetHeight, this.$refs.map.offsetWidth) * 0.1;
-        this.map.fitBounds(bounds, {
-          padding,
-          animate: false,
-        });
-        this.reGeneratePoints();
-      }
-    },
-    exit() {
-      this.$router.push({name: 'Shapes', params: {projectId: this.projectId}});
-    },
-    addLayers() {
-      // Line for the shape itself
-      this.map.addLayer({
-        'id': 'point-line-layer',
-        'type': 'line',
-        'source': 'points-seq',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': config.shape_line_color,
-          'line-width': 5
-        }
-      });
-
-      // Line for fixed points
-
-      this.map.addLayer({
-        'id': 'fixed-point-line-layer',
-        'type': 'line',
-        'source': 'fixedPoints',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': config.shape_fixed_line_color,
-          'line-width': 5
-        }
-      });
-
-      this.map.addLayer({
-        'id': 'connecting-line-layer',
-        'type': 'line',
-        'source': 'connecting-line',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': config.shape_connecting_line_color,
-          'line-width': 5
-        }
-      });
-
-      // Line for the map matching shape
-      this.map.addLayer({
-        'id': 'line-layer',
-        'type': 'line',
-        'source': 'mapmatching-line-source',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': config.map_matching_color,
-          'line-width': 2
-        }
-      });
-
-      // Circles for the points
-      this.map.addLayer({
-        id: "point-layer",
-        type: "circle",
-        source: "points",
-        filter: ["==", "$type", "Point"],
-        paint: {
-          "circle-radius": ['interpolate', ['linear'], ['zoom'],].concat(config.shape_point_zoom),
-          'circle-color': [
-            'case',
-            ['boolean', ['get', 'selected'], false], "#21b0cf",
-            ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
-            'white'
-          ],
-          'circle-stroke-color': [
-            'case',
-            ['boolean', ['get', 'selected'], false], "#21b0cf",
-            ['boolean', ['feature-state', 'hover'], false], config.shape_fixed_line_color,
-            config.shape_line_color,
-          ],
-          "circle-stroke-opacity": 1,
-          "circle-stroke-width": 2
-        }
-      });
-      // Arrow for the shape
-      let img = require('../../assets/img/double-arrow.png')
-      this.map.loadImage(img, (err, image) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        this.map.addImage('double-arrow', image, {sdf: true}, {pixelRatio: 2});
-        this.map.addLayer({
-          'id': 'point-arrow',
-          'type': 'symbol',
-          'source': 'points-seq',
-          'layout': {
-            'symbol-placement': 'line',
-            'symbol-spacing': 200,
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true,
-            'icon-image': 'double-arrow',
-            'icon-size': .7,
-            'visibility': 'visible'
-          },
-          paint: {
-            'icon-color': config.shape_line_color,
-            'icon-halo-color': "#fff",
-            'icon-halo-width': 2,
-            'icon-halo-blur': 0,
-          }
-        });
-        this.map.addLayer({
-          'id': 'line-arrow',
-          'type': 'symbol',
-          'source': 'mapmatching-line-source',
-          'layout': {
-            'symbol-placement': 'line',
-            'symbol-spacing': 100,
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true,
-            'icon-image': 'double-arrow',
-            'icon-size': 1,
-            'visibility': 'visible'
-          },
-          paint: {
-            'icon-color': config.map_matching_color,
-            'icon-halo-color': "#fff",
-            'icon-halo-width': 2,
-          }
-        });
-      });
-    },
-    getPointIndex(id) {
-      for (let i = 0; i < this.points.length; i++) {
-        if (this.points[i].id === id) {
-          return i;
-        }
-      }
-      return -1;
-    },
-    invertPoints() {
-      this.points = this.points.reverse();
-      this.reGeneratePoints();
-    },
-    addListeners() {
-      let map = this.map;
-      let canvas = map.getCanvas();
-      let self = this;
-      map.on('dblclick', 'point-line-layer', evt => {
-        evt.preventDefault();
-      })
-      // When click on a line we add a point in there between the ends
-      map.on('click', 'point-line-layer', evt => {
-        evt.preventDefault();
-        let feature = evt.features[0];
-        let newStop = {
-          ...evt.lngLat,
-          id: self.id++,
-        }
-        self.points.splice(self.getPointIndex(feature.properties.to), 0, newStop);
-        self.reGeneratePoints();
-      });
-
-      let hoveredStops = {};
-      map.on('mouseenter', 'point-line-layer', e => {
-        let feature = e.features[0];
-        hoveredStops[feature.id] = feature;
-        canvas.style.cursor = 'pointer';
-        map.setFeatureState({source: 'points', id: feature.id,}, {hover: true});
-      });
-
-      map.on('mouseleave', 'point-line-layer', () => {
-        canvas.style.cursor = '';
-        Object.keys(hoveredStops).forEach(featureId => {
-          map.setFeatureState({source: 'points', id: featureId}, {hover: false});
-        });
-      });
-
-      // When we double click the map we add a point in that position
-      this.map.on('dblclick', (e) => {
-        if (e.defaultPrevented) {
-          return;
-        }
-        e.preventDefault();
-        this.points.push({
-          ...e.lngLat,
-          id: this.id++,
-        });
-        this.reGeneratePoints();
-      });
-      map.on('contextmenu', 'point-layer', evt => {
-        evt.preventDefault();
-        let id = evt.features[0].id;
-        this.points = this.points.filter(point => point.id !== id);
-        this.reGeneratePoints();
-      });
-      map.on('mousedown', 'point-layer', function (evt_down) {
-        evt_down.preventDefault();
-        canvas.style.cursor = 'grab';
-        let feature = evt_down.features[0]
-
-        map.once('mouseup', evt_up => {
-          let coords = evt_up.lngLat;
-          let distance = self.calcDistance(evt_down, evt_up);
-          if (!distance) {
-            return;
-          }
-          self.updatePoint(feature, coords);
-          canvas.style.cursor = '';
-        });
-      });
-    },
-    updatePoint(pt, coords) {
-      this.points = this.points.map(point => {
-        if (pt.id === point.id) {
-          point = {
-            ...point,
-            ...coords,
-          }
-        }
-        return point;
-      });
-      this.reGeneratePoints();
-    },
-    // Distance in pixels between events
-    calcDistance(e1, e2) {
-      e1 = e1.point;
-      e2 = e2.point;
-      let xdif = e1.x - e2.x;
-      let ydif = e2.y - e2.y;
-      return Math.sqrt(xdif * xdif + ydif * ydif)
-    },
-    calculateMapMatching() {
-      if (this.mapMatching) {
-        if (this.selectRange.stopsInBetween.length > 100) {
-          this.warning = "Mapmatching not available with >100 points";
-          this.geojsonMapMatchingLine.geometry.coordinates = [];
-          this.map.getSource('mapmatching-line-source').setData(this.geojsonMapMatchingLine);
-          return;
-        } else if (this.selectRange.stopsInBetween.length < 2) {
-          return;
-        }
-        mapMatching.match(this.selectRange.stopsInBetween).then(response => {
-          console.log(response.data);
-          if (response.data.code !== "Ok") {
-            this.error = response.data;
-            return
-          }
-          let matchings = response.data.matchings;
-          if (matchings.length === 0) {
-            this.geojsonMapMatchingLine.geometry.coordinates = [];
-            console.log("No matchings")
-          } else {
-            this.geojsonMapMatchingLine.geometry.coordinates = matchings[0].geometry.coordinates;
-          }
-
-          this.map.getSource('mapmatching-line-source').setData(this.geojsonMapMatchingLine);
-          this.error = false;
-        }).catch(err => {
-          console.log(err.response);
-          this.error = err.response.data;
-          this.geojsonMapMatchingLine.geometry.coordinates = [];
-          this.map.getSource('mapmatching-line-source').setData(this.geojsonMapMatchingLine);
-        });
-      } else {
-        this.geojsonMapMatchingLine.geometry.coordinates = [];
-        this.map.getSource('mapmatching-line-source').setData(this.geojsonMapMatchingLine);
-        this.warning = false;
-      }
-    },
-    reGeneratePoints() {
-      // We add the features
-      this.geojsonPoints.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
-      // And the polyline
-      this.selectRange.geojsonLineToEdit.features = this.generateLineFeatures(this.selectRange.stopsInBetween);
-      this.map.getSource('shape-points-source').setData(this.geojsonPoints);
-      this.map.getSource('shape-line-to-edit-source').setData(this.selectRange.geojsonLineToEdit);
-      this.calculateMapMatching();
-    },
-    generateLine(from, to) {
-      return {
-        'type': 'Feature',
-        'properties': {
-          from: from.id,
-          to: to.id,
-        },
-        'geometry': {
-          'type': 'LineString',
-          'coordinates': [
-            [from.lng, from.lat],
-            [to.lng, to.lat],
-          ]
-        }
       }
     },
     generateLineFeatures(points) {
@@ -686,14 +265,116 @@ export default {
               [point.lng, point.lat],
             ]
           },
-          id: point.id
+          id: previousPoint.id
         });
         previousPoint = point;
       });
       return features;
     },
+    setShapeData(shape) {
+      this.points = shape.points.map(point => {
+        return {
+          id: this.id++,
+          lat: point.shape_pt_lat,
+          lng: point.shape_pt_lon,
+        }
+      });
+      this.geojson.points.features = this.points.map(el => {
+        return this.generateGeojsonPoint(el, {sequence: el.id});
+      });
+      this.geojson.lines.features = this.generateLineFeatures(this.points);
+    },
+    changeToEditRangeClick() {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
+      this.changeToEditRange();
+    },
+    changeToCreate() {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.SIMPLE;
+      this.localShape = {
+        id: null,
+        shape_id: null,
+        points: []
+      };
+      this.mapMatching = true;
+      console.log("create shape");
+    },
+    changeToDuplicate(shape) {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.DUPLICATE;
+      this.localShape.id = null;
+      this.localShape.shape_id = this.$t('shape.editor.duplicationPrefix') + this.localShape.shape_id;
+      this.setShapeData(shape);
+    },
+    exit() {
+      this.$router.push({name: 'Shapes', params: {projectId: this.projectId}});
+    },
+    getPointIndex(id) {
+      return this.points.findIndex(e => e.id === id);
+    },
+    invertPoints() {
+      this.points = this.points.reverse();
+      this.reGeneratePoints();
+    },
+    updatePoint(pt, coords) {
+      this.points = this.points.map(point => {
+        if (pt.id === point.id) {
+          point = {
+            ...point,
+            ...coords,
+          }
+        }
+        return point;
+      });
+      this.reGeneratePoints();
+    },
+    calculateMapMatching() {
+      if (this.mapMatching) {
+        if (this.selectRange.stopsInBetween.length > 100) {
+          this.warning = "Mapmatching not available with >100 points";
+          this.geojson.mapMatchingLine.geometry.coordinates = [];
+          this.map.getSource('mapmatching-line-source').setData(this.geojson.mapMatchingLine);
+          return;
+        } else if (this.selectRange.stopsInBetween.length < 2) {
+          return;
+        }
+        mapMatching.match(this.selectRange.stopsInBetween).then(response => {
+          console.log(response.data);
+          if (response.data.code !== "Ok") {
+            this.error = response.data;
+            return
+          }
+          let matchings = response.data.matchings;
+          if (matchings.length === 0) {
+            this.geojson.mapMatchingLine.geometry.coordinates = [];
+            console.log("No matchings")
+          } else {
+            this.geojson.mapMatchingLine.geometry.coordinates = matchings[0].geometry.coordinates;
+          }
+
+          this.map.getSource('mapmatching-line-source').setData(this.geojson.mapMatchingLine);
+          this.error = false;
+        }).catch(err => {
+          console.log(err.response);
+          this.error = err.response.data;
+          this.geojson.mapMatchingLine.geometry.coordinates = [];
+          this.map.getSource('mapmatching-line-source').setData(this.geojson.mapMatchingLine);
+        });
+      } else {
+        this.geojson.mapMatchingLine.geometry.coordinates = [];
+        this.map.getSource('mapmatching-line-source').setData(this.geojson.mapMatchingLine);
+        this.warning = false;
+      }
+    },
+    reGeneratePoints() {
+      // We add the features
+      this.geojson.points.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
+      // And the polyline
+      this.geojson.lines.features = this.generateLineFeatures(this.points);
+      this.map.getSource('shape-points-source').setData(this.geojson.points);
+      this.map.getSource('shape-lines-source').setData(this.geojson.lines);
+      this.calculateMapMatching();
+    },
     replacePoints() {
-      let coords = this.lineGeojson.geometry.coordinates;
+      let coords = this.geojson.mapMatchingLine.geometry.coordinates;
       if (coords.length) {
         this.points = coords.map(coord => {
           return {
@@ -728,7 +409,7 @@ export default {
         this.warning = this.$t('shape.editor.mapMatchingWarning');
         return;
       }
-      let generatePointJson = (point, index) => {
+      let generateGTFSShapePoint = (point, index) => {
         return {
           shape_pt_sequence: index + 1,
           shape_pt_lat: point.lat,
@@ -737,7 +418,7 @@ export default {
       }
       let data = {
         shape_id: this.localShape.shape_id,
-        points: this.points.map(generatePointJson)
+        points: this.points.map(generateGTFSShapePoint)
       };
       if (this.mode === this.Enums.ShapeEditorMode.CREATE || this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
         shapesAPI.shapesAPI.create(this.projectId, data).then(() => {
@@ -749,7 +430,7 @@ export default {
       } else {
         data.id = this.localShape.id;
         data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(
-            generatePointJson);
+            generateGTFSShapePoint);
         shapesAPI.shapesAPI.put(this.projectId, data).then(() => {
           this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
         }).catch(err => {
