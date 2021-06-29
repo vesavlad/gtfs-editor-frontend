@@ -13,7 +13,10 @@
             </label>
             <span>Map Matching</span>
           </div>
-          <button v-if="mapMatching" class="btn" @click="replacePoints">{{ $t('shape.editor.replacePoints') }}</button>
+          <button :disabled="!mapMatching" class="btn" @click="replacePoints">{{
+              $t('shape.editor.replacePoints')
+            }}
+          </button>
         </template>
       </div>
       <div class="right-content grid center">
@@ -521,15 +524,23 @@ export default {
     },
     calculateMapMatching() {
       if (this.mapMatching) {
-        if (this.points.length > 100) {
+        let points = this.points;
+        if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.EDIT_RANGE) {
+          points = points.filter(point => this.map.getFeatureState({
+            source: 'shape-points-source',
+            id: point.id
+          }).editable);
+        }
+
+        if (points.length > 100) {
           this.warning = "Mapmatching not available with >100 points";
           this.geojson.mapMatchingLine.geometry.coordinates = [];
           this.map.getSource('mapmatching-line-source').setData(this.geojson.mapMatchingLine);
           return;
-        } else if (this.points.length < 2) {
+        } else if (points.length < 2) {
           return;
         }
-        mapMatching.match(this.points).then(response => {
+        mapMatching.match(points).then(response => {
           console.log(response.data);
           if (response.data.code !== "Ok") {
             this.error = response.data;
@@ -570,15 +581,30 @@ export default {
       let coords = this.geojson.mapMatchingLine.geometry.coordinates;
       if (coords.length) {
         let ids = [];
-        this.points = coords.map(coord => {
-          this.id++;
-          ids.push(this.id);
+        coords = coords.map(coord => {
+          let id = this.id++;
+          ids.push(id);
           return {
-            id: this.id,
+            id: id,
             lng: coord[0],
             lat: coord[1],
           }
         });
+        if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.EDIT_RANGE) {
+          // remove first and last point (because they can not be modified)
+          coords = coords.slice(1, coords.length - 1);
+          // find position of first and last points in editing range
+          let firstIndex = this.points.findIndex(stop => stop.id === this.selectRange.selectedStopFeatures[0].id);
+          let lastIndex = this.points.findIndex(stop => stop.id === this.selectRange.selectedStopFeatures[1].id);
+          // concatenate first part static points + new points + last part of static points
+          this.points = [
+            ...this.points.slice(0, firstIndex + 1),
+            ...coords,
+            ...this.points.slice(lastIndex, this.points.length)
+          ];
+        } else {
+          this.points = coords;
+        }
         this.mapMatching = false;
         this.reGeneratePoints();
         ids.forEach(id => {
