@@ -62,17 +62,15 @@
         </div>
         <div class="side-content">
           <div class="field-name"><span>Shape ID</span></div>
-          <div class="field" v-if="localShape"><input v-model="localShape.shape_id"></div>
+          <div class="field" v-if="localShape">
+            <SimpleInput v-model="localShape.shape_id"
+                         :field="{type: Enums.InputType.INPUT, title:'shape_id'}"
+                         :errors="error.shape_id"></SimpleInput>
+          </div>
           <div class="field-name"><span>{{ $t('shape.editor.length') }}</span></div>
           <div class="field"> {{ shapeLength }}</div>
           <div class="field-name"><span>{{ $t('shape.editor.pointsNumber') }}</span></div>
           <div class="field"> {{ points.length }}</div>
-          <div v-if="error" class="errors error">
-            {{ error.code }}
-            <div v-for="(text, index) in error.message.split('\n')" :key="index">
-              {{ text }}
-            </div>
-          </div>
           <p v-if="warning" class="errors warning grid">
             <span class="material-icons">warning</span>
             <span>{{ warning }}</span>
@@ -102,12 +100,14 @@ import envelopeMixin from "@/mixins/envelopeMixin";
 import MessageModal from "@/components/modal/MessageModal";
 import config from "@/config";
 import _ from "lodash";
+import SimpleInput from "@/components/vuetable/inputs/SimpleInput";
 
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 
 export default {
   name: 'ShapeEditor',
   components: {
+    SimpleInput,
     MessageModal,
   },
   mixins: [
@@ -183,7 +183,7 @@ export default {
       id: 1,
       mapMatching: false,
       warning: false,
-      error: false,
+      error: {},
       exitModal: {
         visible: false,
       },
@@ -542,7 +542,7 @@ export default {
         }
         mapMatching.match(points).then(response => {
           if (response.data.code !== "Ok") {
-            this.error = response.data;
+            console.log(response.data);
             return
           }
           let matchings = response.data.matchings;
@@ -554,10 +554,8 @@ export default {
           }
 
           this.map.getSource('mapmatching-line-source').setData(this.geojson.mapMatchingLine);
-          this.error = false;
         }).catch(err => {
-          console.log(err.response);
-          this.error = err.response.data;
+          console.log(err.response.data);
           this.geojson.mapMatchingLine.geometry.coordinates = [];
           this.map.getSource('mapmatching-line-source').setData(this.geojson.mapMatchingLine);
         });
@@ -612,23 +610,6 @@ export default {
         });
       }
     },
-    generateErrorMessage(errData) {
-      if (errData[0]) {
-        this.error = {
-          code: "Error storing Shape",
-          message: errData.join("\n")
-        }
-      }
-      this.error = {
-        message: Object.entries(errData).map(entry => {
-          let val = entry[0];
-          let errors = entry[1];
-          return val + ":\n" + errors.join("\n");
-        }).join("\n"),
-        code: "Unable to create shape"
-      };
-
-    },
     saveAndExit() {
       if (this.mapMatching) {
         this.warning = this.$t('shape.editor.mapMatchingWarning');
@@ -650,7 +631,7 @@ export default {
           this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
         }).catch(err => {
           console.log(err.response);
-          this.generateErrorMessage(err.response.data);
+          this.error = err.response.data;
         });
       } else {
         data.id = this.localShape.id;
@@ -658,7 +639,7 @@ export default {
           this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
         }).catch(err => {
           console.log(err.response);
-          this.generateErrorMessage(err.response.data);
+          this.error = err.response.data;
         });
       }
     },
