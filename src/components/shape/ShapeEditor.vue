@@ -541,7 +541,6 @@ export default {
           return;
         }
         mapMatching.match(points).then(response => {
-          console.log(response.data);
           if (response.data.code !== "Ok") {
             this.error = response.data;
             return
