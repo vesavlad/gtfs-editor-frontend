@@ -96,9 +96,9 @@ import Enums from '@/utils/enums.js'
 import errorMessageMixin from '@/mixins/shapeMapMixin';
 import shapeMapMixin from '@/mixins/errorMessageMixin';
 import envelopeMixin from "@/mixins/envelopeMixin";
-import shapeEditorSelectRangeMixin from "@/mixins/shapeEditorSelectRangeMixin";
 import MessageModal from "@/components/modal/MessageModal";
 import config from "@/config";
+import _ from "lodash";
 
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 
@@ -110,8 +110,7 @@ export default {
   mixins: [
     errorMessageMixin,
     shapeMapMixin,
-    envelopeMixin,
-    shapeEditorSelectRangeMixin
+    envelopeMixin
   ],
   props: {
     projectId: {
@@ -178,7 +177,7 @@ export default {
           id: 1,
         }
       },
-      id: 0,
+      id: 1,
       mapMatching: false,
       warning: false,
       error: false,
@@ -226,22 +225,72 @@ export default {
       style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
     });
     this.map.on('load', () => {
-      if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SELECT_RANGE) {
-        this.changeToSelectRange(this.localShape);
-      } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SIMPLE) {
-        if (this.mode === this.Enums.ShapeEditorMode.CREATE) {
-          this.changeToCreate();
-        } else {
-          this.changeToEdit(this.localShape);
-        }
-      } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
-        this.changeToDuplicate(this.localShape);
+      switch (this.localEditionMode) {
+        case this.Enums.ShapeEditorEditionMode.SIMPLE:
+          if (this.mode === this.Enums.ShapeEditorMode.CREATE) {
+            this.changeToCreationMode();
+          } else {
+            this.changeToEditionMode(this.localShape);
+          }
+          break;
+        case this.Enums.ShapeEditorEditionMode.SELECT_RANGE:
+          this.changeToSelectRangeMode(this.localShape);
+          break;
+        case this.Enums.ShapeEditorEditionMode.DUPLICATE:
+          this.changeToDuplicationMode(this.localShape);
+          break;
       }
       this.envelope(this.map, this.projectId);
       this.$emit('load');
     });
   },
+  beforeDestroy() {
+    this.map.remove();
+  },
   methods: {
+    changeToCreationMode() {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.SIMPLE;
+      this.localShape = {
+        id: null,
+        shape_id: null,
+        points: []
+      };
+      this.mapMatching = true;
+      this.setSourceAndLayers();
+      this.enableShapeEdition({letExtendShape: true});
+    },
+    changeToEditionMode(shape) {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.SIMPLE;
+      this.setShapeData(shape);
+      this.setSourceAndLayers();
+      this.points.forEach(stop => {
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+        this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
+      });
+      this.enableShapeEdition({letExtendShape: true});
+    },
+    changeToSelectRangeMode(shape) {
+      this.setShapeData(shape);
+      this.setSourceAndLayers();
+
+      this.map.on('mouseenter', 'shape-points-layer', this.selectRangeMouseEnter);
+      this.map.on('mousemove', 'shape-points-layer', this.selectRangeMouseMove);
+      this.map.on('mouseleave', 'shape-points-layer', this.selectRangeMouseLeave);
+      this.map.on('click', 'shape-points-layer', this.selectRangeClick);
+    },
+    changeToDuplicationMode(shape) {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.DUPLICATE;
+      this.localShape.id = null;
+      this.localShape.shape_id = this.$t('shape.editor.duplicationPrefix') + this.localShape.shape_id;
+      this.setShapeData(shape);
+      this.setSourceAndLayers();
+
+      this.points.forEach(stop => {
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+        this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
+      });
+      this.enableShapeEdition({letExtendShape: true});
+    },
     generateGeojsonPoint(point, properties) {
       return {
         type: 'Feature',
@@ -305,48 +354,42 @@ export default {
         'data': this.geojson.mapMatchingLine,
       });
 
-      // Circles for the points
+      // Circles for shape points
       this.map.addLayer({
-        id: 'point-layer',
+        id: 'shape-points-layer',
         type: 'circle',
         source: 'shape-points-source',
         paint: {
-          'circle-radius':
-              ['interpolate', ['linear'], ['zoom'],
-                12, [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false], 5,
-                ['boolean', ['feature-state', 'selected'], false], 5,
-                1.5
-              ],
-                14, [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false], 5,
-                ['boolean', ['feature-state', 'selected'], false], 5,
-                3
-              ],
-                20, [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false], 5,
-                ['boolean', ['feature-state', 'selected'], false], 5,
-                3
-              ],],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'],
+            12, [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false], 5,
+              ['boolean', ['feature-state', 'selected'], false], 5,
+              1.5
+            ],
+            20, [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false], 5,
+              ['boolean', ['feature-state', 'selected'], false], 5,
+              3
+            ]
+          ],
           'circle-color': [
             'case',
             ['boolean', ['feature-state', 'hover'], false], '#7DC242',
-            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
-            ['boolean', ['feature-state', 'editable'], false], 'white',
+            ['boolean', ['feature-state', 'frozen'], false], '#AAB9BE',
+            ['boolean', ['feature-state', 'editable'], false], '#FFFFFF',
             ['boolean', ['feature-state', 'selected'], false], '#7DC242',
-            ['boolean', ['feature-state', 'between'], false], 'white',
-            'white'
+            ['boolean', ['feature-state', 'between'], false], '#FFFFFF',
+            '#FFFFFF'
           ],
           'circle-stroke-color': [
             'case',
             ['boolean', ['feature-state', 'hover'], false], '#7DC242',
-            ['boolean', ['feature-state', 'editable'], false], config.shape_line_color,
+            ['boolean', ['feature-state', 'editable'], false], '#19849C',
             ['boolean', ['feature-state', 'selected'], false], '#7DC242',
             ['boolean', ['feature-state', 'between'], false], '#7DC242',
-            config.shape_line_color,
+            '#19849C',
           ],
           'circle-stroke-opacity': 1,
           'circle-stroke-width': [
@@ -363,7 +406,7 @@ export default {
 
       // Line for the map matching shape
       this.map.addLayer({
-        'id': 'line-layer',
+        'id': 'mapmatching-line-layer',
         'type': 'line',
         'source': 'mapmatching-line-source',
         'layout': {
@@ -378,7 +421,7 @@ export default {
 
       // Line for the shape itself
       this.map.addLayer({
-        'id': 'point-line-layer',
+        'id': 'shape-lines-layer',
         'type': 'line',
         'source': 'shape-lines-source',
         'layout': {
@@ -388,10 +431,10 @@ export default {
         'paint': {
           'line-color': [
             'case',
-            ['boolean', ['feature-state', 'editable'], false], '#19849c',
-            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
-            ['boolean', ['feature-state', 'between'], false], '#7dc242',
-            '#19849c'
+            ['boolean', ['feature-state', 'editable'], false], '#19849C',
+            ['boolean', ['feature-state', 'frozen'], false], '#AAB9BE',
+            ['boolean', ['feature-state', 'between'], false], '#7DC242',
+            '#19849C'
           ],
           'line-width': [
             'case',
@@ -399,9 +442,9 @@ export default {
             2
           ]
         }
-      }, 'point-layer');
+      }, 'shape-points-layer');
 
-      // Arrow for the shape
+      // Arrow for the shape-lines-layer layer
       let img = require('../../assets/img/double-arrow.png')
       this.map.loadImage(img, (err, image) => {
         if (err) {
@@ -410,7 +453,7 @@ export default {
         }
         this.map.addImage('double-arrow', image, {sdf: true});
         this.map.addLayer({
-          'id': 'point-arrow',
+          'id': 'shape-lines-arrow',
           'type': 'symbol',
           'source': 'shape-lines-source',
           'layout': {
@@ -425,15 +468,15 @@ export default {
           paint: {
             'icon-color': [
               'case',
-              ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
-              ['boolean', ['feature-state', 'editable'], false], '#19849c',
-              ['boolean', ['feature-state', 'between'], false], '#7dc242',
-              '#19849c'
+              ['boolean', ['feature-state', 'editable'], false], '#19849C',
+              ['boolean', ['feature-state', 'frozen'], false], '#AAB9BE',
+              ['boolean', ['feature-state', 'between'], false], '#7DC242',
+              '#19849C'
             ],
-            'icon-halo-color': '#fff',
+            'icon-halo-color': '#FFFFFF',
             'icon-halo-width': 2,
           }
-        }, 'point-layer');
+        }, 'shape-points-layer');
 
         this.map.addLayer({
           'id': 'mapmathing-line-arrow',
@@ -450,7 +493,7 @@ export default {
           },
           paint: {
             'icon-color': config.map_matching_color,
-            'icon-halo-color': "#fff",
+            'icon-halo-color': "#FFFFFF",
             'icon-halo-width': 2,
           }
         });
@@ -459,40 +502,6 @@ export default {
     changeToEditRangeClick() {
       this.localEditionMode = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
       this.changeToEditRange();
-    },
-    changeToCreate() {
-      this.localEditionMode = this.Enums.ShapeEditorEditionMode.SIMPLE;
-      this.localShape = {
-        id: null,
-        shape_id: null,
-        points: []
-      };
-      this.mapMatching = true;
-      this.setSourceAndLayers();
-      this.enableShapeEdition({letExtendShape: true});
-    },
-    changeToDuplicate(shape) {
-      this.localEditionMode = this.Enums.ShapeEditorEditionMode.DUPLICATE;
-      this.localShape.id = null;
-      this.localShape.shape_id = this.$t('shape.editor.duplicationPrefix') + this.localShape.shape_id;
-      this.setShapeData(shape);
-      this.setSourceAndLayers();
-
-      this.points.forEach(stop => {
-        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
-        this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
-      });
-      this.enableShapeEdition({letExtendShape: true});
-    },
-    changeToEdit(shape) {
-      this.localEditionMode = this.Enums.ShapeEditorEditionMode.SIMPLE;
-      this.setShapeData(shape);
-      this.setSourceAndLayers();
-      this.points.forEach(stop => {
-        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
-        this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
-      });
-      this.enableShapeEdition({letExtendShape: true});
     },
     exit() {
       this.$router.push({name: 'Shapes', params: {projectId: this.projectId}});
@@ -631,6 +640,323 @@ export default {
         }).catch(err => {
           console.log(err.response);
           this.generateErrorMessage(err.response.data);
+        });
+      }
+    },
+    setBetweenData() {
+      // clean previous points
+      this.selectRange.stopsInBetween.forEach(stop => {
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: false});
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: false});
+        this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {between: false});
+      });
+      this.selectRange.stopsInBetween = [];
+
+      let firstPoint = this.selectRange.selectedStopFeatures[0];
+      let lastPoint = this.selectRange.selectedStopFeatures[1];
+      if (!firstPoint.id || !lastPoint.id) {
+        console.warn('points are not defined yet');
+        return;
+      }
+
+      for (let i = firstPoint.properties.sequence; i <= lastPoint.properties.sequence; i++) {
+        let stop = this.points[i];
+        this.selectRange.stopsInBetween.push(stop);
+        if ([firstPoint.properties.sequence, lastPoint.properties.sequence].includes(i)) {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: true});
+        } else {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
+        }
+        if (i !== lastPoint.properties.sequence) {
+          this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {between: true});
+        }
+      }
+    },
+    /************************************************************
+    * Events for select range mode
+    * ***********************************************************/
+    selectRangeMouseEnter(e) {
+      let feature = e.features[0];
+      this.selectRange.hoveredStops.add(feature.id);
+      this.map.getCanvas().style.cursor = 'pointer';
+      this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+    },
+    selectRangeMouseMove(e) {
+      let features = this.map.queryRenderedFeatures(e.point);
+      let currentHoveredStops = new Set();
+      features.forEach(feature => {
+        if (feature.layer.id === 'shape-points-layer') {
+          this.selectRange.hoveredStops.add(feature.id);
+          currentHoveredStops.add(feature.id);
+          this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+        }
+      });
+      this.selectRange.hoveredStops.forEach(featureId => {
+        if (!currentHoveredStops.has(featureId)) {
+          this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+        }
+      });
+    },
+    selectRangeMouseLeave() {
+      this.map.getCanvas().style.cursor = '';
+      this.selectRange.hoveredStops.forEach(featureId => {
+        this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+      });
+    },
+    selectRangeClick(e) {
+      let feature = e.features[0];
+      let indexToChange = null;
+
+      if (this.selectRange.selectedStopFeatures[0].properties.sequence === null) {
+        indexToChange = 0;
+      } else if (this.selectRange.selectedStopFeatures[1].properties.sequence === null) {
+        if (this.selectRange.selectedStopFeatures[0].properties.sequence > feature.properties.sequence) {
+          let tmp = this.selectRange.selectedStopFeatures[0];
+          this.$set(this.selectRange.selectedStopFeatures, 0, feature);
+          feature = tmp;
+        }
+        indexToChange = 1;
+      } else {
+        // unselect previous selected points
+        let previousFirstFeatureId = this.selectRange.selectedStopFeatures[0].id;
+        let previousSecondFeatureId = this.selectRange.selectedStopFeatures[1].id;
+        this.map.setFeatureState({source: 'shape-points-source', id: previousFirstFeatureId}, {selected: false});
+        this.map.setFeatureState({source: 'shape-points-source', id: previousSecondFeatureId}, {selected: false});
+
+        this.$set(this.selectRange.selectedStopFeatures, 1, {id: null, properties: {sequence: null}});
+        indexToChange = 0;
+      }
+
+      this.$set(this.selectRange.selectedStopFeatures, indexToChange, feature);
+      this.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {selected: true});
+
+      this.setBetweenData();
+    },
+    changeToEditRange() {
+      // disable previous listeners of select range mode
+      this.map.off('mouseenter', 'shape-points-layer', this.selectRangeMouseEnter);
+      this.map.off('mousemove', 'shape-points-layer', this.selectRangeMouseMove);
+      this.map.off('mouseleave', 'shape-points-layer', this.selectRangeMouseLeave);
+      this.map.off('click', 'shape-points-layer', this.selectRangeClick);
+
+      // set style to edit range
+      for (let i = 0; i < this.points.length; i++) {
+        let stop = this.points[i];
+        if ([this.firstSelectedPoint.properties.sequence, this.endSelectedPoint.properties.sequence].includes(i)) {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+          if (i === this.firstSelectedPoint.properties.sequence) {
+            this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
+          } else {
+            this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {frozen: true});
+          }
+        } else if (this.firstSelectedPoint.properties.sequence < i && i < this.endSelectedPoint.properties.sequence) {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+          this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
+        } else {
+          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {frozen: true});
+          this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {frozen: true});
+        }
+      }
+
+      this.enableShapeEdition();
+    },
+    enableShapeEdition(options) {
+      let defaultOptions = {
+        letExtendShape: false
+      };
+      options = _.assign({}, defaultOptions, options);
+
+      // set moving point source and layer
+      this.map.addSource('moving-point-source', {
+        'type': 'geojson',
+        'data': this.geojson.movingPoint,
+      });
+
+      this.map.addLayer({
+        id: 'moving-point-layer',
+        type: 'circle',
+        source: 'moving-point-source',
+        layout: {
+          'visibility': 'none'
+        },
+        paint: {
+          'circle-radius': 5,
+          'circle-color': '#7DC242',
+          'circle-stroke-color': '#7DC242',
+          'circle-stroke-opacity': 1,
+          'circle-stroke-width': 3
+        }
+      });
+
+      // add new map behaviour
+
+      // logic for line
+      let hoveredStops = new Set();
+
+      this.map.on('dblclick', 'shape-lines-layer', e => {
+        // disable zoom with double click over line
+        e.preventDefault();
+      });
+
+      // when click on a line we add a point in there between the ends
+      this.map.on('click', 'shape-lines-layer', e => {
+        let feature = e.features[0];
+        if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'shape-points-layer').length > 0 ||
+            !this.map.getFeatureState({source: 'shape-lines-source', id: feature.id}).editable) {
+          return;
+        }
+        let newStop = {
+          ...e.lngLat,
+          id: this.id++,
+        }
+        this.points.splice(this.getPointIndex(feature.properties.to), 0, newStop);
+        this.reGeneratePoints();
+        // set point status
+        this.map.setFeatureState({source: 'shape-points-source', id: newStop.id}, {editable: true});
+        this.map.setFeatureState({source: 'shape-points-source', id: newStop.id}, {hover: true});
+        // set line status
+        this.map.setFeatureState({source: 'shape-lines-source', id: newStop.id}, {editable: true});
+        hoveredStops.add(newStop.id);
+        this.map.getCanvas().style.cursor = 'move';
+      });
+
+      this.map.on('mouseenter', 'shape-lines-layer', e => {
+        let feature = e.features[0];
+        let isEditable = this.map.getFeatureState({source: 'shape-lines-source', id: feature.id}).editable;
+        if (hoveredStops.size === 0 && isEditable) {
+          this.map.getCanvas().style.cursor = 'copy';
+        }
+      });
+
+      this.map.on('mouseleave', 'shape-lines-layer', () => {
+        this.map.getCanvas().style.cursor = '';
+      });
+
+      // logic for point
+
+      this.map.on('dblclick', 'shape-points-layer', e => {
+        // disable zoom with double click over line
+        e.preventDefault();
+      });
+
+      this.map.on('contextmenu', 'shape-points-layer', e => {
+        let feature = e.features[0];
+        let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
+        let isSelected = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).selected;
+        if (!isEditable || isSelected) {
+          return;
+        }
+        // remove point
+        this.points = this.points.filter(point => point.id !== feature.id);
+        this.reGeneratePoints();
+        hoveredStops.delete(feature.id);
+        if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'shape-lines-layer').length > 0) {
+          this.map.getCanvas().style.cursor = 'copy';
+        } else {
+          this.map.getCanvas().style.cursor = '';
+        }
+      });
+
+      this.map.on('mouseenter', 'shape-points-layer', e => {
+        let feature = e.features[0];
+        let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
+        let isSelected = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).selected;
+        if (isEditable && !isSelected) {
+          hoveredStops.add(feature.id);
+          this.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {hover: true});
+          this.map.getCanvas().style.cursor = 'move';
+        }
+      });
+
+      this.map.on('mousemove', 'shape-points-layer', e => {
+        let features = this.map.queryRenderedFeatures(e.point);
+        let currentHoveredStops = new Set();
+        features.forEach(feature => {
+          if (feature.id) {
+            let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
+            let isSelected = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).selected;
+            if (isEditable && feature.layer.id === 'shape-points-layer' && !isSelected) {
+              hoveredStops.add(feature.id);
+              currentHoveredStops.add(feature.id);
+              this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
+            }
+          }
+        });
+        hoveredStops.forEach(featureId => {
+          if (!currentHoveredStops.has(featureId)) {
+            this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+          }
+        });
+      });
+
+      this.map.on('mouseleave', 'shape-points-layer', () => {
+        this.map.getCanvas().style.cursor = '';
+        hoveredStops.forEach(featureId => {
+          this.map.setFeatureState({source: 'shape-points-source', id: featureId}, {hover: false});
+        });
+        hoveredStops = new Set();
+      });
+
+      this.map.on('mousedown', 'shape-points-layer', eDown => {
+        // Prevent the default map drag behavior.
+        eDown.preventDefault();
+
+        // only works when user raises mousedown event with left click
+        if (eDown.originalEvent.button !== 0) {
+          return;
+        }
+        let feature = eDown.features[0]
+        let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
+        let isSelected = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).selected;
+        if (!isEditable || isSelected) {
+          return;
+        }
+        this.map.getCanvas().style.cursor = 'grab';
+
+        this.geojson.movingPoint.geometry.coordinates = [];
+        this.map.getSource('moving-point-source').setData(this.geojson.movingPoint);
+        this.map.setLayoutProperty('moving-point-layer', 'visibility', 'visible');
+        this.map.setFilter('shape-points-layer', ['!=', ['id'], feature.id]);
+
+        let mouseMove = eMove => {
+          this.geojson.movingPoint.geometry.coordinates = [eMove.lngLat.lng, eMove.lngLat.lat];
+          this.map.getSource('moving-point-source').setData(this.geojson.movingPoint);
+          this.map.getCanvas().style.cursor = 'grabbing';
+        }
+        this.map.on('mousemove', mouseMove);
+
+        this.map.once('mouseup', eUp => {
+          if (!_.isEqual(eUp.lngLat, eDown.lngLat)) {
+            this.updatePoint(feature, eUp.lngLat);
+            this.map.getCanvas().style.cursor = '';
+          }
+          this.map.off('mousemove', mouseMove);
+          this.map.setLayoutProperty('moving-point-layer', 'visibility', 'none');
+          this.map.setFilter('shape-points-layer', null);
+        });
+      });
+
+      if (options.letExtendShape) {
+        this.map.on('dblclick', e => {
+          // disable zoom with double click
+          e.preventDefault();
+          if (this.map.queryRenderedFeatures(e.point).filter(
+              feature => ['shape-points-layer', 'shape-lines-layer'].includes(feature.layer.id)).length > 0) {
+            return;
+          }
+          let newStop = {
+            ...e.lngLat,
+            id: this.id++,
+          };
+          this.points.push(newStop);
+          this.reGeneratePoints();
+          // set point status
+          this.map.setFeatureState({source: 'shape-points-source', id: newStop.id}, {editable: true});
+          this.map.setFeatureState({source: 'shape-points-source', id: newStop.id}, {hover: true});
+          hoveredStops.add(newStop.id);
+          // set line status
+          this.map.setFeatureState({source: 'shape-lines-source', id: newStop.id}, {editable: true});
+          this.map.getCanvas().style.cursor = 'move';
         });
       }
     }
