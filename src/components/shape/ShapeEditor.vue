@@ -567,6 +567,7 @@ export default {
         this.reGeneratePoints();
         ids.forEach(id => {
           this.map.setFeatureState({source: 'shape-points-source', id: id}, {editable: true});
+          this.map.setFeatureState({source: 'shape-lines-source', id: id}, {editable: true});
         });
       }
     },
