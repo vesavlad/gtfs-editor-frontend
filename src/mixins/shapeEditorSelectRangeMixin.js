@@ -25,7 +25,10 @@ let shapeEditorSelectRangeMixin = {
           'type': 'FeatureCollection',
           'features': []
         },
-        selectedStopFeatures: [{id: null, properties: {sequence: null}}, {id: null, properties: {sequence: null}}],
+        selectedStopFeatures: [
+          {id: null, properties: {sequence: null}},
+          {id: null, properties: {sequence: null}}
+        ],
         stopsInBetween: [],
         hoveredStops: new Set()
       },
