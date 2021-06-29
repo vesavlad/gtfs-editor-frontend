@@ -35,12 +35,12 @@
         </div>
         <div class="side-content">
           <div class="field-name"><span>{{ $t('shape.editor.startPoint') }}</span></div>
-          <div class="field">{{ firstSelectedPoint.properties.sequence }}</div>
+          <div class="field">{{ firstSelectedPoint.id }}</div>
           <div class="field-name"><span>{{ $t('shape.editor.endPoint') }}</span></div>
-          <div class="field">{{ endSelectedPoint.properties.sequence }}</div>
+          <div class="field">{{ endSelectedPoint.id }}</div>
           <div class="field-name"><span>{{ $t('shape.editor.pointsToEdit') }}</span></div>
           <div class="field">{{ pointsToEdit }}</div>
-          <button class="btn submit" @click="changeToEditRangeClick" :disabled="pointsToEdit === 0">
+          <button class="btn submit" @click="changeToEditRange" :disabled="pointsToEdit === 0">
             {{ $t('shape.editor.startEditionOfRangeButtonLabel') }}
           </button>
         </div>
@@ -186,8 +186,8 @@ export default {
       },
       selectRange: {
         selectedStopFeatures: [
-          {id: null, properties: {sequence: null}},
-          {id: null, properties: {sequence: null}}
+          {id: null},
+          {id: null}
         ],
         stopsInBetween: [],
         hoveredStops: new Set()
@@ -212,9 +212,9 @@ export default {
       return this.selectRange.selectedStopFeatures[1];
     },
     pointsToEdit() {
-      if (this.selectRange.selectedStopFeatures[0].properties.sequence !== null &&
-          this.selectRange.selectedStopFeatures[1].properties.sequence !== null) {
-        return this.selectRange.selectedStopFeatures[1].properties.sequence - this.selectRange.selectedStopFeatures[0].properties.sequence;
+      if (this.selectRange.selectedStopFeatures[0].id !== null &&
+          this.selectRange.selectedStopFeatures[1].id !== null) {
+        return this.selectRange.selectedStopFeatures[1].id - this.selectRange.selectedStopFeatures[0].id;
       }
       return 0;
     }
@@ -298,7 +298,7 @@ export default {
           type: 'Point',
           coordinates: [point.lng, point.lat]
         },
-        properties: properties,
+        properties: !properties ? {} : properties,
         id: point.id
       }
     },
@@ -333,9 +333,7 @@ export default {
           lng: point.shape_pt_lon,
         }
       });
-      this.geojson.points.features = this.points.map(el => {
-        return this.generateGeojsonPoint(el, {sequence: el.id});
-      });
+      this.geojson.points.features = this.points.map(this.generateGeojsonPoint);
       this.geojson.lines.features = this.generateLineFeatures(this.points);
     },
     setSourceAndLayers() {
@@ -499,10 +497,6 @@ export default {
         });
       });
     },
-    changeToEditRangeClick() {
-      this.localEditionMode = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
-      this.changeToEditRange();
-    },
     exit() {
       this.$router.push({name: 'Shapes', params: {projectId: this.projectId}});
     },
@@ -565,7 +559,7 @@ export default {
     },
     reGeneratePoints() {
       // We add the features
-      this.geojson.points.features = this.points.map(f => this.generateGeojsonPoint(f, {}));
+      this.geojson.points.features = this.points.map(this.generateGeojsonPoint);
       // And the polyline
       this.geojson.lines.features = this.generateLineFeatures(this.points);
       this.map.getSource('shape-points-source').setData(this.geojson.points);
@@ -659,22 +653,24 @@ export default {
         return;
       }
 
-      for (let i = firstPoint.properties.sequence; i <= lastPoint.properties.sequence; i++) {
-        let stop = this.points[i];
-        this.selectRange.stopsInBetween.push(stop);
-        if ([firstPoint.properties.sequence, lastPoint.properties.sequence].includes(i)) {
-          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: true});
-        } else {
-          this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
+      this.points.forEach(stop => {
+        if (firstPoint.id <= stop.id && stop.id <= lastPoint.id) {
+          this.selectRange.stopsInBetween.push(stop);
+          if ([firstPoint.id, lastPoint.id].includes(stop.id)) {
+            this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {selected: true});
+          } else {
+            this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {between: true});
+          }
+          if (stop.id !== lastPoint.id) {
+            this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {between: true});
+          }
         }
-        if (i !== lastPoint.properties.sequence) {
-          this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {between: true});
-        }
-      }
+      });
+
     },
     /************************************************************
-    * Events for select range mode
-    * ***********************************************************/
+     * Events for select range mode
+     * **********************************************************/
     selectRangeMouseEnter(e) {
       let feature = e.features[0];
       this.selectRange.hoveredStops.add(feature.id);
@@ -707,10 +703,10 @@ export default {
       let feature = e.features[0];
       let indexToChange = null;
 
-      if (this.selectRange.selectedStopFeatures[0].properties.sequence === null) {
+      if (this.selectRange.selectedStopFeatures[0].id === null) {
         indexToChange = 0;
-      } else if (this.selectRange.selectedStopFeatures[1].properties.sequence === null) {
-        if (this.selectRange.selectedStopFeatures[0].properties.sequence > feature.properties.sequence) {
+      } else if (this.selectRange.selectedStopFeatures[1].id === null) {
+        if (this.selectRange.selectedStopFeatures[0].id > feature.id) {
           let tmp = this.selectRange.selectedStopFeatures[0];
           this.$set(this.selectRange.selectedStopFeatures, 0, feature);
           feature = tmp;
@@ -733,6 +729,8 @@ export default {
       this.setBetweenData();
     },
     changeToEditRange() {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
+
       // disable previous listeners of select range mode
       this.map.off('mouseenter', 'shape-points-layer', this.selectRangeMouseEnter);
       this.map.off('mousemove', 'shape-points-layer', this.selectRangeMouseMove);
@@ -740,23 +738,22 @@ export default {
       this.map.off('click', 'shape-points-layer', this.selectRangeClick);
 
       // set style to edit range
-      for (let i = 0; i < this.points.length; i++) {
-        let stop = this.points[i];
-        if ([this.firstSelectedPoint.properties.sequence, this.endSelectedPoint.properties.sequence].includes(i)) {
+      this.points.forEach(stop => {
+        if ([this.firstSelectedPoint.id, this.endSelectedPoint.id].includes(stop.id)) {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
-          if (i === this.firstSelectedPoint.properties.sequence) {
+          if (stop.id === this.firstSelectedPoint.id) {
             this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
           } else {
             this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {frozen: true});
           }
-        } else if (this.firstSelectedPoint.properties.sequence < i && i < this.endSelectedPoint.properties.sequence) {
+        } else if (this.firstSelectedPoint.id < stop.id && stop.id < this.endSelectedPoint.id) {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
           this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
         } else {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {frozen: true});
           this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {frozen: true});
         }
-      }
+      });
 
       this.enableShapeEdition();
     },
