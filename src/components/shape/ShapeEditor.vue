@@ -98,6 +98,7 @@ import shapeMapMixin from '@/mixins/errorMessageMixin';
 import envelopeMixin from "@/mixins/envelopeMixin";
 import shapeEditorSelectRangeMixin from "@/mixins/shapeEditorSelectRangeMixin";
 import MessageModal from "@/components/modal/MessageModal";
+import config from "@/config";
 
 mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_TOKEN;
 
@@ -177,7 +178,7 @@ export default {
           id: 1,
         }
       },
-      id: 0,
+      id: 1,
       mapMatching: false,
       warning: false,
       error: false,
@@ -284,6 +285,173 @@ export default {
       });
       this.geojson.lines.features = this.generateLineFeatures(this.points);
     },
+    setSourceAndLayers() {
+      this.map.addSource('shape-points-source', {
+        'type': 'geojson',
+        'data': this.geojson.points,
+      });
+
+      this.map.addSource('shape-lines-source', {
+        'type': 'geojson',
+        'data': this.geojson.lines,
+      });
+
+      this.map.addSource('mapmatching-line-source', {
+        'type': 'geojson',
+        'data': this.geojson.mapMatchingLine,
+      });
+
+      // Circles for the points
+      this.map.addLayer({
+        id: 'point-layer',
+        type: 'circle',
+        source: 'shape-points-source',
+        paint: {
+          'circle-radius':
+              ['interpolate', ['linear'], ['zoom'],
+                12, [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false], 5,
+                ['boolean', ['feature-state', 'selected'], false], 5,
+                1.5
+              ],
+                14, [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false], 5,
+                ['boolean', ['feature-state', 'selected'], false], 5,
+                3
+              ],
+                20, [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false], 5,
+                ['boolean', ['feature-state', 'selected'], false], 5,
+                3
+              ],],
+          'circle-color': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
+            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
+            ['boolean', ['feature-state', 'editable'], false], 'white',
+            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
+            ['boolean', ['feature-state', 'between'], false], 'white',
+            'white'
+          ],
+          'circle-stroke-color': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], '#7DC242',
+            ['boolean', ['feature-state', 'editable'], false], config.shape_line_color,
+            ['boolean', ['feature-state', 'selected'], false], '#7DC242',
+            ['boolean', ['feature-state', 'between'], false], '#7DC242',
+            config.shape_line_color,
+          ],
+          'circle-stroke-opacity': 1,
+          'circle-stroke-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], 3,
+            ['boolean', ['feature-state', 'editable'], false], 2,
+            ['boolean', ['feature-state', 'frozen'], false], 0,
+            ['boolean', ['feature-state', 'selected'], false], 3,
+            ['boolean', ['feature-state', 'between'], false], 3,
+            2
+          ]
+        }
+      });
+
+      // Line for the map matching shape
+      this.map.addLayer({
+        'id': 'line-layer',
+        'type': 'line',
+        'source': 'mapmatching-line-source',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': config.map_matching_color,
+          'line-width': 2
+        }
+      });
+
+      // Line for the shape itself
+      this.map.addLayer({
+        'id': 'point-line-layer',
+        'type': 'line',
+        'source': 'shape-lines-source',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': [
+            'case',
+            ['boolean', ['feature-state', 'editable'], false], '#19849c',
+            ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
+            ['boolean', ['feature-state', 'between'], false], '#7dc242',
+            '#19849c'
+          ],
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'editable'], false], 4,
+            2
+          ]
+        }
+      }, 'point-layer');
+
+      // Arrow for the shape
+      let img = require('../../assets/img/double-arrow.png')
+      this.map.loadImage(img, (err, image) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        this.map.addImage('double-arrow', image, {sdf: true});
+        this.map.addLayer({
+          'id': 'point-arrow',
+          'type': 'symbol',
+          'source': 'shape-lines-source',
+          'layout': {
+            'symbol-placement': 'line',
+            'symbol-spacing': 100,
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
+            'icon-image': 'double-arrow',
+            'icon-size': 0.4,
+            'visibility': 'visible'
+          },
+          paint: {
+            'icon-color': [
+              'case',
+              ['boolean', ['feature-state', 'frozen'], false], '#aab9be',
+              ['boolean', ['feature-state', 'editable'], false], '#19849c',
+              ['boolean', ['feature-state', 'between'], false], '#7dc242',
+              '#19849c'
+            ],
+            'icon-halo-color': '#fff',
+            'icon-halo-width': 2,
+          }
+        }, 'point-layer');
+
+        this.map.addLayer({
+          'id': 'mapmathing-line-arrow',
+          'type': 'symbol',
+          'source': 'mapmatching-line-source',
+          'layout': {
+            'symbol-placement': 'line',
+            'symbol-spacing': 100,
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
+            'icon-image': 'double-arrow',
+            'icon-size': 0.4,
+            'visibility': 'visible'
+          },
+          paint: {
+            'icon-color': config.map_matching_color,
+            'icon-halo-color': "#fff",
+            'icon-halo-width': 2,
+          }
+        });
+      });
+    },
     changeToEditRangeClick() {
       this.localEditionMode = this.Enums.ShapeEditorEditionMode.EDIT_RANGE;
       this.changeToEditRange();
@@ -296,6 +464,8 @@ export default {
         points: []
       };
       this.mapMatching = true;
+      this.setSourceAndLayers();
+      this.enableShapeEdition({letExtendShape: true});
       console.log("create shape");
     },
     changeToDuplicate(shape) {
@@ -303,6 +473,13 @@ export default {
       this.localShape.id = null;
       this.localShape.shape_id = this.$t('shape.editor.duplicationPrefix') + this.localShape.shape_id;
       this.setShapeData(shape);
+      this.setSourceAndLayers();
+
+      this.points.forEach(stop => {
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+        this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
+      });
+      this.enableShapeEdition();
     },
     exit() {
       this.$router.push({name: 'Shapes', params: {projectId: this.projectId}});
@@ -328,15 +505,15 @@ export default {
     },
     calculateMapMatching() {
       if (this.mapMatching) {
-        if (this.selectRange.stopsInBetween.length > 100) {
+        if (this.points.length > 100) {
           this.warning = "Mapmatching not available with >100 points";
           this.geojson.mapMatchingLine.geometry.coordinates = [];
           this.map.getSource('mapmatching-line-source').setData(this.geojson.mapMatchingLine);
           return;
-        } else if (this.selectRange.stopsInBetween.length < 2) {
+        } else if (this.points.length < 2) {
           return;
         }
-        mapMatching.match(this.selectRange.stopsInBetween).then(response => {
+        mapMatching.match(this.points).then(response => {
           console.log(response.data);
           if (response.data.code !== "Ok") {
             this.error = response.data;
@@ -376,15 +553,21 @@ export default {
     replacePoints() {
       let coords = this.geojson.mapMatchingLine.geometry.coordinates;
       if (coords.length) {
+        let ids = [];
         this.points = coords.map(coord => {
+          this.id++;
+          ids.push(this.id);
           return {
-            id: this.id++,
+            id: this.id,
             lng: coord[0],
             lat: coord[1],
           }
         });
         this.mapMatching = false;
         this.reGeneratePoints();
+        ids.forEach(id => {
+          this.map.setFeatureState({source: 'shape-points-source', id: id}, {editable: true});
+        });
       }
     },
     generateErrorMessage(errData) {
