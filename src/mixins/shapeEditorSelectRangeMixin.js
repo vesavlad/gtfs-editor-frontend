@@ -299,6 +299,8 @@ let shapeEditorSelectRangeMixin = {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
           if (i === this.firstSelectedPoint.properties.sequence) {
             this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
+          } else {
+            this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {frozen: true});
           }
         } else if (this.firstSelectedPoint.properties.sequence < i && i < this.endSelectedPoint.properties.sequence) {
           this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
