@@ -364,11 +364,15 @@ let shapeEditorSelectRangeMixin = {
       });
 
       this.map.on('contextmenu', 'point-layer', e => {
+        let feature = e.features[0];
+        let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
+        if (!isEditable) {
+          return;
+        }
         // remove point
-        let id = e.features[0].id;
-        this.points = this.points.filter(point => point.id !== id);
+        this.points = this.points.filter(point => point.id !== feature.id);
         this.reGeneratePoints();
-        hoveredStops.delete(id);
+        hoveredStops.delete(feature.id);
         if (this.map.queryRenderedFeatures(e.point).filter(feature => feature.layer.id === 'point-line-layer').length > 0) {
           this.map.getCanvas().style.cursor = 'copy';
         } else {
@@ -378,10 +382,10 @@ let shapeEditorSelectRangeMixin = {
 
       this.map.on('mouseenter', 'point-layer', e => {
         let feature = e.features[0];
-        hoveredStops.add(feature.id);
-        this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
         let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
         if (isEditable) {
+          hoveredStops.add(feature.id);
+          this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
           this.map.getCanvas().style.cursor = 'move';
         }
       });
@@ -415,14 +419,19 @@ let shapeEditorSelectRangeMixin = {
       });
 
       this.map.on('mousedown', 'point-layer', eDown => {
+        // Prevent the default map drag behavior.
+        eDown.preventDefault();
+
         // only works when user raises mousedown event with left click
         if (eDown.originalEvent.button !== 0) {
           return;
         }
-        // Prevent the default map drag behavior.
-        eDown.preventDefault();
-        this.map.getCanvas().style.cursor = 'grab';
         let feature = eDown.features[0]
+        let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
+        if (!isEditable) {
+          return;
+        }
+        this.map.getCanvas().style.cursor = 'grab';
 
         this.map.setLayoutProperty('moving-point-layer', 'visibility', 'visible');
         this.map.setFilter('point-layer', ['!=', ['id'], feature.id]);
