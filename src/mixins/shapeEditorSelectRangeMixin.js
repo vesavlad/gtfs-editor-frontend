@@ -161,7 +161,6 @@ let shapeEditorSelectRangeMixin = {
 
       this.map.on('dblclick', 'point-line-layer', e => {
         // disable zoom with double click over line
-        console.log('double click on line-between-selected-points-layer');
         e.preventDefault();
       });
 
@@ -209,7 +208,8 @@ let shapeEditorSelectRangeMixin = {
       this.map.on('contextmenu', 'point-layer', e => {
         let feature = e.features[0];
         let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
-        if (!isEditable) {
+        let isSelected = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).selected;
+        if (!isEditable || isSelected) {
           return;
         }
         // remove point
@@ -226,7 +226,8 @@ let shapeEditorSelectRangeMixin = {
       this.map.on('mouseenter', 'point-layer', e => {
         let feature = e.features[0];
         let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
-        if (isEditable) {
+        let isSelected = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).selected;
+        if (isEditable && !isSelected) {
           hoveredStops.add(feature.id);
           this.map.setFeatureState({source: 'shape-points-source', id: feature.id}, {hover: true});
           this.map.getCanvas().style.cursor = 'move';
@@ -239,7 +240,8 @@ let shapeEditorSelectRangeMixin = {
         features.forEach(feature => {
           if (feature.id) {
             let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
-            if (isEditable && feature.layer.id === 'point-layer') {
+            let isSelected = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).selected;
+            if (isEditable && feature.layer.id === 'point-layer' && !isSelected) {
               hoveredStops.add(feature.id);
               currentHoveredStops.add(feature.id);
               this.map.setFeatureState({source: 'shape-points-source', id: feature.id,}, {hover: true});
@@ -271,7 +273,8 @@ let shapeEditorSelectRangeMixin = {
         }
         let feature = eDown.features[0]
         let isEditable = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).editable;
-        if (!isEditable) {
+        let isSelected = this.map.getFeatureState({source: 'shape-points-source', id: feature.id}).selected;
+        if (!isEditable || isSelected) {
           return;
         }
         this.map.getCanvas().style.cursor = 'grab';

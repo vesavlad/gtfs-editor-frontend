@@ -178,7 +178,7 @@ export default {
           id: 1,
         }
       },
-      id: 1,
+      id: 0,
       mapMatching: false,
       warning: false,
       error: false,
@@ -229,7 +229,11 @@ export default {
       if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SELECT_RANGE) {
         this.changeToSelectRange(this.localShape);
       } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.SIMPLE) {
-        this.changeToCreate();
+        if (this.mode === this.Enums.ShapeEditorMode.CREATE) {
+          this.changeToCreate();
+        } else {
+          this.changeToEdit(this.localShape);
+        }
       } else if (this.localEditionMode === this.Enums.ShapeEditorEditionMode.DUPLICATE) {
         this.changeToDuplicate(this.localShape);
       }
@@ -466,7 +470,6 @@ export default {
       this.mapMatching = true;
       this.setSourceAndLayers();
       this.enableShapeEdition({letExtendShape: true});
-      console.log("create shape");
     },
     changeToDuplicate(shape) {
       this.localEditionMode = this.Enums.ShapeEditorEditionMode.DUPLICATE;
@@ -479,7 +482,17 @@ export default {
         this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
         this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
       });
-      this.enableShapeEdition();
+      this.enableShapeEdition({letExtendShape: true});
+    },
+    changeToEdit(shape) {
+      this.localEditionMode = this.Enums.ShapeEditorEditionMode.SIMPLE;
+      this.setShapeData(shape);
+      this.setSourceAndLayers();
+      this.points.forEach(stop => {
+        this.map.setFeatureState({source: 'shape-points-source', id: stop.id}, {editable: true});
+        this.map.setFeatureState({source: 'shape-lines-source', id: stop.id}, {editable: true});
+      });
+      this.enableShapeEdition({letExtendShape: true});
     },
     exit() {
       this.$router.push({name: 'Shapes', params: {projectId: this.projectId}});
@@ -613,8 +626,6 @@ export default {
         });
       } else {
         data.id = this.localShape.id;
-        data.points = this.fixedPoints.start.concat(this.points).concat(this.fixedPoints.finish).map(
-            generateGTFSShapePoint);
         shapesAPI.shapesAPI.put(this.projectId, data).then(() => {
           this.$router.push({name: "Shapes", params: {projectId: this.projectId}});
         }).catch(err => {
