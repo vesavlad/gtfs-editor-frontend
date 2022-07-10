@@ -72,7 +72,7 @@ export default {
         },
         paint: {
           'line-color': config.shape_line_color,
-          'line-width': 2
+          'line-width': 4
         }
       });
       this.map.addLayer({

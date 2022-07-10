@@ -99,7 +99,7 @@ export default {
         },
         'paint': {
           'line-color': config.shape_line_color,
-          'line-width': 2
+          'line-width': 4
         }
       }, 'layer-stops-icon');
       let img = require('../../assets/img/double-arrow.png')
@@ -145,14 +145,14 @@ export default {
           'circle-radius': ['interpolate', ['linear'], ['zoom'],].concat(config.stoptimes_stop_zoom),
           'circle-color': [
             'case',
-            ['get', 'selected'], '#21b0cf',
-            ['boolean', ['feature-state', 'hover'], false], '#21b0cf',
+            ['get', 'selected'], '#d67515',
+            ['boolean', ['feature-state', 'hover'], false], '#d67515',
             '#39505d'
           ],
           'circle-stroke-color': [
             'case',
-            ['boolean', ['get', 'selected'], false], '#21b0cf',
-            ['boolean', ['feature-state', 'hover'], false], '#21b0cf',
+            ['boolean', ['get', 'selected'], false], '#d67515',
+            ['boolean', ['feature-state', 'hover'], false], '#d67515',
             'white'
           ],
           'circle-stroke-opacity': 1,

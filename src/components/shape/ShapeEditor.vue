@@ -387,10 +387,10 @@ export default {
           'circle-stroke-color': [
             'case',
             ['boolean', ['feature-state', 'hover'], false], '#7DC242',
-            ['boolean', ['feature-state', 'editable'], false], '#19849C',
+            ['boolean', ['feature-state', 'editable'], false], '#d67515',
             ['boolean', ['feature-state', 'selected'], false], '#7DC242',
             ['boolean', ['feature-state', 'between'], false], '#7DC242',
-            '#19849C',
+            '#d67515',
           ],
           'circle-stroke-opacity': 1,
           'circle-stroke-width': [
@@ -416,7 +416,7 @@ export default {
         },
         'paint': {
           'line-color': config.map_matching_color,
-          'line-width': 2
+          'line-width': 4
         }
       });
 
@@ -432,10 +432,10 @@ export default {
         'paint': {
           'line-color': [
             'case',
-            ['boolean', ['feature-state', 'editable'], false], '#19849C',
+            ['boolean', ['feature-state', 'editable'], false], '#d67515',
             ['boolean', ['feature-state', 'frozen'], false], '#AAB9BE',
             ['boolean', ['feature-state', 'between'], false], '#7DC242',
-            '#19849C'
+            '#d67515'
           ],
           'line-width': [
             'case',
@@ -469,10 +469,10 @@ export default {
           paint: {
             'icon-color': [
               'case',
-              ['boolean', ['feature-state', 'editable'], false], '#19849C',
+              ['boolean', ['feature-state', 'editable'], false], '#d67515',
               ['boolean', ['feature-state', 'frozen'], false], '#AAB9BE',
               ['boolean', ['feature-state', 'between'], false], '#7DC242',
-              '#19849C'
+              '#d67515'
             ],
             'icon-halo-color': '#FFFFFF',
             'icon-halo-width': 2,
