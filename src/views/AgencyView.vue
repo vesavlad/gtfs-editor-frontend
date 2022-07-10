@@ -29,11 +29,6 @@ export default {
       url: agenciesAPI.agenciesAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'agency_id',
           sortField: 'agency_id',
           title: 'Agency ID',
@@ -84,6 +79,11 @@ export default {
           name: 'agency_email',
           title: 'E-Mail',
           type: Enums.InputType.EMAIL
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

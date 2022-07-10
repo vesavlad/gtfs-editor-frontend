@@ -9,6 +9,7 @@
     </div>
     <div class="table-content">
       <Vuetable ref="vuetable" :fields="fields" :api-url="url" data-path="results" pagination-path="pagination"
+                :perPage=30 
                 @vuetable:pagination-data="onPaginationData" :query-params="makeQueryParams" :row-class="getRowClass">
         <div slot="actions" slot-scope="props" class="grid min center">
           <button class="btn icon btn-focus" @click="$emit('focus-shape', props.rowData);shapeWithFocus=props.rowData"

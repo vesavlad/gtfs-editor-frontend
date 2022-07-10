@@ -7,11 +7,6 @@ let stopsMixin = {
     return {
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'stop_id',
           title: 'Stop ID',
           sortField: 'stop_id',
@@ -22,7 +17,6 @@ let stopsMixin = {
           name: 'stop_code',
           title: 'Code',
           sortField: 'stop_code',
-          required: true,
           type: Enums.InputType.INPUT
         },
         {
@@ -107,6 +101,11 @@ let stopsMixin = {
             url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectId),
           },
           type: Enums.InputType.FK_SELECT
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     }

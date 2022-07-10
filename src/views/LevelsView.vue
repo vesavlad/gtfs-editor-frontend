@@ -28,11 +28,6 @@ export default {
       url: levelsAPI.levelsAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'level_id',
           sortField: 'level_id',
           title: 'Level ID',
@@ -52,6 +47,11 @@ export default {
           sortField: 'level_name',
           required: true,
           type: Enums.InputType.INPUT
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

@@ -29,11 +29,6 @@ export default {
       downloadURL: pathwaysAPI.pathwaysAPI.getDownloadURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: "pathway_id",
           title: "Pathway ID",
           required: true,
@@ -85,6 +80,11 @@ export default {
           title: "Bidirectional",
           type: Enums.InputType.CHECKBOX,
           required: true,
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

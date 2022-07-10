@@ -4,7 +4,7 @@
                  :class="{disabled: [creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1}"
                  :event="[creationStatus.LOADING, creationStatus.ERROR].indexOf(status)>-1?'':'click'"
                  :to="{name: 'projectoverview', params: {projectId: project.project_id}}">
-      <EnvelopeMap :project="project" :width="347" :height="170" :enableInteraction="false"></EnvelopeMap>
+      <EnvelopeMap :project="project" :width="347" :height="250" :enableInteraction="false"></EnvelopeMap>
     </router-link>
     <div class="card-content">
       <div class="grid title">

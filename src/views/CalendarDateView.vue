@@ -28,11 +28,6 @@ export default {
       url: calendarDatesAPI.calendarDatesAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'service_id',
           sortField: 'service_id',
           title: 'Service ID',
@@ -55,6 +50,11 @@ export default {
             {name: 'Service Added', value: 1},
             {name: 'Service Removed', value: 2},
           ],
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

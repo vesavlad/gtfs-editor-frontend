@@ -29,11 +29,6 @@ export default {
       url: frequenciesAPI.frequenciesAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'trip_id',
           title: 'Trip',
           sortField: 'trip_id',
@@ -74,6 +69,11 @@ export default {
             {name: 'Yes', value: 1},
             {name: 'No', value: 0},
           ],
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

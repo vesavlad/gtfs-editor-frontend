@@ -29,11 +29,6 @@ export default {
       url: fareAttributesAPI.fareAttributesAPI.getFullBaseURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'fare_id',
           sortField: 'fare_id',
           title: 'Fare ID',
@@ -92,6 +87,11 @@ export default {
           title: 'Duration [s]',
           required: true,
           type: Enums.InputType.NUMBER,
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

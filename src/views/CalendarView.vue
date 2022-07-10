@@ -32,11 +32,6 @@ export default {
       days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'service_id',
           sortField: 'service_id',
           title: 'Service ID',
@@ -121,6 +116,11 @@ export default {
           inputConfig: {
             transformLabel: (title) => title.toLowerCase().substring(0,3)
           }
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

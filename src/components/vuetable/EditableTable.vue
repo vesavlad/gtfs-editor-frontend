@@ -26,13 +26,14 @@
         <vuetable ref="vuetable" :api-url="url" :multi-sort="true"
                   :fields="getFieldsWithVisibility()" data-path="results"
                   pagination-path="pagination" @vuetable:pagination-data="onPaginationData"
+                  :perPage=30 
                   :query-params="makeQueryParams" :row-class="getRowClass" :transform="transformData" :css="css"
                   @vuetable:load-success="updateTotalDataLabel">
           <template slot="tableHeader">
             <VuetableRowHeader></VuetableRowHeader>
           </template>
           <div slot="actions" slot-scope="props" class="grid min center">
-            <button class="btn icon flat" @click="setActiveRow(props.rowData)">
+            <button class="btn icon flat warning" @click="setActiveRow(props.rowData)">
               <span class="material-icons">edit</span>
             </button>
             <button class="btn icon flat error" @click="beginDeleteRow(props.rowData)">

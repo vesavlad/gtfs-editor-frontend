@@ -34,11 +34,6 @@ export default {
       downloadURL: routesAPI.routesAPI.getDownloadURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'route_id',
           title: 'Route ID',
           sortField: 'route_id',
@@ -111,6 +106,11 @@ export default {
           remember_creation_value: true,
           sortField: 'route_text_color',
           type: Enums.InputType.COLOR
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ]
     };

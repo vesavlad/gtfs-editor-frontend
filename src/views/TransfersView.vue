@@ -29,11 +29,6 @@ export default {
       downloadURL: transfersAPI.transfersAPI.getDownloadURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'type',
           title: 'Type',
           required: true,
@@ -75,6 +70,11 @@ export default {
           name: 'min_transfer_time',
           title: 'Min Transfer Time',
           type: Enums.InputType.NUMBER
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

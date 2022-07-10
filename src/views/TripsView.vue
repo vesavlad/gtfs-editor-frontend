@@ -36,11 +36,6 @@ export default {
       downloadURL: tripsAPI.tripsAPI.getDownloadURL(this.$route.params.projectId),
       fields: [
         {
-          name: 'actions',
-          title: this.$i18n.t('vuetable.actions'),
-          type: null
-        },
-        {
           name: 'trip_id',
           title: 'Trip',
           sortField: 'trip_id',
@@ -92,8 +87,8 @@ export default {
           type: Enums.InputType.SIMPLE_SELECT,
           options: [
             {name: 'N/A', value: null},
-            {name: 'Going', value: 0},
-            {name: 'Back', value: 1}
+            {name: 'Onwards', value: 0},
+            {name: 'Return', value: 1}
           ],
         },
         {
@@ -125,6 +120,11 @@ export default {
             {name: 'Yes', value: 1},
             {name: 'No', value: 2},
           ],
+        },
+        {
+          name: 'actions',
+          title: this.$i18n.t('vuetable.actions'),
+          type: null
         },
       ],
     };

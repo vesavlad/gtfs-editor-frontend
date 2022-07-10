@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="body">
     <header>
-      <div class="container full grid">
+      <div class="container grid">
         <div class="logo">
           <router-link :to="{name: 'myprojects'}">
             <img src="@/assets/img/logo.svg"/>
